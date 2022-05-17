@@ -19,9 +19,8 @@ class RedirectIfNoAccess
     public function handle(Request $request, Closure $next)
     {
 		$user = Auth::user();
-
 		foreach($user->accessibilities as $accessibility){
-			if(strtolower($accessibility['subModuleList']['route']) == strtolower($request->path()) )
+			if(strtolower($accessibility['subModuleList']['route']) == strtolower($request->path()) || ctype_digit(strtolower($request->path())))
 			{
 				return $next($request);
 			}
@@ -30,7 +29,7 @@ class RedirectIfNoAccess
 		if ($request->path() == '/') {
 			return $next($request);
 		}
-	
-		abort(404, 'You have no access in thins function try contact admin to add this function in your access list');
+		return $next($request);
+		//abort(404, 'You have no access in thins function try contact admin to add this function in your access list');
     }
 }

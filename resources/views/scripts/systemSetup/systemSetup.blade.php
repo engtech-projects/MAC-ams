@@ -4,6 +4,8 @@
 		if(sessionStorage.clickNavId)
 		{
 			$('#'+sessionStorage.clickNavId).click();
+		}else{
+			$('#v-pills-CompanySettings-tab').click();
 		}
 		$(document).on('click','.sysnav',function(e){
 			e.preventDefault();
@@ -13,7 +15,6 @@
 			} else {
 				alert("Sorry, your browser does not support Web Storage...");
 			}
-
 		});
 		$(document).on('click','.SearchName',function(e){
 			e.preventDefault();
