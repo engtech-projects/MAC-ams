@@ -18,18 +18,24 @@ class RedirectIfNoAccess
      */
     public function handle(Request $request, Closure $next)
     {
+		$isNumeric = false;
+		foreach(explode('/',strtolower($request->path())) as $value)
+		{
+			if(is_numeric($value))
+			{
+				$isNumeric = true;
+			}
+		}
 		$user = Auth::user();
 		foreach($user->accessibilities as $accessibility){
-			if(strtolower($accessibility['subModuleList']['route']) == strtolower($request->path()) || ctype_digit(strtolower($request->path())))
+			if(strtolower($accessibility['subModuleList']['route']) == strtolower($request->path()) || $isNumeric)
 			{
 				return $next($request);
 			}
 		}
-
 		if ($request->path() == '/') {
 			return $next($request);
 		}
-		return $next($request);
-		//abort(404, 'You have no access in thins function try contact admin to add this function in your access list');
+		abort(404, 'You have no access in thins function try contact admin to add this function in your access list');
     }
 }

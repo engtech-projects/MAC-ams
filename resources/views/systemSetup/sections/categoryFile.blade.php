@@ -1,15 +1,16 @@
-<form action="{{route('SystemSetupController.currency.update')}}" method="post">
+<form id="categoryFileForm" method="post">
 	@csrf
+	<input type="hidden" class="form-control form-control-sm rounded-0" name="catId" id="catId"  placeholder="" >
 	<div class="row">
 		<div class="col-md-12 frm-header">
-			<h3 class="card-title"><b>Category File Settings</b></h3>
+			<h3 class="card-title"><b>Subsidiary Category File Settings</b></h3>
 		</div>
 		<div class="col-md-4 col-xs-12">
 			<div class="box">
 				<div class="form-group">
-					<label class="label-normal" for="currency">Code</label>
+					<label class="label-normal" for="sub_cat_code">Subsidiary Category Code</label>
 					<div class="input-group">
-						<input type="text" class="form-control form-control-sm rounded-0" name="Code1" id="Code"  placeholder="Code" required>
+						<input type="text" class="form-control form-control-sm rounded-0" name="sub_cat_code" id="sub_cat_code"  placeholder="Category Code" required>
 					</div>
 				</div>
 			</div>
@@ -17,118 +18,37 @@
 		<div class="col-md-4 col-xs-12">
 			<div class="box">
 				<div class="form-group">
-					<label class="label-normal" for="Category">Category</label>
+					<label class="label-normal" for="sub_cat_name">Subsidiary Category Name</label>
 					<div class="input-group">
-						<input type="text" class="form-control form-control-sm rounded-0" name="Category" id="Category"  placeholder="Category" required>
+						<input type="text" class="form-control form-control-sm rounded-0" name="sub_cat_name" id="sub_cat_name"  placeholder="Category Name" required>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="col-md-12">
-			<!-- Table -->
-			<section class="content">
-				<div class="container-fluid">
-					<div class="row">
-						<table id="categoryFileTbl" class="table table-bordered">
-							<thead>
-								<th width="20%">Code</th>
-								<th width="62%">Category</th>
-								<th width="13%">Action</th>
-							</thead>
-							<tbody>
-								<tr>
-									<td class="font-weight-bold">10001-ButuanCity</td>
-									<td>10001-ButuanCityCateogry</td>
-									<td>
-										<div class="row">
-											<div class="col-md-4">
-												<button class="btn btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-											</div>
-											<div class="col-md-4">
-												<button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-											</div>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td class="font-weight-bold">10001-ButuanCity</td>
-									<td>10001-ButuanCityCateogry</td>
-									<td>
-										<div class="row">
-											<div class="col-md-4">
-												<button class="btn btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-											</div>
-											<div class="col-md-4">
-												<button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-											</div>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td class="font-weight-bold">10001-ButuanCity</td>
-									<td>10001-ButuanCityCateogry</td>
-									<td>
-										<div class="row">
-											<div class="col-md-4">
-												<button class="btn btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-											</div>
-											<div class="col-md-4">
-												<button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-											</div>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td class="font-weight-bold">10001-ButuanCity</td>
-									<td>10001-ButuanCityCateogry</td>
-									<td>
-										<div class="row">
-											<div class="col-md-4">
-												<button class="btn btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-											</div>
-											<div class="col-md-4">
-												<button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-											</div>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td class="font-weight-bold">10001-ButuanCity</td>
-									<td>10001-ButuanCityCateogry</td>
-									<td>
-										<div class="row">
-											<div class="col-md-4">
-												<button class="btn btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-											</div>
-											<div class="col-md-4">
-												<button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-											</div>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td class="font-weight-bold">10001-ButuanCity</td>
-									<td>10001-ButuanCityCateogry</td>
-									<td>
-										<div class="row">
-											<div class="col-md-4">
-												<button class="btn btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-											</div>
-											<div class="col-md-4">
-												<button class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-											</div>
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
+		<div class="col-md-4 col-xs-12">
+			<div class="box">
+				<div class="form-group">
+					<label class="label-normal" for="sub_cat_type">Subsidiary Category Type</label>
+					<div class="input-group">
+						<input type="text" class="form-control form-control-sm rounded-0" name="sub_cat_type" id="sub_cat_type"  placeholder="Category Type" required>
 					</div>
 				</div>
-			</section>
-			<!-- /.Table -->
+			</div>
 		</div>
-		<div class="col-md-12 col-xs-12 ">
+
+		<div class="col-md-12 col-xs-12">
+			<div class="box">
+				<div class="form-group">
+					<label class="label-normal" for="sub_cat_type">Description</label>
+					<div class="input-group">
+						<textarea type="text" class="form-control form-control-sm rounded-0" name="cat_description" id="cat_description"  placeholder="Category Type"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12 col-xs-12" style="padding-bottom:20px;">
 			<div class="col-md-4">
 				<div class="box">
 					<label class="label-normal" for="">&nbsp;</label>
@@ -138,5 +58,47 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="col-md-12">
+			<!-- Table -->
+			<section class="content">
+				<div class="container-fluid">
+					<div class="col-md-12">
+						<table id="categoryFileTbl" class="table table-bordered">
+							<thead>
+								<th  width="15%">Category Code</th>
+								<th>Category Name</th>
+								<th>Category Type</th>
+								<th>Description</th>
+								<th width="13%">Action</th>
+							</thead>
+							<tbody>
+								@foreach($subsidiaryCategories as $subsidiaryCategory)
+								<tr>
+									<td class="font-weight-bold">{{$subsidiaryCategory->sub_cat_code}}</td>
+									<td>{{$subsidiaryCategory->sub_cat_name}}</td>
+									<td>{{$subsidiaryCategory->sub_cat_type}}</td>
+									<td>{{$subsidiaryCategory->description}}</td>
+									<td>
+										<div class="row">
+											<div class="col-md-4">
+												<button value="{{$subsidiaryCategory->sub_cat_id}}" vType="edit" class="btn btn-categoryA btn-info btn-sm"><i class="fa  fa-pen"></i></button>
+											</div>
+											<div class="col-md-4">
+												<button value="{{$subsidiaryCategory->sub_cat_id}}" vType="delete" class="btn btn-categoryA btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+											</div>
+										</div>
+									</td>
+								</tr>
+								@endforeach
+								
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</section>
+			<!-- /.Table -->
+		</div>
+		
 	</div>
 </form>

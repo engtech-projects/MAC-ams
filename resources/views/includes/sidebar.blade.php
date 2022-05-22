@@ -10,7 +10,7 @@
 		<!-- Sidebar user (optional) -->
 		<div class="user-panel mt-3 pb-3 mb-3 d-flex">
 			<div class="image">
-				<img src="{{ asset('img/img_temp.png') }}" class="img-circle elevation-2" alt="User Image">
+				<img src="{{ asset('img/default_user.fw.png') }}" class="img-circle elevation-2" alt="User Image">
 			</div>
 			<div class="info">
 				<a href="#" class="d-block">{{ ucwords(Auth::user()->username) }}</a>
@@ -129,14 +129,74 @@
 			</li>
 			@endif
 
-			@if(checkUserHasAccessModule('module','Reports'))
-			<li class="nav-item">
-			<a href="{{route('employees')}}" class="nav-link">
-				<i class="nav-icon fas fa-list-ul"></i>
+			@if(checkUserHasAccessModule('module','reports'))
+			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/subsidiaryledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition')  ) ? 'menu-open' : '' }}">
+			<a href="{{ route('sales') }}" class="nav-link {{  (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">
+				<i class="nav-icon fas fa-chart-line"></i>
 				<p>
 				Reports
+				<i class="right fas fa-angle-left"></i>
 				</p>
 			</a>
+			<ul class="nav nav-treeview">
+				@if(checkUserHasAccessModule('sub-module','reports/subsidiaryledger'))
+				<li class="nav-item">
+				<a href="{{ route('reports.subsidiaryledger') }}" class="nav-link {{ (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>Subsidiary Ledger</p>
+				</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','reports/generalLedger'))
+				<li class="nav-item">
+				<a href="{{ route('reports.generalLedger') }}" class="nav-link {{ (request()->is('reports/generalLedger')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>General Ledger</p>
+				</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','reports/trialBalance'))
+				<li class="nav-item">
+				<a href="{{ route('reports.trialBalance') }}" class="nav-link {{ (request()->is('reports/trialBalance')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>Trial Balance</p>
+				</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','reports/incomeStatement'))
+				<li class="nav-item">
+				<a href="{{ route('reports.incomeStatement') }}" class="nav-link {{ (request()->is('reports/incomeStatement')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>Subsidiary Ledger</p>
+				</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','reports/bankReconcillation'))
+				<li class="nav-item">
+				<a href="{{ route('reports.bankReconcillation') }}" class="nav-link {{ (request()->is('reports/bankReconcillation')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>Bank Reconcillation</p>
+				</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','reports/cashPosition'))
+				<li class="nav-item">
+				<a href="{{ route('reports.cashPosition') }}" class="nav-link {{ (request()->is('reports/cashPosition')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>Cash Position</p>
+				</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','reports/cashTransactionBlotter'))
+				<li class="nav-item">
+				<a href="{{ route('reports.cashTransactionBlotter') }}" class="nav-link {{ (request()->is('reports/cashTransactionBlotter')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>Cash Tranasction Blotter</p>
+				</a>
+				</li>
+				@endif
+			
+			</ul>
 			</li>
 			@endif
 

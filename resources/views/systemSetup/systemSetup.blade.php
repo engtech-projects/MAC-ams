@@ -32,18 +32,21 @@
 		font-weight:bold;
 		font-size:14px;
 	}
+	.dataTables_filter{
+		float:right!important;
+	}
 </style>
 
 <!-- Main content -->
 <section class="content">
   <div class="container-fluid">
 	<div class="row">
-		<div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
-				<div class="spacer" style="margin-top:20px;"></div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="spacer" style="margin-top:10px;"></div>
 				<div class="card">
 					<div class="row">
-						<div class="card-body">
-							<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+						<div class="card-body" style="padding:0.4em;">
+							<div class="nav  nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 								@if(checkUserHasAccessModule('sub-module','companySettings'))
 								<a class="nav-link sysnav" id="v-pills-CompanySettings-tab" data-toggle="pill" href="#v-pills-CompanySettings" role="tab" aria-controls="v-pills-CompanySettings" aria-selected="false"><i class="nav-icon fas fa-building"></i> Company Settings</a>
 								@endif
@@ -62,15 +65,17 @@
 								@if(checkUserHasAccessModule('sub-module','currency'))
 								<a class="nav-link sysnav" id="v-pills-Currency-tab" data-toggle="pill" href="#v-pills-Currency" role="tab" aria-controls="v-pills-Currency" aria-selected="false"><i class="nav-icon fas fa-dollar-sign"></i> Currency</a>
 								@endif
+								@if(checkUserHasAccessModule('sub-module','subsidiary'))
+								<a class="nav-link sysnav" id="v-pills-Subsidiary-tab" data-toggle="pill" href="#v-pills-Subsidiary" role="tab" aria-controls="v-pills-Subsidiary" aria-selected="false"><i class="nav-icon fas fa-users"></i> Subsidiary Ledger</a>
+								@endif
 							</div>
 						</div>
 					</div>
 				</div>
 				<!-- /.card -->
 		</div>
-		<div class="col-lg-10 col-md-9 col-sm-8 col-xs-12">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<!-- Default box -->
-			<div class="spacer" style="margin-top:20px;"></div>
 			<div class="card">
 				<div class="card-body">
 					<div class="tab-content" id="v-pills-tabContent">
@@ -92,12 +97,15 @@
 						<div class="tab-pane fade" id="v-pills-Currency" role="tabpanel" aria-labelledby="v-pills-Currency-tab">
 							@include('systemSetup.sections.currency')
 						</div>
+						<div class="tab-pane fade" id="v-pills-Subsidiary" role="tabpanel" aria-labelledby="v-pills-Currency-tab">
+							@include('systemSetup.sections.subsidiary')
+						</div>
 					</div>
 				</div>
 			</div>
 			<!-- /.card -->
 		</div>
-		</div>
+	</div>
   </div>
 </section>
 <!-- /.content -->

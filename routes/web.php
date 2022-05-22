@@ -13,6 +13,7 @@ use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ProductsServicesController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SystemSetupController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\GeneralSettingsController;
 use App\Http\Controllers\UserProfileController;
 
@@ -93,6 +94,15 @@ Route::post('systemSetup/general/usermasterfile/createOrUpdateAccessibility', [S
 Route::get('systemSetup/general/usermasterfile/searchAccount', [SystemSetupController::class, 'searchAccount'])->name('SystemSetupController.usermasterfile.searchAccount');
 Route::get('systemSetup/general/usermasterfile/fetchInfo', [SystemSetupController::class, 'fetchInfo'])->name('SystemSetupController.usermasterfile.fetchInfo');
 
+Route::post('systemSetup/general/journalBook/createOrUpdate', [SystemSetupController::class, 'journalBookCreateOrUpdate'])->name('SystemSetupController.journalBook.createOrUpdate');
+Route::get('systemSetup/general/journalBook/fetchBookInfo', [SystemSetupController::class, 'fetchBookInfo'])->name('SystemSetupController.journalBook.fetchBookInfo');
+Route::get('systemSetup/general/journalBook/deleteBook', [SystemSetupController::class, 'deleteBook'])->name('SystemSetupController.journalBook.deleteBook');
+
+Route::post('systemSetup/general/categoryFile/createOrUpdate', [SystemSetupController::class, 'categoryFileCreateOrUpdate'])->name('SystemSetupController.categoryFile.createOrUpdate');
+Route::get('systemSetup/general/categoryFile/fetchCategoryInfo', [SystemSetupController::class, 'fetchCategoryInfo'])->name('SystemSetupController.categoryFile.fetchCategoryInfo');
+Route::get('systemSetup/general/categoryFile/deleteCategory', [SystemSetupController::class, 'deleteCategoryFile'])->name('SystemSetupController.categoryFile.deleteCategory');
+
+
 Route::post('systemSetup/general/company/update', [SystemSetupController::class, 'companyUpdate'])->name('SystemSetupController.company.update');
 Route::post('systemSetup/general/accounting/update', [SystemSetupController::class, 'accountingUpdate'])->name('SystemSetupController.accounting.update');
 Route::post('systemSetup/general/currency/update', [SystemSetupController::class, 'currencyUpdate'])->name('SystemSetupController.currency.update');
@@ -108,6 +118,17 @@ Route::post('sales/store', [SalesController::class, 'store'])->name('sales.store
 Route::post('sales-datatable', [SalesController::class, 'populate'])->name('sales.populate');
 Route::get('getsales', [SalesController::class, 'load'])->name('sales.load');
 Route::get('sales/invoice', [SalesController::class, 'invoice'])->name('sales.invoice');
+
+
+//reports 
+Route::get('reports/subsidiaryledger', [ReportsController::class, 'subsidiaryLedger'])->name('reports.subsidiaryledger');
+Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');
+Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
+Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
+Route::get('reports/bankReconcillation', [ReportsController::class, 'bankReconcillation'])->name('reports.bankReconcillation');
+Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
+Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
+
 
 // payment
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');

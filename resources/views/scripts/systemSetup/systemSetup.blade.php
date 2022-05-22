@@ -1,6 +1,9 @@
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	(function ($) {
+		$('form').attr('autocomplete','off');
+		var journalBookTbl = $('#journalBookTble').DataTable();
+		var categoryFileTbl = $('#categoryFileTbl').DataTable();
 		if(sessionStorage.clickNavId)
 		{
 			$('#'+sessionStorage.clickNavId).click();
@@ -66,6 +69,8 @@
 			}
 		
 		});
+
+		
 		$(document).on('submit','#userMasterFileForm',function(e){
 			e.preventDefault();
 			var datastring = $(this).serialize();
@@ -88,6 +93,192 @@
 					console.log("Error");
 				}
 			});
+		});
+
+		$(document).on('submit','#bookJournalForm',function(e){
+			e.preventDefault();
+			var datastring = $(this).serialize();
+			$.ajax({
+				type: "POST",
+				url: "{{ route('SystemSetupController.journalBook.createOrUpdate')}}",
+				data: datastring,
+				dataType: "json",
+				success: function(result) {
+					if(result.status == 'create'){
+						toastr.success('Successfully Create');
+					}else if(result.status == 'update'){
+						toastr.success('Successfully Update');
+						journalBookTbl.row($("button[value ='"+result.book_id+"']").parents('tr'))
+							.remove().draw();
+							$('#bookId').val('');
+					}else{
+						toastr.error(result.message);
+					}
+					if(result.status == 'create' || result.status == 'update')
+					{
+						journalBookTbl.row.add([
+							$('#book_code').val(),
+							$('#book_name').val(),
+							$('#book_src').val(),
+							$('#book_ref').val(),
+							$('#book_flag').val(),
+							$('#book_head').val(),
+							`<div class="row">
+								<div class="col-md-4">
+									<button value="${result.book_id}" vtype="edit" class="btn btn-bookA btn-info btn-sm"><i class="fa  fa-pen"></i></button>
+								</div>
+								<div class="col-md-4">
+									<button value="${result.book_id}" vtype="delete" class="btn btn-bookA btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+								</div>
+							</div>`
+						]).draw().node();
+						$('#bookJournalForm')[0].reset();
+					}
+				},
+				error: function() {
+					console.log("Error");
+				}
+			});
+		});	
+		$(document).on('submit', '#categoryFileForm', function(e){
+			e.preventDefault();
+			var datastring = $(this).serialize();
+			$.ajax({
+				type: "POST",
+				url: "{{ route('SystemSetupController.categoryFile.createOrUpdate')}}",
+				data: datastring,
+				dataType: "json",
+				success: function(result) {
+					if(result.status == 'create'){
+						toastr.success('Successfully Create');
+					}else if(result.status == 'update'){
+						toastr.success('Successfully Update');
+						categoryFileTbl.row($("button[value ='"+result.sub_cat_id+"']").parents('tr'))
+							.remove().draw();
+							$('#catId').val('');
+					}else{
+						toastr.error(result.message);
+					}
+					if(result.status == 'create' || result.status == 'update')
+					{
+						categoryFileTbl.row.add([
+							$('#sub_cat_code').val(),
+							$('#sub_cat_name').val(),
+							$('#sub_cat_type').val(),
+							$('#cat_description').val(),
+							`<div class="row">
+								<div class="col-md-4">
+									<button value="${result.sub_cat_id}" vtype="edit" class="btn btn-categoryA btn-info btn-sm"><i class="fa  fa-pen"></i></button>
+								</div>
+								<div class="col-md-4">
+									<button value="${result.sub_cat_id}" vtype="delete" class="btn btn-categoryA btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+								</div>
+							</div>`
+						]).draw().node();
+						$('#categoryFileForm')[0].reset();
+					}
+				},
+				error: function() {
+					console.log("Error");
+				}
+			});
+		});
+
+		$(document).on('click', '.btn-categoryA', function(e){
+			e.preventDefault();
+			var type = $(this).attr('vtype');
+			var id = $(this).attr('value');
+
+			if(type === 'edit')
+			{
+				$.ajax({
+					type: "GET",
+					url: "{{ route('SystemSetupController.categoryFile.fetchCategoryInfo')}}",
+					data: {catId : id},
+					dataType: "json",
+					success: function(data) {
+						if(data)
+						{
+							$('#catId').val(data[0].sub_cat_id);
+							$('#sub_cat_code').val(data[0].sub_cat_code);
+							$('#sub_cat_name').val(data[0].sub_cat_name);
+							$('#sub_cat_type').val(data[0].sub_cat_type);
+							$('#cat_description').val(data[0].description);
+						}
+					},
+					error: function() {
+						console.log("Error");
+					}
+				});
+			}else if(type === 'delete'){
+				if (confirm("Are You Sure want to delete this Category ?")) {
+					$.ajax({
+						type: "GET",
+						url: "{{ route('SystemSetupController.categoryFile.deleteCategory')}}",
+						data: {catId: id},
+						dataType: "json",
+						success: function(data) {
+							if(data){
+								toastr.success('Subsidiary Category Successfully Remove');
+								categoryFileTbl.row($("button[value ='"+id+"']").parents('tr'))
+								.remove().draw();
+							}
+						},
+						error: function() {
+							console.log("Error");
+						}
+					});
+				} 
+			}
+		})
+		$(document).on('click','.btn-bookA', function(e){
+			e.preventDefault();
+			var type = $(this).attr('vtype');
+			var id = $(this).attr('value');
+			if(type === 'edit')
+			{
+				$.ajax({
+					type: "GET",
+					url: "{{ route('SystemSetupController.journalBook.fetchBookInfo')}}",
+					data: {bookId : id},
+					dataType: "json",
+					success: function(data) {
+						if(data)
+						{
+							$('#bookId').val(data[0].book_id);
+							$('#book_code').val(data[0].book_code);
+							$('#book_name').val(data[0].book_name);
+							$('#book_src').val(data[0].book_src);
+							$('#book_ref').val(data[0].book_ref);
+							$('#book_flag').val(data[0].book_flag);
+							$('#book_head').val(data[0].book_head);
+						}
+					},
+					error: function() {
+						console.log("Error");
+					}
+				});
+			}else if(type === 'delete')
+			{
+				if (confirm("Are You Sure want to delete this Book ?")) {
+					$.ajax({
+						type: "GET",
+						url: "{{ route('SystemSetupController.journalBook.deleteBook')}}",
+						data: {bookId: id},
+						dataType: "json",
+						success: function(data) {
+							if(data){
+								toastr.success('Book Successfully Remove');
+								journalBookTbl.row($("button[value ='"+id+"']").parents('tr'))
+								.remove().draw();
+							}
+						},
+						error: function() {
+							console.log("Error");
+						}
+					});
+				} 
+			}
 		});
 		$('#searchBarUser').keyup(function(e){
 			var value = $(this).val();

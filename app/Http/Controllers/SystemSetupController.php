@@ -9,6 +9,8 @@ use App\Models\Currency;
 use App\Models\Accounting;
 use App\Models\User;
 use App\Models\PersonalInfo;
+use App\Models\JournalBook;
+use App\Models\SubsidiaryCategory;
 use App\Models\Accessibilities;
 use App\Models\AccessList;
 use Carbon\Carbon;
@@ -27,6 +29,8 @@ class SystemSetupController extends MainController
 			'nav' 		=> ['settings', 'general'],
 			'company' 	=> Company::with('address')->first(),
 			'accessLists' => AccessList::with('subModuleList')->get(),
+			'journalBookList' => JournalBook::get(),
+			'subsidiaryCategories' => SubsidiaryCategory::get(),
 			'currencies' => Currency::all(),
 			'accounting' => Accounting::first()
 		]);
@@ -81,6 +85,52 @@ class SystemSetupController extends MainController
 		return redirect(route('systemSetup'));
 	}
 
+
+	public function journalBookCreateOrUpdate(Request $request)
+	{
+		$book_id = $request->bookId;
+		if(count(JournalBook::where('book_code',$request->book_code)->get()) > 0)
+		{
+			return json_encode(['status' => 'error', 'message'=> 'Book Code Already Exist']);
+		}
+
+		if($book_id == '')
+		{
+			$book = new JournalBook;
+			$book->book_code = $request->book_code;
+			$book->book_name = $request->book_name;
+			$book->book_src = $request->book_src;
+			$book->book_ref = $request->book_ref;
+			$book->book_flag = $request->book_head;
+			$book->book_head = $request->book_flag;
+			$book->save();
+
+			return json_encode(['status' => 'create', 'book_id'=> $book->book_id]);
+
+		}else{
+			$book = JournalBook::find($book_id);
+			$book->book_code = $request->book_code;
+			$book->book_name = $request->book_name;
+			$book->book_src = $request->book_src;
+			$book->book_ref = $request->book_ref;
+			$book->book_flag = $request->book_head;
+			$book->book_head = $request->book_flag;
+			$book->save();
+			return json_encode(['status' => 'update', 'book_id'=> $book->book_id]);
+		}
+	}
+
+	public function fetchBookInfo(Request $request)
+	{
+		$book_id = $request->bookId;
+		return json_encode(JournalBook::where('book_id',$book_id)->get());
+	}
+	public function deleteBook(Request $request)
+	{
+		$book_id = $request->bookId;
+		return json_encode(JournalBook::find($book_id)->delete());
+	}
+
 	public function userMasterFileCreateOrUpdate(Request $request)
 	{
 		$user_id = $request->userId;
@@ -123,6 +173,50 @@ class SystemSetupController extends MainController
 			return json_encode('update');
 		}
 	}
+	public function categoryFileCreateOrUpdate(Request $request)
+	{
+		$cat_id = $request->catId;
+		if(count(SubsidiaryCategory::where('sub_cat_id',$request->cat_id)->get()) > 0)
+		{
+			return json_encode(['status' => 'error', 'message'=> 'Category File Code Already Exist']);
+		}
+
+		if($cat_id == '')
+		{
+			$cat = new SubsidiaryCategory;
+			$cat->sub_cat_code = $request->sub_cat_code;
+			$cat->sub_cat_name = $request->sub_cat_name;
+			$cat->sub_cat_type = $request->sub_cat_type;
+			$cat->description = $request->cat_description;
+
+			$cat->save();
+
+			return json_encode(['status' => 'create', 'sub_cat_id'=> $cat->sub_cat_id]);
+
+		}else{
+			$cat = SubsidiaryCategory::find($cat_id);
+			$cat->sub_cat_code = $request->sub_cat_code;
+			$cat->sub_cat_name = $request->sub_cat_name;
+			$cat->sub_cat_type = $request->sub_cat_type;
+			$cat->description = $request->cat_description;
+
+			$cat->save();
+			return json_encode(['status' => 'update', 'sub_cat_id'=> $cat->sub_cat_id]);
+		}
+	}
+
+	public function fetchCategoryInfo(Request $request)
+	{
+		$cat_id = $request->catId;
+		return json_encode(SubsidiaryCategory::where('sub_cat_id',$cat_id)->get());
+	}
+
+	public function deleteCategoryFile(Request $request)
+	{
+		$cat_id = $request->catId;
+		return json_encode(SubsidiaryCategory::find($cat_id)->delete());	
+	}
+
 	public function userMasterFileCreateOrUpdateAccessibility(Request $request)
 	{
 		if(Accessibilities::where(['user_id'=>$request->user_id,'sml_id'=>$request->sml_id])->count() > 0)
