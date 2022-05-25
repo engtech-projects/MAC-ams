@@ -3,20 +3,7 @@
 @section('content')
 
 <style type="text/css">
-	.dataTables_filter {
-		float: left !important;
-	}
-	.nav-pills .nav-link.active, .nav-pills .show>.nav-link{
-		background-color: #3d9970!important;
-  		color: #fff!important;
-		border-radius:0px;
-	}
-	.nav-link:hover, .nav-link:focus{
-		background-color: #4ec891!important;
-  		color: #fff!important;
-		border-radius:0px;
-		
-	}
+
 	.frm-header{
 		margin-bottom:10px;
 		padding-bottom:10px;

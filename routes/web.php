@@ -141,6 +141,9 @@ Route::post('payment/store', [PaymentController::class, 'store'])->name('payment
 // journal
 Route::get('journal', [JournalController::class, 'create'])->name('journal.create');
 Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
+Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
+Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
+
 
 // User Profile
 Route::get('user/profile', [UserProfileController::class, 'index'])->name('user.profile');

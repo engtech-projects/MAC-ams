@@ -28,10 +28,12 @@
   <!-- /.login-logo -->
   <div class="card card-outline">
     <div class="card-header text-center">
-      <a href="#" class="h1"><b>Just</b>Accounting</a>
+	  <div class="col-md-12">
+	  	<img src="{{ asset('img/mac_logo.fw.png') }}" alt="mac_logo" class="img img-responsive">
+	  </div>
     </div>
     <div class="card-body">
-      <p class="login-box-msg" style="font-size: 20px;">Sign In</p>
+      <p class="login-box-msg" style="font-size: 1.5rem;"><b>Login</b></p>
      
       <form method="POST" action="{{ route('login.user') }}">
         @csrf

@@ -48,6 +48,26 @@ class JournalController extends MainController
 
  	}
 
+	public function journalEntry(Request $request)
+	{
+		$data = [
+			'title' => 'Journal Entry',
+			'trialbalanceList' => ''
+		];
+
+	    return view('journal.sections.journalEntry', $data);
+	}
+
+	public function journalEntryList(Request $request)
+	{
+		$data = [
+			'title' => 'Journal Entry List',
+			'journalEntryList' => ''
+		];
+
+	    return view('journal.sections.journalEntryList', $data);
+	}
+
  	public function show($id) {}
  	public function populate() {}
 

@@ -58,7 +58,7 @@ class ReportsController extends MainController
 			'trialbalanceList' => ''
 		];
 
-	    return view('reports.sections.trialBalance', $data);
+	    return view('reports.sections.incomeStatement', $data);
 	}
 
 	public function bankReconcillation()

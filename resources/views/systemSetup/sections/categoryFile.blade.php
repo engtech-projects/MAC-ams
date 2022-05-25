@@ -3,12 +3,12 @@
 	<input type="hidden" class="form-control form-control-sm rounded-0" name="catId" id="catId"  placeholder="" >
 	<div class="row">
 		<div class="col-md-12 frm-header">
-			<h3 class="card-title"><b>Subsidiary Category File Settings</b></h3>
+			<h3 class="card-title"><b> Category File Settings</b></h3>
 		</div>
 		<div class="col-md-4 col-xs-12">
 			<div class="box">
 				<div class="form-group">
-					<label class="label-normal" for="sub_cat_code">Subsidiary Category Code</label>
+					<label class="label-normal" for="sub_cat_code"> Category Code</label>
 					<div class="input-group">
 						<input type="text" class="form-control form-control-sm rounded-0" name="sub_cat_code" id="sub_cat_code"  placeholder="Category Code" required>
 					</div>
@@ -18,7 +18,7 @@
 		<div class="col-md-4 col-xs-12">
 			<div class="box">
 				<div class="form-group">
-					<label class="label-normal" for="sub_cat_name">Subsidiary Category Name</label>
+					<label class="label-normal" for="sub_cat_name"> Category Name</label>
 					<div class="input-group">
 						<input type="text" class="form-control form-control-sm rounded-0" name="sub_cat_name" id="sub_cat_name"  placeholder="Category Name" required>
 					</div>
@@ -29,7 +29,7 @@
 		<div class="col-md-4 col-xs-12">
 			<div class="box">
 				<div class="form-group">
-					<label class="label-normal" for="sub_cat_type">Subsidiary Category Type</label>
+					<label class="label-normal" for="sub_cat_type"> Category Type</label>
 					<div class="input-group">
 						<input type="text" class="form-control form-control-sm rounded-0" name="sub_cat_type" id="sub_cat_type"  placeholder="Category Type" required>
 					</div>

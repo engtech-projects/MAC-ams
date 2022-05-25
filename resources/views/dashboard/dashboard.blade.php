@@ -2,6 +2,28 @@
 
 @section('content')
 <!-- Main content -->
+<style type="text/css">
+
+	.frm-header{
+		margin-bottom:10px;
+		padding-bottom:10px;
+		border-bottom:2px solid #4ec891;
+	}
+	.search-custom{
+		display:block;
+		position:absolute;
+		z-index:999;
+		width:100%;
+		margin:0px!important;
+		color:#3d9970!;
+		font-weight:bold;
+		font-size:14px;
+	}
+	.dataTables_filter{
+		float:right!important;
+	}
+</style>
+
 <section class="content">
   <div class="container-fluid">
     <div class="row">
