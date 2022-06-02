@@ -1,7 +1,7 @@
 <script type="text/javascript">
 (function ($) {
   'use strict'
-
+  $('form').attr('autocomplete','off');
     var Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -11,10 +11,7 @@
 
     // accounts datatable
     var accountsTable = new toDataTable();
-    accountsTable.setSelector($('#tbl-chart-of-accounts'))
-        .setConfig(accountsTableConfig())
-        .initialize();
-
+ 
     // var oTable;
 
   	$(document).on('click', '#chkSubAccount', function(){
@@ -25,14 +22,14 @@
   		$('#sltParentAccount').prop('disabled', true);      
   	});
 
-
+	
     $(document).on('submit', '#frm-create-account', function(e){
       e.preventDefault();
 
       var form = $(this);
       var url = form.prop('action');
       
-      var posting = $.post(url, form.serializeArray());
+    var posting = $.post(url, form.serializeArray());
         posting.done(function(response){
 
           if(response.success) {
@@ -43,8 +40,7 @@
             });
 
             $('#modal-create-account').modal('hide');
-            oTable.ajax.reload();
-
+			reload();
           }else{
 
             Toast.fire({
@@ -105,6 +101,34 @@
       modal.modal('show');
     });
 
+	$(document).on('click', '#btn-create-class', function(e){
+      e.preventDefault();
+      var modal = $('#modal-create-account');
+      var target = $(this);
+      // load content from HTML string
+      //modal.find('.modal-body').html("Nice modal body baby...");
+      // or, load content from value of data-remote url
+      modal.find('.modal-body').html('');
+      modal.find('.modal-body').load(target.data("remote"), function(){
+        $('.select2').select2();
+      });
+      modal.modal('show');
+    });
+
+	$(document).on('click', '#btn-create-type', function(e){
+      e.preventDefault();
+      var modal = $('#modal-create-account');
+      var target = $(this);
+      // load content from HTML string
+      //modal.find('.modal-body').html("Nice modal body baby...");
+      // or, load content from value of data-remote url
+      modal.find('.modal-body').html('');
+      modal.find('.modal-body').load(target.data("remote"), function(){
+        $('.select2').select2();
+      });
+      modal.modal('show');
+    });
+
     $(document).on('click', '.btn-edit-account', function(e){
       e.preventDefault();
       var modal = $('#modal-create-account');
@@ -118,6 +142,51 @@
       });
       modal.modal('show');
     });
+
+	
+
+
+	$(document).on('submit', '#form-class',function(e){
+		e.preventDefault();
+		$.ajax({
+          url: "{{ route('accounts.saveClass')}}",
+          type: 'POST',
+          data: $(this).serialize(),
+          success: function(response) {
+				if(response === 'true')
+				{
+					Toast.fire({
+						icon: 'success',
+						title: ' Class Successfully Save'
+					});
+					$('#form-class')[0].reset();
+					$('#modal-create-class').modal('hide');
+					reload();
+				}
+          }
+      	});
+	});
+
+	$(document).on('submit', '#form-type',function(e){
+		e.preventDefault();
+		$.ajax({
+          url: "{{ route('accounts.saveType')}}",
+          type: 'POST',
+          data: $(this).serialize(),
+          success: function(response) {
+				if(response === 'true')
+				{
+					Toast.fire({
+						icon: 'success',
+						title: ' Type Successfully Save'
+					});
+					$('#form-type')[0].reset();
+					$('#modal-create-class').modal('hide');
+					reload();
+				}
+          }
+      	});
+	});
 
     $(document).on('submit', '#frm-update-account', function(e){
       e.preventDefault();
@@ -140,7 +209,7 @@
               });
 
               $('#modal-create-account').modal('hide');
-              // oTable.ajax.reload();
+			  reload();
 
             }else{
 
@@ -245,6 +314,12 @@ function toDataTable() {
   }
 }
 
+function reload()
+{
+	window.setTimeout(() => {
+		location.reload();
+	}, 500);
+}
 function accountsTableConfig() {
 
   let config = {

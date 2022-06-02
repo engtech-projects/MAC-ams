@@ -92,4 +92,26 @@ class ReportsController extends MainController
 
 	    return view('reports.sections.cashTransactionBlotter', $data);
 	}
+
+	public function cheque()
+	{
+		$data = [
+			'title' => 'Cashier Transaction Blotter',
+			'trialbalanceList' => ''
+		];
+
+	    return view('reports.sections.cheque', $data);
+	}
+
+	public function postDatedCheque()
+	{
+		$data = [
+			'title' => 'Cashier Transaction Blotter',
+			'trialbalanceList' => ''
+		];
+
+	    return view('reports.sections.postDatedCheque', $data);
+	}
+	
+
 }

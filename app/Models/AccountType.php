@@ -14,6 +14,10 @@ class AccountType extends Model
     public $timestamps = true;
 
     protected $fillable = [
-    	'account_type', 'has_opening_balance', 'account_category_id'
+    	'account_no', 'account_type', 'has_opening_balance', 'account_category_id'
     ];
+
+	public function accountCategory(){
+		return $this->hasMany(AccountCategory::class, 'account_category_id');
+    }
 }

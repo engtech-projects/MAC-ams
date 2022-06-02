@@ -21,6 +21,20 @@
         <label for="" class="label-normal">Description</label>
         <textarea style="resize: none;" name="account_description" class="form-control form-control-sm rounded-0" rows="3">{{ $account->account_description }}</textarea>
       </div>
+
+	  <div class="form-group">
+		<div><label for="" class="label-normal">Bank Reconcillation ? </label></div>
+		<div class="icheck-success d-inline">
+			<input type="radio" id="reconcillation_yes" name="bank_reconcillation" value="Yes" checked="checked">
+			<label for="reconcillation_yes" class="label-normal"> Yes
+			</label>
+		</div>
+		<div class="icheck-success d-inline">
+			<input type="radio" id="reconcillation_no" name="bank_reconcillation" value="No">
+			<label for="reconcillation_no" class="label-normal"> No
+			</label>
+		</div>
+	  </div>
       <div class="form-group clearfix">
         <div><label for="" class="label-normal">Cash Flow</label></div>
         @foreach ($cashFlows as $cashFlow)

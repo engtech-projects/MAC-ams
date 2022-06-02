@@ -1,7 +1,7 @@
 <aside class="main-sidebar elevation-4 sidebar-light-olive">
 	<!-- Brand Logo -->
 	<a href="{{route('dashboard')}}" class="brand-link elevation-4">
-		<span class="brand-text font-weight-bold" style="font-size:1em; padding-left:2px;">Micro Access Finance Corporation</span>
+		<span class="brand-text font-weight-bold" style="font-size:1em; padding-left:2px;">Engtech Global Solution Inc.</span>
 	</a>
 
 	<!-- Sidebar -->
@@ -160,7 +160,7 @@
 
 			@if(checkUserHasAccessModule('module','reports'))
 			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/subsidiaryledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
-					|| request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition')  ) ? 'menu-open' : '' }}">
+					|| request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition') || request()->is('reports/cheque') || request()->is('reports/postDatedCheque')) ? 'menu-open' : '' }}">
 			<a href="{{ route('sales') }}" class="nav-link {{  (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-clipboard-list"></i>
 				<p>
@@ -225,6 +225,22 @@
 					</a>
 					</li>
 					@endif
+					@if(checkUserHasAccessModule('sub-module','reports/cheque'))
+					<li class="nav-item">
+					<a href="{{ route('reports.cheque') }}" class="nav-link {{ (request()->is('reports/cheque')) ? 'active' : '' }}">
+						<i class="far fa-circle nav-icon"></i>
+						<p>Cheque</p>
+					</a>
+					</li>
+					@endif
+					@if(checkUserHasAccessModule('sub-module','reports/postDatedCheque'))
+					<li class="nav-item">
+					<a href="{{ route('reports.postDatedCheque') }}" class="nav-link {{ (request()->is('reports/postDatedCheque')) ? 'active' : '' }}">
+						<i class="far fa-circle nav-icon"></i>
+						<p>Post-Dated Cheque</p>
+					</a>
+					</li>
+					@endif
 
 				
 				</ul>
@@ -257,7 +273,7 @@
 		<!-- /.sidebar-menu -->
 		
 	</div>
-	<div class="col-md-12">
+	<div class="col-md-12" style="display:none;">
 		
 		<img src="{{ asset('img/mac_logo.fw.png') }}" alt="mac_logo" class="img-fluid">
 	</div>

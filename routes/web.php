@@ -43,6 +43,9 @@ Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard'
 // AccountsController
 Route::resource('accounts', AccountsController::class);
 Route::get('accounts-datatable', [AccountsController::class, 'populate'])->name('accounts.populate');
+Route::get('accounts/getAccountTypeContent', [AccountsController::class, 'getAccountTypeContent'])->name('accounts.getAccountTypeContent');
+Route::post('accounts/saveType', [AccountsController::class, 'saveType'])->name('accounts.saveType');
+Route::post('accounts/saveClass', [AccountsController::class, 'saveClass'])->name('accounts.saveClass');
 Route::post('set-status', [AccountsController::class, 'setStatus'])->name('accounts.setStatus');
 Route::post('accounts/import', [AccountsController::class, 'import'])->name('accounts.import');
 
@@ -126,6 +129,8 @@ Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
 Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
 Route::get('reports/bankReconcillation', [ReportsController::class, 'bankReconcillation'])->name('reports.bankReconcillation');
+Route::get('reports/cheque', [ReportsController::class, 'cheque'])->name('reports.cheque');
+Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedCheque'])->name('reports.postDatedCheque');
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
 
