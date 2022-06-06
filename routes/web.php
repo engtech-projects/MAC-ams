@@ -125,6 +125,11 @@ Route::get('sales/invoice', [SalesController::class, 'invoice'])->name('sales.in
 
 //reports 
 Route::get('reports/subsidiaryledger', [ReportsController::class, 'subsidiaryLedger'])->name('reports.subsidiaryledger');
+Route::get('reports/subsidiaryViewInfo', [ReportsController::class, 'subsidiaryViewInfo'])->name('reports.subsidiaryViewInfo');
+Route::get('reports/subsidiaryDelete', [ReportsController::class, 'subsidiaryDelete'])->name('reports.subsidiaryDelete');
+
+
+
 Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
 Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
@@ -133,6 +138,7 @@ Route::get('reports/cheque', [ReportsController::class, 'cheque'])->name('report
 Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedCheque'])->name('reports.postDatedCheque');
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
+Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 
 
 // payment

@@ -20,6 +20,9 @@
 			border-radius:0px;
 			
 		}
+		.buttons-print, .buttons-html5{
+			display:none!important;
+		}
 	
 		
 		.dataTables_filter{

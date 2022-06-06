@@ -22,6 +22,9 @@
 	.dataTables_filter{
 		float:right!important;
 	}
+	.buttons-print, .buttons-html5{
+		display:none;
+	}
 </style>
 
 <!-- Main content -->
@@ -29,9 +32,9 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" method="post">
+			<form id="subsidiaryForm" method="post">
 				@csrf
-				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
+				<input type="hidden" class="form-control form-control-sm rounded-0" name="sub_id" id="sub_id"  placeholder="" >
 				<div class="row">
 					<div class="col-md-8 frm-header">
 						<h4 ><b>Subsidiary Ledger</b></h4>
@@ -59,9 +62,9 @@
 					<div class="col-md-2 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_code">Code</label>
+								<label class="label-normal" for="sub_acct_no">Code</label>
 								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_code" id="book_code"  placeholder="Book Code" required>
+									<input type="number" class="form-control form-control-sm rounded-0" name="sub_acct_no" id="sub_acct_no"  placeholder="Subsidiary Account No." required>
 								</div>
 							</div>
 						</div>
@@ -70,20 +73,31 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_name">Account Name</label>
+								<label class="label-normal" for="sub_name">Account Name</label>
 								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_name" id="book_name"  placeholder="Book Name" required>
+									<input type="text" class="form-control form-control-sm rounded-0" name="sub_name" id="sub_name"  placeholder="Subsidiary Name" required>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-md-7 col-xs-12">
+					<div class="col-md-4 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_src">Address</label>
+								<label class="label-normal" for="sub_address">Address</label>
 								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_src" id="book_src"  placeholder="Book Source" required>
+									<input type="text" class="form-control form-control-sm rounded-0" name="sub_address" id="sub_address"  placeholder="Address" required>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-md-3 col-xs-12">
+						<div class="box">
+							<div class="form-group">
+								<label class="label-normal" for="sub_life_used">Life Used</label>
+								<div class="input-group">
+									<input type="text" class="form-control form-control-sm rounded-0" name="sub_life_used" id="sub_life_used"  placeholder="Life Used" required>
 								</div>
 							</div>
 						</div>
@@ -92,9 +106,9 @@
 					<div class="col-md-2 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_name">Phone Number</label>
+								<label class="label-normal" for="sub_tel">Phone Number</label>
 								<div class="input-group">
-									<input type="Number" class="form-control form-control-sm rounded-0" name="book_name" id="book_name"  placeholder="Book Name" required>
+									<input type="Number" class="form-control form-control-sm rounded-0" name="sub_tel" id="sub_tel"  placeholder="Subsidiary Telephone Number" required>
 								</div>
 							</div>
 						</div>
@@ -103,25 +117,25 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_name">Subsidiary Category</label>
+								<label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
 								<div class="input-group">
-								<select name="gender" class="form-control form-control-sm" id="gender">
-									<option value="" disabled selected>-Select Report-</option>
-									<option value="income_minus_expense">Cat1</option>
-									<option value="income_minus_expense_summary">Cat2</option>
-									<option value="subsidiary_all_account">Cat3</option>
+								<select name="sub_cat_id" class="form-control form-control-sm" id="sub_cat_id">
+									<option value="" disabled selected>-Select Category-</option>
+									@foreach ($sub_categories as $sub_category)
+										<option value="{{$sub_category->sub_cat_id}}">{{$sub_category->sub_cat_code}} - {{$sub_category->sub_cat_name}}</option>
+									@endforeach
 								</select>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-md-3 col-xs-12">
+					<div class="col-md-5 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">Branch</label>
+								<label class="label-normal" for="sub_per_branch">Branch</label>
 								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input type="text" class="form-control form-control-sm rounded-0" name="sub_per_branch" id="sub_per_branch"  placeholder="Branch" required>
 								</div>
 							</div>
 						</div>
@@ -130,31 +144,9 @@
 					<div class="col-md-2 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">Date</label>
+								<label class="label-normal" for="sub_date">Date</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-2 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_ref">Amount</label>
-								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_head">Depresation</label>
-								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Print Voucher" required>
+									<input type="date" class="form-control form-control-sm rounded-0" name="sub_date" id="sub_date"  required>
 								</div>
 							</div>
 						</div>
@@ -163,9 +155,19 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_head">Amort</label>
+								<label class="label-normal" for="sub_amount">Amount</label>
 								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Print Voucher" required>
+									<input type="number" class="form-control form-control-sm rounded-0" name="sub_amount" id="sub_amount"  placeholder="Amount" required>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-xs-12">
+						<div class="box">
+							<div class="form-group">
+								<label class="label-normal" for="sub_no_amort">Amort</label>
+								<div class="input-group">
+									<input type="number" class="form-control form-control-sm rounded-0" name="sub_no_amort" id="sub_no_amort" required>
 								</div>
 							</div>
 						</div>
@@ -174,9 +176,9 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_head">Salvage</label>
+								<label class="label-normal" for="sub_salvage">Salvage</label>
 								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Print Voucher" required>
+									<input type="number" class="form-control form-control-sm rounded-0" name="sub_salvage" id="sub_salvage"  placeholder="Salvage" required>
 								</div>
 							</div>
 						</div>
@@ -185,12 +187,15 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">Date Post</label>
+								<label class="label-normal" for="sub_date_post">Date Post</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input type="date" class="form-control form-control-sm rounded-0" name="sub_date_post" id="sub_date_post"  placeholder="Date Posted" required>
 								</div>
 							</div>
 						</div>
+					</div>
+					<div class="col-md-12 text-right" style="padding-bottom:20px">
+						<button class="btn btn-flat btn-sm bg-gradient-success " type="submit">Save/Update</button>
 					</div>
 				</div>
 				
@@ -216,71 +221,41 @@
 											<th>Amort</th>
 											<th>life Used</th>
 											<th>Salv</th>
-											<th>Account</th>
 											<th>Date Posted</th>
+											<th>Action</th>
 										</thead>
 										<tbody>
+											@foreach ($subsidiaryData as $data)
+												<tr>
+													<td class="font-weight-bold">{{$data->sub_acct_no}}</td>
+													<td>{{$data->sub_name}}</td>
+													<td>{{$data->sub_address}}</td>
+													<td>{{$data->sub_tel}}</td>
+													<td>{{$data->sub_per_branch}}</td>
+													<td>{{Carbon::parse($data->sub_dat)->format('m/d/Y')}}</td>
+													<td>{{$data->sub_amount}}</td>
+													<td>{{$data->sub_no_amort}}</td>
+													<td>{{$data->sub_life_used}}</td>
+													<td>{{$data->sub_salvage}}</td>
+													<td>{{$data->sub_date_post}}</td>
+													<td>
+														<div class="btn-group">
+															<button type="button" class="btn btn-xs btn-default btn-flat coa-action">Action</button>
+															<a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
+															<span class="sr-only">Toggle Dropdown</span>
+															</a>
+															<div class="dropdown-menu dropdown-menu-right" role="menu" style="left:0;">
+																<a class="dropdown-item btn-edit-account subsid-view-info"  value="{{$data->sub_id}}" href="#">Edit</a>
+																<a class="dropdown-item btn-edit-account subsid-delete"  value="{{$data->sub_id}}" href="#">delete</a>
+															</div>
+														</div>
+													</td>
+												</tr>
+											@endforeach
 											
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
 										</tbody>
 									</table>
 								</div>
-							</div>
 						</div>
 					</section>
 					<!-- /.Table -->
@@ -297,5 +272,6 @@
 
 
 @section('footer-scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
   @include('scripts.reports.reports')
 @endsection

@@ -23,6 +23,7 @@ class Subsidiary extends Model
     	'sub_amount',
     	'sub_no_depre',
     	'sub_no_amort',
+    	'sub_life_used',
     	'sub_salvage',
     	'sub_date_post'
     ];

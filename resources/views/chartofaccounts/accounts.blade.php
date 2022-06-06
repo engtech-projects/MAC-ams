@@ -34,8 +34,8 @@
           <div class="card-header">
             <h3 class="card-title"> Chart of Accounts </h3>
 				<div class="col-md-12 text-right">
-                    <a href="#"  onclick="$('#modal-create-class').modal('show')"class="btn btn-flat btn-sm bg-gradient-success " data-remote="{{ route('accounts.createNewClass') }}">New Class</a>
-					<a href="#"  onclick="$('#modal-create-type').modal('show')" class="btn btn-flat btn-sm bg-gradient-success" data-remote="{{ route('accounts.createNewType') }}">New Type</a>
+                    <a href="#"  onclick="$('#modal-create-class').modal('show')"class="btn btn-flat btn-sm bg-gradient-success">New Class</a>
+					<a href="#"  onclick="$('#modal-create-type').modal('show')" class="btn btn-flat btn-sm bg-gradient-success">New Type</a>
 					<a href="#"  data class="btn btn-flat btn-sm bg-gradient-success btn-create-account" data-remote="{{ route('accounts.create') }}">New Account</a>
                 </div>
                <div class="card-tools">

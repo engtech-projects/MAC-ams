@@ -102,14 +102,7 @@ class AccountsController extends MainController
 		}
 		return 'false';
 	}
-	
-	public function createNewClass(Request $request)
-	{
 
-		echo '2';
-
-	
-	}
 	
     public function populate() {
         return Accounts::fetch(true);
