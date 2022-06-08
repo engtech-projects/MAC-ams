@@ -22,6 +22,10 @@
 	.dataTables_filter{
 		float:right!important;
 	}
+	.editable
+	{
+		color:black;
+	}
 </style>
 
 <!-- Main content -->
@@ -29,39 +33,30 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" method="post">
+			<form id="journalEntryForm" method="post">
 				@csrf
-				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
+				<input type="hidden" class="form-control form-control-sm rounded-0" name="journal_id" id="journal_id"  placeholder="" >
 				<div class="row">
 					<div class="col-md-8 frm-header">
 						<h4 ><b>Journal Entry</b></h4>
 					</div>
 					<div class="col-md-4 frm-header">
-						<label class="label-normal" for="gender">Select Report</label>
+						<label class="label-normal" for="date">Journal Date</label>
 						<div class="input-group">
-							<select name="gender" class="form-control form-control-sm" id="gender">
-								<option value="" disabled selected>-Select Report-</option>
-								<option value="income_minus_expense">Income Minus Expense</option>
-								<option value="income_minus_expense_summary">Income Minus Expense (Summary)</option>
-								<option value="subsidiary_all_account">Subsidiary (All Account)</option>
-								<option value="subsidiary_per_account">Subsidiary (Per Account)</option>
-								<option value="schedule_of_account">Schedule of Account</option>
-								<option value="subsidiary_aging_account">Subsidiary Aging / Account</option>
-								<option value="aging_of_payables">Aging  of Payables</option>
-								<option value="statment_of_receivables">Statement of Receivables</option>
-								<option value="statement_of_payables">Statemnt of Payables</option>
-								<option value="collection_details_report">Collection Details Report</option>
-								<option value="payment_details_report">Payment Details Report</option>
-								<option value="month_end_schedule_report">Month End Schedule Report</option>
-							</select>
+						<input type="date" class="form-control form-control-sm rounded-0" name="journal_date" id="journal_date"  placeholder="Journal Date" required>
 						</div>
 					</div>
-					<div class="col-md-2 col-xs-12">
+					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_code">Code</label>
+								<label class="label-normal" for="branch_id">Branch</label>
 								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_code" id="book_code"  placeholder="Book Code" required>
+								<select name="branch_id" class="form-control form-control-sm" id="branch_id">
+									<option value="" disabled selected>-Select Branch-</option>
+									<option value="1">Butuan CIty Branch</option>
+									<option value="2">Nasipit Branch</option>
+								</select>
+									
 								</div>
 							</div>
 						</div>
@@ -70,91 +65,60 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_name">Account Name</label>
+								<label class="label-normal" for="book_id">Book Reference</label>
 								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_name" id="book_name"  placeholder="Book Name" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-7 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_src">Address</label>
-								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_src" id="book_src"  placeholder="Book Source" required>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					<div class="col-md-2 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_name">Phone Number</label>
-								<div class="input-group">
-									<input type="Number" class="form-control form-control-sm rounded-0" name="book_name" id="book_name"  placeholder="Book Name" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_name">Subsidiary Category</label>
-								<div class="input-group">
-								<select name="gender" class="form-control form-control-sm" id="gender">
-									<option value="" disabled selected>-Select Report-</option>
-									<option value="income_minus_expense">Cat1</option>
-									<option value="income_minus_expense_summary">Cat2</option>
-									<option value="subsidiary_all_account">Cat3</option>
+								<select name="book_id" class="form-control form-control-sm" id="book_id" >
+									<option value="" disabled selected>-Select Book References-</option>
+									@foreach($journalBooks as $journalBook)
+										<option value="{{$journalBook->book_id}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_name}}</option>
+									@endforeach
 								</select>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_ref">Branch</label>
-								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
 					<div class="col-md-2 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">Date</label>
+								<label class="label-normal" for="source">Source</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-2 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_ref">Amount</label>
-								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input type="text" class="form-control form-control-sm rounded-0" name="source" id="source"  placeholder="Source" required>
 								</div>
 							</div>
 						</div>
 					</div>
 					
+					<div class="col-md-2 col-xs-12">
+						<div class="box">
+							<div class="form-group">
+								<label class="label-normal" for="cheque_no">Cheque No</label>
+								<div class="input-group">
+									<input type="Number" class="form-control form-control-sm rounded-0" name="cheque_no" id="cheque_no"  placeholder="Cheque No" required>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-2 col-xs-12">
+						<div class="box">
+							<div class="form-group">
+								<label class="label-normal" for="status">Status</label>
+								<div class="input-group">
+									<select name="book_id" class="form-control form-control-sm" id="book_id">
+										<option value="" disabled >Posted</option>
+										<option value="" disabled selected>Unposted</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_head">Depresation</label>
+								<label class="label-normal" for="amount">Amount</label>
 								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Print Voucher" required>
+									<input type="number" class="form-control form-control-sm rounded-0" name="amount" id="amount"  placeholder="Amount" required>
 								</div>
 							</div>
 						</div>
@@ -163,31 +127,20 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_head">Amort</label>
+								<label class="label-normal" for="payee">Payee</label>
 								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Print Voucher" required>
+									<input type="text" class="form-control form-control-sm rounded-0" name="payee" id="payee"  placeholder="Payee" required>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-md-3 col-xs-12">
+					<div class="col-md-6 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_head">Salvage</label>
+								<label class="label-normal" for="remarks">Remarks</label>
 								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Print Voucher" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_ref">Date Post</label>
-								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input type="text" class="form-control form-control-sm rounded-0" name="remarks" id="remarks"  placeholder="Remarks" required>
 								</div>
 							</div>
 						</div>
@@ -197,101 +150,64 @@
 			</form>
 		</div>
 		<div class="co-md-12" style="height:10px;"></div>
-		<div class="row">
-			<div class="col-md-12">
-					<!-- Table -->
-					<section class="content">
-						<div class="container-fluid">
-							<div class="row" >
-								<div class="col-md-12 table-responsive">
-									<table id="subsidiaryledgerTbl"  class="table table-bordered ">
-										<thead>
-											<th>Code</th>
-											<th>Account Name</th>
-											<th>Address</th>
-											<th>Tel No.</th>
-											<th>Branch</th>
-											<th>Date</th>
-											<th>Amount</th>
-											<th>Amort</th>
-											<th>life Used</th>
-											<th>Salv</th>
-											<th>Account</th>
-											<th>Date Posted</th>
-										</thead>
-										<tbody>
-											
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</div>
-					</section>
-					<!-- /.Table -->
+		<div class="col-md-12">
+			<div class="col-md-12 text-right">
+				<button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i class="fa fa-plus"></i> Add Details </button>
+			</div>
+			<div class="co-md-12" style="height:10px;"></div>
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-bordered table-sm" id="tbl-create-journal">
+					<thead>
+						<tr class="text-center">
+							<th>Account #</th>
+							<th width="200">Account Name</th>
+							<th width="150">Debit</th>
+							<th width="150">Credit</th>
+							<th width="200">S/L</th>
+							<th width="200">Description</th>
+							<th class="text-right" width="50">Action</th>
+						</tr>
+					</thead>
+					<tbody id="tbl-create-journal-container">
+						@for($i = 0; $i < 1; $i++)
+							<tr class='editable-table-row'>
+								<td value="" ></td>
+								<td class='editable-table-data' value="" ><a href="#" ed-title="account_no" class="editable-row-item"></a> </td>
+								<td class='editable-table-data' value="" ><a href="#" class="editable-row-item"></a> </td>
+								<td class='editable-table-data' value="" ><a href="#" class="editable-row-item"></a> </td>
+								<td class='editable-table-data' value="" >
+									<select name="" class="form-control form-control-sm" id="" >
+										<option value="" disabled selected>-Select S/L-</option>
+										@foreach($journalBooks as $journalBook)
+											<option value="{{$journalBook->book_id}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_name}}</option>
+										@endforeach
+									</select>
+								</td>
+								<td class='editable-table-data' value="" ><a href="#" class="editable-row-item"></a> </td>
+								<td>
+									<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
+										<span>
+											<i class="fas fa-trash" aria-hidden="true"></i>
+										</span>
+									</button>
+								</td>
+							</tr>
+						@endfor
+						
+					</tbody>
+				</table>
+					</div>
 				</div>
 			</div>
+			<div class="col-md-12 text-right">
+				<button class="btn btn-flat btn-sm bg-gradient-success" > SAVE</button>
+			</div>
+			<!-- Button trigger modal -->
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+			Launch demo modal
+			</button>
 		</div>
-		<!-- Button trigger modal -->
-		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-		Launch demo modal
-		</button>
-
 		<!-- Modal -->
 		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-xl" role="document">
@@ -440,5 +356,5 @@
 
 
 @section('footer-scripts')
-  @include('scripts.reports.reports')
+  @include('scripts.journal.journal')
 @endsection

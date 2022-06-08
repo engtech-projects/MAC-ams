@@ -101,7 +101,7 @@
 						<div class="container-fluid">
 							<div class="row" >
 								<div class="col-md-12">
-									<table id="subsidiaryledgerTbl"  class="table table-bordered">
+									<table id="journalEntryDetails"  class="table table-bordered">
 										<thead>
 											<th>Reference No.</th>
 											<th>Account Name</th>
@@ -194,5 +194,5 @@
 
 
 @section('footer-scripts')
-  @include('scripts.reports.reports')
+  @include('scripts.journal.journal')
 @endsection

@@ -84,9 +84,15 @@
 											<div class="col-md-4">
 												<button value="{{$subsidiaryCategory->sub_cat_id}}" vType="edit" class="btn btn-categoryA btn-info btn-sm"><i class="fa  fa-pen"></i></button>
 											</div>
+											@if(isDeletable('subsidiary', 'sub_cat_id', $subsidiaryCategory->sub_cat_id))
 											<div class="col-md-4">
 												<button value="{{$subsidiaryCategory->sub_cat_id}}" vType="delete" class="btn btn-categoryA btn-danger btn-sm"><i class="fa fa-trash"></i></button>
 											</div>
+											@else
+												<div class="col-md-4">
+													<button class="btn  btn-danger btn-sm disabled" onclick="alert('this category is already used in other field')"><i class="fa fa-trash" ></i></button>
+												</div>
+											@endif
 										</div>
 									</td>
 								</tr>

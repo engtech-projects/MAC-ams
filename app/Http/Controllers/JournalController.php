@@ -15,6 +15,7 @@ use App\Models\Employee;
 use App\Models\Transactions;
 use App\Models\TransactionType;
 use App\Models\TransactionStatus;
+use App\Models\JournalBook;
 
 class JournalController extends MainController
 {
@@ -52,7 +53,7 @@ class JournalController extends MainController
 	{
 		$data = [
 			'title' => 'Journal Entry',
-			'trialbalanceList' => ''
+			'journalBooks' => JournalBook::get(),
 		];
 
 	    return view('journal.sections.journalEntry', $data);

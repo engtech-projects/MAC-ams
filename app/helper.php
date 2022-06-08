@@ -54,6 +54,11 @@ function balanceDue($arr){
 	return number_format($sum, 2, '.', '');
 }
 
+function isDeletable($table, $field, $id)
+{
+	return (DB::table($table)->where($field,$id)->exists()) ? false : true;
+}
+
 function checkUserHasAccessModule($type, $moduleName)
 {
 	$user = Auth::user();
