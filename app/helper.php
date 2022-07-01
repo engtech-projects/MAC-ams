@@ -59,6 +59,16 @@ function isDeletable($table, $field, $id)
 	return (DB::table($table)->where($field,$id)->exists()) ? false : true;
 }
 
+function addCommas($number)
+{
+	return number_format($number, 2);
+}
+
+function removeCommas($obj)
+{
+	return str_replace(',', '', $obj);
+}
+
 function checkUserHasAccessModule($type, $moduleName)
 {
 	$user = Auth::user();

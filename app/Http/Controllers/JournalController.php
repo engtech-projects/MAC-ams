@@ -15,17 +15,18 @@ use App\Models\Employee;
 use App\Models\Transactions;
 use App\Models\TransactionType;
 use App\Models\TransactionStatus;
+use App\Models\Subsidiary;
 use App\Models\JournalBook;
+use App\Models\journalEntry;
+use App\Models\journalEntryDetails;
 
 class JournalController extends MainController
 {
-   
-   public function index() {}   
 
+	public function index() {}   
  	public function create() {
 
  		$transactionType = TransactionType::where('transaction_type', 'journal')->first();
-
  		$data = [
  			'title' => 'Journal Entry',
  			'customers' => Customer::all(),
@@ -40,13 +41,10 @@ class JournalController extends MainController
  		];
 
  		return view('journal.createjournal', $data);
-
  	}
 
  	public function store(Request $request) {
-
  		return $request;
-
  	}
 
 	public function journalEntry(Request $request)
@@ -54,16 +52,95 @@ class JournalController extends MainController
 		$data = [
 			'title' => 'Journal Entry',
 			'journalBooks' => JournalBook::get(),
+			'subsidiaries' => Subsidiary::get(),
+			'chartOfAccount' => Accounts::get()
 		];
 
 	    return view('journal.sections.journalEntry', $data);
 	}
 
+	public function saveJournalEntry(Request $request)
+	{
+		$journal = new journalEntry;
+		$journal->journal_no = $request->journal_no;
+		$journal->journal_date = $request->journal_date;
+		$journal->branch_id = $request->branch_id;
+		$journal->book_id = $request->book_id;
+		$journal->source = $request->source;
+		$journal->cheque_no = $request->cheque_no;
+		$journal->amount = $request->amount;
+		$journal->status = $request->status;
+		$journal->payee = $request->payee;
+		$journal->remarks = $request->remarks;
+		$journal->save();
+		return json_encode(['message'=>'save','id'=> $journal->journal_id]);
+	}
+
+	public function saveJournalEntryDetails(Request $request)
+	{
+		if(journalEntryDetails::insert($request->items))
+		{
+			return json_encode(['message'=>'save']);
+		}
+	}
+	public function JournalEntryFetch(Request $request)
+	{
+		return json_encode(['message'=>'fetch','data'=> JournalEntry::with(['journalDetails.chartOfAccount','bookDetails', 'journalDetails.subsidiary'])->where('journal_id', $request->journal_id)->get()]);
+	}
+	public function JournalEntryDelete(Request $request)
+	{
+		$journal = JournalEntry::find($request->journal_id);
+		
+		if($journal->delete())
+		{
+			return json_encode(['message'=> 'delete']);
+		}
+		return json_encode(['message'=> 'error']);
+	}
+
+	public function JournalEntryEdit(Request $request)
+	{
+		//$request->$journal_id;
+		$journal = JournalEntry::find($request->journal_id);
+		$journal->journal_no = $request->journal_no;
+		$journal->journal_date = $request->journal_date;
+		$journal->branch_id = $request->branch_id;
+		$journal->book_id = $request->book_id;
+		$journal->source = $request->source;
+		$journal->cheque_no = $request->cheque_no;
+		$journal->amount = $request->amount;
+		$journal->status = $request->status;
+		$journal->payee = $request->payee;
+		$journal->remarks = $request->remarks;
+		if($journal->save())
+		{
+			return json_encode(['message'=> 'update']);
+		}
+		return json_encode(['message'=> 'error']);
+	}
+	
+	public function JournalEntryPostUnpost(Request $request)
+	{
+		$journal = JournalEntry::find($request->journal_id);
+		$journal->status = 'posted';
+		
+		if($journal->save())
+		{
+			return json_encode(['message'=> $journal->status]);
+		}
+		return json_encode(['message'=> 'error']);
+	}
+	
+	
+
 	public function journalEntryList(Request $request)
 	{
 		$data = [
-			'title' => 'Journal Entry List',
-			'journalEntryList' => ''
+			'title' => 'Journal Entry',
+			'journalBooks' => JournalBook::get(),
+			'subsidiaries' => Subsidiary::get(),
+			'journalEntryList' => JournalEntry::fetch(),
+			'chartOfAccount' => Accounts::get()
 		];
 
 	    return view('journal.sections.journalEntryList', $data);

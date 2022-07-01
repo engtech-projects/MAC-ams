@@ -65,9 +65,6 @@
 								@if(checkUserHasAccessModule('sub-module','currency'))
 								<a class="nav-link sysnav" id="v-pills-Currency-tab" data-toggle="pill" href="#v-pills-Currency" role="tab" aria-controls="v-pills-Currency" aria-selected="false"><i class="nav-icon fas fa-dollar-sign"></i> Currency</a>
 								@endif
-								@if(checkUserHasAccessModule('sub-module','subsidiary'))
-								<a class="nav-link sysnav" id="v-pills-Subsidiary-tab" data-toggle="pill" href="#v-pills-Subsidiary" role="tab" aria-controls="v-pills-Subsidiary" aria-selected="false"><i class="nav-icon fas fa-users"></i> Subsidiary Ledger</a>
-								@endif
 							</div>
 						</div>
 					</div>
@@ -97,9 +94,7 @@
 						<div class="tab-pane fade" id="v-pills-Currency" role="tabpanel" aria-labelledby="v-pills-Currency-tab">
 							@include('systemSetup.sections.currency')
 						</div>
-						<div class="tab-pane fade" id="v-pills-Subsidiary" role="tabpanel" aria-labelledby="v-pills-Currency-tab">
-							@include('systemSetup.sections.subsidiary')
-						</div>
+					
 					</div>
 				</div>
 			</div>

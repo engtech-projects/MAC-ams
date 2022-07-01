@@ -15,17 +15,22 @@ class journalEntryDetails extends Model
 
     protected $fillable = [
 		'journal_id',
+		'account_id',
 		'subsidiary_id',
 		'journal_details_account_no',
 		'journal_details_title',
 		'journal_details_debit',
 		'journal_details_credit',
 		'journal_details_ref_no',
+		'journal_details_description',
 		'status'
     ];
 	
 	public function subsidiary(){
 		return $this->belongsTo(Subsidiary::class, 'subsidiary_id');
+	}
+	public function chartOfAccount(){
+		return $this->belongsTo(Accounts::class, 'account_id');
 	}
 
 }

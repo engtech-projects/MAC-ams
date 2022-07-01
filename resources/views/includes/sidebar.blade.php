@@ -76,19 +76,19 @@
 			</li>
 			@endif
 			@if(checkUserHasAccessModule('module','journal'))
-			<li class="nav-item {{ (isset($nav) && $nav[0] == 'sales') ? 'menu-open' : '' }} {{ (request()->is('sales') || request()->is('sales/invoice') ) ? 'menu-open' : '' }}">
-			<a href="{{ route('sales') }}" class="nav-link {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journalEntryList')) ? 'active' : '' }}">
-				<i class="nav-icon fas fa-address-book"></i>
-				<p>
-				Journal
-				<i class="right fas fa-angle-left"></i>
-				</p>
-			</a>
+			<li class="nav-item {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? 'menu-open' : '' }}">
+				<a href="{{ route('sales') }}" class="nav-link {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? '' : '' }}">
+					<i class="nav-icon fas fa-address-book"></i>
+					<p>
+					Journal
+					<i class="right fas fa-angle-left"></i>
+					</p>
+				</a>
 			<ul class="nav nav-treeview">
 			
 				@if(checkUserHasAccessModule('sub-module','journal/journalEntry'))
 				<li class="nav-item">
-					<a href="{{route('journal.journalEntry')}}" class="nav-link {{ (isset($nav) && $nav[1] == 'journal/journalEntry') ? 'active' : '' }}">
+					<a href="{{route('journal.journalEntry')}}" class="nav-link {{ request()->is('journal/journalEntry') ? 'active' : '' }}">
 						<i class="far fa-circle nav-icon"></i>
 						<p>Journal Entry</p>
 					</a>
@@ -96,7 +96,7 @@
 				@endif
 				@if(checkUserHasAccessModule('sub-module','journal/journalEntryList'))
 				<li class="nav-item">
-					<a href="{{route('journal.journalEntry')}}" class="nav-link {{ (isset($nav) && $nav[1] == 'journal/journalEntryList') ? 'active' : '' }}" class="nav-link">
+					<a href="{{route('journal.journalEntryList')}}" class="nav-link {{ request()->is('journal/journalEntryList') ? 'active' : '' }}" class="nav-link">
 						<i class="far fa-circle nav-icon"></i>
 						<p>Journal Entry List</p>
 					</a>

@@ -23,8 +23,11 @@
 		.buttons-print, .buttons-html5{
 			display:none!important;
 		}
-	
-		
+		.page-item.active .page-link
+		{
+			background-color: #3d9970!important;
+			border-color: #3d9970!important;
+		}
 		.dataTables_filter{
 			float:right!important;
 		}

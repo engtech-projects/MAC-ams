@@ -154,7 +154,12 @@ Route::get('journal', [JournalController::class, 'create'])->name('journal.creat
 Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
 Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
 Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
-
+Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalEntry'])->name('journal.saveJournalEntry');
+Route::post('journal/saveJournalEntryDetails', [JournalController::class, 'saveJournalEntryDetails'])->name('journal.saveJournalEntryDetails');
+Route::post('journal/JournalEntryFetch', [JournalController::class, 'JournalEntryFetch'])->name('journal.JournalEntryFetch');
+Route::post('journal/JournalEntryDelete', [JournalController::class, 'JournalEntryDelete'])->name('journal.JournalEntryDelete');
+Route::post('journal/JournalEntryEdit', [JournalController::class, 'JournalEntryEdit'])->name('journal.JournalEntryEdit');
+Route::post('journal/JournalEntryPostUnpost', [JournalController::class, 'JournalEntryPostUnpost'])->name('journal.JournalEntryPostUnpost');
 
 // User Profile
 Route::get('user/profile', [UserProfileController::class, 'index'])->name('user.profile');
