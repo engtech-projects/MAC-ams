@@ -313,14 +313,37 @@
 			}
 		});
 	})
+	$(document).on('click','#searchJournal',function(e){
+		e.preventDefault();
+		// $.ajax({
+		// 	headers: {
+		// 		'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		// 	},
+		// 	type: "POST",
+		// 	url: "{{route('journal.saveJournalEntryDetails')}}",
+		// 	data:{items :details},
+		// 	dataType: "json",
+		// 	success: function(data) {
+		// 		if(data.message == 'save')
+		// 		{
+		// 			toastr.success('Successfully Save');
+		// 			reload();
+		// 		}
+		// 	},
+		// 	error: function(data) {
+		// 		toastr.error('Error');
+		// 	}
+		// });
+	})
 	$(document).on('click','#printVoucher',function(e){
 		var winPrint = window.open('', '', 'left=0,top=0,width=800,height=600,toolbar=0,scrollbars=0,status=0');
 		winPrint.document.write($('#toPrintVouch').html());
 		winPrint.document.close();
 		winPrint.focus();
-		winPrint.print();
-		winPrint.close(); 
-		
+		window.setTimeout(() => {
+			winPrint.print();
+			winPrint.close(); 
+		}, 500);
 	})
 	$(document).on('click','#add_item',function(e){
 		e.preventDefault();

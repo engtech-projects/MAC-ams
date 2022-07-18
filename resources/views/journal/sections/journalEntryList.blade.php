@@ -106,7 +106,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">To</label>
 								<div class="input-group">
-									<button class="btn btn-flat btn-sm bg-gradient-success"->SEARCH</button>
+									<button class="btn btn-flat btn-sm bg-gradient-success" id="searchJournal" >SEARCH</button>
 								</div>
 							</div>
 						</div>
