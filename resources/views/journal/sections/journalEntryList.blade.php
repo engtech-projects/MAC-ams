@@ -31,9 +31,8 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" method="post">
+			<form id="SearchJournalForm" method="post">
 				@csrf
-				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div class="row">
 					<div class="col-md-12 frm-header">
 						<h4 ><b>Journal Entry List</b></h4>
@@ -44,8 +43,8 @@
 							<div class="form-group">
 								<label class="label-normal" for="branch_id">Branch</label>
 								<div class="input-group">
-									<select name="branch_id" class="form-control form-control-sm" id="branch_id">
-										<option value="" disabled selected>-Select Branch-</option>
+									<select name="s_branch_id" class="form-control form-control-sm" id="s_branch_id">
+										<option value="" disabled selected>-All-</option>
 										<option value="1">Butuan CIty Branch</option>
 										<option value="2">Nasipit Branch</option>
 									</select>
@@ -58,8 +57,8 @@
 							<div class="form-group">
 								<label class="label-normal" for="branch_id">Book Reference</label>
 								<div class="input-group">
-									<select name="book_id" class="form-control form-control-sm" id="book_id" >
-										<option value="" disabled selected>-Select Book References-</option>
+									<select name="s_book_id" class="form-control form-control-sm" id="s_book_id" >
+										<option value="" disabled selected>-All-</option>
 										@foreach($journalBooks as $journalBook)
 											<option value="{{$journalBook->book_id}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 										@endforeach
@@ -71,11 +70,12 @@
 					<div class="col-md-4 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="branch_id">Status</label>
+								<label class="label-normal" for="s_status">Status</label>
 								<div class="input-group">
-									<select name="status" class="form-control form-control-sm" id="status">
-											<option value="unposted" selected>Unposted</option>
-											<option value="posted" selected>Posted</option>
+									<select name="s_status" class="form-control form-control-sm" id="s_status">
+											<option value="" selected>-All-</option>
+											<option value="unposted">Unposted</option>
+											<option value="posted">Posted</option>
 									</select>
 								</div>
 							</div>
@@ -84,9 +84,9 @@
 					<div class="col-md-5 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">From</label>
+								<label class="label-normal" for="s_from">From</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input type="date" class="form-control form-control-sm rounded-0" name="s_from" id="s_from"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -94,9 +94,9 @@
 					<div class="col-md-5 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">To</label>
+								<label class="label-normal" for="s_to">To</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input disabled type="date" class="form-control form-control-sm rounded-0" name="s_to" id="s_to"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -131,7 +131,7 @@
 								<th>Status</th>
 								<th>Action</th>
 							</thead>
-							<tbody>
+							<tbody id="journalEntryDetailsContent">
 								@foreach($journalEntryList as $journal)
 									<tr>
 										<td class="font-weight-bold">{{$journal->bookDetails->book_code}}</td>
@@ -139,7 +139,7 @@
 										<td>{{$journal->amount}}</td>
 										<td>{{$journal->remarks}}</td>
 										<td>{{$journal->journal_date}}</td>
-										<td class=" {{($journal->status  == 'posted') ? 'text-success' : 'text-dangerclass="nav-link ">Journal Entry</a>'}}"><b>{{ucfirst($journal->status)}}</b></td>
+										<td class="nav-link {{($journal->status  == 'posted') ? 'text-success' : 'text-danger">Journal Entry</a>'}}"><b>{{ucfirst($journal->status)}}</b></td>
 										<td>
 											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-sm bg-gradient-danger JnalDelete">Delete</button>
 											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
@@ -272,7 +272,6 @@
 										</tr>
 									</thead>
 									<tbody id="tbl-create-journalview-container">
-										
 									</tbody>
 									<tfoot>
 										<tr class="text-center">

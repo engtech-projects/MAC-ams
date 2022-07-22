@@ -160,6 +160,7 @@ Route::post('journal/JournalEntryFetch', [JournalController::class, 'JournalEntr
 Route::post('journal/JournalEntryDelete', [JournalController::class, 'JournalEntryDelete'])->name('journal.JournalEntryDelete');
 Route::post('journal/JournalEntryEdit', [JournalController::class, 'JournalEntryEdit'])->name('journal.JournalEntryEdit');
 Route::post('journal/JournalEntryPostUnpost', [JournalController::class, 'JournalEntryPostUnpost'])->name('journal.JournalEntryPostUnpost');
+Route::get('journal/searchJournalEntry', [JournalController::class, 'searchJournalEntry'])->name('journal.searchJournalEntry');
 
 // User Profile
 Route::get('user/profile', [UserProfileController::class, 'index'])->name('user.profile');

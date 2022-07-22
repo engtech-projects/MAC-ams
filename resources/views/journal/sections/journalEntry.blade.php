@@ -38,7 +38,6 @@
 		<div class="col-md-12">
 			<form id="journalEntryForm" method="POST">
 				@csrf
-				<input type="hidden" class="form-control form-control-sm rounded-0" name="journal_id" id="journal_id"  placeholder="" >
 					<div class="row">
 						<div class="col-md-8 frm-header">
 							<h4 ><b>Journal Entry</b></h4>

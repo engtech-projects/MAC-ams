@@ -23,7 +23,9 @@ use App\Models\journalEntryDetails;
 class JournalController extends MainController
 {
 
-	public function index() {}   
+	public function index() {
+		$this->journalEntry();
+	}   
  	public function create() {
 
  		$transactionType = TransactionType::where('transaction_type', 'journal')->first();
@@ -132,6 +134,14 @@ class JournalController extends MainController
 	}
 	
 	
+	public function searchJournalEntry(Request $request)
+	{
+		return json_encode(JournalEntry::fetch($request->s_status,
+			$request->s_from,
+			$request->s_to,
+			$request->s_book_id,
+			$request->s_branch_id));
+	}
 
 	public function journalEntryList(Request $request)
 	{
