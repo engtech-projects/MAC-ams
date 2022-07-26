@@ -189,9 +189,22 @@
 									<td class='editable-table-data' value="" >
 										<select  fieldName="subsidiary_id" class="form-control form-control-sm editable-row-item">
 											<option disabled value="" selected>-Select S/L-</option>
-											@foreach($subsidiaries as $subsidiary)
-												<option value="{{$subsidiary->sub_id}}">{{$subsidiary->sub_acct_no}} - {{$subsidiary->sub_name}}</option>
-											@endforeach
+											
+											<?php
+												$temp = '';
+												foreach($subsidiaries as $subsidiary){
+													if($temp == '')
+													{
+														$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+														echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+													}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
+													{
+														echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+														$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+													}
+													echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
+												}
+											?>
 										</select>
 									</td>
 									<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class=" editable-row-item"></a></td>

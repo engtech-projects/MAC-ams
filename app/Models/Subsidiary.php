@@ -29,7 +29,7 @@ class Subsidiary extends Model
     ];
 
 	public function subsidiaryCategory(){
-		return $this->hasOne(SubsidiaryCategory::class, 'sub_cat_id');
+		return $this->belongsTo(SubsidiaryCategory::class, 'sub_cat_id');
     }
 
 }
