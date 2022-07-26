@@ -72,7 +72,7 @@
 									<select name="book_id" class="form-control form-control-sm" id="book_id" required>
 										<option value="" disabled selected>-Select Book References-</option>
 										@foreach($journalBooks as $journalBook)
-											<option value="{{$journalBook->book_id}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_name}}</option>
+											<option value="{{$journalBook->book_id}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 										@endforeach
 									</select>
 									</div>
