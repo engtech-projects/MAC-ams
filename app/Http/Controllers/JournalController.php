@@ -51,6 +51,7 @@ class JournalController extends MainController
 
 	public function journalEntry(Request $request)
 	{
+		
 		$data = [
 			'title' => 'Journal Entry',
 			'journalBooks' => JournalBook::get(),
@@ -63,8 +64,14 @@ class JournalController extends MainController
 
 	public function saveJournalEntry(Request $request)
 	{
+		$journal_no = 0;
+		$id = journalEntry::orderBy('journal_id','DESC')->take(1)->pluck('journal_id');
+		if(count($id) > 0){
+			$journal_no = '1'.sprintf("%006s",$id[0]);
+		}
+	
 		$journal = new journalEntry;
-		$journal->journal_no = $request->journal_no;
+		$journal->journal_no = $journal_no;
 		$journal->journal_date = $request->journal_date;
 		$journal->branch_id = $request->branch_id;
 		$journal->book_id = $request->book_id;
