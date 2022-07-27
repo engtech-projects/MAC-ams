@@ -70,6 +70,7 @@ class JournalController extends MainController
 		$journal->book_id = $request->book_id;
 		$journal->source = $request->source;
 		$journal->cheque_no = $request->cheque_no;
+		$journal->cheque_date = $request->cheque_date;
 		$journal->amount = $request->amount;
 		$journal->status = $request->status;
 		$journal->payee = $request->payee;
