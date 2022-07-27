@@ -54,7 +54,7 @@ class JournalController extends MainController
 		$data = [
 			'title' => 'Journal Entry',
 			'journalBooks' => JournalBook::get(),
-			'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->get(),
+			'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
 			'chartOfAccount' => Accounts::get()
 		];
 
