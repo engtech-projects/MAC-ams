@@ -101,7 +101,16 @@
 								</div>
 							</div>
 						</div>
-
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="cheque_date">Cheque Date</label>
+									<div class="input-group">
+										<input type="date" class="form-control form-control-sm rounded-0" name="cheque_date" id="cheque_date"  placeholder="Cheque Date">
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -124,7 +133,6 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="col-md-3 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -135,8 +143,7 @@
 								</div>
 							</div>
 						</div>
-
-						<div class="col-md-6 col-xs-12">
+						<div class="col-md-4 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="remarks">Remarks</label>
