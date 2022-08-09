@@ -1,7 +1,7 @@
 <aside class="main-sidebar elevation-4 sidebar-light-olive">
 	<!-- Brand Logo -->
 	<a href="{{route('dashboard')}}" class="brand-link elevation-4">
-		<span class="brand-text font-weight-bold" style="font-size:1em; padding-left:2px;">Engtech Global Solution Inc.</span>
+		<span class="brand-text font-weight-bold" style="font-size:1em; padding-left:2px;">Micro Access Loan Corporation</span>
 	</a>
 
 	<!-- Sidebar -->
@@ -273,7 +273,7 @@
 		<!-- /.sidebar-menu -->
 		
 	</div>
-	<div class="col-md-12" style="display:none;">
+	<div class="col-md-12">
 		
 		<img src="{{ asset('img/mac_logo.fw.png') }}" alt="mac_logo" class="img-fluid">
 	</div>

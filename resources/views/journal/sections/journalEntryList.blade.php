@@ -484,120 +484,119 @@
 </div>
 <!-- Modal -->
 <div class="modal fade" id="journalDetailsVoucher" tabindex="2" role="dialog" aria-labelledby="journalDetailsVoucherLabel" aria-hidden="true">
-		<div class="modal-dialog modal-xl" role="document">
-			<div class="modal-content">
-				<div class="modal-body"  >
-					
-					<div class="container-fluid ">
-						<div id="ui-view">
-							<div class="card">
-							
-								<div class="card-body" id="toPrintVouch">
-									<link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
-									<link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
-									<link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
-									<div class="col-md-12">
-										<img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"  class="img img-fluid">
-									</div>
-									<div class="col-md-12">
-										<h3 style="text-align:center">Journal Voucher</h3>
-									</div>
-									<div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
-										<div class="col-md-6">
-											<div class="col-md-12">
-												<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="voucher_pay"></strong></h6>
-												
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="col-md-12">
-												<h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong id="voucher_branch"></strong></h6>
-												
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="col-md-12">
-												<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong id="voucher_date"></strong></h6>
-												
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="col-md-12">
-												<h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong id="voucher_ref_no"></strong></h6>
-												
-											</div>
-										</div>
-									</div>
-									<div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-body"  >
+				
+				<div class="container-fluid ">
+					<div id="ui-view">
+						<div class="card">
+						
+							<div class="card-body" id="toPrintVouch">
+								<link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
+								<link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+								<link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
+								<div class="col-md-12">
+									<img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"  class="img img-fluid">
+								</div>
+								<div class="col-md-12">
+									<h3 style="text-align:center">Journal Voucher</h3>
+								</div>
+								<div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
+									<div class="col-md-6">
 										<div class="col-md-12">
-											<div class="col-md-12">
-												<h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong id="voucher_source"></strong></h6>
-												
-											</div>
-										</div>
-										<div class="col-md-12">
-											<div class="col-md-12">
-												<h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong id="voucher_particular"></strong></h6>
-												
-											</div>
-										</div>
-										<div class="col-md-12">
-											<div class="col-md-12">
-												<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; ₱ <strong id="voucher_amount"></strong></h6>
-												
-											</div>
-										</div>
-										<div class="col-md-12">
-											<div class="col-md-12">
-												<h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong id="voucher_amount_in_words" style="text-transform:capitalize;"></strong></h6>
-												
-											</div>
-										</div>
-									</div>
-									<div class="table-responsive-sm" style="padding-top:5px;">
-										<table class="table table-striped" style="border-top:4px dashed black;border-bottom:4px dashed black;">
-										<thead>
-											<tr>
-											<th class="center">Account</th>
-											<th>Title</th>
-											<th>S/L</th>
-											<th class="center">Debii</th>
-											<th class="right">Credit</th>
-											</tr>
-										</thead>
-										<tbody id="journalVoucherContent">
+											<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="voucher_pay"></strong></h6>
 											
-										</tbody>
-										</table>
+										</div>
 									</div>
-									<div class="row">
-										<div class="col-lg-4 col-sm-5"></div>
-										<div class="col-lg-4 col-sm-5 ml-auto">
-										<table class="table table-clear">
-											<tbody>
-											<tr>
-												<td class="left">
-												<strong>TOTAL</strong>
-												</td>
-												<td class="left">₱ <strong id="total_debit_voucher"></strong></td>
-												<td class="left">₱ <strong id="total_credit_voucher"></strong></td>
-											</tr>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong id="voucher_branch"></strong></h6>
 											
-											</tbody>
-										</table>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong id="voucher_date"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong id="voucher_ref_no"></strong></h6>
+											
+										</div>
+									</div>
+								</div>
+								<div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong id="voucher_source"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong id="voucher_particular"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; ₱ <strong id="voucher_amount"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong id="voucher_amount_in_words" style="text-transform:capitalize;"></strong></h6>
+											
+										</div>
+									</div>
+								</div>
+								<div class="table-responsive-sm" style="padding-top:5px;">
+									<table class="table table-striped" style="border-top:4px dashed black;border-bottom:4px dashed black;">
+									<thead>
+										<tr>
+										<th class="center">Account</th>
+										<th>Title</th>
+										<th>S/L</th>
+										<th class="center">Debii</th>
+										<th class="right">Credit</th>
+										</tr>
+									</thead>
+									<tbody id="journalVoucherContent">
 										
-										</div>
+									</tbody>
+									</table>
+								</div>
+								<div class="row">
+									<div class="col-lg-4 col-sm-5"></div>
+									<div class="col-lg-4 col-sm-5 ml-auto">
+									<table class="table table-clear">
+										<tbody>
+										<tr>
+											<td class="left">
+											<strong>TOTAL</strong>
+											</td>
+											<td class="left">₱ <strong id="total_debit_voucher"></strong></td>
+											<td class="left">₱ <strong id="total_credit_voucher"></strong></td>
+										</tr>
+										
+										</tbody>
+									</table>
+									
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				
 			</div>
-		</div>
 			
+		</div>
 	</div>
+</div>
 </section>	
 <!-- /.content -->
 @endsection

@@ -119,7 +119,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="amount">Amount</label>
 									<div class="input-group">
-										<input type="number" class="form-control form-control-sm rounded-0" name="amount" id="amount"  placeholder="Amount" required>
+										<input type="number" class="form-control form-control-sm rounded-0" name="amount" id="amount"  step="any" placeholder="Amount" required>
 									</div>
 								</div>
 							</div>
@@ -245,6 +245,7 @@
 				</div>
 			</div>
 			<div class="col-md-12 text-right">
+				<button class="btn btn-flat btn-sm bg-gradient-info" id="open_voucher" >VOUCHER</button>
 				<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#btn_submit').click()" > SAVE JOURNAL</button>
 			</div>
 		
@@ -252,6 +253,117 @@
 	
 		
   </div>
+
+  <div class="modal fade" id="JDetailsVoucher" tabindex="2" role="dialog" aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-body"  >
+				<div class="container-fluid ">
+					<div id="ui-view">
+						<div class="card">
+							<div class="card-body" id="journal_toPrintVouch">
+								<link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
+								<link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+								<link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
+								<div class="col-md-12">
+									<img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"  class="img img-fluid">
+								</div>
+								<div class="col-md-12">
+									<h3 style="text-align:center">Journal Voucher</h3>
+								</div>
+								<div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_pay"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_branch"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_date"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_ref_no"></strong></h6>
+											
+										</div>
+									</div>
+								</div>
+								<div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_source"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_particular"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; ₱ <strong id="journal_voucher_amount"></strong></h6>
+											
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_amount_in_words" style="text-transform:capitalize;"></strong></h6>
+											
+										</div>
+									</div>
+								</div>
+								<div class="table-responsive-sm" style="padding-top:5px;">
+									<table class="table table-striped" style="border-top:4px dashed black;border-bottom:4px dashed black;">
+									<thead>
+										<tr>
+										<th class="center">Account</th>
+										<th>Title</th>
+										<th>S/L</th>
+										<th class="center">Debii</th>
+										<th class="right">Credit</th>
+										</tr>
+									</thead>
+									<tbody id="journal_VoucherContent">
+										
+									</tbody>
+									</table>
+								</div>
+								<div class="row">
+									<div class="col-lg-4 col-sm-5"></div>
+									<div class="col-lg-4 col-sm-5 ml-auto">
+									<table class="table table-clear">
+										<tbody>
+										<tr>
+											<td class="left">
+											<strong>TOTAL</strong>
+											</td>
+											<td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
+											<td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
+										</tr>
+										</tbody>
+									</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</div>
 </section>	
 <!-- /.content -->
 

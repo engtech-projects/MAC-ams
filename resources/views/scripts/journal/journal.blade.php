@@ -441,6 +441,10 @@
 			}
 		});
 	});
+	$(document).on('click','#open_voucher',function(e){
+		e.preventDefault();
+		setVoucherData();
+	});
 	$(document).on('click','.editable-table-data',function (e) {
         e.stopPropagation();
         e.preventDefault();
@@ -488,6 +492,46 @@
 			return total;
 		}
 		return false;
+	}
+	function setVoucherData()
+	{
+		if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
+			 && $('#JDetailsVoucher').val() && $('#source').val() && $('#JDetailsVoucher').val() && $('#amount').val()){
+			$('#journal_VoucherContent').html('')
+
+			$('#journal_voucher_pay').text($('#payee').val())
+			$('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
+			$('#journal_voucher_date').text($('#journal_date').val())
+			$('#journal_voucher_ref_no').text($('#JDetailsVoucher').val())
+			$('#journal_voucher_source').text($('#source').val())
+			$('#journal_voucher_particular').text($('#JDetailsVoucher').val())
+			$('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
+			$('#journal_voucher_amount_in_words').text(numberToWords(parseFloat($('#amount').val())))
+
+
+			$('#journal_total_debit_voucher').text($('#total_debit').text())
+			$('#journal_total_credit_voucher').text($('#total_credit').text())
+
+			
+			$.each($('#tbl-create-journal-container').find('tr'), function(k,v){
+				var field = $(v).children()
+				$('#journal_VoucherContent').append(`
+					<tr>
+						<td class="center">${$(field[0]).find('.editable-row-item').text()}</td>
+						<td class="left">${$(field[1]).find('.editable-row-item').find(":selected").text()}</td>
+						<td class="left">${$(field[2]).find('.editable-row-item').text()}</td>
+						<td class="center">${$(field[3]).find('.editable-row-item').text()}</td>
+						<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
+					</tr>`
+				);
+				
+			});
+			$('#JDetailsVoucher').modal('show');
+		}else{
+			alert('input required field')
+		}
+		
+
 	}
 	function getBalance()
 	{
