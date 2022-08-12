@@ -20,6 +20,7 @@ class journalEntry extends Model
 		'book_id',
 		'source',
 		'cheque_no',
+		'cheque_date',
 		'amount',
 		'payee',
 		'remarks',
