@@ -78,8 +78,6 @@
 			var field = $(v).children()
 			if($(field[0]).find('.editable-row-item').text() == '' ||
 				$(field[1]).find('.editable-row-item').val() == '' ||
-				$(field[2]).find('.editable-row-item').text() == '' || 
-				$(field[3]).find('.editable-row-item').text() == '' ||  
 				$(field[4]).find('.editable-row-item').val() == '')
 			{
 				_st = false;
@@ -111,8 +109,8 @@
 									{
 										journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
 										account_id: $(field[1]).find('.editable-row-item').val(),
-										journal_details_debit: $(field[2]).find('.editable-row-item').text(),
-										journal_details_credit: $(field[3]).find('.editable-row-item').text(),
+										journal_details_debit: ($(field[2]).find('.editable-row-item').text() === '') ? '0' : $(field[2]).find('.editable-row-item').text(),
+										journal_details_credit:($(field[3]).find('.editable-row-item').text() === '') ? '0' : $(field[3]).find('.editable-row-item').text(),
 										subsidiary_id: $(field[4]).find('.editable-row-item').val(),
 										journal_details_description: $(field[5]).find('.editable-row-item').text(),
 										journal_id: data.id,
