@@ -89,34 +89,42 @@ class SystemSetupController extends MainController
 	public function journalBookCreateOrUpdate(Request $request)
 	{
 		$book_id = $request->bookId;
-		if(count(JournalBook::where('book_code',$request->book_code)->get()) > 0)
-		{
-			return json_encode(['status' => 'error', 'message'=> 'Book Code Already Exist']);
-		}
-
+		$journ = new JournalBook;
+		$status = $journ->checkBookCode($request->book_code, $request->book_id);
+		
+		
 		if($book_id == '')
 		{
-			$book = new JournalBook;
-			$book->book_code = $request->book_code;
-			$book->book_name = $request->book_name;
-			$book->book_src = $request->book_src;
-			$book->book_ref = $request->book_ref;
-			$book->book_flag = $request->book_head;
-			$book->book_head = $request->book_flag;
-			$book->save();
-
-			return json_encode(['status' => 'create', 'book_id'=> $book->book_id]);
-
+			if(!$status)
+			{
+				$book = new JournalBook;
+				$book->book_code = $request->book_code;
+				$book->book_name = $request->book_name;
+				$book->book_src = $request->book_src;
+				$book->book_ref = $request->book_ref;
+				$book->book_flag = $request->book_head;
+				$book->book_head = $request->book_flag;
+				$book->save();
+				return json_encode(['status' => 'create', 'book_id'=> $book->book_id]);
+			}else{
+				return json_encode(['status' => 'book_code_duplicate', 'book_id'=>'']);
+			}
 		}else{
-			$book = JournalBook::find($book_id);
-			$book->book_code = $request->book_code;
-			$book->book_name = $request->book_name;
-			$book->book_src = $request->book_src;
-			$book->book_ref = $request->book_ref;
-			$book->book_flag = $request->book_head;
-			$book->book_head = $request->book_flag;
-			$book->save();
-			return json_encode(['status' => 'update', 'book_id'=> $book->book_id]);
+			if(!$status)
+			{
+				$book = JournalBook::find($book_id);
+				$book->book_code = $request->book_code;
+				$book->book_name = $request->book_name;
+				$book->book_src = $request->book_src;
+				$book->book_ref = $request->book_ref;
+				$book->book_flag = $request->book_head;
+				$book->book_head = $request->book_flag;
+				$book->save();
+				return json_encode(['status' => 'update', 'book_id'=> $book->book_id]);
+			}else{
+				return json_encode(['status' => 'book_code_duplicate', 'book_id'=>'']);
+			}
+			
 		}
 	}
 

@@ -54,7 +54,7 @@ class JournalController extends MainController
 		
 		$data = [
 			'title' => 'Journal Entry',
-			'journalBooks' => JournalBook::get(),
+			'journalBooks' => JournalBook::getBookWithJournalCount(),
 			'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
 			'chartOfAccount' => Accounts::get()
 		];
@@ -65,13 +65,13 @@ class JournalController extends MainController
 	public function saveJournalEntry(Request $request)
 	{
 		$journal_no = 0;
-		$id = journalEntry::orderBy('journal_id','DESC')->take(1)->pluck('journal_id');
-		if(count($id) > 0){
-			$journal_no = '1'.sprintf("%006s",$id[0]);
-		}
-	
+		// $id = journalEntry::orderBy('journal_id','DESC')->take(1)->pluck('journal_id');
+		// if(count($id) > 0){
+		// 	$journal_no = '1'.sprintf("%006s",$id[0]);
+		// }
+			
 		$journal = new journalEntry;
-		$journal->journal_no = $journal_no;
+		$journal->journal_no = $request->journal_no;
 		$journal->journal_date = $request->journal_date;
 		$journal->branch_id = $request->branch_id;
 		$journal->book_id = $request->book_id;
@@ -99,7 +99,7 @@ class JournalController extends MainController
 	}
 	public function JournalEntryDelete(Request $request)
 	{
-		$journal = JournalEntry::find($request->journal_id);
+		$journal = JournalEntry::find($request->id);
 		
 		if($journal->delete())
 		{

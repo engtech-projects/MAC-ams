@@ -104,36 +104,42 @@
 				data: datastring,
 				dataType: "json",
 				success: function(result) {
-					if(result.status == 'create'){
-						toastr.success('Successfully Create');
-					}else if(result.status == 'update'){
-						toastr.success('Successfully Update');
-						journalBookTbl.row($("button[value ='"+result.book_id+"']").parents('tr'))
-							.remove().draw();
-							$('#bookId').val('');
-					}else{
-						toastr.error(result.message);
-					}
-					if(result.status == 'create' || result.status == 'update')
+					if(result.status != "book_code_duplicate")
 					{
-						journalBookTbl.row.add([
-							$('#book_code').val(),
-							$('#book_name').val(),
-							$('#book_src').val(),
-							$('#book_ref').val(),
-							$('#book_flag').val(),
-							$('#book_head').val(),
-							`<div class="row">
-								<div class="col-md-4">
-									<button value="${result.book_id}" vtype="edit" class="btn btn-bookA btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-								</div>
-								<div class="col-md-4">
-									<button value="${result.book_id}" vtype="delete" class="btn btn-bookA btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-								</div>
-							</div>`
-						]).draw().node();
-						$('#bookJournalForm')[0].reset();
+						if(result.status == 'create'){
+							toastr.success('Successfully Create');
+						}else if(result.status == 'update'){
+							toastr.success('Successfully Update');
+							journalBookTbl.row($("button[value ='"+result.book_id+"']").parents('tr'))
+								.remove().draw();
+								$('#bookId').val('');
+						}else{
+							toastr.error(result.message);
+						}
+						if(result.status == 'create' || result.status == 'update')
+						{
+							journalBookTbl.row.add([
+								$('#book_code').val(),
+								$('#book_name').val(),
+								$('#book_src').val(),
+								$('#book_ref').val(),
+								$('#book_flag').val(),
+								$('#book_head').val(),
+								`<div class="row">
+									<div class="col-md-4">
+										<button value="${result.book_id}" vtype="edit" class="btn btn-bookA btn-info btn-sm"><i class="fa  fa-pen"></i></button>
+									</div>
+									<div class="col-md-4">
+										<button value="${result.book_id}" vtype="delete" class="btn btn-bookA btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+									</div>
+								</div>`
+							]).draw().node();
+							$('#bookJournalForm')[0].reset();
+						}
+					}else{
+						toastr.error('Code Duplicate Can\'t Create or Update');
 					}
+					
 				},
 				error: function() {
 					console.log("Error");

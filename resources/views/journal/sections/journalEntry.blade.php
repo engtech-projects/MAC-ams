@@ -42,13 +42,14 @@
 						<div class="col-md-8 frm-header">
 							<h4 ><b>Journal Entry</b></h4>
 						</div>
+						<input type="hidden" name="journal_no" id="journal_no" >
 						<div class="col-md-4 frm-header">
 							<label class="label-normal" for="date">Journal Date</label>
 							<div class="input-group">
 							<input type="date" class="form-control form-control-sm rounded-0" name="journal_date" id="journal_date"  placeholder="Journal Date" required >
 							</div>
 						</div>
-						<div class="col-md-3 col-xs-12">
+						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="branch_id">Branch</label>
@@ -64,7 +65,7 @@
 							</div>
 						</div>
 
-						<div class="col-md-3 col-xs-12">
+						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="">Book Reference</label>
@@ -72,14 +73,23 @@
 									<select name="book_id" class="form-control form-control-sm" id="book_id" required>
 										<option value="" disabled selected>-Select Book References-</option>
 										@foreach($journalBooks as $journalBook)
-											<option value="{{$journalBook->book_id}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
+											<option value="{{$journalBook->book_id}}" _count="{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 										@endforeach
 									</select>
 									</div>
 								</div>
 							</div>
 						</div>
-
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="">Reference No.</label>
+									<div class="input-group">
+										<label class="label-normal" id="LrefNo" ></label>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">

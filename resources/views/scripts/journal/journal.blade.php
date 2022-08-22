@@ -151,24 +151,26 @@
 			alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
 		}
 	});
-	$(document).on('click','#JnalDelete',function(e){
+	$(document).on('click','.jnalDelete',function(e){
 		e.preventDefault();
 		var id = $(this).attr('value');
-		$.ajax({
-			headers: {
-				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-			},
-			type: "POST",
-			url: "{{route('journal.JournalEntryDelete')}}",
-			data:{items :details},
-			dataType: "json",
-			success: function(data) {
-				console.log(data)
-			},
-			error: function() {
-				console.log("Error");
-			}
-		});
+		if (confirm("Are You Sure want to delete this Journal Entry ?")) {
+			$.ajax({
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				type: "POST",
+				url: "{{route('journal.JournalEntryDelete')}}",
+				data:{id :id},
+				dataType: "json",
+				success: function(data) {
+					console.log(data)
+				},
+				error: function() {
+					console.log("Error");
+				}
+			});
+		}
 	})
 	$(document).on('click','.JnalFetch',function(e){
 		e.preventDefault();
@@ -503,8 +505,8 @@
 	}
 	function setVoucherData()
 	{
-		if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
-			 && $('#JDetailsVoucher').val() && $('#source').val() && $('#JDetailsVoucher').val() && $('#amount').val()){
+		// if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
+		// 	 && $('#JDetailsVoucher').val() && $('#source').val() && $('#JDetailsVoucher').val() && $('#amount').val()){
 			$('#journal_VoucherContent').html('')
 
 			$('#journal_voucher_pay').text($('#payee').val())
@@ -535,9 +537,9 @@
 				
 			});
 			$('#JDetailsVoucher').modal('show');
-		}else{
-			alert('input required field')
-		}
+		// }else{
+		// 	alert('input required field')
+		// }
 		
 
 	}
@@ -611,7 +613,8 @@
         });
     });
 	$(document).on('change','#book_id',function(){
-		$('#source').val($('option:selected', this).attr('book-src'));
+		$('#journal_no').val($(this).find(':selected').attr('_count'));
+		$('#LrefNo').text($(this).find(':selected').attr('_count'));
 	});
 	function editJournal(id)
 	{

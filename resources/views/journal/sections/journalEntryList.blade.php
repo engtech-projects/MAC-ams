@@ -123,7 +123,8 @@
 					<div class="col-md-12">
 						<table id="journalEntryDetails"  class="table table-bordered">
 							<thead>
-								<th>Reference #</th>
+								<th>Book Code</th>
+								<th>Journal #</th>
 								<th>Source</th>
 								<th>Amount</th>
 								<th>Remarks</th>
@@ -135,13 +136,14 @@
 								@foreach($journalEntryList as $journal)
 									<tr>
 										<td class="font-weight-bold">{{$journal->bookDetails->book_code}}</td>
+										<td class="font-weight-bold">{{$journal->journal_no}}</td>
 										<td>{{$journal->source}}</td>
 										<td>{{$journal->amount}}</td>
 										<td>{{$journal->remarks}}</td>
 										<td>{{$journal->journal_date}}</td>
 										<td class="nav-link {{($journal->status  == 'posted') ? 'text-success' : 'text-danger">Journal Entry</a>'}}"><b>{{ucfirst($journal->status)}}</b></td>
 										<td>
-											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-sm bg-gradient-danger JnalDelete">Delete</button>
+											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-sm bg-gradient-danger jnalDelete">Delete</button>
 											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
 											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
 										</td>

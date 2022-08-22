@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 class JournalBook extends Model
 {
@@ -20,5 +21,26 @@ class JournalBook extends Model
     	'book_head',
     	'book_flag',
     ];
+
+	public function getBookWithJournalCount()
+	{
+		return DB::table("journal_book")
+			->leftJoin("journal_entry", function($join){
+				$join->on("journal_book.book_id", "=", "journal_entry.book_id");
+			})
+			->selectRaw("journal_book.*, COUNT(journal_entry.journal_id) as ccount")
+			->groupBy("journal_book.book_id")
+			->get();
+	}
+
+	public function checkBookCode($code,$id)
+	{
+		$data = $this->where('book_code', $code)->Where('book_id',$id)->get();
+		if(count($data) > 0)
+		{
+			return true;
+		}
+		return false;
+	}
 
 }
