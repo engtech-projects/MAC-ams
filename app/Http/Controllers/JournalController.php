@@ -22,12 +22,10 @@ use App\Models\journalEntryDetails;
 
 class JournalController extends MainController
 {
-
 	public function index() {
 		$this->journalEntry();
 	}   
  	public function create() {
-
  		$transactionType = TransactionType::where('transaction_type', 'journal')->first();
  		$data = [
  			'title' => 'Journal Entry',
@@ -41,35 +39,24 @@ class JournalController extends MainController
  			'expenses' => Accounts::expense(),
  			'transactionType' => $transactionType
  		];
-
  		return view('journal.createjournal', $data);
  	}
-
  	public function store(Request $request) {
  		return $request;
  	}
-
 	public function journalEntry(Request $request)
 	{
-		
 		$data = [
 			'title' => 'Journal Entry',
 			'journalBooks' => JournalBook::getBookWithJournalCount(),
 			'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
 			'chartOfAccount' => Accounts::get()
 		];
-
 	    return view('journal.sections.journalEntry', $data);
 	}
 
 	public function saveJournalEntry(Request $request)
 	{
-		$journal_no = 0;
-		// $id = journalEntry::orderBy('journal_id','DESC')->take(1)->pluck('journal_id');
-		// if(count($id) > 0){
-		// 	$journal_no = '1'.sprintf("%006s",$id[0]);
-		// }
-			
 		$journal = new journalEntry;
 		$journal->journal_no = $request->journal_no;
 		$journal->journal_date = $request->journal_date;
@@ -85,7 +72,6 @@ class JournalController extends MainController
 		$journal->save();
 		return json_encode(['message'=>'save','id'=> $journal->journal_id]);
 	}
-
 	public function saveJournalEntryDetails(Request $request)
 	{
 		if(journalEntryDetails::insert($request->items))
@@ -100,14 +86,12 @@ class JournalController extends MainController
 	public function JournalEntryDelete(Request $request)
 	{
 		$journal = JournalEntry::find($request->id);
-		
 		if($journal->delete())
 		{
 			return json_encode(['message'=> 'delete']);
 		}
 		return json_encode(['message'=> 'error']);
 	}
-
 	public function JournalEntryEdit(Request $request)
 	{
 		//$request->$journal_id;
@@ -140,8 +124,6 @@ class JournalController extends MainController
 		}
 		return json_encode(['message'=> 'error']);
 	}
-	
-	
 	public function searchJournalEntry(Request $request)
 	{
 		return json_encode(JournalEntry::fetch($request->s_status,
@@ -150,7 +132,6 @@ class JournalController extends MainController
 			$request->s_book_id,
 			$request->s_branch_id));
 	}
-
 	public function journalEntryList(Request $request)
 	{
 		$data = [
@@ -160,10 +141,8 @@ class JournalController extends MainController
 			'journalEntryList' => JournalEntry::fetch(),
 			'chartOfAccount' => Accounts::get()
 		];
-
 	    return view('journal.sections.journalEntryList', $data);
 	}
-
  	public function show($id) {}
  	public function populate() {}
 

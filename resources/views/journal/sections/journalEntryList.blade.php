@@ -24,6 +24,12 @@
 	.label-sty{
 		color:#344069!important;
 	}
+	a{
+		color:#101b27!important;
+	}
+	.page-item.active .page-link{
+		color:white!important;
+	}
 	
 </style>
 <!-- Main content -->
@@ -309,31 +315,31 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModal" aria-hidden="true">
+<div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit" aria-hidden="true">
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="modal-body">
 				<div class="container-fluid ">
 					<div class="col-md-12">
-						<form id="journalEntryForm" method="POST">
+						<form id="journalEntryFormEdit" method="POST">
 							@csrf
-							<input type="hidden" class="form-control form-control-sm rounded-0" name="journal_id" id="journal_id"  placeholder="" >
+							<input type="hidden" class="form-control form-control-sm rounded-0" name="edit_journal_id" id="edit_journal_id"  placeholder="" >
 								<div class="row">
 									<div class="col-md-8 frm-header">
-										<h4 ><b>Journal Entry</b></h4>
+										<h4 ><b>Journal Entry (Edit)</b></h4>
 									</div>
 									<div class="col-md-4 frm-header">
-										<label class="label-sty label-normal" for="date">Journal Date</label>
+										<label class="label-normal" for="date">Journal Date</label>
 										<div class="input-group">
-										<input type="date" class="form-control form-control-sm rounded-0" name="journal_date" id="journal_date"  placeholder="Journal Date" required>
+										<input type="date" class="form-control form-control-sm rounded-0" name="edit_journal_date" id="edit_journal_date"  placeholder="Journal Date" required >
 										</div>
 									</div>
-									<div class="col-md-3 col-xs-12">
+									<div class="col-md-2 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="branch_id">Branch</label>
+												<label class="label-normal" for="edit_branch_id">Branch</label>
 												<div class="input-group">
-												<select name="branch_id" class="form-control form-control-sm" id="branch_id">
+												<select name="edit_branch_id" class="form-control form-control-sm" id="edit_branch_id" required>
 													<option value="" disabled selected>-Select Branch-</option>
 													<option value="1">Butuan CIty Branch</option>
 													<option value="2">Nasipit Branch</option>
@@ -342,15 +348,15 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-md-3 col-xs-12">
+									<div class="col-md-2 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="">Book Reference</label>
+												<label class="label-normal" for="">Book Reference</label>
 												<div class="input-group">
-												<select name="book_id" class="form-control form-control-sm" id="book_id" >
+												<select name="edit_book_id" class="form-control form-control-sm" id="edit_book_id" required>
 													<option value="" disabled selected>-Select Book References-</option>
 													@foreach($journalBooks as $journalBook)
-														<option value="{{$journalBook->book_id}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_name}}</option>
+														<option value="{{$journalBook->book_id}}" _count="{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 													@endforeach
 												</select>
 												</div>
@@ -360,9 +366,9 @@
 									<div class="col-md-2 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="source">Source</label>
+												<label class="label-normal" for="">Reference No.</label>
 												<div class="input-group">
-													<input type="text" class="form-control form-control-sm rounded-0" name="source" id="source"  placeholder="Source" required>
+													<label class="label-normal" id="edit_LrefNo" ></label>
 												</div>
 											</div>
 										</div>
@@ -370,9 +376,9 @@
 									<div class="col-md-2 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="cheque_no">Cheque No</label>
+												<label class="label-normal" for="edit_source">Source</label>
 												<div class="input-group">
-													<input type="Number" class="form-control form-control-sm rounded-0" name="cheque_no" id="cheque_no"  placeholder="Cheque No" required>
+													<input type="text" class="form-control form-control-sm rounded-0" name="edit_source" id="edit_source"  placeholder="Source" required>
 												</div>
 											</div>
 										</div>
@@ -380,9 +386,29 @@
 									<div class="col-md-2 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="status">Status</label>
+												<label class="label-normal" for="edit_cheque_no">Cheque No</label>
 												<div class="input-group">
-													<select name="status" class="form-control form-control-sm" id="status">
+													<input type="Number" class="form-control form-control-sm rounded-0" name="edit_cheque_no" id="edit_cheque_no"  placeholder="Cheque No">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-2 col-xs-12">
+										<div class="box">
+											<div class="form-group">
+												<label class="label-normal" for="edit_cheque_date">Cheque Date</label>
+												<div class="input-group">
+													<input type="date" class="form-control form-control-sm rounded-0" name="edit_cheque_date" id="edit_cheque_date"  placeholder="Cheque Date">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-2 col-xs-12">
+										<div class="box">
+											<div class="form-group">
+												<label class="label-normal" for="edit_status">Status</label>
+												<div class="input-group">
+													<select name="edit_status" class="form-control form-control-sm" id="edit_status" required>
 														<option value="unposted" selected>Unposted</option>
 													</select>
 												</div>
@@ -392,9 +418,9 @@
 									<div class="col-md-3 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="amount">Amount</label>
+												<label class="label-normal" for="edit_amount">Amount</label>
 												<div class="input-group">
-													<input type="number" class="form-control form-control-sm rounded-0" name="amount" id="amount"  placeholder="Amount" required>
+													<input type="number" class="form-control form-control-sm rounded-0" name="edit_amount" id="edit_amount"  step="any" placeholder="Amount" required>
 												</div>
 											</div>
 										</div>
@@ -402,36 +428,36 @@
 									<div class="col-md-3 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="payee">Payee</label>
+												<label class="label-normal" for="edit_payee">Payee</label>
 												<div class="input-group">
-													<input type="text" class="form-control form-control-sm rounded-0" name="payee" id="payee"  placeholder="Payee" required>
+													<input type="text" class="form-control form-control-sm rounded-0" name="edit_payee" id="edit_payee"  placeholder="Payee" required >
 												</div>
 											</div>
 										</div>
 									</div>
-									<div class="col-md-6 col-xs-12">
+									<div class="col-md-4 col-xs-12">
 										<div class="box">
 											<div class="form-group">
-												<label class="label-sty label-normal" for="remarks">Remarks</label>
+												<label class="label-normal" for="edit_remarks">Remarks (<font style="color:red;">Separate with comma for the next remarks</font>)</label>
 												<div class="input-group">
-													<input type="text" class="form-control form-control-sm rounded-0" name="remarks" id="remarks"  placeholder="Remarks" required>
+													<input type="text" class="form-control form-control-sm rounded-0" name="edit_remarks" id="edit_remarks"  placeholder="Remarks" required>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-								<button id="btn_submit" style="display:none;" > SAVE</button>
+								<button id="edit_btn_submit" style="display:none;" > UPDATE</button>
 						</form>
 					</div>
 					<div class="co-md-12" style="height:10px;"></div>
 					<div class="col-md-12">
 						<div class="col-md-12 text-right">
-							<button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i class="fa fa-plus"></i> Add Details </button>
+							<button class="btn btn-flat btn-sm bg-gradient-success" id="edit_add_item"><i class="fa fa-plus"></i> Add Details </button>
 						</div>
 						<div class="co-md-12" style="height:10px;"></div>
 						<div class="row">
 							<div class="col-md-12">
-								<table class="table table-bordered table-sm" id="tbl-create-journal">
+								<table class="table table-bordered table-sm" id="tbl-edit-journal">
 								<thead>
 									<tr class="text-center">
 										<th>Account #</th>
@@ -443,39 +469,35 @@
 										<th class="text-right" width="50">Action</th>
 									</tr>
 								</thead>
-								<tbody id="tbl-create-journal-container">
-									@for($i = 0; $i < 5; $i++)
-										<tr class='editable-table-row'>
-											<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_account_no" class="editable-row-item"></a></td>
-											<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_title" class="editable-row-item"></a> </td>
-											<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item"></a> </td>
-											<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
-											<td class='editable-table-data' value="" >
-												<select  fieldName="subsidiary_id" class="form-control form-control-sm subsidiary_item">
-													<option disabled value="" selected>-Select S/L-</option>
-													@foreach($subsidiaries as $subsidiary)
-														<option value="{{$subsidiary->sub_id}}">{{$subsidiary->sub_name}}</option>
-													@endforeach
-												</select>
-											</td>
-											<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class=" editable-row-item"></a></td>
-											
-											<td>
-												<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
-													<span>
-														<i class="fas fa-trash" aria-hidden="true"></i>
-													</span>
-												</button>
-											</td>
-										</tr>
-									@endfor
+								<tbody id="tbl-create-edit-container">
+									
 								</tbody>
+								<tfoot>
+									<tr class="text-center">
+										<th></th>
+										<th width="200">TOTAL</th>
+										<th width="150" id="edit_total_debit">0</th>
+										<th width="150" id="edit_total_credit">0</th>
+										<th width="200"></th>
+										<th width="200"></th>
+										<th class="text-right" width="50"></th>
+									</tr>
+									<tr class="text-center">
+										<th></th>
+										<th width="200">BALANCE</th>
+										<th width="150" id="edit_balance_debit">0</th>
+										<th width="150"></th>
+										<th width="200"></th>
+										<th width="200"></th>
+										<th class="text-right" width="50"></th>
+									</tr>
+								</tfoot>
 							</table>
 								</div>
 							</div>
 						</div>
 						<div class="col-md-12 text-right">
-							<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#btn_submit').click()" > SAVE JOURNAL</button>
+							<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#btn_submit').click()" > UPDATE JOURNAL</button>
 						</div>
 						<!-- Button trigger modal -->
 					</div>
@@ -508,7 +530,6 @@
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="voucher_pay"></strong></h6>
-											
 										</div>
 									</div>
 									<div class="col-md-6">

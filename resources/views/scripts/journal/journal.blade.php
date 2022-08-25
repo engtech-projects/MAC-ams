@@ -193,11 +193,13 @@
 	})
 	$(document).on('DOMSubtreeModified','a[fieldName="journal_details_debit"]',function(){
 		$('#total_debit').text(getTotal('debit').toLocaleString("en-US"));
+		$('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US"));
 		getBalance()
 		checkTotalAndAmount()
 	})
 	$(document).on('DOMSubtreeModified','a[fieldName="journal_details_credit"]', function(){
 		$('#total_credit').text(getTotal('credit').toLocaleString("en-US"));
+		$('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US"));
 		getBalance()
 		checkTotalAndAmount()
 	})
@@ -229,6 +231,88 @@
 	});
 	$(document).on('click','.stsVoucher',function(e){
 		$('#journalDetailsVoucher').modal('show')
+	});
+	$(document).on('click','.JnalEdit',function(e){
+		$('#journalModalEdit').modal('show');
+		var id = $(this).attr('value');
+		$('#tbl-create-edit-container').html('');
+		$.ajax({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			type: "POST",
+			data:{journal_id:id},
+			url: "{{route('journal.JournalEntryFetch')}}",
+			dataType: "json",
+			success: function(response) {
+				if(response.message == 'fetch')
+				{
+					console.log(response.data);
+					$.each(response.data, function(k, v){
+						var total_debit = 0;
+						var total_credit = 0;
+						var balance = 0;
+						$('#edit_LrefNo').text(v.journal_no)
+						$('#edit_journal_id').val(v.journal_id);
+						$('#edit_journal_date').val(v.journal_date);
+						$('#edit_branch_id').val(v.branch_id);
+						$('#edit_book_id').val(v.book_id);
+						$('#edit_source').val(v.source);
+						$('#edit_cheque_no').val(v.cheque_no);
+						$('#edit_cheque_date').val(v.cheque_date);
+						$('#edit_status').val(v.status);
+						$('#edit_amount').val(v.amount);
+						$('#edit_payee').val(v.payee);
+						$('#edit_remarks').val(v.remarks);
+						$.each(v.journal_details, function(kk, vv){
+							$('#tbl-create-edit-container').append(`<tr class='editable-table-row'>
+								<td class="acctnu" value="" >
+									<a href="#" class="editable-row-item journal_details_account_no">${vv.chart_of_account.account_number}</a>
+								</td>
+								<td class='editable-table-data' value="" >
+									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="form-control form-control-sm editable-row-item COASelect">
+										<option disabled value="" selected>-Select Account Name-</option>
+										@foreach($chartOfAccount as $account)
+											<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_name}}</option>
+										@endforeach
+									</select>
+								</td>
+								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
+								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
+								<td class='editable-table-data' value="" >
+									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="form-control form-control-sm edit_subsidiary_item" value="">
+										@foreach($subsidiaries as $subsidiary)
+											<option value="{{$subsidiary->sub_id}}">{{$subsidiary->sub_name}}</option>
+										@endforeach
+									</select>
+								</td>
+								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class=" editable-row-item">${(!vv.journal_details_description) ? '' : vv.journal_details_description}</a></td>
+								<td>
+									<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
+										<span>
+											<i class="fas fa-trash" aria-hidden="true"></i>
+										</span>
+									</button>
+								</td>
+							</tr>`);
+							$('#subsidiary_acct_'+vv.journal_details_id).val(vv.account_id);
+							$('#subsidiary_'+vv.journal_details_id).val(vv.subsidiary_id);
+							total_debit = parseFloat(total_debit) + parseFloat(vv.journal_details_debit)
+							total_credit = parseFloat(total_credit) + parseFloat(vv.journal_details_credit)
+							balance = parseFloat(total_debit) - parseFloat(total_credit)
+
+						});
+						$('#edit_total_debit').text(total_debit)
+						$('#edit_total_credit').text(total_credit)
+						$('#edit_balance_debit').text(balance)
+
+					});
+				}
+			},
+			error: function() {
+				console.log("Error");
+			}
+		});
 	});
 	$(document).on('click','.JnalView',function(e){
 		e.preventDefault();
@@ -393,6 +477,64 @@
 			winPrint.close(); 
 		}, 500);
 	})
+	$(document).on('click','#edit_add_item', function(e){
+		e.preventDefault()
+		var content = `<tr class='editable-table-row'>
+			<td class="acctnu" value="" >
+				<a href="#" class="editable-row-item journal_details_account_no"></a>
+			</td>
+			<td class='editable-table-data' value="" >
+				<select  fieldName="account_id" class="form-control form-control-sm editable-row-item COASelect">
+					<option disabled value="" selected>-Select Account Name-</option>
+					@foreach($chartOfAccount as $account)
+						<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_name}}</option>
+					@endforeach
+				</select>
+			</td>
+			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item"></a> </td>
+			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
+			<td class='editable-table-data' value="" >
+				<select  fieldName="subsidiary_id" class="form-control form-control-sm editable-row-item">
+					<option disabled value="" selected>-Select S/L-</option>
+					<?php
+						$temp = '';
+						foreach($subsidiaries as $subsidiary){
+							if($temp == '')
+							{
+								$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+								echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+							}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
+							{
+								echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+								$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+							}
+							echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
+						}
+					?>
+				</select>
+			</td>
+			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class="editable-row-item"></a> </td>
+			<td>
+				<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
+					<span>
+						<i class="fas fa-trash" aria-hidden="true"></i>
+					</span>
+				</button>
+			</td>
+		</tr>`
+		$('#tbl-create-edit-container').append(content); 
+		$('.editable-row-item').editable({
+				type: 'text',
+				emptytext: '',
+				showbuttons: false,
+				unsavedclass: null,
+				toggle: 'manual',
+				onblur: "cancel",
+				inputclass: 'form-control form-control-sm block',
+				success: function (response, newValue) {
+			}
+		});
+	});
 	$(document).on('click','#add_item',function(e){
 		e.preventDefault();
 		var content = `<tr class='editable-table-row'>
@@ -483,6 +625,19 @@
 					}
 				}
 			});
+
+			$.each($('#tbl-create-edit-container').find('tr'), function(k,v){
+				var field = $(v).children()
+				var debitAmount = $(field[2]).find('.editable-row-item').text().float();
+				if(Number.isNaN(debitAmount))
+				{
+				}else{
+					if($.isNumeric(debitAmount))
+					{
+						total += debitAmount;
+					}
+				}
+			});
 			return total;
 		}else
 		{
@@ -499,6 +654,18 @@
 				}
 			});
 
+			$.each($('#tbl-create-edit-container').find('tr'), function(k,v){
+				var field = $(v).children()
+				var creditAmount = parseFloat($(field[3]).find('.editable-row-item').text().float());
+				if(Number.isNaN(creditAmount))
+				{
+				}else{
+					if($.isNumeric(creditAmount))
+					{
+						total += creditAmount;
+					}
+				}
+			});
 			return total;
 		}
 		return false;
@@ -507,46 +674,43 @@
 	{
 		// if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
 		// 	 && $('#JDetailsVoucher').val() && $('#source').val() && $('#JDetailsVoucher').val() && $('#amount').val()){
-			$('#journal_VoucherContent').html('')
+		$('#journal_VoucherContent').html('')
+		$('#journal_voucher_pay').text($('#payee').val())
+		$('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
+		$('#journal_voucher_date').text($('#journal_date').val())
+		$('#journal_voucher_ref_no').text($('#JDetailsVoucher').val())
+		$('#journal_voucher_source').text($('#source').val())
+		$('#journal_voucher_particular').text($('#JDetailsVoucher').val())
+		$('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
+		$('#journal_voucher_amount_in_words').text(numberToWords(parseFloat($('#amount').val())))
 
-			$('#journal_voucher_pay').text($('#payee').val())
-			$('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
-			$('#journal_voucher_date').text($('#journal_date').val())
-			$('#journal_voucher_ref_no').text($('#JDetailsVoucher').val())
-			$('#journal_voucher_source').text($('#source').val())
-			$('#journal_voucher_particular').text($('#JDetailsVoucher').val())
-			$('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
-			$('#journal_voucher_amount_in_words').text(numberToWords(parseFloat($('#amount').val())))
 
+		$('#journal_total_debit_voucher').text($('#total_debit').text())
+		$('#journal_total_credit_voucher').text($('#total_credit').text())
 
-			$('#journal_total_debit_voucher').text($('#total_debit').text())
-			$('#journal_total_credit_voucher').text($('#total_credit').text())
-
-			
-			$.each($('#tbl-create-journal-container').find('tr'), function(k,v){
-				var field = $(v).children()
-				$('#journal_VoucherContent').append(`
-					<tr>
-						<td class="center">${$(field[0]).find('.editable-row-item').text()}</td>
-						<td class="left">${$(field[1]).find('.editable-row-item').find(":selected").text()}</td>
-						<td class="left">${$(field[2]).find('.editable-row-item').text()}</td>
-						<td class="center">${$(field[3]).find('.editable-row-item').text()}</td>
-						<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
-					</tr>`
-				);
-				
-			});
-			$('#JDetailsVoucher').modal('show');
-		// }else{
-		// 	alert('input required field')
-		// }
 		
-
+		$.each($('#tbl-create-journal-container').find('tr'), function(k,v){
+			var field = $(v).children()
+			$('#journal_VoucherContent').append(`
+				<tr>
+					<td class="center">${$(field[0]).find('.editable-row-item').text()}</td>
+					<td class="left">${$(field[1]).find('.editable-row-item').find(":selected").text()}</td>
+					<td class="left">${$(field[2]).find('.editable-row-item').text()}</td>
+					<td class="center">${$(field[3]).find('.editable-row-item').text()}</td>
+					<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
+				</tr>`
+			);
+			
+		});
+		$('#JDetailsVoucher').modal('show');
 	}
 	function getBalance()
 	{
 		$('#balance_debit').text(
 			(parseFloat($('#total_debit').text().replace(",","")) - parseFloat($('#total_credit').text().replace(",",""))).toLocaleString("en-US")
+		);
+		$('#edit_balance_debit').text(
+			(parseFloat($('#edit_total_debit').text().replace(",","")) - parseFloat($('#edit_total_credit').text().replace(",",""))).toLocaleString("en-US")
 		);
 	}
 	function numberToWords(number) {  
@@ -589,16 +753,16 @@
     	var personName = $('select[name=person] option:selected').text();
     	var personType = $('select[name=person] option:selected').data('type');
     	var markup = `
-			        <tr class="transaction-items">
-			          <td></td>
-			          <td>${accountName}</td>
-			          <td class="text-right">${debit}</td>
-			          <td class="text-right">${credit}</td>
-			          <td>${description}</td>
-			          <td>${personName}</td>
-			          <td class="text-center"><i class="fa fa-trash-alt fa-xs text-muted remove-items" aria-hidden="true"></i></td>
-			        </tr>
-			        `;
+			<tr class="transaction-items">
+				<td></td>
+				<td>${accountName}</td>
+				<td class="text-right">${debit}</td>
+				<td class="text-right">${credit}</td>
+				<td>${description}</td>
+				<td>${personName}</td>
+				<td class="text-center"><i class="fa fa-trash-alt fa-xs text-muted remove-items" aria-hidden="true"></i></td>
+			</tr>
+			`;
 		$('#footer-row').before(markup);
     });
     $(document).on('submit', '#frm-create-journal', function(e){

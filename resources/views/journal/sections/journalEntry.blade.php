@@ -156,7 +156,7 @@
 						<div class="col-md-4 col-xs-12">
 							<div class="box">
 								<div class="form-group">
-									<label class="label-normal" for="remarks">Remarks</label>
+									<label class="label-normal" for="remarks">Remarks (<font style="color:red;">Separate with comma for the next remarks</font>)</label>
 									<div class="input-group">
 										<input type="text" class="form-control form-control-sm rounded-0" name="remarks" id="remarks"  placeholder="Remarks" required>
 									</div>
@@ -206,7 +206,6 @@
 									<td class='editable-table-data' value="" >
 										<select  fieldName="subsidiary_id" class="form-control form-control-sm editable-row-item">
 											<option disabled value="" selected>-Select S/L-</option>
-											
 											<?php
 												$temp = '';
 												foreach($subsidiaries as $subsidiary){
@@ -265,12 +264,8 @@
 				<button class="btn btn-flat btn-sm bg-gradient-info" id="open_voucher" >VOUCHER</button>
 				<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#btn_submit').click()" > SAVE JOURNAL</button>
 			</div>
-		
 		</div>
-	
-		
   </div>
-
   <div class="modal fade" id="JDetailsVoucher" tabindex="2" role="dialog" aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
@@ -386,8 +381,6 @@
 
 
 @endsection
-
-
 @section('footer-scripts')
   @include('scripts.journal.journal')
 @endsection
