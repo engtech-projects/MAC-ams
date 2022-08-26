@@ -41,7 +41,6 @@ class Supplier extends Model
         $supplier->save();
 
         if( $supplier->supplier_id )  {
-
             $address = new SupplierAddress();
             $address->street = $request->street;
             $address->city = $request->city;
@@ -50,10 +49,8 @@ class Supplier extends Model
             $address->country = $request->country;
             $address->supplier_id = $supplier->supplier_id;
             $address->save();
-
             return response()->json(array('success' => true, 'message' => 'New supplier created!'), 200);
         }
-
         return response()->json(array('success' => true, 'message' => 'Something went wrong!'), 200);
     }
 

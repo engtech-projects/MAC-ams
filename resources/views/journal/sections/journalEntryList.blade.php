@@ -224,13 +224,14 @@
 							<div class="col-md-2 col-xs-12">
 								<div class="box">
 									<div class="form-group">
-										<label class="label-bold label-sty" for="status">Status</label>
+										<label class="label-bold label-sty" for="cheque_no">Cheque Date</label>
 										<div class="input-group">
-											<label class="label-normal"  id="vjournal_status" ></label>
+											<label class="label-bold" id="vjournal_cheque_date"></label>
 										</div>
 									</div>
 								</div>
 							</div>
+							
 							<div class="col-md-3 col-xs-12">
 								<div class="box">
 									<div class="form-group">
@@ -251,12 +252,22 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-md-6 col-xs-12">
+							<div class="col-md-4 col-xs-12">
 								<div class="box">
 									<div class="form-group">
 										<label class="label-bold label-sty" for="remarks">Remarks</label>
 										<div class="input-group">
 										<label class="label-normal" id="vjournal_remarks">Book_no</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-2 col-xs-12">
+								<div class="box">
+									<div class="form-group">
+										<label class="label-bold label-sty" for="status">Status</label>
+										<div class="input-group">
+											<label class="label-normal"  id="vjournal_status" ></label>
 										</div>
 									</div>
 								</div>

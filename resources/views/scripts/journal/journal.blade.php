@@ -345,6 +345,7 @@
 						$('#voucher_amount_in_words').text(numberToWords(parseFloat(v.amount)));
 						$('#vjournal_remarks').text(v.remarks);
 						$('#vjournal_branch, #voucher_branch').text(v.branch_id);
+						$('#vjournal_cheque_date').text(v.cheque_date);
 						if(v.status == 'unposted')
 						{
 							content = `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
