@@ -332,6 +332,7 @@
 					var total_credit = 0;
 					$('#tbl-create-journalview-container').html('');
 					$('#journalVoucherContent').html('');
+					$('#vjournal_remarks').html('');
 					$.each(response.data, function(k, v){
 						$('#posted-content').html('');
 						var content = '';
@@ -344,7 +345,7 @@
 						$('#vjournal_payee, #voucher_pay').text(v.payee);
 						$('#voucher_amount_in_words').text(numberToWords(parseFloat(v.amount)));
 
-						$.each(v.remarks.split(','), function(k, vv){
+						$.each(v.remarks.split('::'), function(k, vv){
 							$('#vjournal_remarks').append(
 								`<li>${vv}</li>`
 							);

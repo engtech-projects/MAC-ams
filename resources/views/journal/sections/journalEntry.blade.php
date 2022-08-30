@@ -156,7 +156,7 @@
 						<div class="col-md-4 col-xs-12">
 							<div class="box">
 								<div class="form-group">
-									<label class="label-normal" for="remarks">Remarks (<font style="color:red;">Separate with comma for the next remarks</font>)</label>
+									<label class="label-normal" for="remarks">Remarks (<font style="color:red;">Separate with double colon (::) for the next remarks</font>)</label>
 									<div class="input-group">
 										<input type="text" class="form-control form-control-sm rounded-0" name="remarks" id="remarks"  placeholder="Remarks" required>
 									</div>
