@@ -257,7 +257,7 @@
 									<div class="form-group">
 										<label class="label-bold label-sty" for="remarks">Remarks</label>
 										<div class="input-group">
-										<label class="label-normal" id="vjournal_remarks">Book_no</label>
+										<label class="label-normal" id="vjournal_remarks"></label>
 										</div>
 									</div>
 								</div>

@@ -343,7 +343,13 @@
 						$('#vjournal_amount, #voucher_amount').text(parseFloat(v.amount).toLocaleString("en-US"));
 						$('#vjournal_payee, #voucher_pay').text(v.payee);
 						$('#voucher_amount_in_words').text(numberToWords(parseFloat(v.amount)));
-						$('#vjournal_remarks').text(v.remarks);
+
+						$.each(v.remarks.split(','), function(k, vv){
+							$('#vjournal_remarks').append(
+								`<li>${vv}</li>`
+							);
+							
+						});
 						$('#vjournal_branch, #voucher_branch').text(v.branch_id);
 						$('#vjournal_cheque_date').text(v.cheque_date);
 						if(v.status == 'unposted')
