@@ -63,7 +63,9 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">Account Name</label>
 								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<select name="gender" class="form-control form-control-sm" id="gender">
+										<option value="" disabled selected>-Select Report-</option>
+									</select>
 								</div>
 							</div>
 						</div>

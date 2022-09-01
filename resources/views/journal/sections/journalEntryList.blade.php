@@ -145,13 +145,18 @@
 										<td class="font-weight-bold">{{$journal->journal_no}}</td>
 										<td>{{$journal->source}}</td>
 										<td>{{$journal->amount}}</td>
-										<td>{{$journal->remarks}}</td>
+										<?php $remarks = explode('::', $journal->remarks)?>
+											<td>
+												@foreach($remarks as $remark)
+													<li> {{$remark}}</li>
+												@endforeach
+											</td>
 										<td>{{$journal->journal_date}}</td>
 										<td class="nav-link {{($journal->status  == 'posted') ? 'text-success' : 'text-danger">Journal Entry</a>'}}"><b>{{ucfirst($journal->status)}}</b></td>
 										<td>
 											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-sm bg-gradient-danger jnalDelete">Delete</button>
 											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
-											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
+											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
 										</td>
 									</tr>
 								@endforeach 
@@ -367,7 +372,7 @@
 												<select name="edit_book_id" class="form-control form-control-sm" id="edit_book_id" required>
 													<option value="" disabled selected>-Select Book References-</option>
 													@foreach($journalBooks as $journalBook)
-														<option value="{{$journalBook->book_id}}" _count="{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
+														<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 													@endforeach
 												</select>
 												</div>
@@ -508,7 +513,7 @@
 							</div>
 						</div>
 						<div class="col-md-12 text-right">
-							<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#btn_submit').click()" > UPDATE JOURNAL</button>
+							<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#edit_btn_submit').click()" > UPDATE JOURNAL</button>
 						</div>
 						<!-- Button trigger modal -->
 					</div>

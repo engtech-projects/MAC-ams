@@ -23,7 +23,7 @@ class ReportsController extends MainController
 			'sub_categories' => SubsidiaryCategory::get(),
 			'title' => 'Subsidiary Ledger',
 			'subsidiaryLedgerList' => ''
-		];
+		];	
 
 	   return view('reports.sections.subsidiaryledger', $data);
 	}
@@ -84,7 +84,7 @@ class ReportsController extends MainController
 		}
 		return false;
 	}
-
+	
 	public function subsidiaryDelete(Request $request)
 	{
 		if(Subsidiary::find($request->id)->delete()){
@@ -93,29 +93,12 @@ class ReportsController extends MainController
 		return false;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-
-
-
 	public function generalLedger()
 	{
 		
 		$data = [
 			'title' => 'General Ledger',
-			'generalLedgerList' => ''
+			'data' => Accounts::generalLedger_fetchAccounts()
 		];
 
 	   return view('reports.sections.generalledger', $data);

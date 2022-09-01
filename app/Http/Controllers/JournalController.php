@@ -57,20 +57,26 @@ class JournalController extends MainController
 
 	public function saveJournalEntry(Request $request)
 	{
-		$journal = new journalEntry;
-		$journal->journal_no = $request->journal_no;
-		$journal->journal_date = $request->journal_date;
-		$journal->branch_id = $request->branch_id;
-		$journal->book_id = $request->book_id;
-		$journal->source = $request->source;
-		$journal->cheque_no = $request->cheque_no;
-		$journal->cheque_date = $request->cheque_date;
-		$journal->amount = $request->amount;
-		$journal->status = $request->status;
-		$journal->payee = $request->payee;
-		$journal->remarks = $request->remarks;
-		$journal->save();
-		return json_encode(['message'=>'save','id'=> $journal->journal_id]);
+		if($request->journal_id == '')
+		{
+			$journal = new journalEntry;
+			$journal->journal_no = $request->journal_no;
+			$journal->journal_date = $request->journal_date;
+			$journal->branch_id = $request->branch_id;
+			$journal->book_id = $request->book_id;
+			$journal->source = $request->source;
+			$journal->cheque_no = $request->cheque_no;
+			$journal->cheque_date = $request->cheque_date;
+			$journal->amount = $request->amount;
+			$journal->status = $request->status;
+			$journal->payee = $request->payee;
+			$journal->remarks = $request->remarks;
+			$journal->save();
+			return json_encode(['message'=>'save','id'=> $journal->journal_id]);
+		}else{
+			
+
+		}
 	}
 	public function saveJournalEntryDetails(Request $request)
 	{
@@ -94,24 +100,20 @@ class JournalController extends MainController
 	}
 	public function JournalEntryEdit(Request $request)
 	{
-		//$request->$journal_id;
-		$journal = JournalEntry::find($request->journal_id);
-		$journal->journal_no = $request->journal_no;
-		$journal->journal_date = $request->journal_date;
-		$journal->branch_id = $request->branch_id;
-		$journal->book_id = $request->book_id;
-		$journal->source = $request->source;
-		$journal->cheque_no = $request->cheque_no;
-		$journal->cheque_date = $request->cheque_date;
-		$journal->amount = $request->amount;
-		$journal->status = $request->status;
-		$journal->payee = $request->payee;
-		$journal->remarks = $request->remarks;
-		if($journal->save())
-		{
-			return json_encode(['message'=> 'update']);
-		}
-		return json_encode(['message'=> 'error']);
+		$journal = JournalEntry::find($request->edit_journal_id);
+		$journal->journal_no = $request->edit_journal_no;
+		$journal->journal_date = $request->edit_journal_date;
+		$journal->branch_id = $request->edit_branch_id;
+		$journal->book_id = $request->edit_book_id;
+		$journal->source = $request->edit_source;
+		$journal->cheque_no = $request->edit_cheque_no;
+		$journal->cheque_date = $request->edit_cheque_date;
+		$journal->amount = $request->edit_amount;
+		$journal->status = $request->edit_status;
+		$journal->payee = $request->edit_payee;
+		$journal->remarks = $request->edit_remarks;
+		$journal->save();
+		return json_encode(['message'=>'update','id'=> $journal->journal_id]);
 	}
 	
 	public function JournalEntryPostUnpost(Request $request)

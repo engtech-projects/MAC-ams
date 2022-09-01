@@ -200,5 +200,36 @@ class Accounts extends Model
 
         return $expense;
     }
+    //gerneralLedger (All Account)
+	public function generalLedger_fetchAccounts($from='', $to='', $account_id='')
+	{
+		$query = DB::table("chart_of_accounts")->
+			select("chart_of_accounts.account_number",
+				"chart_of_accounts.account_name",
+				"chart_of_accounts.account_id",
+				"chart_of_accounts.status",
+				"journal_entry_details.journal_details_debit", 
+				"journal_entry_details.journal_details_credit", 
+				"journal_entry.source", 
+				"journal_entry.cheque_no", 
+				"journal_entry.cheque_date");
+				$query->join("journal_entry_details", function($join){
+					$join->on("chart_of_accounts.account_id", "=", "journal_entry_details.account_id");
+				})
+				->join("journal_entry", function($join){
+					$join->on("journal_entry_details.journal_id", "=", "journal_entry.journal_id");
+				})
+				->orderBy("chart_of_accounts.account_id","asc");
+        if($from != '' && $to != '')
+        {
+            $query->whereBetween("journal_entry.journal_date", [$from, $to]);
+        }
+		if($account_id != '')
+		{
+			$query->where('chart_of_accounts.account_id',$account_id);
+		}
+		return $query->get();
+	}
+
 
 }

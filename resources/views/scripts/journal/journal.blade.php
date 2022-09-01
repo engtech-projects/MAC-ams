@@ -232,6 +232,49 @@
 	$(document).on('click','.stsVoucher',function(e){
 		$('#journalDetailsVoucher').modal('show')
 	});
+	$('#journalEntryFormEdit').submit(function(e){
+		e.preventDefault();
+		var s_data = $(this).serialize();
+		$.ajax({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			type: "POST",
+			url: "{{route('journal.JournalEntryEdit')}}",
+			data:s_data,
+			dataType: "json",
+			success: function(data) {
+				console.log(data)
+				// $('#journalEntryDetails').DataTable().destroy();
+				// $('#journalEntryDetailsContent').html('');
+
+				// $.each(data, function(k,v){
+				// 	var status = (v.status == 'posted') ? 'text-success' : 'text-danger';
+				// 	var disabled = (v.status == 'posted') ? 'disabled' : '';
+				// 	$('#journalEntryDetailsContent').append(
+				// 		`<tr>
+				// 			<td class="font-weight-bold">${v.book_details.book_code}</td>
+				// 			<td>${v.source}</td>
+				// 			<td>${v.amount}</td>
+				// 			<td>${v.remarks}</td>
+				// 			<td>${v.journal_date}</td>
+				// 			<td class="nav-link ${status}"><b>${v.status}</b></td>
+				// 			<td>
+				// 				<button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-sm bg-gradient-danger JnalDelete">Delete</button>
+				// 				<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
+				// 				<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
+				// 			</td>
+				// 		</tr>`
+				// 	);
+					
+				// });
+				// $('#journalEntryDetails').DataTable();
+			},
+			error: function(data) {
+				toastr.error('Error');
+			}
+		});
+	});
 	$(document).on('click','.JnalEdit',function(e){
 		$('#journalModalEdit').modal('show');
 		var id = $(this).attr('value');
@@ -300,12 +343,10 @@
 							total_debit = parseFloat(total_debit) + parseFloat(vv.journal_details_debit)
 							total_credit = parseFloat(total_credit) + parseFloat(vv.journal_details_credit)
 							balance = parseFloat(total_debit) - parseFloat(total_credit)
-
 						});
 						$('#edit_total_debit').text(total_debit)
 						$('#edit_total_credit').text(total_credit)
 						$('#edit_balance_debit').text(balance)
-
 					});
 				}
 			},
@@ -344,12 +385,10 @@
 						$('#vjournal_amount, #voucher_amount').text(parseFloat(v.amount).toLocaleString("en-US"));
 						$('#vjournal_payee, #voucher_pay').text(v.payee);
 						$('#voucher_amount_in_words').text(numberToWords(parseFloat(v.amount)));
-
 						$.each(v.remarks.split('::'), function(k, vv){
 							$('#vjournal_remarks').append(
 								`<li>${vv}</li>`
 							);
-							
 						});
 						$('#vjournal_branch, #voucher_branch').text(v.branch_id);
 						$('#vjournal_cheque_date').text(v.cheque_date);
