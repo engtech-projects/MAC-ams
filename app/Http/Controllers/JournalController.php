@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Hash;
 use Session;
+use DB;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AccountType;
@@ -80,10 +81,14 @@ class JournalController extends MainController
 	}
 	public function saveJournalEntryDetails(Request $request)
 	{
+		
+		journalEntryDetails::where('journal_id', $request->id)->delete();
 		if(journalEntryDetails::insert($request->items))
 		{
 			return json_encode(['message'=>'save']);
 		}
+		
+		
 	}
 	public function JournalEntryFetch(Request $request)
 	{

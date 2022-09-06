@@ -212,12 +212,17 @@ class Accounts extends Model
 				"journal_entry_details.journal_details_credit", 
 				"journal_entry.source", 
 				"journal_entry.cheque_no", 
+				"journal_entry.journal_date", 
+				"subsidiary.sub_name", 
 				"journal_entry.cheque_date");
 				$query->join("journal_entry_details", function($join){
 					$join->on("chart_of_accounts.account_id", "=", "journal_entry_details.account_id");
 				})
 				->join("journal_entry", function($join){
 					$join->on("journal_entry_details.journal_id", "=", "journal_entry.journal_id");
+				})
+                ->join("subsidiary", function($join){
+					$join->on("journal_entry_details.subsidiary_id", "=", "subsidiary.sub_id");
 				})
 				->orderBy("chart_of_accounts.account_id","asc");
         if($from != '' && $to != '')

@@ -98,7 +98,7 @@ class ReportsController extends MainController
 		
 		$data = [
 			'title' => 'General Ledger',
-			'data' => Accounts::generalLedger_fetchAccounts()
+			'datas' => Accounts::generalLedger_fetchAccounts()
 		];
 
 	   return view('reports.sections.generalledger', $data);

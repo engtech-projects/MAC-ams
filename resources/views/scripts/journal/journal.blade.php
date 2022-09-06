@@ -102,40 +102,7 @@
 					success: function(data) {
 						if(data.message == 'save')
 						{
-							var details = [];
-							$.each($('#tbl-create-journal-container').find('tr'), function(k,v){
-								var field = $(v).children()
-								details.push(
-									{
-										journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
-										account_id: $(field[1]).find('.editable-row-item').val(),
-										journal_details_debit: ($(field[2]).find('.editable-row-item').text() === '') ? '0' : $(field[2]).find('.editable-row-item').text(),
-										journal_details_credit:($(field[3]).find('.editable-row-item').text() === '') ? '0' : $(field[3]).find('.editable-row-item').text(),
-										subsidiary_id: $(field[4]).find('.editable-row-item').val(),
-										journal_details_description: $(field[5]).find('.editable-row-item').text(),
-										journal_id: data.id,
-									}
-								);
-							});
-							$.ajax({
-								headers: {
-									'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-								},
-								type: "POST",
-								url: "{{route('journal.saveJournalEntryDetails')}}",
-								data:{items :details},
-								dataType: "json",
-								success: function(data) {
-									if(data.message == 'save')
-									{
-										toastr.success('Successfully Save');
-										reload();
-									}
-								},
-								error: function(data) {
-									toastr.error('Error');
-								}
-							});
+							saveJournalEntryDetails(data.id, 'save');
 						}
 					},
 					error: function() {
@@ -245,30 +212,10 @@
 			dataType: "json",
 			success: function(data) {
 				console.log(data)
-				// $('#journalEntryDetails').DataTable().destroy();
-				// $('#journalEntryDetailsContent').html('');
-
-				// $.each(data, function(k,v){
-				// 	var status = (v.status == 'posted') ? 'text-success' : 'text-danger';
-				// 	var disabled = (v.status == 'posted') ? 'disabled' : '';
-				// 	$('#journalEntryDetailsContent').append(
-				// 		`<tr>
-				// 			<td class="font-weight-bold">${v.book_details.book_code}</td>
-				// 			<td>${v.source}</td>
-				// 			<td>${v.amount}</td>
-				// 			<td>${v.remarks}</td>
-				// 			<td>${v.journal_date}</td>
-				// 			<td class="nav-link ${status}"><b>${v.status}</b></td>
-				// 			<td>
-				// 				<button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-sm bg-gradient-danger JnalDelete">Delete</button>
-				// 				<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
-				// 				<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
-				// 			</td>
-				// 		</tr>`
-				// 	);
-					
-				// });
-				// $('#journalEntryDetails').DataTable();
+				if(data.message == 'update')
+				{
+					saveJournalEntryDetails(data.id,'update')
+				}
 			},
 			error: function(data) {
 				toastr.error('Error');
@@ -323,7 +270,7 @@
 								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
 								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
 								<td class='editable-table-data' value="" >
-									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="form-control form-control-sm edit_subsidiary_item" value="">
+									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
 										@foreach($subsidiaries as $subsidiary)
 											<option value="{{$subsidiary->sub_id}}">{{$subsidiary->sub_name}}</option>
 										@endforeach
@@ -750,6 +697,49 @@
 			
 		});
 		$('#JDetailsVoucher').modal('show');
+	}
+	function saveJournalEntryDetails(jid, type)
+	{
+		var elem = $('#tbl-create-edit-container');
+		if(type == 'save')
+		{
+			elem = ('#tbl-create-journal-container');
+		}
+		var details = [];
+		$.each(elem.find('tr'), function(k,v){
+			var field = $(v).children()
+			console.log( $(field[4]))
+			details.push(
+				{
+					journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
+					account_id: $(field[1]).find('.editable-row-item').val(),
+					journal_details_debit: ($(field[2]).find('.editable-row-item').text() === '') ? '0' : $(field[2]).find('.editable-row-item').text(),
+					journal_details_credit:($(field[3]).find('.editable-row-item').text() === '') ? '0' : $(field[3]).find('.editable-row-item').text(),
+					subsidiary_id: $(field[4]).find('.editable-row-item').val(),
+					journal_details_description: $(field[5]).find('.editable-row-item').text(),
+					journal_id: jid,
+				}
+			);
+		});
+		$.ajax({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			type: "POST",
+			url: "{{route('journal.saveJournalEntryDetails')}}",
+			data:{items :details, id:jid},
+			dataType: "json",
+			success: function(data) {
+				if(data.message == 'save')
+				{
+					toastr.success('Successfully Save');
+					reload();
+				}
+			},
+			error: function(data) {
+				toastr.error('Error');
+			}
+		});
 	}
 	function getBalance()
 	{

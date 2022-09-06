@@ -105,77 +105,48 @@
 								<div class="col-md-12">
 									<table id="subsidiaryledgerTbl"  class="table table-bordered">
 										<thead>
-											<th>Reference No.</th>
-											<th>Account Name</th>
-											<th>Address</th>
-											<th>Tel No.</th>
-											<th>Branch</th>
 											<th>Date</th>
-											<th>Amount</th>
-											<th>Amort</th>
-											<th>life Used</th>
-											<th>Salv</th>
-											<th>Account</th>
-											<th>Date Posted</th>
+											<th>Preference Name</th>
+											<th>Source</th>
+											<th>Cheque Date</th>
+											<th>Cheque No.</th>
+											<th>Debit</th>
+											<th>Credit</th>
+											<th>Balance</th>
 										</thead>
 										<tbody>
-											
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
-											<tr>
-												<td class="font-weight-bold">0000</td>
-												<td>Head Office</td>
-												<td>Butuan City</td>
-												<td>354-2202</td>
-												<td>BRANCH-BRANCH</td>
-												<td>1/1/22</td>
-												<td>25,001.00</td>
-												<td>320</td>
-												<td>5</td>
-												<td>5</td>
-												<td>01292</td>
-												<td>1/12/22</td>
-											</tr>
+											<?php 
+												$id = '';
+											?>
+											@if(!empty($datas))
+												@foreach($datas as $data)
+														@if($id == '')
+															<tr>
+																<td colspan="7" class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
+																<td>Balance-text</td>
+															</tr>
+															<?php $id = $data->account_id;?>
+														@else
+															@if($id != $data->account_id)
+																<tr rowspan="12">
+																	<td colspan="7" class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
+																	<td>Balance-text</td>
+																</tr>
+																<?php $id = $data->account_id;?>
+															@endif
+														@endif
+													<tr>
+														<td>{{$data->journal_date}}</td>
+														<td>{{$data->sub_name}}</td>
+														<td>{{$data->source}}</td>
+														<td>{{($data->cheque_date == '') ? '/' : $data->cheque_date}}</td>
+														<td>{{($data->cheque_no == '') ? '/' : $data->cheque_no}}</td>
+														<td>{{number_format($data->journal_details_debit, 2, ".", ",")}}</td>
+														<td>{{number_format($data->journal_details_credit, 2, ".", ",")}}</td>
+														<td>01292</td>
+													</tr>
+												@endforeach
+											@endif
 										</tbody>
 									</table>
 								</div>
