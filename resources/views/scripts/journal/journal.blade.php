@@ -131,10 +131,13 @@
 				data:{id :id},
 				dataType: "json",
 				success: function(data) {
-					console.log(data)
+					if(data.message == 'delete'){
+						toastr.success('Successfully Delete');
+						reload();
+					}
 				},
 				error: function() {
-					console.log("Error");
+					toastr.error('Error');
 				}
 			});
 		}
@@ -154,7 +157,7 @@
 				console.log(data)
 			},
 			error: function() {
-				console.log("Error");
+				toastr.error('Error');
 			}
 		});
 	})
@@ -703,7 +706,7 @@
 		var elem = $('#tbl-create-edit-container');
 		if(type == 'save')
 		{
-			elem = ('#tbl-create-journal-container');
+			elem = $('#tbl-create-journal-container');
 		}
 		var details = [];
 		$.each(elem.find('tr'), function(k,v){
