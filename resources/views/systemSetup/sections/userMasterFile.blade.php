@@ -99,7 +99,7 @@
 			<div class="box">
 				<h4 style="font-size:16px;text-transform:uppercase;margin-bottom:24px;">ACCESSIBILITY</h4>
 				<div class="col-md-12" style="min-height:560px; max-height:560px; overflow:auto;">
-					<table class="table table-bordered" >
+					<table class="table table-bordered"  id="systemSetupAccessibility">
 						<thead>
 							<tr>
 								<th>Module</th>

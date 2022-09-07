@@ -5,13 +5,12 @@
  Source Server Type    : MySQL
  Source Server Version : 50733
  Source Host           : 127.0.0.1:3306
- Source Schema         : just_accounting_db
 
  Target Server Type    : MySQL
  Target Server Version : 50733
  File Encoding         : 65001
 
- Date: 15/08/2022 11:38:26
+ Date: 07/09/2022 10:00:05
 */
 
 SET NAMES utf8mb4;
@@ -58,7 +57,7 @@ CREATE TABLE `accessibilities`  (
   INDEX `accessibilities_ibfk_1`(`sml_id`) USING BTREE,
   CONSTRAINT `accessibilities_ibfk_1` FOREIGN KEY (`sml_id`) REFERENCES `sub_module_lists` (`sml_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `accessibilities_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB AUTO_INCREMENT = 219 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 222 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of accessibilities
@@ -66,7 +65,6 @@ CREATE TABLE `accessibilities`  (
 INSERT INTO `accessibilities` VALUES (25, 122, 1, '2022-04-25', '2022-04-25 00:00:00', '2022-04-25 00:00:00');
 INSERT INTO `accessibilities` VALUES (26, 123, 1, '2022-04-25', '2022-04-25 00:00:00', '2022-04-25 00:00:00');
 INSERT INTO `accessibilities` VALUES (27, 124, 1, '2022-04-25', '2022-04-25 00:00:00', '2022-04-25 00:00:00');
-INSERT INTO `accessibilities` VALUES (28, 125, 1, '2022-04-25', '2022-04-25 00:00:00', '2022-04-25 00:00:00');
 INSERT INTO `accessibilities` VALUES (29, 126, 1, '2022-04-25', '2022-04-25 00:00:00', '2022-04-25 00:00:00');
 INSERT INTO `accessibilities` VALUES (30, 127, 1, '2022-04-25', '2022-04-25 00:00:00', '2022-04-25 00:00:00');
 INSERT INTO `accessibilities` VALUES (31, 128, 1, '2022-04-25', '2022-04-25 00:00:00', '2022-04-25 00:00:00');
@@ -109,11 +107,11 @@ INSERT INTO `accessibilities` VALUES (160, 204, 1, '2022-05-18', '2022-05-18 03:
 INSERT INTO `accessibilities` VALUES (161, 205, 1, '2022-05-18', '2022-05-18 06:02:00', '2022-05-18 06:02:00');
 INSERT INTO `accessibilities` VALUES (162, 206, 1, '2022-05-18', '2022-05-18 06:02:01', '2022-05-18 06:02:01');
 INSERT INTO `accessibilities` VALUES (163, 207, 1, '2022-05-18', '2022-05-18 06:02:02', '2022-05-18 06:02:02');
+INSERT INTO `accessibilities` VALUES (164, 208, 1, '2022-05-20', '2022-05-20 01:48:25', '2022-05-20 01:48:25');
 INSERT INTO `accessibilities` VALUES (165, 209, 1, '2022-05-20', '2022-05-20 02:09:49', '2022-05-20 02:09:49');
 INSERT INTO `accessibilities` VALUES (166, 211, 1, '2022-05-22', '2022-05-22 15:14:56', '2022-05-22 15:14:56');
 INSERT INTO `accessibilities` VALUES (167, 212, 1, '2022-05-22', '2022-05-22 15:14:57', '2022-05-22 15:14:57');
 INSERT INTO `accessibilities` VALUES (168, 213, 1, '2022-05-22', '2022-05-22 15:14:58', '2022-05-22 15:14:58');
-INSERT INTO `accessibilities` VALUES (169, 214, 1, '2022-05-22', '2022-05-22 15:14:59', '2022-05-22 15:14:59');
 INSERT INTO `accessibilities` VALUES (170, 215, 1, '2022-05-22', '2022-05-22 15:14:59', '2022-05-22 15:14:59');
 INSERT INTO `accessibilities` VALUES (171, 216, 1, '2022-05-22', '2022-05-22 15:32:27', '2022-05-22 15:32:27');
 INSERT INTO `accessibilities` VALUES (175, 217, 1, '2022-05-24', '2022-05-24 03:38:06', '2022-05-24 03:38:06');
@@ -154,8 +152,11 @@ INSERT INTO `accessibilities` VALUES (213, 260, 1, '2022-06-13', '2022-06-13 03:
 INSERT INTO `accessibilities` VALUES (214, 262, 1, '2022-06-13', '2022-06-13 03:00:57', '2022-06-13 03:00:57');
 INSERT INTO `accessibilities` VALUES (215, 263, 1, '2022-06-22', '2022-06-22 03:14:51', '2022-06-22 03:14:51');
 INSERT INTO `accessibilities` VALUES (216, 265, 1, '2022-06-24', '2022-06-24 05:49:38', '2022-06-24 05:49:38');
-INSERT INTO `accessibilities` VALUES (217, 208, 1, '2022-07-15', '2022-07-15 06:28:37', '2022-07-15 06:28:37');
-INSERT INTO `accessibilities` VALUES (218, 267, 1, '2022-07-21', '2022-07-21 02:45:51', '2022-07-21 02:45:51');
+INSERT INTO `accessibilities` VALUES (217, 267, 1, '2022-08-31', '2022-08-31 03:10:21', '2022-08-31 03:10:21');
+INSERT INTO `accessibilities` VALUES (218, 268, 1, '2022-09-06', '2022-09-06 06:18:28', '2022-09-06 06:18:28');
+INSERT INTO `accessibilities` VALUES (219, 269, 1, '2022-09-06', '2022-09-06 06:32:03', '2022-09-06 06:32:03');
+INSERT INTO `accessibilities` VALUES (220, 214, 1, '2022-09-06', '2022-09-06 06:42:41', '2022-09-06 06:42:41');
+INSERT INTO `accessibilities` VALUES (221, 125, 1, '2022-09-06', '2022-09-06 06:53:30', '2022-09-06 06:53:30');
 
 -- ----------------------------
 -- Table structure for account_category
@@ -167,7 +168,7 @@ CREATE TABLE `account_category`  (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`account_category_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of account_category
@@ -192,8 +193,8 @@ CREATE TABLE `account_type`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`account_type_id`) USING BTREE,
   INDEX `idfk_account_category_id`(`account_category_id`) USING BTREE,
-  CONSTRAINT `idfk_account_category_id` FOREIGN KEY (`account_category_id`) REFERENCES `account_category` (`account_category_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 36 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+  CONSTRAINT `account_type_ibfk_1` FOREIGN KEY (`account_category_id`) REFERENCES `account_category` (`account_category_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 36 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of account_type
@@ -232,12 +233,11 @@ CREATE TABLE `accounting`  (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`accounting_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of accounting
 -- ----------------------------
-INSERT INTO `accounting` VALUES (1, '2022-05-10', '2022-06-30', 'accrual', NULL, '2022-05-10 02:54:37', '2022-08-15 03:04:42');
 
 -- ----------------------------
 -- Table structure for bill
@@ -256,13 +256,12 @@ CREATE TABLE `bill`  (
   `account_id` int(10) UNSIGNED NULL DEFAULT NULL,
   `to_increase` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY (`bill_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bill
 -- ----------------------------
 INSERT INTO `bill` VALUES (2, 98, '1001', '2021-11-24', '2021-11-24', 'supplier', 2, '5000', 1, 3, 'credit');
-INSERT INTO `bill` VALUES (3, 99, '1001', '2022-01-11', '2022-01-11', 'supplier', 2, '500', NULL, 3, 'credit');
 
 -- ----------------------------
 -- Table structure for chart_of_accounts
@@ -282,7 +281,7 @@ CREATE TABLE `chart_of_accounts`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`account_id`) USING BTREE,
   UNIQUE INDEX `account`(`account_number`, `account_name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 418 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 418 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of chart_of_accounts
@@ -302,7 +301,7 @@ INSERT INTO `chart_of_accounts` VALUES (249, '1205 ', 'Loans Receivable - Curren
 INSERT INTO `chart_of_accounts` VALUES (250, '1255', 'Loans Receivable - Past Due', 'Loans Receivable - Past Due', NULL, 'yes', NULL, 'active', 3, '2022-05-25 14:42:35', '2022-05-25 14:42:35');
 INSERT INTO `chart_of_accounts` VALUES (251, '1260', 'Loans Receivable - Restructured', 'Loans Receivable - Restructured', NULL, 'yes', NULL, 'active', 3, '2022-05-25 14:45:09', '2022-05-25 14:45:09');
 INSERT INTO `chart_of_accounts` VALUES (252, '1265', 'Loans Receivable - Litigation Loans', 'Loans Receivable - Litigation Loans', NULL, 'yes', NULL, 'active', 3, '2022-05-25 14:45:35', '2022-05-25 14:45:35');
-INSERT INTO `chart_of_accounts` VALUES (253, '1270', 'LaJhggHEdq5yKkPJdBXLMoAubyHwAB4ttD', 'LaJhggHEdq5yKkPJdBXLMoAubyHwAB4ttD', NULL, 'yes', NULL, 'active', 3, '2022-05-25 14:45:44', '2022-05-25 14:45:44');
+INSERT INTO `chart_of_accounts` VALUES (253, '1270', 'Loans Receivable - Write-off Loans', 'Loans Receivable - Write-off Loans', NULL, 'yes', NULL, 'active', 3, '2022-05-25 14:45:44', '2022-05-25 14:45:44');
 INSERT INTO `chart_of_accounts` VALUES (254, '1300', 'Allowance for Probable Loans Losses', 'Allowance for Probable Loans Losses', NULL, 'yes', NULL, 'active', 3, '2022-05-25 14:45:52', '2022-05-25 14:45:52');
 INSERT INTO `chart_of_accounts` VALUES (255, '1350', 'Advances to Officers and Employee', 'Advances to Officers and Employee', NULL, 'yes', NULL, 'active', 4, '2022-05-25 14:47:45', '2022-05-25 14:47:45');
 INSERT INTO `chart_of_accounts` VALUES (256, '1355', 'Accounts Receivable Litigation', 'Accounts Receivable Litigation', NULL, 'yes', NULL, 'active', 4, '2022-05-25 14:52:01', '2022-05-25 14:52:01');
@@ -475,10 +474,10 @@ DROP TABLE IF EXISTS `company`;
 CREATE TABLE `company`  (
   `company_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `logo` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `company_email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `phone_number` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `contact_number` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `logo` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `company_email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone_number` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contact_number` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`company_id`) USING BTREE
@@ -487,7 +486,7 @@ CREATE TABLE `company`  (
 -- ----------------------------
 -- Records of company
 -- ----------------------------
-INSERT INTO `company` VALUES (1, 'Engtech Global Solutions Inc.s', '', 'pedales.rustom@gmail.com', '+639631433932', NULL, NULL, '2022-06-01 03:30:03');
+INSERT INTO `company` VALUES (1, 'Engtech', '', 'Engtech@engtech.com', '48468', '1848', '2022-08-03 07:08:20', '2022-08-03 07:08:28');
 
 -- ----------------------------
 -- Table structure for company_address
@@ -505,13 +504,13 @@ CREATE TABLE `company_address`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`address_id`) USING BTREE,
   INDEX `company_address_company_id_foreign`(`company_id`) USING BTREE,
-  CONSTRAINT `company_address_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `company_address_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of company_address
 -- ----------------------------
-INSERT INTO `company_address` VALUES (1, 'P5B Silad Mahogany\r\nHDS Building 999 JC Aquino St.', 'Butuan City', 'Butuan City', '8600', 'Philippines', 1, '2022-04-25 07:05:30', '2022-04-25 07:05:30');
+INSERT INTO `company_address` VALUES (1, 'erwer', 'erwer', 'erw', 'rwer', 'werw', 1, '2022-08-03 07:08:20', '2022-08-03 07:08:20');
 
 -- ----------------------------
 -- Table structure for currency
@@ -530,7 +529,7 @@ CREATE TABLE `currency`  (
 -- ----------------------------
 -- Records of currency
 -- ----------------------------
-INSERT INTO `currency` VALUES (1, 'Peso', 'PHP', 'active', '2022-08-03 15:21:08', '2022-08-15 03:05:44');
+INSERT INTO `currency` VALUES (1, 'Peso', 'PHP', 'active', '2022-08-03 15:21:08', '2022-08-03 15:21:12');
 
 -- ----------------------------
 -- Table structure for customer
@@ -552,11 +551,13 @@ CREATE TABLE `customer`  (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`customer_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of customer
 -- ----------------------------
+INSERT INTO `customer` VALUES (1, NULL, NULL, NULL, NULL, NULL, 'gian anduyan', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `customer` VALUES (2, NULL, NULL, NULL, NULL, NULL, 'rustom pedales', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for customer_address
@@ -575,7 +576,7 @@ CREATE TABLE `customer_address`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`address_id`) USING BTREE,
   INDEX `customer_address_customer_id_foreign`(`customer_id`) USING BTREE,
-  CONSTRAINT `customer_address_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `customer_address_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -599,12 +600,13 @@ CREATE TABLE `employee_addresses`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`address_id`) USING BTREE,
   INDEX `employee_addresses_employee_id_foreign`(`employee_id`) USING BTREE,
-  CONSTRAINT `employee_addresses_employee_id_foreign` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+  CONSTRAINT `employee_addresses_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of employee_addresses
 -- ----------------------------
+INSERT INTO `employee_addresses` VALUES (1, 'street', 'city', 'province', '8600', NULL, NULL, 1, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for employees
@@ -648,13 +650,12 @@ CREATE TABLE `expense`  (
   `account_id` int(11) UNSIGNED NULL DEFAULT NULL,
   `to_increase` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY (`expense_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of expense
 -- ----------------------------
 INSERT INTO `expense` VALUES (2, 97, 1, '2021-11-21 00:00:00', '125003625', 3, 'supplier', 3000.00, 1, 'credit');
-INSERT INTO `expense` VALUES (3, 100, 1, '2022-01-11 00:00:00', '1003', 2, 'supplier', 6000.00, 1, 'credit');
 
 -- ----------------------------
 -- Table structure for failed_jobs
@@ -693,13 +694,11 @@ CREATE TABLE `invoice`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`invoice_id`) USING BTREE,
   UNIQUE INDEX `invoice_invoice_no_unique`(`invoice_no`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of invoice
 -- ----------------------------
-INSERT INTO `invoice` VALUES (1, 101, '3423', '2022-01-11', '2022-01-11', 2, 2, 25000.00, '2022-01-11 03:24:35', '2022-01-11 03:24:35');
-INSERT INTO `invoice` VALUES (2, 102, '2620', '2022-01-11', '2022-01-11', 2, 2, 50000.00, '2022-01-11 03:25:05', '2022-01-11 03:25:05');
 
 -- ----------------------------
 -- Table structure for item_details
@@ -714,15 +713,13 @@ CREATE TABLE `item_details`  (
   `amount` double(11, 2) NULL DEFAULT NULL,
   `transaction_id` int(11) UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`item_details_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of item_details
 -- ----------------------------
 INSERT INTO `item_details` VALUES (16, 1, 'description 1', 3, 500.00, 1500.00, 90);
 INSERT INTO `item_details` VALUES (17, 2, '', 1, 25000.00, 25000.00, 91);
-INSERT INTO `item_details` VALUES (18, 2, 'desc 1', 1, 25000.00, 25000.00, 101);
-INSERT INTO `item_details` VALUES (19, 2, '', 2, 25000.00, 50000.00, 102);
 
 -- ----------------------------
 -- Table structure for journal_book
@@ -739,21 +736,21 @@ CREATE TABLE `journal_book`  (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`book_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 35 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of journal_book
 -- ----------------------------
-INSERT INTO `journal_book` VALUES (1, 'CDB', 'CHECK DISBURSEMENT BOOK\r\n', 'CHECK DISBURSEMENT BOOK', '2066', 'Active', 'Active', '2022-06-08 02:04:47', '2022-06-08 02:04:47');
-INSERT INTO `journal_book` VALUES (2, 'PJB\r\n', 'PURCHASE/PAYABLES JOURNAL BOOK\r\n', 'PURCHASE/PAYABLES JOURNAL BOOK', '0', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (3, 'SJB\r\n', 'SALES/RECIEVABLES JOURNAL BOOK\r\n', 'SALES/RECIEVABLES JOURNAL BOOK', '0', 'Active', 'Active', '2022-07-12 12:43:52', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (4, 'CRB\r\n', 'CASH RECEIPT BOOK\r\n', 'CASH RECEIPT BOOK', '1415', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (5, 'GJB\r\n', 'GENERAL JOURNAL BOOK\r\n', 'GENERAL JOURNAL BOOK', '3354', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (6, 'CSDB\r\n', 'CASH DISBURSMENT BOOK', 'CASH DISBURSMENT BOOK', '5165', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (7, 'CDPB\r\n', 'CASH DISBURSMENT BOOK', 'COLLECTION DEPOSITS BOOK', '651', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (8, 'LRB\r\n', 'LOAN RELEASES BOOK', 'LOAN RELEASES BOOK', '2362', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (9, 'LPB\r\n', 'LOAN PAYMENTS BOOK', 'LOAN PAYMENTS BOOK', '3210', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
-INSERT INTO `journal_book` VALUES (10, 'ODB\r\n', 'OTHER DEPOSIT BOOK', 'OTHER DEPOSIT BOOK', '0', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (25, 'CDB', 'CHECK DISBURSEMENT BOOK\r\n', 'CHECK DISBURSEMENT BOOK', '2066', 'Active', 'Active', '2022-06-08 02:04:47', '2022-06-08 02:04:47');
+INSERT INTO `journal_book` VALUES (26, 'PJB', 'PURCHASE/PAYABLES JOURNAL BOOK\r\n', 'PURCHASE/PAYABLES JOURNAL BOOK', '0', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (27, 'SJB', 'SALES/RECIEVABLES JOURNAL BOOK\r\n', 'SALES/RECIEVABLES JOURNAL BOOK', '0', 'Active', 'Active', '2022-07-12 12:43:52', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (28, 'CRB', 'CASH RECEIPT BOOK\r\n', 'CASH RECEIPT BOOK', '1415', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (29, 'GJB', 'GENERAL JOURNAL BOOK\r\n', 'GENERAL JOURNAL BOOK', '3354', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (30, 'CSDB', 'CASH DISBURSMENT BOOK', 'CASH DISBURSMENT BOOK', '5165', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (31, 'CDPB', 'CASH DISBURSMENT BOOK', 'COLLECTION DEPOSITS BOOK', '651', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (32, 'LRB', 'LOAN RELEASES BOOK', 'LOAN RELEASES BOOK', '2362', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (33, 'LPB', 'LOAN PAYMENTS BOOK', 'LOAN PAYMENTS BOOK', '3210', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
+INSERT INTO `journal_book` VALUES (34, 'ODB', 'OTHER DEPOSIT BOOK', 'OTHER DEPOSIT BOOK', '0', 'Active', 'Active', '2022-06-08 02:05:48', '2022-06-08 02:05:48');
 
 -- ----------------------------
 -- Table structure for journal_entry
@@ -766,8 +763,8 @@ CREATE TABLE `journal_entry`  (
   `branch_id` int(11) NULL DEFAULT NULL,
   `book_id` int(11) NULL DEFAULT NULL,
   `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `cheque_date` date NULL DEFAULT NULL,
   `cheque_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `cheque_date` date NULL DEFAULT NULL,
   `amount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `payee` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
@@ -777,7 +774,7 @@ CREATE TABLE `journal_entry`  (
   PRIMARY KEY (`journal_id`) USING BTREE,
   INDEX `book_id`(`book_id`) USING BTREE,
   CONSTRAINT `journal_entry_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `journal_book` (`book_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of journal_entry
@@ -805,25 +802,14 @@ CREATE TABLE `journal_entry_details`  (
   INDEX `journal_subsidiary_id`(`subsidiary_id`) USING BTREE,
   INDEX `journal_entry_details_ibfk_3`(`journal_id`) USING BTREE,
   INDEX `account_id`(`account_id`) USING BTREE,
-  CONSTRAINT `journal_entry_details_ibfk_2` FOREIGN KEY (`subsidiary_id`) REFERENCES `subsidiary` (`sub_id`) ON DELETE SET NULL ON UPDATE SET NULL,
-  CONSTRAINT `journal_entry_details_ibfk_3` FOREIGN KEY (`journal_id`) REFERENCES `journal_entry` (`journal_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `journal_entry_details_ibfk_4` FOREIGN KEY (`account_id`) REFERENCES `chart_of_accounts` (`account_id`) ON DELETE SET NULL ON UPDATE SET NULL
-) ENGINE = InnoDB AUTO_INCREMENT = 80 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+  CONSTRAINT `journal_entry_details_ibfk_1` FOREIGN KEY (`subsidiary_id`) REFERENCES `subsidiary` (`sub_id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `journal_entry_details_ibfk_2` FOREIGN KEY (`journal_id`) REFERENCES `journal_entry` (`journal_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_details_ibfk_3` FOREIGN KEY (`account_id`) REFERENCES `chart_of_accounts` (`account_id`) ON DELETE SET NULL ON UPDATE SET NULL
+) ENGINE = InnoDB AUTO_INCREMENT = 131 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of journal_entry_details
 -- ----------------------------
-INSERT INTO `journal_entry_details` VALUES (69, 29, 238, 1, '1010', NULL, '2500', '0', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (70, 29, 238, 4, '1010', NULL, '500', '0', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (71, 29, 249, 7, '1205', NULL, '0', '1000', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (72, 29, 249, 12, '1205', NULL, '0', '500', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (73, 29, 248, 15, '1060', NULL, '0', '500', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (74, 30, 238, 1, '1010', NULL, '10000', '0', 'cash in', NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (75, 30, 241, 2, '1025', NULL, '0', '3000', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (76, 30, 251, 20, '1260', NULL, '0', '4000', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (77, 31, 238, 7, '1010', NULL, '10000', '0', 'hulam', NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (78, 31, 269, 4, '1540', NULL, '0', '5000', 'bayad ug sakyanan', NULL, NULL, NULL, NULL);
-INSERT INTO `journal_entry_details` VALUES (79, 31, 300, 1, '2076', NULL, '0', '2000', 'tax', NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for migrations
@@ -862,7 +848,7 @@ INSERT INTO `migrations` VALUES (26, '2021_10_22_071645_create_company_addresses
 INSERT INTO `migrations` VALUES (27, '2021_10_28_020722_create_accountings_table', 9);
 INSERT INTO `migrations` VALUES (28, '2021_10_28_020929_create_currencies_table', 9);
 INSERT INTO `migrations` VALUES (29, '2021_11_15_013953_create_products_services_categories_table', 10);
-INSERT INTO `migrations` VALUES (30, '2022_01_04_022349_create_reports', 11);
+INSERT INTO `migrations` VALUES (30, '2014_10_12_000000_create_personal_info_table', 11);
 
 -- ----------------------------
 -- Table structure for opening_balance
@@ -912,12 +898,11 @@ CREATE TABLE `payment`  (
   `reference_id` varbinary(191) NULL DEFAULT NULL,
   `transaction_id` int(11) NULL DEFAULT NULL,
   PRIMARY KEY (`payment_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of payment
 -- ----------------------------
-INSERT INTO `payment` VALUES (1, 1, '2022-01-11', NULL, 25000.00, 'invoice', 0x31, 103);
 
 -- ----------------------------
 -- Table structure for payment_method
@@ -991,7 +976,7 @@ CREATE TABLE `personal_info`  (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`personal_info_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of personal_info
@@ -1080,7 +1065,7 @@ CREATE TABLE `sub_module_lists`  (
   PRIMARY KEY (`sml_id`) USING BTREE,
   INDEX `sub_module_lists_al_id_foreign`(`al_id`) USING BTREE,
   CONSTRAINT `sub_module_lists_ibfk_1` FOREIGN KEY (`al_id`) REFERENCES `access_lists` (`al_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 268 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = COMPACT;
+) ENGINE = InnoDB AUTO_INCREMENT = 270 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = COMPACT;
 
 -- ----------------------------
 -- Records of sub_module_lists
@@ -1155,7 +1140,9 @@ INSERT INTO `sub_module_lists` VALUES (260, 9, 'journal/saveJournalEntry', 'Jour
 INSERT INTO `sub_module_lists` VALUES (262, 9, 'journal/saveJournalEntryDetails', 'Journal Entry (save Journal Entry Details)', '2022-04-25 17:03:24', '2022-04-25 17:03:24');
 INSERT INTO `sub_module_lists` VALUES (263, 9, 'journal/JournalEntryFetch', 'Journal (Fetch Journal Information)', '2022-04-25 17:03:24', '2022-04-25 17:03:24');
 INSERT INTO `sub_module_lists` VALUES (265, 9, 'journal/JournalEntryPostUnpost', 'Journal (Set Unposted to Posted)', '2022-04-25 17:03:24', '2022-04-25 17:03:24');
-INSERT INTO `sub_module_lists` VALUES (267, 9, 'journal/searchJournalEntry', 'Journal (Search Journal Entry)', '2022-04-25 17:03:24', '2022-04-25 17:03:24');
+INSERT INTO `sub_module_lists` VALUES (267, 9, 'journal/JournalEntryEdit', 'Journal Edit', '2022-04-25 17:03:24', '2022-04-25 17:03:24');
+INSERT INTO `sub_module_lists` VALUES (268, 6, 'user/profile', 'User Profile ', '2022-09-06 14:17:15', '2022-09-06 14:17:19');
+INSERT INTO `sub_module_lists` VALUES (269, 9, 'journal/JournalEntryDelete', 'Journal Entry Delete', '2022-09-06 14:21:32', '2022-09-06 14:21:34');
 
 -- ----------------------------
 -- Table structure for subsidiary
@@ -1742,7 +1729,7 @@ CREATE TABLE `subsidiary_category`  (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`sub_cat_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 55 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 56 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of subsidiary_category
@@ -1791,6 +1778,7 @@ INSERT INTO `subsidiary_category` VALUES (51, 'AMORT ', 'ACCU. AMORTIZATION', NU
 INSERT INTO `subsidiary_category` VALUES (52, 'UI&D', 'UNREAD INTEREST & DISCOUNT', NULL, NULL, '2022-05-18 06:25:25', '2022-05-18 06:25:25');
 INSERT INTO `subsidiary_category` VALUES (53, 'MISCE', 'MISCELLANEOUS', NULL, NULL, '2022-05-18 06:25:25', '2022-05-18 06:25:25');
 INSERT INTO `subsidiary_category` VALUES (54, 'SUPPLY', 'OFFICE SUPPLIES', NULL, NULL, '2022-05-18 06:25:25', '2022-05-18 06:25:25');
+INSERT INTO `subsidiary_category` VALUES (55, 'XS', 'cdd', 'cdds', 'cdds', '2022-08-03 07:17:07', '2022-08-03 07:19:17');
 
 -- ----------------------------
 -- Table structure for supplier
@@ -1837,7 +1825,7 @@ CREATE TABLE `supplier_address`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`address_id`) USING BTREE,
   INDEX `supplier_address_supplier_id_foreign`(`supplier_id`) USING BTREE,
-  CONSTRAINT `supplier_address_supplier_id_foreign` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`supplier_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `supplier_address_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`supplier_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -1878,21 +1866,13 @@ CREATE TABLE `transaction_details`  (
   `person_type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `to_increase` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   PRIMARY KEY (`transaction_details_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 116 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 108 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of transaction_details
 -- ----------------------------
 INSERT INTO `transaction_details` VALUES (106, 5, 97, 3000.00, '', NULL, NULL, 'debit');
 INSERT INTO `transaction_details` VALUES (107, 5, 98, 5000.00, '1212', NULL, NULL, 'debit');
-INSERT INTO `transaction_details` VALUES (108, 5, 99, 500.00, 'qwdqw', NULL, NULL, 'debit');
-INSERT INTO `transaction_details` VALUES (109, 7, 100, 6000.00, 'qwdq', NULL, NULL, 'debit');
-INSERT INTO `transaction_details` VALUES (110, 2, 101, 25000.00, NULL, NULL, NULL, 'debit');
-INSERT INTO `transaction_details` VALUES (111, 8, 101, 25000.00, NULL, NULL, NULL, 'credit');
-INSERT INTO `transaction_details` VALUES (112, 2, 102, 50000.00, NULL, NULL, NULL, 'debit');
-INSERT INTO `transaction_details` VALUES (113, 8, 102, 50000.00, NULL, NULL, NULL, 'credit');
-INSERT INTO `transaction_details` VALUES (114, 1, 103, 25000.00, NULL, NULL, NULL, 'debit');
-INSERT INTO `transaction_details` VALUES (115, 2, 103, 25000.00, NULL, NULL, NULL, 'credit');
 
 -- ----------------------------
 -- Table structure for transaction_status
@@ -1959,18 +1939,13 @@ CREATE TABLE `transactions`  (
   `created_by` int(10) UNSIGNED NULL DEFAULT NULL,
   `updated_by` int(10) UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`transaction_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 104 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 99 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of transactions
 -- ----------------------------
 INSERT INTO `transactions` VALUES (97, 4, 'note', NULL, 'void', '2021-11-23', '2021-11-23 01:37:27', '2021-11-25 03:21:09', 1, NULL);
 INSERT INTO `transactions` VALUES (98, 3, 'note 1001', NULL, 'open', '2021-11-24', '2021-11-24 06:15:33', '2021-11-24 06:15:33', 1, NULL);
-INSERT INTO `transactions` VALUES (99, 3, NULL, NULL, 'open', '2022-01-11', '2022-01-11 03:21:36', '2022-01-11 03:21:36', 1, NULL);
-INSERT INTO `transactions` VALUES (100, 4, NULL, NULL, 'paid', '2022-01-11', '2022-01-11 03:24:15', '2022-01-11 03:24:15', 1, NULL);
-INSERT INTO `transactions` VALUES (101, 1, NULL, NULL, 'paid', '2022-01-11', '2022-01-11 03:24:35', '2022-01-11 03:25:11', 1, NULL);
-INSERT INTO `transactions` VALUES (102, 1, NULL, NULL, 'open', '2022-01-11', '2022-01-11 03:25:05', '2022-01-11 03:25:05', 1, NULL);
-INSERT INTO `transactions` VALUES (103, 2, NULL, NULL, 'closed', '2022-01-11', '2022-01-11 03:25:11', '2022-01-11 03:25:11', 1, NULL);
 
 -- ----------------------------
 -- Table structure for user_roles
@@ -2007,13 +1982,13 @@ CREATE TABLE `users`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `personal_info_id`(`personal_info_id`) USING BTREE,
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`personal_info_id`) REFERENCES `personal_info` (`personal_info_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES (1, 1, 'admin', '$2y$10$MCG/ne93UlRjG9omTjz6RO4/NhuWOGl57wPpWcp7nNMbBxKVzRHA6', 'NysqnywOrZ', 'active', 1, '6TBck5LbCycpaWpl3daxfUwJCmSMWdMX8YFmYScTf7krYvvUBwSCGKfFkqyt', '2021-09-01 11:34:14', '2022-05-06 05:48:15');
+INSERT INTO `users` VALUES (1, 1, 'admin', '$2y$10$aJWE1gL9WSc2UV8rXBeTOu/ONM49aXtPQNJ9AEFbhOO5Ai1hx.c/2', 'NysqnywOrZ', 'active', 1, 'K9nQ05oQ2zs9BA8U7iKEcAJ6jv5EUDcomfhvMHzzJyO10zA3oHS6fJmBQ2Qi', '2021-09-01 11:34:14', '2021-09-01 11:34:19');
 INSERT INTO `users` VALUES (2, 2, 'zetadmin', '$2y$10$MeHB1Z5KVmsYTM4XSf1URu0wTXEE8lDaCov4wKzXRmUxzXwugXIye', 'NysqnywOrZ', 'active', 1, 'nfv4IkK4WzLorIorsfIoJjR4UrY00tWgesTHptUZjwLowzdEl4hjuyPWUCw7', '2021-09-01 11:34:14', '2022-06-02 06:08:37');
-INSERT INTO `users` VALUES (4, 9, 'tomtomy', '$2y$10$eY9r75BVKUxzPQMI5Gs25OfV.VgsBZ6KK.wHvhzpsqZE27bRIdQPm', '$2y$10$sfgoyx/XXm2cEImPekU3KOS5Np8Bw01wJRHoG4i5pu68s.GLKFmkK', 'active', 1, NULL, '2022-05-06 05:15:40', '2022-05-06 07:14:42');
+INSERT INTO `users` VALUES (3, 9, 'tomtomy', '$2y$10$eY9r75BVKUxzPQMI5Gs25OfV.VgsBZ6KK.wHvhzpsqZE27bRIdQPm', '$2y$10$sfgoyx/XXm2cEImPekU3KOS5Np8Bw01wJRHoG4i5pu68s.GLKFmkK', 'active', 1, '', '2022-05-06 05:15:40', '2022-05-06 07:14:42');
 
 SET FOREIGN_KEY_CHECKS = 1;

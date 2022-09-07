@@ -1,6 +1,9 @@
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	(function ($) {
+		$('#systemSetupAccessibility').DataTable({
+			pageLength: 1000
+		});
 		$('form').attr('autocomplete','off');
 		var journalBookTbl = $('#journalBookTble').DataTable();
 		var categoryFileTbl = $('#categoryFileTbl').DataTable();
@@ -58,10 +61,12 @@
 						{
 							$('#btn_plus_'+sml_id).addClass('d-none');
 							$('#btn_minus_'+sml_id).removeClass('d-none');
+							toastr.success('Successfully Added');
 						}else if(response == 'removed')
 						{
 							$('#btn_plus_'+sml_id).removeClass('d-none');
 							$('#btn_minus_'+sml_id).addClass('d-none');
+							toastr.success('Successfully Removed');
 						}
 					});
 			}else{
