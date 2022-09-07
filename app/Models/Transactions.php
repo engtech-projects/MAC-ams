@@ -337,9 +337,9 @@ class Transactions extends Model
                 $expense->where('transactions.status', $filters['status']);
             }
 
-            if( $filters['dateRange'] ){
-                $expense = $expense->whereBetween('expense.payment_date', [$filters['dateRange']['from'], $filters['dateRange']['to']]);
-            }
+            // if( $filters['dateRange'] ){
+            //     $expense = $expense->whereBetween('expense.payment_date', [$filters['dateRange']['from'], $filters['dateRange']['to']]);
+            // }
 
 
         }

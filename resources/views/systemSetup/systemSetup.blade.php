@@ -86,7 +86,7 @@
 							@include('systemSetup.sections.userMasterFile')
 						</div>
 						<div class="tab-pane fade" id="v-pills-CompanySettings" role="tabpanel" aria-labelledby="v-pills-CompanySettings-tab">
-							@include('systemSetup.sections.CompanySettings')
+							@include('systemSetup.sections.companySettings')
 						</div>
 						<div class="tab-pane fade" id="v-pills-Accounting" role="tabpanel" aria-labelledby="v-pills-Accounting-tab">
 							@include('systemSetup.sections.accounting')

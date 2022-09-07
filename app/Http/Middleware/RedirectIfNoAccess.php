@@ -36,6 +36,6 @@ class RedirectIfNoAccess
 		if ($request->path() == '/') {
 			return $next($request);
 		}
-		abort(404, 'You have no access in thins function try contact admin to add this function in your access list');
+		abort(404, 'You have no access in this function try contact admin to add this function in your access list');
     }
 }

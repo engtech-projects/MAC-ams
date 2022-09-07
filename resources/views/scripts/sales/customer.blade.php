@@ -32,9 +32,9 @@
 
 			  		let action = `<button type="button" class="btn btn-xs btn-default btn-flat coa-action"><small>Print</button>`;
 
-			  		if( full.unpaid.length ) {
-			  			action = `<button type="button" class="btn btn-xs btn-default btn-flat coa-action rcv-payment"  data-title="Receive Payment" data-remote="${remoteUrl}"><small>Receive payment</button>`;
-			  		}
+			  		// if( full.unpaid.length ) {
+			  		// 	action = `<button type="button" class="btn btn-xs btn-default btn-flat coa-action rcv-payment"  data-title="Receive Payment" data-remote="${remoteUrl}"><small>Receive payment</button>`;
+			  		// }
 
 			        return `
 			            <div class="btn-group">
