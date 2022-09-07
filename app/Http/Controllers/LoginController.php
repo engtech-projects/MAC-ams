@@ -12,7 +12,12 @@ class LoginController extends MainController
 {
 
     public function __construct() {
-       $this->middleware('guest')->except('userLogout');
+       if(Auth::user()){
+            return redirect()->intended('dashboard');
+       }else{
+             $this->middleware('guest')->except('userLogout');
+       }
+       
     }
 
     public function index() {
