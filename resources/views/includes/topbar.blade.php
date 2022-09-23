@@ -3,6 +3,10 @@
 		padding-left:20px;
 		font-size:1.3rem;
 	}
+	.buttons-colvis, .buttons-colvis:hover, .buttons-colvis:active{
+		background:#28a745;
+		color:white;
+	}
 </style>
 <nav class="main-header navbar navbar-expand navbar-light">
 <!-- Left navbar links -->

@@ -202,16 +202,14 @@
 			</form>
 		</div>
 		<div class="co-md-12" style="height:10px;"></div>
-		<div class="row">
-			<div class="col-md-12">
+		<div class="col-md-12">
 					<!-- Table -->
 					<section class="content">
 						<div class="container-fluid">
 							<div class="row" >
 								<div class="col-md-12 table-responsive">
-									<table id="subsidiaryledgerTbl"  class="table table-bordered ">
+									<table id="subsidiaryledgerTbl"  class="table ">
 										<thead>
-											<th>Code</th>
 											<th>Account Name</th>
 											<th>Address</th>
 											<th>Tel No.</th>
@@ -219,15 +217,12 @@
 											<th>Date</th>
 											<th>Amount</th>
 											<th>Amort</th>
-											<th>life Used</th>
-											<th>Salv</th>
 											<th>Date Posted</th>
 											<th>Action</th>
 										</thead>
 										<tbody>
 											@foreach ($subsidiaryData as $data)
 												<tr>
-													<td class="font-weight-bold">{{$data->sub_acct_no}}</td>
 													<td>{{$data->sub_name}}</td>
 													<td>{{$data->sub_address}}</td>
 													<td>{{$data->sub_tel}}</td>
@@ -235,8 +230,6 @@
 													<td>{{Carbon::parse($data->sub_dat)->format('m/d/Y')}}</td>
 													<td>{{$data->sub_amount}}</td>
 													<td>{{$data->sub_no_amort}}</td>
-													<td>{{$data->sub_life_used}}</td>
-													<td>{{$data->sub_salvage}}</td>
 													<td>{{$data->sub_date_post}}</td>
 													<td>
 														<div class="btn-group">
@@ -261,7 +254,6 @@
 					<!-- /.Table -->
 				</div>
 			</div>
-		</div>
 	</div>
   </div>
 </section>	

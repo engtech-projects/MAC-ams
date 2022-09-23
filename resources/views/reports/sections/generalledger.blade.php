@@ -22,6 +22,9 @@
 	.dataTables_filter{
 		float:right!important;
 	}
+	#external_filter_container {
+		display: inline-block;
+	}
 </style>
 
 <!-- Main content -->
@@ -63,8 +66,11 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">Account Name</label>
 								<div class="input-group">
-									<select name="gender" class="form-control form-control-sm" id="gender">
-										<option value="" disabled selected>-Select Report-</option>
+									<select name="accountName" class="form-control form-control-sm" id="genLedgerAccountName">
+										<option value="" selected>-All-</option>
+										@foreach($chartOfAccount as $data)
+											<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
+										@endforeach
 									</select>
 								</div>
 							</div>
@@ -73,9 +79,9 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">From</label>
+								<label class="label-normal" for="genLedgerFrom">From</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input type="date" class="form-control form-control-sm rounded-0" name="genLedgerFrom" id="genLedgerFrom"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -83,9 +89,9 @@
 					<div class="col-md-3 col-xs-12">
 						<div class="box">
 							<div class="form-group">
-								<label class="label-normal" for="book_ref">To</label>
+								<label class="label-normal" for="genLedgerTo">To</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+									<input type="date" class="form-control form-control-sm rounded-0" name="genLedgerTo" id="genLedgerTo"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -103,38 +109,51 @@
 						<div class="container-fluid">
 							<div class="row" >
 								<div class="col-md-12">
-									<table id="subsidiaryledgerTbl"  class="table table-bordered">
+									<div id="external_filter_container"></div>
+									<table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
 										<thead>
-											<th>Date</th>
-											<th>Preference Name</th>
-											<th>Source</th>
+											<th width="15%">Date</th>
+											<th width="26%">Preference Name</th>
+											<th width="15%">Source</th>
 											<th>Cheque Date</th>
 											<th>Cheque No.</th>
 											<th>Debit</th>
 											<th>Credit</th>
 											<th>Balance</th>
 										</thead>
-										<tbody>
+										<tbody id="generalLedgerTblContainer">
 											<?php 
 												$id = '';
 											?>
-											@if(!empty($datas))
-												@foreach($datas as $data)
-														@if($id == '')
+											@if(!empty($generalLedgerAccounts))
+												@foreach($generalLedgerAccounts as $data)
+													@if($id == '')
+														<tr>
+															<td  class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
+															<td></td>
+															<td></td>
+															<td></td>
+															<td></td>
+															<td></td>
+															<td></td>
+															<td>aa</td>
+														</tr>
+														<?php $id = $data->account_id;?>
+													@else
+														@if($id != $data->account_id)
 															<tr>
-																<td colspan="7" class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
-																<td>Balance-text</td>
+																<td  class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td></td>
+																<td>aaa</td>
 															</tr>
 															<?php $id = $data->account_id;?>
-														@else
-															@if($id != $data->account_id)
-																<tr rowspan="12">
-																	<td colspan="7" class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
-																	<td>Balance-text</td>
-																</tr>
-																<?php $id = $data->account_id;?>
-															@endif
 														@endif
+													@endif
 													<tr>
 														<td>{{$data->journal_date}}</td>
 														<td>{{$data->sub_name}}</td>

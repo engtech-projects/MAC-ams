@@ -1,10 +1,13 @@
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	(function ($) {
-		$('form').attr('autocomplete','off');
-		var subsidiaryTbl = $('#subsidiaryledgerTbl').DataTable({
+		var dtbleOption = {
 			dom: 'Bftrip',
-			buttons: ['print', 'csv',
+			"info": false,
+			"paging": false,
+			"ordering": false,
+			"filter": false,
+			buttons: [
 				{
 					text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
 					className: 'btn btn-flat btn-sm btn-default',
@@ -24,15 +27,24 @@
 					}
 				},
 				{
-					text: '<i class="fas fa-file-upload" aria-hidden="true"></i>',
-					className: 'btn btn-flat btn-sm btn-default',
-					titleAttr: 'Import',
-					action: function ( e, dt, node, config ) {
-						document.getElementById('import').click();
+					extend: 'print',
+					exportOptions: {
+						columns: [ 0, ':visible' ]
 					}
 				},
+				{
+					extend: 'csv',
+					exportOptions: {
+						columns: [ 0, ':visible' ]
+					}
+				},
+				'colvis'
 			],
-		});
+		}
+		var subsidiaryTbl = $('#subsidiaryledgerTbl').dataTable(dtbleOption);
+		var generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
+		$('form').attr('autocomplete','off');
+		
 		$(document).on('click','.subsid-view-info',function(e){
 			e.preventDefault();
 			$.ajax({
@@ -137,8 +149,81 @@
 				}
 			});
 		});
-	})(jQuery);
+		$(document).on('change', '#genLedgerAccountName', function(e){
+			var id = $(this).val();
+			var from = $('#genLedgerFrom').val();
+			var to = $('#genLedgerTo').val();
+			$.ajax({
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				type: "POST",
+				url: "{{route('reports.generalLedgerFetchAccount')}}",
+				data:{id:id,from:from,to:to},
+				dataType: "json",
+				success: function(data) {
+					generalLedger.fnClearTable();
+					generalLedger.fnDestroy();
 
+
+					if(data)
+					{
+						var vvid = '';
+						var tempContainer = '';
+						var container = '';
+						$.each(data, function(k,v){
+
+							if(vvid == ''){
+								container += `<tr>
+										<td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>aa</td>
+									</tr>`;
+								vvid = v.account_id;
+							}else{
+								if(vvid != v.account_id){
+									container += `<tr>
+										<td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>aa</td>
+									</tr>`;
+								vvid = v.account_id;
+								}
+							}
+							container += 
+								`<tr>
+									<td>${v.journal_date}</td>
+									<td>${v.sub_name}</td>
+									<td>${v.source}</td>
+									<td>${(v.cheque_date == '') ? '/' : v.cheque_date}</td>
+									<td>${(v.cheque_no == '') ? '/' : v.cheque_no}</td>
+									<td>${v.journal_details_debit.toLocaleString("en-US")}</td>
+									<td>${v.journal_details_credit.toLocaleString("en-US")}</td>
+									<td>01292</td>
+								</tr>`;
+						});
+
+						$('#generalLedgerTblContainer').html(container)
+					}
+					generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
+				},
+				error: function() {
+					console.log("Error");
+				}
+			});
+		});
+	})(jQuery);
+	
 	function reload()
 	{
 		window.setTimeout(() => {

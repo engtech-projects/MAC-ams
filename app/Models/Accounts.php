@@ -200,6 +200,23 @@ class Accounts extends Model
 
         return $expense;
     }
+    public function getTrialBalance($from='', $to='', $account_id='')
+    {
+        $query = DB::table("chart_of_accounts")
+              ->select(DB::raw("chart_of_accounts.account_name,
+                    chart_of_accounts.account_number    ,
+                    SUM(journal_entry_details.journal_details_debit) as total_debit ,
+                    SUM(journal_entry_details.journal_details_credit) as total_credit"))
+                ->join("journal_entry_details", function($join){
+                    $join->on("chart_of_accounts.account_id", "=", "journal_entry_details.account_id");
+                })
+                ->join("journal_entry", function($join){
+                    $join->on("journal_entry_details.journal_id", "=", "journal_entry.journal_id");
+                });
+               
+               $query->groupBy("chart_of_accounts.account_id");
+        return $query->get();
+    }
     //gerneralLedger (All Account)
 	public function generalLedger_fetchAccounts($from='', $to='', $account_id='')
 	{

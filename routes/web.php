@@ -28,12 +28,9 @@ use App\Http\Controllers\UserProfileController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('auth.login');
-// });
 
 // LoginController
-Route::get('/', [LoginController::class, 'index']);
+Route::get('/', [LoginController::class, 'index'])->name('/');
 Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::get('logout',[LoginController::class, 'userLogout'])->name('logout');
 Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user');
@@ -131,6 +128,7 @@ Route::get('reports/subsidiaryDelete', [ReportsController::class, 'subsidiaryDel
 
 
 Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');
+Route::post('reports/generalLedgerFetchAccount', [ReportsController::class, 'generalLedgerFetchAccount'])->name('reports.generalLedgerFetchAccount');
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
 Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
 Route::get('reports/bankReconcillation', [ReportsController::class, 'bankReconcillation'])->name('reports.bankReconcillation');

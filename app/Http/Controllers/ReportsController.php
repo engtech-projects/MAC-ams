@@ -76,6 +76,20 @@ class ReportsController extends MainController
 		return false;
 	}
 
+	public function generalLedgerFetchAccount(Request $request)
+	{
+		if($request->id != '')
+		{
+			$id = $request->id;
+			$genLedgerFrom = $request->genLedgerFrom;
+			$genLedgerTo = $request->genLedgerTo;
+			return json_encode(Accounts::generalLedger_fetchAccounts($genLedgerFrom, $genLedgerTo, $id));
+		}else{
+			return json_encode(Accounts::generalLedger_fetchAccounts());
+		}
+		
+	}
+
 	public function subsidiaryViewInfo(Request $request)
 	{
 		$data = Subsidiary::where('sub_id',$request->id)->get();
@@ -93,12 +107,14 @@ class ReportsController extends MainController
 		return false;
 	}
 	
+
 	public function generalLedger()
 	{
 		
 		$data = [
 			'title' => 'General Ledger',
-			'datas' => Accounts::generalLedger_fetchAccounts()
+			'chartOfAccount'=> Accounts::get(),
+			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts()
 		];
 
 	   return view('reports.sections.generalledger', $data);
@@ -108,6 +124,7 @@ class ReportsController extends MainController
 	{
 		$data = [
 			'title' => 'Subsidiary Ledger',
+			'trialBalance'=> Accounts::getTrialBalance(),
 			'trialbalanceList' => ''
 		];
 

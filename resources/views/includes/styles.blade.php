@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="{{ asset('plugins/daterangepicker/daterangepicker.css') }}">
 <!-- Toastr -->
 <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/yadfc/jquery.dataTables.yadcf.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/yadfc/jquery-ui.css') }}">
 <!-- icheck bootstrap -->
 <link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
  <!-- Select2 -->
@@ -17,6 +19,8 @@
 <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
 <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
 <link rel="stylesheet" href="{{ asset('plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables/buttons.dataTables.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables/jquery.dataTables.min.css') }}">
 <!-- x editable style -->
 <link rel="stylesheet" href="{{ asset('plugins/bootstrap3-editable-1.5.1/bootstrap3-editable/css/bootstrap-editable.css') }}">
 <!-- Theme style -->

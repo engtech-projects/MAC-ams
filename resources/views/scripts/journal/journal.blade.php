@@ -30,14 +30,6 @@
 						printBtn.click();
 					}
 				},
-				{
-					text: '<i class="fas fa-file-upload" aria-hidden="true"></i>',
-					className: 'btn btn-flat btn-sm btn-default',
-					titleAttr: 'Import',
-					action: function ( e, dt, node, config ) {
-						document.getElementById('import').click();
-					}
-				},
 			],
 	});
   	var Toast = Swal.mixin({

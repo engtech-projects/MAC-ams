@@ -21,6 +21,17 @@
 <script src="{{  asset('plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
 <script src="{{  asset('plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
 <script src="{{  asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<script src="{{  asset('plugins/yadfc/jquery.dataTables.yadcf.js') }}"></script>
+<script src="{{  asset('plugins/yadfc/jquery-ui.js') }}"></script>
+
+
+<script src="{{  asset('plugins/datatables/buttons.print.min.js') }}"></script>
+<script src="{{  asset('plugins/datatables/pdfmake.min.js') }}"></script>
+<script src="{{  asset('plugins/datatables/vfs_fonts.js') }}"></script>
+<script src="{{  asset('plugins/datatables/jszip.min.js') }}"></script>
+<script src="{{  asset('plugins/datatables/buttons.print.min.js') }}"></script>
+
+
 <!-- x editable -->
 <script src="{{ asset('plugins/bootstrap3-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable.min.js') }}"></script>
 <!-- AdminLTE App -->

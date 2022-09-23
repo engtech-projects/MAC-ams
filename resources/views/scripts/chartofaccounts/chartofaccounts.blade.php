@@ -350,14 +350,6 @@ function accountsTableConfig() {
 					printBtn.click();
                 }
             },
-            {
-                text: '<i class="fas fa-file-upload" aria-hidden="true"></i>',
-                className: 'btn btn-flat btn-sm btn-default',
-                titleAttr: 'Import',
-                action: function ( e, dt, node, config ) {
-                    document.getElementById('import').click();
-                }
-            },
       ],
       ajax: {
           url: "{{ route('accounts.populate') }}",
