@@ -92,14 +92,28 @@
 									
 								</thead>
 								<tbody id="trialBalance">
+									<?php 
+										$totaldeb = 0;
+										$totalcred = 0;
+									?>
 									@foreach($trialBalance as $data)
 									<tr>
 										<td class="font-weight-bold">{{$data->account_number}}</td>
 										<td>{{$data->account_name}}</td>
-										<td>{{$data->total_debit}}</td>
-										<td>{{$data->total_credit}}</td>
+										<td>{{number_format($data->total_debit, 2, '.', ',')}}</td>
+										<td>{{number_format($data->total_credit, 2, '.', ',')}}</td>
 									</tr>
+									<?php 
+										$totaldeb += $data->total_debit;
+										$totalcred += $data->total_credit;
+									?>
 									@endforeach
+									<tr>
+										<td class="font-weight-bold"></td>
+										<td></td>
+										<td><b>{{number_format($totalcred, 2, '.', ',')}}</b></td>
+										<td><b>{{number_format($totalcred, 2, '.', ',')}}</b></td>
+									</tr>
 								</tbody>
 							</table>
 						</div>
