@@ -15,7 +15,6 @@ class AccountsController extends MainController
 {
     public function index() {
 		$accountData = Accounts::fetch();
-		// dd($accountData);
         $data = [
             'title' => 'Chart of Accounts',
             'accounts' => Accounts::fetch(),
@@ -24,7 +23,6 @@ class AccountsController extends MainController
 			'accountTypes' => AccountType::orderBy('account_category_id')->get(),
             'cashFlows'    => ['investing', 'financing', 'operating'] 
         ];
-
     	return view('chartofaccounts.accounts', $data);
     }
 

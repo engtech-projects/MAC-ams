@@ -203,6 +203,10 @@
 		</div>
 		<div class="co-md-12" style="height:10px;"></div>
 		<div class="col-md-12">
+			<button class="btn btn-success" id="subsidiaryPrintExcel" type="subsidiary_ledger">Print Excel</button>
+		</div>
+		<div class="col-md-12">
+			
 					<!-- Table -->
 					<section class="content">
 						<div class="container-fluid">
@@ -245,7 +249,6 @@
 													</td>
 												</tr>
 											@endforeach
-											
 										</tbody>
 									</table>
 								</div>

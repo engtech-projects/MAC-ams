@@ -7,44 +7,33 @@
 			"paging": false,
 			"ordering": false,
 			"filter": false,
-			buttons: [
-				{
-					text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
-					className: 'btn btn-flat btn-sm btn-default',
-					titleAttr: 'Export',
-					action: function ( e, dt, node, config ) {
-						var exportBtn = document.getElementsByClassName('btn btn-secondary buttons-csv buttons-html5')[0];
-						exportBtn.click();
-					}
-				},
-				{
-					text: '<i class="fas fa-print" aria-hidden="true"></i>',
-					className: 'btn btn-flat btn-sm btn-default',
-					titleAttr: 'Print',
-					action: function ( e, dt, node, config ) {
-						var printBtn = document.getElementsByClassName('btn btn-secondary buttons-print')[0];
-						printBtn.click();
-					}
-				},
-				{
-					extend: 'print',
-					exportOptions: {
-						columns: [ 0, ':visible' ]
-					}
-				},
-				{
-					extend: 'csv',
-					exportOptions: {
-						columns: [ 0, ':visible' ]
-					}
-				},
-				'colvis'
-			],
+		
 		}
 		var subsidiaryTbl = $('#subsidiaryledgerTbl').dataTable(dtbleOption);
 		var generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
+
+
 		$('form').attr('autocomplete','off');
 		
+		$(document).on('click','#printGeneralLedgerExcel',function(e){
+			var from = $('#genLedgerFrom').val();
+			var to = $('#genLedgerTo').val();
+			var account_name = $('#genLedgerAccountName').val();
+			var rtype = $(this).attr('type')
+
+			var path = '/reports/reportPrint?type='+rtype+'&from='+from+'&to='+to+'&account_name='+account_name;
+			window.open("{{ url('/') }}"+path, '_blank');
+		});
+		$(document).on('click','#subsidiaryPrintExcel',function(e){
+			var rtype = $(this).attr('type')
+			var path = '/reports/reportPrint?type='+rtype;
+			window.open("{{ url('/') }}"+path, '_blank');
+		});
+		$(document).on('click','#printCharOfAccountExcel',function(e){
+			var rtype = $(this).attr('type')
+			var path = '/reports/reportPrint?type='+rtype;
+			window.open("{{ url('/') }}"+path, '_blank');
+		});
 		$(document).on('click','.subsid-view-info',function(e){
 			e.preventDefault();
 			$.ajax({

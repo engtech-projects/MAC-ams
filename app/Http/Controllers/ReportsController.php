@@ -7,14 +7,17 @@ use App\Models\Customer;
 use App\Models\Transactions;
 use App\Models\PaymentMethod;
 use App\Models\Accounts;
+use App\Models\AccountCategory;
+use App\Models\AccountType;
 use App\Models\TransactionType;
 use App\Models\TransactionStatus;
 use App\Models\Subsidiary;
 use App\Models\SubsidiaryCategory;
+use App\Http\Controllers\PrinterController;
+use App\Http\Controllers\AccountsController;
 
 class ReportsController extends MainController
 {
-
 	// invoice
 	public function subsidiaryLedger() {
 
@@ -24,13 +27,12 @@ class ReportsController extends MainController
 			'title' => 'Subsidiary Ledger',
 			'subsidiaryLedgerList' => ''
 		];	
-
-	   return view('reports.sections.subsidiaryledger', $data);
+		
+	    return view('reports.sections.subsidiaryledger', $data);
+		
 	}
-
 	public function subsidiarySaveorEdit(Request $request)
 	{	
-
 		if($request->sub_id == '')
 		{
 			$sub = new Subsidiary;
@@ -48,7 +50,6 @@ class ReportsController extends MainController
 			$sub->sub_no_amort = $request->sub_no_amort;
 			$sub->sub_salvage = $request->sub_salvage;
 			$sub->sub_date_post = $request->sub_date_post;
-	
 			if($sub->save())
 			{
 				return json_encode(['message' => 'save', 'sub_id'=> $sub->sub_id]);
@@ -75,7 +76,6 @@ class ReportsController extends MainController
 		}
 		return false;
 	}
-
 	public function generalLedgerFetchAccount(Request $request)
 	{
 		if($request->id != '')
@@ -87,9 +87,7 @@ class ReportsController extends MainController
 		}else{
 			return json_encode(Accounts::generalLedger_fetchAccounts());
 		}
-		
 	}
-
 	public function subsidiaryViewInfo(Request $request)
 	{
 		$data = Subsidiary::where('sub_id',$request->id)->get();
@@ -98,7 +96,6 @@ class ReportsController extends MainController
 		}
 		return false;
 	}
-	
 	public function subsidiaryDelete(Request $request)
 	{
 		if(Subsidiary::find($request->id)->delete()){
@@ -106,20 +103,15 @@ class ReportsController extends MainController
 		}
 		return false;
 	}
-	
-
 	public function generalLedger()
 	{
-		
 		$data = [
 			'title' => 'General Ledger',
 			'chartOfAccount'=> Accounts::get(),
 			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts()
 		];
-
-	   return view('reports.sections.generalledger', $data);
+		return view('reports.sections.generalledger', $data);
 	}
-
 	public function trialBalance()
 	{
 		$data = [
@@ -127,30 +119,24 @@ class ReportsController extends MainController
 			'trialBalance'=> Accounts::getTrialBalance(),
 			'trialbalanceList' => ''
 		];
-
-	    return view('reports.sections.trialBalance', $data);
+		return view('reports.sections.trialBalance', $data);
 	}
-
 	public function incomeStatement()
 	{
 		$data = [
 			'title' => 'Subsidiary Ledger',
 			'trialbalanceList' => ''
 		];
-
 	    return view('reports.sections.incomeStatement', $data);
 	}
-
 	public function bankReconcillation()
 	{
 		$data = [
 			'title' => 'Subsidiary Ledger',
 			'trialbalanceList' => ''
 		];
-
-	    return view('reports.sections.trialBalance', $data);
+		return view('reports.sections.trialBalance', $data);
 	}
-
 	public function cashPosition()
 	{
 		$data = [
@@ -160,9 +146,6 @@ class ReportsController extends MainController
 
 	    return view('reports.sections.trialBalance', $data);
 	}
-
-	
-
 	public function cashTransactionBlotter()
 	{
 		$data = [
@@ -172,26 +155,64 @@ class ReportsController extends MainController
 
 	    return view('reports.sections.cashTransactionBlotter', $data);
 	}
-
 	public function cheque()
 	{
 		$data = [
 			'title' => 'Cashier Transaction Blotter',
 			'trialbalanceList' => ''
 		];
-
-	    return view('reports.sections.cheque', $data);
+		return view('reports.sections.cheque', $data);
 	}
-
 	public function postDatedCheque()
 	{
 		$data = [
 			'title' => 'Cashier Transaction Blotter',
 			'trialbalanceList' => ''
 		];
-
-	    return view('reports.sections.postDatedCheque', $data);
+		return view('reports.sections.postDatedCheque', $data);
 	}
-	
+	public function chartOfAccounts()
+	{
+		$accountData = Accounts::fetch();
+        $data = [
+            'title' => 'Chart of Accounts',
+            'accounts' => Accounts::fetch(),
+			'organizedAccount'=> AccountsController::groupByType($accountData),
+			'account_category'=> AccountCategory::get(),
+			'accountTypes' => AccountType::orderBy('account_category_id')->get(),
+            'cashFlows'    => ['investing', 'financing', 'operating'] 
+        ];
+    	return view('reports.sections.chartOfAccounts', $data);
+	}
 
+	public function reportPrint(Request $request)
+	{
+		$print = new PrinterController;
+		switch($request->type){
+			case 'chart_of_account':
+				$print->generate_chart_of_account(AccountsController::groupByType(Accounts::fetch()),'CHART OF ACCOUNT');
+				break;
+			case 'trial_balance':
+				$print->generate_trial_balance($request,'TRIAL BALANCE');
+				break;
+			case 'subsidiary_ledger':
+				$print->subsidiary_ledger_print(Subsidiary::get(),'SUBSIDIARY LEDGER');
+				break;
+			case 'general_ledger':
+				$optionType = [
+					'from'=> $request->from,
+					'to'=> $request->to,
+					'account_name'=>$request->account_name
+				];
+				var_dump($optionType);
+				$print->generate_general_ledger($request,'GENERAL LEDGER');
+				break;
+			case 'income_statement':
+				$print->generate_income_statement($request,'INCOME STATEMENT');
+				break;
+			default:
+				
+		}
+		
+	}
 }

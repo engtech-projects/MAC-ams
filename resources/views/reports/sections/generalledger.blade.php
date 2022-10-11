@@ -136,7 +136,7 @@
 															<td></td>
 															<td></td>
 															<td></td>
-															<td>aa</td>
+															<td>0.0</td>
 														</tr>
 														<?php $id = $data->account_id;?>
 													@else
@@ -149,7 +149,7 @@
 																<td></td>
 																<td></td>
 																<td></td>
-																<td>aaa</td>
+																<td>0.0</td>
 															</tr>
 															<?php $id = $data->account_id;?>
 														@endif
@@ -162,7 +162,7 @@
 														<td>{{($data->cheque_no == '') ? '/' : $data->cheque_no}}</td>
 														<td>{{number_format($data->journal_details_debit, 2, ".", ",")}}</td>
 														<td>{{number_format($data->journal_details_credit, 2, ".", ",")}}</td>
-														<td>01292</td>
+														<td>0.0</td>
 													</tr>
 												@endforeach
 											@endif
