@@ -311,6 +311,7 @@
 			success: function(response) {
 				if(response.message == 'fetch')
 				{
+					var total_amount = 0;
 					var total_debit = 0;
 					var total_credit = 0;
 					$('#tbl-create-journalview-container').html('');
@@ -324,7 +325,7 @@
 						$('#vjournal_source, #voucher_source').text(v.source);
 						$('#vjournal_cheque').text((v.cheque_no) ? v.cheque_no : 'NO CHEQUE');
 						$('#vjournal_status').text(v.status);
-						$('#vjournal_amount, #voucher_amount').text(parseFloat(v.amount).toLocaleString("en-US"));
+						total_amount += parseFloat(v.amount);
 						$('#vjournal_payee, #voucher_pay').text(v.payee);
 						$('#voucher_amount_in_words').text(numberToWords(parseFloat(v.amount)));
 						$.each(v.remarks.split('::'), function(k, vv){
@@ -373,6 +374,7 @@
 						$('#vtotal_credit, #total_credit_voucher').text(total_credit.toLocaleString("en-US"))
 						$('#vbalance_debit').text((parseFloat(total_debit) - parseFloat(total_credit)).toLocaleString("en-US"))
 					});
+					$('#vjournal_amount, #voucher_amount').text(total_amount.toLocaleString("en-US"));
 				}
 				$('#journalModalView').modal('show')
 			},
