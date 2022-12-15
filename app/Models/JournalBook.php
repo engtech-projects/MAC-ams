@@ -22,7 +22,7 @@ class JournalBook extends Model
     	'book_flag',
     ];
 
-	public function getBookWithJournalCount()
+	public static function getBookWithJournalCount()
 	{
 		return DB::table("journal_book")
 			->leftJoin("journal_entry", function($join){

@@ -54,7 +54,7 @@ class Accounts extends Model
                     ->orderBy('account_category.account_category_id', 'asc')
                     ->orderBy('account_type.account_type_id', 'asc')
                     ->get();
-		
+
 		if(count($data) > 0)
 		{
 			if ($isJson) {
@@ -72,7 +72,7 @@ class Accounts extends Model
 				return json_encode($jsonData);
 			}
 		}
-        
+
         return $data;
     }
 
@@ -103,7 +103,7 @@ class Accounts extends Model
 
         $account = Accounts::find($request->id);
         $account->status = $request->status;
-     
+
         if ($account->save() ) {
             return response()->json(array('success' => true, 'message' => "Account has been set to $request->status"), 200);
         }
@@ -200,7 +200,7 @@ class Accounts extends Model
 
         return $expense;
     }
-    public function getTrialBalance($from='', $to='', $account_id='')
+    public static function getTrialBalance($from='', $to='', $account_id='')
     {
         $query = DB::table("chart_of_accounts")
               ->select(DB::raw("chart_of_accounts.account_name,
@@ -213,24 +213,24 @@ class Accounts extends Model
                 ->join("journal_entry", function($join){
                     $join->on("journal_entry_details.journal_id", "=", "journal_entry.journal_id");
                 });
-               
+
                $query->groupBy("chart_of_accounts.account_id");
         return $query->get();
     }
     //gerneralLedger (All Account)
-	public function generalLedger_fetchAccounts($from='', $to='', $account_id='')
+	public static function generalLedger_fetchAccounts($from='', $to='', $account_id='')
 	{
 		$query = DB::table("chart_of_accounts")->
 			select("chart_of_accounts.account_number",
 				"chart_of_accounts.account_name",
 				"chart_of_accounts.account_id",
 				"chart_of_accounts.status",
-				"journal_entry_details.journal_details_debit", 
-				"journal_entry_details.journal_details_credit", 
-				"journal_entry.source", 
-				"journal_entry.cheque_no", 
-				"journal_entry.journal_date", 
-				"subsidiary.sub_name", 
+				"journal_entry_details.journal_details_debit",
+				"journal_entry_details.journal_details_credit",
+				"journal_entry.source",
+				"journal_entry.cheque_no",
+				"journal_entry.journal_date",
+				"subsidiary.sub_name",
 				"journal_entry.cheque_date");
 				$query->join("journal_entry_details", function($join){
 					$join->on("chart_of_accounts.account_id", "=", "journal_entry_details.account_id");

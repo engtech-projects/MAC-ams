@@ -25,8 +25,8 @@ class journalEntry extends Model
 		'payee',
 		'remarks',
     ];
-	
-	public function fetch($status = '', $from = '', $to='', $book_id='', $branch_id='')
+
+	public static function fetch($status = '', $from = '', $to='', $book_id='', $branch_id='')
 	{
 		$query = journalEntry::with(['journalDetails','bookDetails']);
 		if($status != '')
