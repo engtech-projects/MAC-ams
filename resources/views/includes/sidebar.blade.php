@@ -56,7 +56,7 @@
 				</a>
 				</li>
 				@endif
-				@if(checkUserHasAccessModule('sub-module','sales/customer'))
+				@if(checkUserHasAccessModule('sub-module','sales/customers'))
 				<li class="nav-item">
 					<a href="{{route('sales.customers')}}" class="nav-link {{ (isset($nav) && $nav[1] == 'customers') ? 'active' : '' }}">
 						<i class="far fa-circle nav-icon"></i>
@@ -85,7 +85,7 @@
 					</p>
 				</a>
 			<ul class="nav nav-treeview">
-			
+
 				@if(checkUserHasAccessModule('sub-module','journal/journalEntry'))
 				<li class="nav-item">
 					<a href="{{route('journal.journalEntry')}}" class="nav-link {{ request()->is('journal/journalEntry') ? 'active' : '' }}">
@@ -105,9 +105,9 @@
 			</ul>
 			</li>
 			@endif
-			@if(checkUserHasAccessModule('module','Expenses'))
-			<li class="nav-item {{ (request()->is('expenses')) ? 'menu-open' : '' }} {{ (request()->is('supplier')) ? 'menu-open' : '' }}">
-			<a href="#" class="nav-link {{ (request()->is('expenses')) ? 'active' : '' }} {{ (request()->is('supplier')) ? 'active' : '' }}">
+			@if(checkUserHasAccessModule('module','Disbursement'))
+			<li class="nav-item {{ (request()->is('disbursement')) ? 'menu-open' : '' }} {{ (request()->is('supplier')) ? 'menu-open' : '' }}">
+			<a href="#" class="nav-link {{ (request()->is('disbursement')) ? 'active' : '' }} {{ (request()->is('supplier')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-money-check"></i>
 				<p>
 				Expenses
@@ -135,7 +135,7 @@
 			</li>
 			@endif
 			<!-- Employees Menu -->
-			
+
 			@if(checkUserHasAccessModule('module','Employees'))
 			<li class="nav-item {{ (isset($nav) && $nav[0] == 'employees') ? 'menu-open' : '' }}">
 				<a href="#" class="nav-link">
@@ -156,6 +156,7 @@
 					@endif
 				</ul>
 			</li>
+
 			@endif
 
 			@if(checkUserHasAccessModule('module','reports'))
@@ -193,15 +194,15 @@
 						</a>
 					</li>
 					@endif
-					<!-- @if(checkUserHasAccessModule('sub-module','reports/incomeStatement'))
+					@if(checkUserHasAccessModule('sub-module','reports/incomeStatement'))
 					<li class="nav-item">
 						<a href="{{ route('reports.incomeStatement') }}" class="nav-link {{ (request()->is('reports/incomeStatement')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
 							<p>Income Statement</p>
 						</a>
 					</li>
-					@endif -->
-					<!-- @if(checkUserHasAccessModule('sub-module','reports/bankReconcillation'))
+					@endif
+					@if(checkUserHasAccessModule('sub-module','reports/bankReconcillation'))
 					<li class="nav-item">
 						<a href="{{ route('reports.bankReconcillation') }}" class="nav-link {{ (request()->is('reports/bankReconcillation')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
@@ -216,16 +217,16 @@
 							<p>Cash Position</p>
 						</a>
 					</li>
-					@endif -->
-					<!-- @if(checkUserHasAccessModule('sub-module','reports/cashTransactionBlotter'))
+					@endif
+					@if(checkUserHasAccessModule('sub-module','reports/cashTransactionBlotter'))
 					<li class="nav-item">
 						<a href="{{ route('reports.cashTransactionBlotter') }}" class="nav-link {{ (request()->is('reports/cashTransactionBlotter')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
 							<p>Cash Tranasction Blotter</p>
 						</a>
 					</li>
-					@endif -->
-					<!-- @if(checkUserHasAccessModule('sub-module','reports/cheque'))
+					@endif
+					@if(checkUserHasAccessModule('sub-module','reports/cheque'))
 					<li class="nav-item">
 						<a href="{{ route('reports.cheque') }}" class="nav-link {{ (request()->is('reports/cheque')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
@@ -239,7 +240,7 @@
 							<i class="far fa-circle nav-icon"></i>
 							<p>Post-Dated Cheque</p>
 						</a>
-					</li> -->
+					</li>
 					@endif
 					@if(checkUserHasAccessModule('sub-module','reports/chartOfAccounts'))
 					<li class="nav-item">
@@ -249,7 +250,7 @@
 						</a>
 					</li>
 					@endif
-				
+
 				</ul>
 			</li>
 			@endif
@@ -262,7 +263,7 @@
 					Chart of accounts
 				</p>
 			</a>
-		
+
 			</li>
 			@endif
 			@if(checkUserHasAccessModule('module','System Setup'))
@@ -277,12 +278,10 @@
 			@endif
 		</ul>
 		</nav>
-		<!-- /.sidebar-menu -->
-		
 	</div>
 	<div class="col-md-12">
-		
+
 		<img src="{{ asset('img/mac_logo.fw.png') }}" alt="mac_logo" class="img-fluid">
 	</div>
-	<!-- /.sidebar -->
+
 </aside>

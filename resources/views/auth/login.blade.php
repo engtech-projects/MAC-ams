@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
 
   <style type="text/css">
-    
+
     .login-page {
       background-color: #ffffff;
       height: 75vh;
@@ -34,10 +34,9 @@
     </div>
     <div class="card-body">
       <p class="login-box-msg" style="font-size: 1.5rem;"><b>Login</b></p>
-     
+
       <form method="POST" action="{{ route('login.user') }}">
         @csrf
-
         @if (Session::has('success'))
         <div class="callout callout-danger">
           <h5>Something Went Wrong!</h5>

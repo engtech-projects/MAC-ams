@@ -1,6 +1,6 @@
-<form method="POST" action="{{ route('payment.store') }}" id="frm-payment"> 
+<form method="POST" action="{{ route('payment.store') }}" id="frm-payment">
   <input type="hidden" name="transaction_type_id" value="{{ $transactionType->transaction_type_id }}">
-  <input type="hidden" name="transaction_type" value="{{ $transactionType->transaction_type }}"> 
+  <input type="hidden" name="transaction_type" value="{{ $transactionType->transaction_type }}">
   <input type="hidden" name="transaction" value="{{ $transaction->transaction_type }}">
   <input type="hidden" name="default_account" value="{{ $transactionType->account_id }}">
   @csrf
@@ -54,7 +54,7 @@
 
     </div>
 
-    <div class="col-md-2">    
+    <div class="col-md-2">
 
       <div class="form-group">
         <label for="" class="label-normal">Reference no.</label>
@@ -66,7 +66,7 @@
     <div class="col-md-4">
       <div class="small-box bg-default text-right">
         <div class="inner">
-          <h3 id="amount-received">{{  $transaction->invoice->balance }}</h3>
+          <h3 id="amount-received" class="amnt-rcv">{{  $transaction->invoice->balance }}</h3>
           <span class="text-muted">AMOUNT RECEIVED</span>
         </div>
       </div>
@@ -81,7 +81,7 @@
       </div>
     </div>
     <div class="col-md-12">
-        
+
       <table class="table table-bordered table-sm" id="tbl-expense-details">
         <thead>
           <tr>
@@ -102,19 +102,19 @@
         <tbody>
           <tr>
             <td class="text-center">
-             
+
               <div class="form-group">
                 <div class="form-check">
                   <input class="form-check-input select-invoice" type="checkbox" checked="true">
                 </div>
               </div>
-             
+
             </td>
             <td><span class="text-blue" >{{ $transaction->invoice->description }}</span> <span>{{ $transaction->invoice->due_date }}</span></td>
             <td>{{ $transaction->invoice->due_date }}</td>
-            <td class="text-right"> {{  $transaction->invoice->total_amount }} </td>
+            <td class="text-right amount"> {{  $transaction->invoice->total_amount }} </td>
             <td class="text-right invoice-balance"> {{  $transaction->invoice->balance }} </td>
-            <td class="text-right">
+            <td class="text-right payment">
               <input type="hidden" value="{{ $transaction->invoice->invoice_id }}" name="reference_id" form="frm-payment">
               <input type="text" class="form-control form-control-sm rounded-0 text-right txt-payment" form="frm-payment" name="amount" value="{{  $transaction->invoice->balance }}">
             </td>
@@ -149,3 +149,38 @@
     </div>
 
   </div>
+
+  <script>
+
+if ($('body').find('.modal.show').length) {
+    let rcv = $('.amnt-rcv').text();
+    let inv_blnc = $('.invoice-balance').text();
+    let amount = $('.amount').text();
+
+    let payment_amount = $('.txt-payment').val();
+
+    console.log(payment_amount);
+
+
+    $('.txt-payment').val(amountConverter(payment_amount))
+    $('.amount').text(amountConverter(amount))
+    $('.invoice-balance').text(amountConverter(inv_blnc))
+    $('.amnt-rcv').text(amountConverter(rcv))
+
+
+
+    function amountConverter(amount) {
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'PHP',
+
+    });
+
+    return formatter.format(amount)
+    }
+}
+
+
+
+
+  </script>

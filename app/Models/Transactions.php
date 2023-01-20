@@ -56,7 +56,7 @@ class Transactions extends Model
 	}
 
     public function store(Transactions $transaction, Request $request) {
-        
+
         $transaction->transaction_type_id = $request->transaction_type_id;
         $transaction->transaction_date = Carbon::now()->format('Y-m-d');
         $transaction->note = $request->note;
@@ -94,7 +94,7 @@ class Transactions extends Model
                     $isSuccessful = $payment->store($request, $transaction->transaction_id);
                     break;
             }
-            
+
             if( $isSuccessful ){
                 return response()->json(array('success' => true, 'message' => 'Transaction has been saved!'), 200);
             }
@@ -140,7 +140,7 @@ class Transactions extends Model
 
         $sales = [];
         foreach ($data as $key => $value) {
-            
+
             $sales[] = [
                 'transaction_id' => $value['transaction_id'],
                 'date' => $value['transaction_date'],
@@ -174,14 +174,14 @@ class Transactions extends Model
             ->leftJoin('customer', 'invoice.customer_id', '=', 'customer.customer_id')
             ->orderBy('transactions.transaction_date', 'asc')
             ->select(
-                'transactions.transaction_id', 
-                'transactions.status', 
-                'transactions.transaction_date', 
+                'transactions.transaction_id',
+                'transactions.status',
+                'transactions.transaction_date',
                 'transaction_type.transaction_type',
-                'invoice.invoice_id', 
-                'invoice.invoice_no as no', 
-                'invoice.due_date', 
-                'invoice.total_amount', 
+                'invoice.invoice_id',
+                'invoice.invoice_no as no',
+                'invoice.due_date',
+                'invoice.total_amount',
                 'customer.displayname'
                 )
 
@@ -232,11 +232,11 @@ class Transactions extends Model
                 ->leftJoin('customer', 'invoice.customer_id', '=', 'customer.customer_id')
                 ->orderBy('transactions.transaction_date', 'asc')
                 ->select(
-                    'transactions.transaction_id', 
-                    'transactions.status', 
-                    'transactions.transaction_date', 
+                    'transactions.transaction_id',
+                    'transactions.status',
+                    'transactions.transaction_date',
                     'transaction_type.transaction_type',
-                    'payment.payment_id as no', 
+                    'payment.payment_id as no',
                     'payment.amount as total_amount',
                     'payment.transaction',
                     'payment.reference_id',
@@ -246,7 +246,7 @@ class Transactions extends Model
 
                 ->where('transaction_type.transaction_type', 'payment')
                 ->where('payment.transaction', 'invoice');
-        
+
         if (is_array($filters) && count($filters) > 0 ){
 
             if( $filters['customer'] != 'all'  ) {
@@ -271,7 +271,7 @@ class Transactions extends Model
                     ->join('transaction_type', 'transactions.transaction_type_id', '=', 'transaction_type.transaction_type_id')
                     ->orderBy('transactions.transaction_date', 'asc')
                     ->select(
-                        'transactions.*', 
+                        'transactions.*',
                         'transaction_type.transaction_type',
                         'bill.*'
                     );
@@ -296,7 +296,7 @@ class Transactions extends Model
         $data = $bill->get();
 
         foreach ($data as $key => $value) {
-            
+
             $value->details = TransactionDetails::getDetails($value->transaction_id)->toArray();
             $value->payment_date = date('Y-m-d', strtotime($value->payment_date));
             // update balance
@@ -313,14 +313,14 @@ class Transactions extends Model
 
         return $data;
     }
-    
+
     public function expense( $filters = NULL ) {
 
         $expense = Transactions::join('expense', 'transactions.transaction_id', '=', 'expense.transaction_id')
                     ->join('transaction_type', 'transactions.transaction_type_id', '=', 'transaction_type.transaction_type_id')
                     ->orderBy('transactions.transaction_date', 'asc')
                     ->select(
-                        'transactions.*', 
+                        'transactions.*',
                         'transaction_type.transaction_type',
                         'expense.*'
                     );
@@ -347,7 +347,7 @@ class Transactions extends Model
         $data = $expense->get();
 
         foreach ($data as $key => $value) {
-            
+
             $value->details = TransactionDetails::getDetails($value->transaction_id)->toArray();
             $value->payment_date = date('Y-m-d', strtotime($value->payment_date));
             // update balance
@@ -375,7 +375,7 @@ class Transactions extends Model
 
         $expenses = [];
         foreach ($data as $key => $value) {
-            
+
             $expenses[] = [
                 'date' => $value['transaction_date'],
                 'type' => $value['transaction_type'],
@@ -411,14 +411,14 @@ class Transactions extends Model
         return json_encode($jsonData);
 
         // $expenses = Transactions::leftJoin('transaction_type', 'transactions.transaction_type_id', '=', 'transaction_type.transaction_type_id')
-                
+
         //         ->leftJoin('bill', 'transactions.transaction_id', '=', 'bill.transaction_id')
         //         ->leftJoin('expense', 'transactions.transaction_id', '=', 'expense.transaction_id')
         //         ->orderBy('transactions.transaction_date', 'asc')
         //         ->select(
-        //             'transactions.*', 
-        //             'transaction_type.transaction_type', 
-        //             'bill.*', 'bill.total_amount as bill_total', 'bill.payee as bill_payee', 'bill.payee_type as bill_payee_type', 
+        //             'transactions.*',
+        //             'transaction_type.transaction_type',
+        //             'bill.*', 'bill.total_amount as bill_total', 'bill.payee as bill_payee', 'bill.payee_type as bill_payee_type',
         //             'expense.*', 'expense.total_amount as expense_total'
         //             )
         //         ->whereIn('transaction_type.transaction_type', ['bill', 'expense']);
@@ -434,7 +434,7 @@ class Transactions extends Model
         // $data = $expenses->get();
 
         // foreach ($data as $key => $value) {
-           
+
         //     if( $value->transaction_type == 'bill' ){
         //         $value->no = $value->bill_no;
         //         $value->total = $value->bill_total;
@@ -470,7 +470,7 @@ class Transactions extends Model
 
         $transaction = Transactions::leftJoin('transaction_type', 'transactions.transaction_type_id', '=', 'transaction_type.transaction_type_id')
                     ->select(
-                    'transactions.*', 
+                    'transactions.*',
                     'transaction_type.transaction_type'
                     )
                     ->where('transactions.transaction_id', $transaction_id)
@@ -483,14 +483,14 @@ class Transactions extends Model
                 $transaction->invoice->description = ucfirst($transaction->transaction_type);
 
                 if( $transaction->invoice->invoice_no ){
-                    $transaction->invoice->description .= ' #'.$transaction->invoice->invoice_no;    
+                    $transaction->invoice->description .= ' #'.$transaction->invoice->invoice_no;
                 }
 
                 $transaction->invoice->due_date = Carbon::createFromFormat('Y-m-d', $transaction->invoice->due_date)->format('m/d/Y');
                 $transaction->invoice->amount;
                 $transaction->invoice->balance = Payment::getBalanceFromInvoice($transaction->invoice->invoice_id);
                 break;
-            
+
             default:
         }
 

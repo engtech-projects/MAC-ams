@@ -18,7 +18,7 @@
 			background-color: #4ec891!important;
 			color: #fff!important;
 			border-radius:0px;
-			
+
 		}
 		/* .buttons-print, .buttons-html5{
 			display:none!important;
@@ -33,7 +33,7 @@
 		}
 	</style>
   @include('includes.styles')
- 
+
 </head>
 <body class="hold-transition sidebar-mini text-sm">
 <!-- Site wrapper -->
@@ -73,9 +73,9 @@
 @yield('footer-scripts')
 </body>
 <script>
-	$(document).ready(function(){
-		mytime();
-	});
+
+
+
 	function mytime()
 	{
 		var d=new Date();
@@ -89,9 +89,9 @@
 		if (m<10) { m = "0" + m; }
 		if (s<10) { s = "0" + s; }
 		document.getElementById('currentTime').innerHTML=h + ":" + m + ":" + s + " " + ap;
-		
+
 		t=setTimeout('mytime()',500);
 		document.getElementById('currentDate').innerHTML =  new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
-	}	
+	}
 </script>
 </html>

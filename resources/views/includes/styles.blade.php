@@ -25,5 +25,6 @@
 <link rel="stylesheet" href="{{ asset('plugins/bootstrap3-editable-1.5.1/bootstrap3-editable/css/bootstrap-editable.css') }}">
 <!-- Theme style -->
 <link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
+
 <!-- custom style -->
 <link rel="stylesheet" href="{{ asset('css/custom.css') }}">

@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 
+use App\Repositories\Reports\ReportsRepositoryInterface;
+use App\Repositories\Reports\ReportsRepository;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -14,7 +17,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
     }
 
     /**

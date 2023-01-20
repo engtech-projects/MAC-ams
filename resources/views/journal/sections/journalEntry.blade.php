@@ -29,6 +29,9 @@
 	{
 		color:black;
 	}
+    .select2 {
+        width: 100% !important
+    }
 </style>
 
 <!-- Main content -->
@@ -54,12 +57,12 @@
 								<div class="form-group">
 									<label class="label-normal" for="branch_id">Branch</label>
 									<div class="input-group">
-									<select name="branch_id" class="form-control form-control-sm" id="branch_id" required>
+									<select name="branch_id" class="select2 form-control form-control-sm" id="branch_id" required>
 										<option value="" disabled selected>-Select Branch-</option>
 										<option value="1">Butuan CIty Branch</option>
 										<option value="2">Nasipit Branch</option>
 									</select>
-										
+
 									</div>
 								</div>
 							</div>
@@ -70,7 +73,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="">Book Reference</label>
 									<div class="input-group">
-									<select name="book_id" class="form-control form-control-sm" id="book_id" required>
+									<select name="book_id" class="select2 form-control form-control-sm" id="book_id" required>
 										<option value="" disabled selected>-Select Book References-</option>
 										@foreach($journalBooks as $journalBook)
 											<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
@@ -100,7 +103,7 @@
 								</div>
 							</div>
 						</div>
-						
+
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -126,7 +129,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="status">Status</label>
 									<div class="input-group">
-										<select name="status" class="form-control form-control-sm" id="status" required>
+										<select name="status" class="select2 form-control form-control-sm" id="status" required>
 											<option value="unposted" selected>Unposted</option>
 										</select>
 									</div>
@@ -138,7 +141,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="amount">Amount</label>
 									<div class="input-group">
-										<input type="number" class="form-control form-control-sm rounded-0" name="amount" id="amount"  step="any" placeholder="Amount" required>
+										<input type="text" class="form-control form-control-sm rounded-0" name="amount_cur" id="amount"  step="any" placeholder="Amount" required>
 									</div>
 								</div>
 							</div>
@@ -190,21 +193,23 @@
 						<tbody id="tbl-create-journal-container">
 							@for($i = 0; $i < 1; $i++)
 								<tr class='editable-table-row'>
-									<td  class="acctnu" value="" >
+									<td class="acctnu" value="">
 										<a href="#" class="editable-row-item journal_details_account_no"></a>
 									</td>
-									<td class='editable-table-data' value="" >
-										<select  fieldName="account_id" class="form-control editable-row-item form-control-sm COASelect">
+									<td class='editable-table-data' width="300">
+										<select  fieldName="account_id" class="select-account form-control editable-row-item form-control-sm COASelect">
 											<option disabled value="" selected>-Select Account Name-</option>
 											@foreach($chartOfAccount as $account)
-												<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_name}}</option>
+												<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_number}}<span> - </span> {{$account->account_name}}</span></option>
 											@endforeach
 										</select>
+
+
 									</td>
-									<td class='editable-table-data journalNum' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item"></a> </td>
+									<td class='editable-table-data journalNum' value="" ><a href="#" fieldName="journal_details_debit" id="debit" class=" editable-row-item"></a> </td>
 									<td class='editable-table-data journalNum' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
 									<td class='editable-table-data' value="" >
-										<select  fieldName="subsidiary_id" class="form-control form-control-sm editable-row-item">
+										<select  fieldName="subsidiary_id" class="select-account form-control form-control-sm editable-row-item">
 											<option disabled value="" selected>-Select S/L-</option>
 											<?php
 												$temp = '';
@@ -224,7 +229,7 @@
 										</select>
 									</td>
 									<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class=" editable-row-item"></a></td>
-									
+
 									<td>
 										<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
 											<span>
@@ -234,7 +239,7 @@
 									</td>
 								</tr>
 							@endfor
-							
+
 						</tbody>
 						<tfoot>
 							<tr class="text-center">
@@ -287,25 +292,25 @@
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_pay"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_branch"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_date"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_ref_no"></strong></h6>
-											
+
 										</div>
 									</div>
 								</div>
@@ -313,25 +318,25 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_source"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_particular"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; ₱ <strong id="journal_voucher_amount"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_amount_in_words" style="text-transform:capitalize;"></strong></h6>
-											
+
 										</div>
 									</div>
 								</div>
@@ -342,12 +347,12 @@
 										<th class="center">Account</th>
 										<th>Title</th>
 										<th>S/L</th>
-										<th class="center">Debii</th>
+										<th class="center">Debit</th>
 										<th class="right">Credit</th>
 										</tr>
 									</thead>
 									<tbody id="journal_VoucherContent">
-										
+
 									</tbody>
 									</table>
 								</div>
@@ -372,11 +377,11 @@
 					</div>
 				</div>
 			</div>
-			
+
 		</div>
 	</div>
 </div>
-</section>	
+</section>
 <!-- /.content -->
 
 

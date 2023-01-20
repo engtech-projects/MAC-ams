@@ -29,11 +29,11 @@
           <div class="card-body">
 
             <div class="row">
-              
+
               <div class="col-md-3">
                 <div class="form-group">
                   <label for="" class="label-normal">Status </label>
-                  <select class="form-control form-control-sm rounded-0" id="flt-status">
+                  <select class="select2 form-control form-control-sm rounded-0" id="flt-status">
                     <option value="all" selected>All Status</option>
                     @foreach ($transactionStatus as $status)
                         <option value="{{ $status->status }}">{{ ucwords($status->status) }}</option>

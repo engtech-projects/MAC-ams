@@ -44,8 +44,9 @@
 <!-- <script src="{{ asset('js/adminlte/demo.js') }}"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-growl/1.0.0/jquery.bootstrap-growl.min.js"></script>
 
+
 <script>
-	jQuery(document).ready(function() {  
+	jQuery(document).ready(function() {
 		@if(Session::has('success'))
 			$.bootstrapGrowl("{{Session::get('success')}}", {type:'success'});
 		@endif

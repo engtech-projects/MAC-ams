@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Transactions;
 use App\Models\PaymentMethod;
 use App\Models\Accounts;
+use App\Models\AccountOfficer;
 use App\Models\AccountCategory;
 use App\Models\AccountType;
 use App\Models\TransactionType;
@@ -15,9 +16,20 @@ use App\Models\Subsidiary;
 use App\Models\SubsidiaryCategory;
 use App\Http\Controllers\PrinterController;
 use App\Http\Controllers\AccountsController;
+use App\Models\AccountOfficerCollection;
+use App\Models\Branch;
+use App\Models\BranchCollection;
+use App\Models\CashBlotter;
+use App\Models\CashBreakdown;
+use App\Repositories\Reports\ReportsRepositoryInterface;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ReportsController extends MainController
 {
+
+
 	// invoice
 	public function subsidiaryLedger() {
 
@@ -26,13 +38,13 @@ class ReportsController extends MainController
 			'sub_categories' => SubsidiaryCategory::get(),
 			'title' => 'Subsidiary Ledger',
 			'subsidiaryLedgerList' => ''
-		];	
-		
+		];
+
 	    return view('reports.sections.subsidiaryledger', $data);
-		
+
 	}
 	public function subsidiarySaveorEdit(Request $request)
-	{	
+	{
 		if($request->sub_id == '')
 		{
 			$sub = new Subsidiary;
@@ -148,13 +160,162 @@ class ReportsController extends MainController
 	}
 	public function cashTransactionBlotter()
 	{
+
+        /* return AccountOfficer::leftjoin('branch','branch.branch_id','=','account_officer.branch_id')
+        ->where('branch.branch_id','=',1)->get(); */
+
+
 		$data = [
 			'title' => 'Cashier Transaction Blotter',
-			'trialbalanceList' => ''
+			'trialbalanceList' => '',
+            'cash_blotter'  => CashBlotter::fetchCashBlotter(),
+            'branches' => Branch::fetchBranch(),
+            'account_officers'      =>      AccountOfficer::fetchAccountOfficer(),
 		];
 
 	    return view('reports.sections.cashTransactionBlotter', $data);
+
+
 	}
+    public function cashBlotterIndex() {
+        $data = CashBlotter::fetchCashBlotter();
+        return response()->json([
+            'data'      =>      $data
+        ]);
+    }
+
+    public function fetchAccountOfficer($id) {
+        $ao_officer = AccountOfficer::getAccountOfficerByBranchId($id);
+            return response()->json([
+                'data'      =>      $ao_officer
+            ],200);
+
+    }
+
+    public function storeCashBlotter(Request $request) {
+        $cashblotter = new CashBlotter();
+        $cashblotter->transaction_date      =   $request['transaction_date'];
+        $cashblotter->total_collection      =   $request['totalcash_count'];
+        $cashblotter->branch_id             =   $request['branch_id'];
+        $cashblotter->save();
+
+
+        $cashblotter_id = $cashblotter->cashblotter_id;
+
+        $ao_collection =  json_decode($request['ao_collection']);
+        $branch_collection  = json_decode($request['branch_collection']);
+        $this->storeAoCollection($cashblotter_id,$ao_collection);
+        $this->storeBranchCollection($cashblotter_id,$branch_collection);
+        $this->storeCashBreakdown($cashblotter_id,$request);
+
+
+        return response()->json([
+            'success'       =>      true,
+            'message'       =>      'Cash Transaction Blotter created'
+        ],201);
+        return response()->json(array('success' => false, 'message' => 'Something went wrong!'), 522);
+    }
+
+    public function showCashBlotter($id) {
+
+    }
+
+
+
+    public function editCashBlotter($id) {
+        $cashblotter = CashBlotter::fetchCashBlotterById($id);
+        $cash_breakdown =  CashBreakdown::fetchCashBreakdownByCashblotterId($id);
+        $data = [
+            'cashblotter_id'        =>      $id,
+            'cash_blotter'           =>      $cashblotter,
+            'cash_breakdown'         =>      $cash_breakdown,
+            'branches'              =>      Subsidiary::fetchBranch(),
+            'account_officers'      =>      AccountOfficer::fetchAccountOfficer(),
+        ];
+        if($cash_breakdown == null)
+        {
+            return response()->json([
+                'success'       =>      false,
+                'message'       =>      'No cash breakdown found'
+            ],422);
+        }else if($cashblotter   ==   null) {
+            return response()->json([
+                'success'       =>      false,
+                'message'       =>      'No cash blotter found'
+            ],422);
+        }
+        else {
+            return response()->json([
+                'data'      =>      $data
+            ],200);
+        }
+    }
+
+
+    public function getEditCashBlotter($id) {
+        $cashblotter = CashBlotter::findOrFail($id);
+        return response()->json([
+            'data'      =>      $cashblotter
+        ]);
+    }
+
+
+
+    private function storeAoCollection($cashblotter_id,$ao_collection) {
+        $aocollection_data = Array();
+        $now = Carbon::now();
+        foreach($ao_collection as $item) {
+            $aocollection_data[] = [
+                'remarks'               =>  $item->remarks,
+                'total_amount'          =>  $item->totalamount,
+                'accountofficer_id'     =>  $item->accountofficer_id,
+                'cashblotter_id'        =>  $cashblotter_id,
+                'created_at'            =>  $now,
+                'updated_at'            =>  $now,
+
+            ];
+        }
+        AccountOfficerCollection::insert($aocollection_data);
+    }
+
+
+    private function storeBranchCollection($cashblotter_id,$branch_collection) {
+        $aocollection_data = Array();
+        $now = Carbon::now();
+        foreach($branch_collection as $item) {
+            $aocollection_data[] = [
+                'total_amount'          =>  $item->totalamount,
+                'branch_id'             =>  $item->branch_id,
+                'cashblotter_id'        =>  $cashblotter_id,
+                'created_at'            =>  $now,
+                'updated_at'            =>  $now,
+
+            ];
+        }
+        BranchCollection::insert($aocollection_data);
+    }
+
+
+
+    private function storeCashBreakdown($cashblotter_id,$request) {
+        $cash_breakdown = new CashBreakdown();
+        $cash_breakdown->onethousand_pesos      =       $request['onethousand'];
+        $cash_breakdown->fivehundred_pesos      =       $request['fivehundred'];
+        $cash_breakdown->twohundred_pesos       =       $request['twohundred'];
+        $cash_breakdown->onehundred_pesos       =       $request['onehundred'];
+        $cash_breakdown->fifty_pesos            =       $request['fifty'];
+        $cash_breakdown->twenty_pesos           =       $request['twenty'];
+        $cash_breakdown->ten_pesos              =       $request['ten'];
+        $cash_breakdown->five_pesos             =       $request['five'];
+        $cash_breakdown->one_peso               =       $request['one'];
+        $cash_breakdown->one_centavo            =       $request['centavo'];
+        $cash_breakdown->total_amount           =       $request['totalcash_count'];
+        $cash_breakdown->cashblotter_id         =       $cashblotter_id;
+
+        $cash_breakdown->save();
+    }
+
+
 	public function cheque()
 	{
 		$data = [
@@ -163,6 +324,8 @@ class ReportsController extends MainController
 		];
 		return view('reports.sections.cheque', $data);
 	}
+
+
 	public function postDatedCheque()
 	{
 		$data = [
@@ -171,6 +334,8 @@ class ReportsController extends MainController
 		];
 		return view('reports.sections.postDatedCheque', $data);
 	}
+
+
 	public function chartOfAccounts()
 	{
 		$accountData = Accounts::fetch();
@@ -180,10 +345,12 @@ class ReportsController extends MainController
 			'organizedAccount'=> AccountsController::groupByType($accountData),
 			'account_category'=> AccountCategory::get(),
 			'accountTypes' => AccountType::orderBy('account_category_id')->get(),
-            'cashFlows'    => ['investing', 'financing', 'operating'] 
+            'cashFlows'    => ['investing', 'financing', 'operating']
         ];
     	return view('reports.sections.chartOfAccounts', $data);
 	}
+
+
 
 	public function reportPrint(Request $request)
 	{
@@ -211,8 +378,8 @@ class ReportsController extends MainController
 				$print->generate_income_statement($request,'INCOME STATEMENT');
 				break;
 			default:
-				
+
 		}
-		
+
 	}
 }

@@ -8,7 +8,7 @@
           @foreach ($accountTypes as $accountType)
             <option value="{{ $accountType->account_type_id }}">{{ ucfirst($accountType->account_type) }}</option>
           @endforeach
-        </select>              
+        </select>
       </div>
       <div class="form-group">
         <label for="" class="label-normal">Description</label>
@@ -45,7 +45,7 @@
       </div>
       <div class="form-group">
         <label for="" class="label-normal">Account Name <i class="fa fa-asterisk fa-xs text-red" aria-hidden="true"></i> </label>
-        <input type="text" class="form-control form-control-sm rounded-0" id="" name="account_name" required>
+        <input type="text" class="form-control form-control-sm rounded-0" id="aa" name="account_name" required>
       </div>
 
        <div class="form-group clearfix">
@@ -64,11 +64,11 @@
           @endforeach
         </select>
       </div>
-       
+
       <div><label for="" class="label-normal">Opening Balance</label></div>
       <div class="form-group row">
         <div class="col-sm-4">
-          <input type="text" name="opening_balance" class="form-control form-control-sm rounded-0 text-right" placeholder="0.00">
+          <input type="text" name="opening_balance" id="openingbalance" class="form-control form-control-sm rounded-0 text-right" placeholder="0.00">
         </div>
         <label class="col-sm-2 col-form-label label-normal text-center">as of</label>
         <div class="col-sm-6">
@@ -88,3 +88,20 @@
 
   </div>
 </form>
+
+<script>
+    $(document).ready(function() {
+        $("#openingbalance").on("focus", function(){
+            if((parseFloat(this.value) - parseInt(this.value)) == 0){
+                this.value = parseFloat(this.value).toFixed(0)
+            }
+        });
+        $("#openingbalance").on("blur", function(){
+            if(this.value){
+                this.value = parseFloat(this.value).toFixed(2)
+            }else{
+                this.value = parseFloat(0).toFixed(2)
+            }
+        });
+    })
+</script>

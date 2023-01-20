@@ -1,14 +1,14 @@
 <!--  -->
 <style type="text/css">
-  
+
   .remove-items:hover {
     cursor: pointer;
-  }  
+  }
 
 </style>
 
 
-<form id="frm-create-invoice" method="POST" action="{{ route('sales.store') }}"> 
+<form id="frm-create-invoice" method="POST" action="{{ route('sales.store') }}">
   <input type="hidden" name="transaction_type_id" value="{{ $transactionType->transaction_type_id }}">
   <input type="hidden" name="transaction_type" value="{{ $transactionType->transaction_type }}">
   <input type="hidden" name="account_id" value="{{ $transactionType->account_id }}">
@@ -60,7 +60,7 @@
     </div>
 
     <div class="col-md-2">
-      
+
       <div class="form-group">
         <label for="" class="label-normal">Due date</label>
 		<input type="date" class="form-control form-control-sm rounded-0" value="{{ isset($invoice)? date('Y-m-d', strtotime($invoice->due_date)) : Carbon\Carbon::now()->format('Y-m-d') }}" form="frm-create-invoice" name="due_date">
@@ -71,7 +71,7 @@
     <div class="col-md-4">
       <div class="small-box bg-default text-right">
         <div class="inner">
-          <h3 id="total-amount">{{isset($invoice->transaction->items)? balanceDue($invoice->transaction->items) : '0.00'}}</h3>
+          <h3 id="total-amount" class="balance-due">{{isset($invoice->transaction->items)? balanceDue($invoice->transaction->items) : '0.00'}}</h3>
           <span class="text-muted">BALANCE DUE</span>
         </div>
       </div>
@@ -86,7 +86,7 @@
       </div>
     </div>
     <div class="col-md-12">
-        
+
       <table class="table table-bordered table-sm" id="">
         <thead>
           <tr>
@@ -114,9 +114,9 @@
               <input type="text" class="form-control form-control-sm rounded-0" name="description" form="frm-add-item-details" placeholder="Add a description">
             </td>
             <td> <input type="text" class="form-control form-control-sm rounded-0 text-right" value="1" name="qty" form="frm-add-item-details" required></td>
-            <td> <input type="text" class="form-control form-control-sm rounded-0 text-right" name="rate" form="frm-add-item-details" required></td>
+            <td> <input type="text" class="form-control form-control-sm rounded-0 text-right" id="rate" name="rate" form="frm-add-item-details" required></td>
             <td>
-              <input type="text" class="form-control form-control-sm rounded-0 text-right" placeholder="0.00" name="amount" form="frm-add-item-details" required>
+              <input type="text" class="form-control form-control-sm rounded-0 text-right" id="amount" placeholder="0.00" name="amount" form="frm-add-item-details" required>
             </td>
             <td class="text-center">
               <button type="submit" form="frm-add-item-details" class="btn btn-sm btn-flat btn-default btn-add-item-details">
@@ -131,8 +131,8 @@
 					<td data-id="{{$item->item_id}}">{{$item->item->name}}</td>
 					<td>{{$item->description}}</td>
 					<td class="text-right">{{$item->qty}}</td>
-					<td class="text-right">{{$item->rate}}</td>
-					<td class="text-right">{{$item->amount}}</td>
+					<td class="text-right" id="rate_list">{{$item->rate}}</td>
+					<td class="text-right" id="amount_list">{{$item->amount}}</td>
 					<td class="text-center"><i class="fa fa-trash-alt fa-xs text-muted remove-items" aria-hidden="true"></i></td>
 				</tr>
 			@endforeach
@@ -167,3 +167,40 @@
     </div>
 
   </div>
+
+  <script>
+
+    if ($('body').find('.modal.show').length) {
+        let balance_due = $('.balance-due').text()
+        let amount_list = $('#amount_list').text();
+        let rate_list = $('#rate_list').text();
+        let inv_blnc = $('.invoice-balance').text();
+        let amount = $('#amount').val();
+
+        let rate = $('#rate').val();
+
+
+
+        $('#rate').val(amountConverter(rate))
+        $('#amount').text(amountConverter(amount))
+        $('#amount_list').text(amountConverter(amount_list))
+        $('#rate_list').text(amountConverter(rate_list))
+        $('.balance-due').text(amountConverter(balance_due))
+
+
+
+        function amountConverter(amount) {
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'PHP',
+
+        });
+
+        return formatter.format(amount)
+        }
+    }
+
+
+
+
+      </script>

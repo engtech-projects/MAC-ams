@@ -8,6 +8,9 @@
 		padding-bottom:10px;
 		border-bottom:2px solid #4ec891;
 	}
+    .tbl-row {
+        cursor: pointer;
+    }
 	.search-custom{
 		display:block;
 		position:absolute;
@@ -30,7 +33,11 @@
 	.page-item.active .page-link{
 		color:white!important;
 	}
-	
+    #account-details {
+        padding: 50px;
+        display: none;
+    }
+
 </style>
 <!-- Main content -->
 <section class="content">
@@ -49,7 +56,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="branch_id">Branch</label>
 								<div class="input-group">
-									<select name="s_branch_id" class="form-control form-control-sm" id="s_branch_id">
+									<select name="s_branch_id" class="form-control form-control-sm select2" id="s_branch_id">
 										<option value="" disabled selected>-All-</option>
 										<option value="1">Butuan CIty Branch</option>
 										<option value="2">Nasipit Branch</option>
@@ -63,7 +70,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="branch_id">Book Reference</label>
 								<div class="input-group">
-									<select name="s_book_id" class="form-control form-control-sm" id="s_book_id" >
+									<select name="s_book_id" class="select2 form-control form-control-sm" id="s_book_id" >
 										<option value="" disabled selected>-All-</option>
 										@foreach($journalBooks as $journalBook)
 											<option value="{{$journalBook->book_id}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
@@ -78,7 +85,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="s_status">Status</label>
 								<div class="input-group">
-									<select name="s_status" class="form-control form-control-sm" id="s_status">
+									<select name="s_status" class="select2 form-control form-control-sm" id="s_status">
 											<option value="" selected>-All-</option>
 											<option value="unposted">Unposted</option>
 											<option value="posted">Posted</option>
@@ -125,6 +132,11 @@
 		<div class="col-md-12">
 			<!-- Table -->
 			<section class="content">
+{{--                 <a class="" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                    <i class="fas fa-cog"></i>
+                </a> --}}
+
+
 				<div class="container-fluid">
 					<div class="col-md-12">
 						<table id="journalEntryDetails"  class="table table-bordered">
@@ -136,15 +148,15 @@
 								<th>Remarks</th>
 								<th>Journal Date</th>
 								<th>Status</th>
-								<th>Action</th>
+								<th width="150">Action</th>
 							</thead>
 							<tbody id="journalEntryDetailsContent">
 								@foreach($journalEntryList as $journal)
-									<tr>
+									<tr class="tbl-row" data-id="{{$journal->journal_id}}" >
 										<td class="font-weight-bold">{{$journal->bookDetails->book_code}}</td>
 										<td class="font-weight-bold">{{$journal->journal_no}}</td>
 										<td>{{$journal->source}}</td>
-										<td>{{$journal->amount}}</td>
+										<td class="journal-amount">{{$journal->amount}}</td>
 										<?php $remarks = explode('::', $journal->remarks)?>
 											<td>
 												@foreach($remarks as $remark)
@@ -154,14 +166,60 @@
 										<td>{{$journal->journal_date}}</td>
 										<td class="nav-link {{($journal->status  == 'posted') ? 'text-success' : 'text-danger">Journal Entry</a>'}}"><b>{{ucfirst($journal->status)}}</b></td>
 										<td>
-											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-sm bg-gradient-danger jnalDelete">Delete</button>
-											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
-											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
+											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
+											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
+											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i class="fa fa-edit"></i></button>
+                                            <button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-xs bg-gradient-success stStatus"><i class="fa fa-check"></i></button>
 										</td>
 									</tr>
-								@endforeach 
+								@endforeach
 							</tbody>
 						</table>
+                        <div id="account-details">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-bordered table-sm" id="tbl-create-journal">
+                                        <thead>
+                                            <tr class="text-center">
+                                                <th>Account #</th>
+                                                <th>Account Name</th>
+
+                                                <th>S/L</th>
+                                                <th>Description</th>
+                                                <th width="150">Debit</th>
+								                <th width="150">Credit</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbl-preview-container">
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="text-center">
+                                                <th></th>
+
+                                                <th width="200"></th>
+                                                <th width="200"></th>
+                                                <th width="200">TOTAL</th>
+                                                <th width="150" id="vtotal_debit">0</th>
+                                                <th width="150" id="vtotal_credit">0</th>
+
+                                            </tr>
+                                            <tr class="text-center">
+                                                <th></th>
+                                                <th width="200"></th>
+                                                <th width="200"></th>
+                                                <th width="200">BALANCE</th>
+                                                <th width="150" id="vbalance_debit">0</th>
+                                                <th width="150" id="vbalance_credit">0</th>
+
+
+                                            </tr>
+
+                                        </tfoot>
+                                    </table>
+                                    </div>
+                                </div>
+                        </div>
 					</div>
 				</div>
 			</section>
@@ -236,7 +294,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<div class="col-md-3 col-xs-12">
 								<div class="box">
 									<div class="form-group">
@@ -289,10 +347,10 @@
 										<tr class="text-center">
 											<th>Account #</th>
 											<th>Account Name</th>
-											<th>Debit</th>
-											<th>Credit</th>
 											<th>S/L</th>
 											<th>Description</th>
+                                            <th>Debit</th>
+                                            <th>Credit</th>
 										</tr>
 									</thead>
 									<tbody id="tbl-create-journalview-container">
@@ -300,28 +358,28 @@
 									<tfoot>
 										<tr class="text-center">
 											<th></th>
+                                            <th></th>
+                                            <th></th>
 											<th width="200">TOTAL</th>
-											<th width="150" id="vtotal_debit">0</th>
-											<th width="150" id="vtotal_credit">0</th>
-											<th width="200"></th>
-											<th width="200"></th>
+											<th width="150" class="text-left" id="vtotal_debit">0</th>
+											<th width="150" class="text-left" id="vtotal_credit">0</th>
 										</tr>
 										<tr class="text-center">
 											<th></th>
+                                            <th></th>
+                                            <th></th>
 											<th width="200">BALANCE</th>
-											<th width="150" id="vbalance_debit">0</th>
-											<th width="150" id="vbalance_credit">0</th>
-											<th width="200"></th>
-											<th width="200"></th>
+											<th width="150" class="text-left" id="vdebit">0</th>
+											<th width="150" class="text-left" id="vcredit">0</th>
 										</tr>
-										
+
 									</tfoot>
 								</table>
 								</div>
 							</div>
 							<div class="col-md-12" style="height:20px;"></div>
 							<div class="col-md-12 text-right" id="posted-content">
-							
+
 							</div>
 						</div>
 						<!-- Button trigger modal -->
@@ -486,8 +544,9 @@
 									</tr>
 								</thead>
 								<tbody id="tbl-create-edit-container">
-									
+
 								</tbody>
+
 								<tfoot>
 									<tr class="text-center">
 										<th></th>
@@ -527,11 +586,11 @@
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="modal-body"  >
-				
+
 				<div class="container-fluid ">
 					<div id="ui-view">
 						<div class="card">
-						
+
 							<div class="card-body" id="toPrintVouch">
 								<link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
 								<link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -551,19 +610,19 @@
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong id="voucher_branch"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong id="voucher_date"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong id="voucher_ref_no"></strong></h6>
-											
+
 										</div>
 									</div>
 								</div>
@@ -571,25 +630,25 @@
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong id="voucher_source"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong id="voucher_particular"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; ₱ <strong id="voucher_amount"></strong></h6>
-											
+
 										</div>
 									</div>
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong id="voucher_amount_in_words" style="text-transform:capitalize;"></strong></h6>
-											
+
 										</div>
 									</div>
 								</div>
@@ -600,12 +659,12 @@
 										<th class="center">Account</th>
 										<th>Title</th>
 										<th>S/L</th>
-										<th class="center">Debii</th>
+										<th class="center">Debit</th>
 										<th class="right">Credit</th>
 										</tr>
 									</thead>
 									<tbody id="journalVoucherContent">
-										
+
 									</tbody>
 									</table>
 								</div>
@@ -618,13 +677,13 @@
 											<td class="left">
 											<strong>TOTAL</strong>
 											</td>
-											<td class="left">₱ <strong id="total_debit_voucher"></strong></td>
-											<td class="left">₱ <strong id="total_credit_voucher"></strong></td>
+											<td class="left"><strong id="total_debit_voucher"></strong></td>
+											<td class="left"><strong id="total_credit_voucher"></strong></td>
 										</tr>
-										
+
 										</tbody>
 									</table>
-									
+
 									</div>
 								</div>
 							</div>
@@ -632,11 +691,11 @@
 					</div>
 				</div>
 			</div>
-			
+
 		</div>
 	</div>
 </div>
-</section>	
+
 <!-- /.content -->
 @endsection
 

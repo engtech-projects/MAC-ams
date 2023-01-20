@@ -1,20 +1,553 @@
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 <script type="text/javascript">
 	(function ($) {
+
+        var cashblotter_tbl
+        fetchCashBlotter()
+
+
+        var editCashblotterFlyOut = new GlobalWidget();
+        var showCashblotterFlyOut = new GlobalWidget();
+
+
+
+        $('#create-cashblotter').click(function(){
+            $('#Mymodal').modal('show')
+            reset()
+            $('#title').text("Cash Transaction Blotter (New)")
+        });
+
+     /*
+     **********************  EDIT CASH BLOTTER **************************
+    */
+
+    $(document).on('click', '#update-cashblotter', function(e){
+        e.preventDefault();
+        $('#Mymodal').modal('show')
+        reset()
+        $('#title').text("Cash Transaction Blotter (Edit)")
+
+        var cashblotter_id = $(this).attr('data-id')
+        $.ajax({
+            type: "GET",
+            url: "cashTransactionBlotter/editcashblotter/"+cashblotter_id,
+            dataType: "json",
+            success: function (response) {
+                    $('#onethousand').val(response.data.cash_breakdown.onethousand_pesos)
+                    $('#fivehundred').val(response.data.cash_breakdown.fivehundred_pesos)
+                    $('#twohundred').val(response.data.cash_breakdown.twohundred_pesos)
+                    $('#onehundred').val(response.data.cash_breakdown.onehundred_pesos)
+                    $('#fifty').val(response.data.cash_breakdown.fifty_pesos)
+                    $('#twenty').val(response.data.cash_breakdown.twenty_pesos)
+                    $('#ten').val(response.data.cash_breakdown.ten_pesos)
+                    $('#five').val(response.data.cash_breakdown.five_pesos)
+                    $('#one').val(response.data.cash_breakdown.one_peso)
+                    $('#centavo').val(response.data.cash_breakdown.one_centavo)
+                    setCashBreakdown()
+
+            }
+        });
+        /* let target = $(this);
+        let title = target.data('title');
+        let route = target.data('remote');
+        editCashblotterFlyOut.setTitle(title)
+                    .setRoute(route)
+                    .setCallback( function(){
+                        $('.select2').select2({
+                            placeholder: 'Select',
+                            allowClear: true,
+                        })
+                    }).init(); */
+    })
+
+    function setCashBreakdown() {
+        $('.cash-breakdown').each(function(index, row){
+
+        let cells = $(row).find('td');
+        let val = cells.eq(0).text();
+        let pcs = $(row).find('input[type=number]').val()
+        var total_amount = cells.eq(2).text()
+        let total = val*pcs
+        cells.eq(2).text(amountConverter(total))
+        totalCashCount()
+
+
+});
+
+
+    }
+
+    /*
+     **********************  VIEW CASH BLOTTER **************************
+    */
+
+    $(document).on('click', '.view-cashblotter', function(e){
+        e.preventDefault();
+
+
+        let target = $(this);
+        let title = target.data('title');
+        let route = target.data('remote');
+
+        showCashblotterFlyOut.setTitle(title)
+                    .setRoute(route)
+                    .setCallback( function(){
+                        $('.select2').select2({
+                            placeholder: 'Select',
+                            allowClear: true,
+                        })
+                    }).init();
+    })
+
+    /*
+     **********************  DELETE CASH BLOTTER **************************
+    */
+
+    $(document).on('click', '.delete-cashblotter', function(e){
+        e.preventDefault();
+        alert("delete cash blotter")
+
+        aja
+
+
+
+        /* let target = $(this);
+        let title = target.data('title');
+        let route = target.data('remote');
+
+        paymentFlyout.setTitle(title)
+                    .setRoute(route)
+                    .setCallback( function(){
+                        $('.select2').select2({
+                            placeholder: 'Select',
+                            allowClear: true,
+                        })
+                    }).init(); */
+    })
+
+
+    /*
+     **********************  DOWNLOAD CASH BLOTTER **************************
+    */
+    $(document).on('click', '.download-cashblotter', function(e){
+        e.preventDefault();
+        alert("download cash blotter")
+
+
+
+        /* let target = $(this);
+        let title = target.data('title');
+        let route = target.data('remote');
+
+        paymentFlyout.setTitle(title)
+                    .setRoute(route)
+                    .setCallback( function(){
+                        $('.select2').select2({
+                            placeholder: 'Select',
+                            allowClear: true,
+                        })
+                    }).init(); */
+    })
+
+
+    /*
+     **********************  PRINT CASH BLOTTER **************************
+    */
+
+    $(document).on('click', '.print-cashblotter', function(e){
+        e.preventDefault();
+        alert("print cash blotter")
+
+
+
+        /* let target = $(this);
+        let title = target.data('title');
+        let route = target.data('remote');
+
+        paymentFlyout.setTitle(title)
+                    .setRoute(route)
+                    .setCallback( function(){
+                        $('.select2').select2({
+                            placeholder: 'Select',
+                            allowClear: true,
+                        })
+                    }).init(); */
+    })
+
+
+
+    /*
+     **********************  ADD CASH BLOTTER **************************
+    */
+
+    $(document).on('change','#select_branch',function(){
+        var branch_id   =   $(this).val()
+        $('.select-officer').find('option').remove()
+        $('.select-officer').append('<option value="" disabled selected text="Select-Officer">')
+        $.ajax({
+            type: "get",
+            url: "/reports/cashTransactionBlotter/fetchaccountofficer/"+branch_id,
+            dataType: "json",
+            success: function (response) {
+                var data = response.data
+                $.each(data,function(i,item){
+                    $('.select-officer ').append($('<option>',{
+                        value:item.accountofficer_id,
+                        text:item.name
+                    }))
+                })
+            }
+        });
+
+    })
+
+
+    $(document).on('submit','#add-cash-blotter',function(e){
+        e.preventDefault()
+
+        var form = $(this);
+        var formData = form.serializeArray();
+        var totalcash_count = Number($('#totalcashcount').text().replace(/[^0-9\.-]+/g,""))
+        var aocollection_items = []
+        var branchcollection_items = []
+        aocollection_items = addAoCollection()
+        branchcollection_items = addBranchCollection()
+
+
+        if(!aocollection_items) {
+            alert("Please add account officer collection")
+            return false
+        }
+
+        formData.push({name:'totalcash_count',value:totalcash_count})
+        formData.push({name:'ao_collection',value:JSON.stringify(aocollection_items)})
+        formData.push({name:'branch_collection',value:JSON.stringify(branchcollection_items)})
+
+        $.ajax({
+				type:'POST',
+				dataType: "json",
+				url:"{{route('reports.storeCashBlotter')}}",
+				data:formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+				success:function(data) {
+                    toastr.success(data.message);
+                    $('#create-cashblotter-modal').modal('hide');
+                    $('#cash-blotter-tbl').DataTable().ajax.reload();
+                    $('#Mymodal').modal('hide')
+                    reset()
+
+                },
+                error:function(data){
+                    console.log(data)
+                }
+            })
+
+    })
+
+    function reset() {
+        $('#add-cash-blotter')[0].reset()
+        $('.aocollection-items').remove()
+        $('.branchcollection-items').remove()
+        $('#totalbranchcollection').text(0)
+        $('#totalaccountofficercollection').text(0)
+        $('#totalcashcount').text(0)
+        $('.cash-breakdown').each(function(index, row){
+            let cells = $(row).find('td')
+            cells.eq(2).text(0)
+        })
+
+    }
+
+
+
+    function addAoCollection() {
+        var items = [];
+
+        $('.aocollection-items').each(function(index, row){
+
+        let cells = $(row).find('td');
+        let accountofficer_id = cells.eq(0).data('id');
+        let remarks = cells.eq(1).text();
+        let totalamount = Number(cells.eq(2).text().replace(/[^0-9\.-]+/g,""))
+
+        /* let aocollection_totalamount = Number(cells.eq(3).text().replace(/[^0-9\.-]+/g,"")); */
+
+        items.push(
+            {
+            'accountofficer_id' : accountofficer_id,
+            'remarks' : remarks,
+            'totalamount':totalamount
+            }
+        );
+
+        });
+
+        if( items.length ) {
+            return items
+        }
+        return false;
+    }
+    function addBranchCollection() {
+        var items = [];
+
+        $('.branchcollection-items').each(function(index, row){
+
+        let cells = $(row).find('td');
+        let branch_id = cells.eq(0).data('id');
+        let totalamount = Number(cells.eq(1).text().replace(/[^0-9\.-]+/g,""))
+
+        /* let aocollection_totalamount = Number(cells.eq(3).text().replace(/[^0-9\.-]+/g,"")); */
+
+        items.push(
+            {
+            'branch_id' : branch_id,
+            'totalamount':totalamount
+            }
+        );
+
+        });
+
+        if( items.length ) {
+            return items
+        }
+        return false;
+    }
+
+    /*
+     **********************  SELECT DROPDOWN WITH INPUT SEARCH **************************
+    */
+
+    $('.select-officer').select2({
+        placeholder: 'Select-Officer',
+        allowClear: true,
+    });
+    $('.select-branch').select2({
+        placeholder: 'Select-Branch',
+        allowClear: true,
+    });
+
+
+    /*
+     **********************  CASH BRANCH COLLECTION  **************************
+    */
+
+    $(document).on('click', '#btn-add-branch-collection', function(e){
+
+        var branchcollection_amount = amountConverter($('#branchcollection_amount').val())
+        var branch_id = $('#branch_id').val();
+        if(branchcollection_amount == "" || branch_id == null) {
+            alert("All fields are required")
+        }else {
+            var branch_name =  $('.select-branch option:selected').text();
+            var markup = `
+                <tr class="branchcollection-items">
+                <td data-id="${branch_id}" >${branch_name}</td>
+                <td id="total_amount">${branchcollection_amount}</td>
+                <td class="text-center"><button id="btn-remove-account-officer-collection" class="btn btn-xs btn-danger remove-account-officer-collection">
+                        <i class="fas fa-trash fa-xs"></i>
+                    </button></i>
+                </td>
+                </tr>
+                `;
+            $('#branch-collection-row').before(markup);
+            calculateAmount("branchcollection");
+
+            $('#branchcollection_amount').val("")
+            $('#branch_id').val(null).trigger("change")
+
+        }
+
+    })
+
+
+
+
+    /*
+     **********************  CASH ACCOUNT OFFICER COLLECTION  **************************
+    */
+
+    $(document).on('click', '#btn-add-account-officer-collection', function(e){
+        var remarks = $('#remarks').val();
+        var total_amount = amountConverter($('#total_amount').val());
+        var accountofficer_id = $('#accountofficer_id').val();
+        if(remarks == "" || total_amount == "" || accountofficer_id == null) {
+            alert("All fields are required")
+        }else {
+            var name =  $('.select-officer option:selected').text();
+            var markup = `
+                <tr class="aocollection-items">
+                <td data-id="${accountofficer_id}" >${name}</td>
+                <td class="text-right">${remarks}</td>
+                <td id="total_amount">${total_amount}</td>
+                <td><button id="btn-remove-account-officer-collection" class="btn btn-xs btn-danger remove-account-officer-collection">
+                        <i class="fas fa-trash fa-xs"></i>
+                    </button></i>
+                </td>
+                </tr>
+                `;
+            $('#footer-row').before(markup);
+            calculateAmount("aocollection");
+
+            $('#remarks').val("")
+            $('#total_amount').val("")
+            $('#accountofficer_id').val(null).trigger("change")
+
+        }
+
+    })
+    $(document).on('click', '.remove-account-officer-collection', function(e){
+        e.preventDefault();
+        $(this).closest('tr').remove();
+        calculateAmount("aocollection");
+    });
+    function calculateAmount(type) {
+        var amount = 0;
+        totalAmount = 0;
+        if(type == "aocollection") {
+            $('.aocollection-items').each(function(index, row){
+                var tr = $(this)
+
+                var totalCollection = tr.find('td:eq(2)').text().trim() != "" ? Number(tr.find('td:eq(2)').text().replace(/[^0-9\.-]+/g,"")) : 0;
+
+            totalAmount += totalCollection;
+            if( isNaN(totalCollection) ) {
+                return false;
+            }
+
+            });
+            console.log(amountConverter(totalAmount))
+
+
+            $('#totalaccountofficercollection').html(amountConverter(totalAmount));
+        }else {
+            $('.branchcollection-items').each(function(index, row){
+                var tr = $(this)
+                var totalCollection = tr.find('td:eq(1)').text().trim() != "" ? Number(tr.find('td:eq(1)').text().replace(/[^0-9\.-]+/g,"")) : 0;
+
+            totalAmount += totalCollection;
+            if( isNaN(totalCollection) ) {
+                return false;
+            }
+
+            });
+            $('#totalbranchcollection').html(amountConverter(totalAmount));
+        }
+
+
+
+    }
+
+
+
+
+    /*
+     **********************  CASH BREAKDOWN  **************************
+    */
+
+        $(document).on('change','#onethousand',function(){
+            var val = 1000
+            var pcs = $('#onethousand').val()
+            $('#onethousandtotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#fivehundred',function(){
+            var val = 500
+            var pcs = $('#fivehundred').val()
+            $('#fivehundredtotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#twohundred',function(){
+            var val = 200
+            var pcs = $('#twohundred').val()
+            $('#twohundredtotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#onehundred',function(){
+            var val = 100
+            var pcs = $('#onehundred').val()
+            $('#onehundredtotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#fifty',function(){
+            var val = 50
+            var pcs = $('#fifty').val()
+            $('#fiftytotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#twenty',function(){
+            var val = 20
+            var pcs = $('#twenty').val()
+            $('#twentytotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#ten',function(){
+            var val = 10
+            var pcs = $('#ten').val()
+            $('#tentotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#five',function(){
+            var val = 5
+            var pcs = $('#five').val()
+            $('#fivetotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#one',function(){
+            var val = 1
+            var pcs = $('#one').val()
+            $('#onetotalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+        $(document).on('change','#centavo',function(){
+            var val = .25
+            var pcs = $('#centavo').val()
+            $('#centavototalamount').text(amountConverter(val*pcs))
+            totalCashCount()
+        })
+
+        function totalCashCount() {
+            var totalAmount = 0
+
+
+            var onethousand = Number($('#onethousandtotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var fivehundred = Number($('#fivehundredtotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var twohundred = Number($('#twohundredtotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var onehundred = Number($('#onehundredtotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var fifty = Number($('#fiftytotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var twenty = Number($('#twentytotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var ten = Number($('#tentotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var five = Number($('#fivetotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var one = Number($('#onetotalamount').text().replace(/[^0-9\.-]+/g,""))
+            var centavo = parseFloat(Number($('#centavototalamount').text().replace(/[^0-9\.-]+/g,"")))
+            var total = onethousand+fivehundred+twohundred+onehundred+fifty+twenty+ten+five+one+centavo
+            $('#totalcashcount').text(amountConverter(total))
+        }
+
+        function amountConverter(amount) {
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'PHP',
+
+            });
+
+            return formatter.format(amount)
+        }
+
 		var dtbleOption = {
 			dom: 'Bftrip',
 			"info": false,
 			"paging": false,
 			"ordering": false,
 			"filter": false,
-		
+
 		}
 		var subsidiaryTbl = $('#subsidiaryledgerTbl').dataTable(dtbleOption);
 		var generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
 
-
 		$('form').attr('autocomplete','off');
-		
+
 		$(document).on('click','#printGeneralLedgerExcel',function(e){
 			var from = $('#genLedgerFrom').val();
 			var to = $('#genLedgerTo').val();
@@ -87,7 +620,7 @@
 						console.log("Error");
 					}
 				});
-			} 
+			}
 		});
 		$(document).on('submit','#subsidiaryForm',function(e){
 			e.preventDefault();
@@ -189,7 +722,7 @@
 								vvid = v.account_id;
 								}
 							}
-							container += 
+							container +=
 								`<tr>
 									<td>${v.journal_date}</td>
 									<td>${v.sub_name}</td>
@@ -212,11 +745,47 @@
 			});
 		});
 	})(jQuery);
-	
+
 	function reload()
 	{
 		window.setTimeout(() => {
 			location.reload();
 		}, 500);
 	}
+    function fetchCashBlotter() {
+        $('#cash-blotter-tbl').dataTable({
+            processing: true,
+            searching: true,
+            type:"GET",
+            ajax:{
+				url:"{{route('reports.cashblotter')}}",
+            },
+            columns:[
+                {data:"branch_code"},
+                {data:"branch_name"},
+                {data:"transaction_date"},
+
+                {data:"total_collection",
+                    className: 'text-left',
+                    render: $.fn.dataTable.render.number( ',', '.', 2 ,'₱')
+                },
+                {data:null,
+                    render:function(data,row,type){
+                        var cashblotter_id = data.cashblotter_id
+                        var editCashBlotterUrl = "{{ route('reports.editCashBlotter',':id') }}";
+                        editCashBlotterUrl = editCashBlotterUrl.replace(':id', cashblotter_id);
+                        var showCashBlotterUrl = "{{ route('reports.showCashBlotter',':id') }}";
+                        showCashBlotterUrl = showCashBlotterUrl.replace(':id', cashblotter_id);
+                        var action;
+                        /* '<button class="mr-1 btn btn-xs btn-warning"><i class="fas fa-xs fa-edit edit-cashblotter" data-title="Cash Transaction Blotter (Edit)" data-remote="'+editCashBlotterUrl+'"></i></button>'+ */
+                        return '<button class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye view-cashblotter" data-title="Cash Transaction Blotter (Preview)" data-remote="'+showCashBlotterUrl+'"></i></button>'+
+                        '<button class="mr-1 btn btn-xs btn-warning" id="update-cashblotter" data-id="'+data.cashblotter_id+'"><i class="fas fa-xs fa-edit"></i></button>'+
+                        '<button class="mr-1 btn btn-xs btn-danger"><i class="fas fa-xs fa-trash delete-cashblotter"></i></button>'+
+                        '<button class="mr-1 btn btn-xs btn-primary"><i class="fas fa-xs fa-download download-cashblotter"></i></button>'+
+                        '<button class="mr-1 btn btn-xs btn-default"><i class="fas fa-xs fa-print print-cashblotter"></i></button>'
+                    }
+                }
+            ]
+        })
+    }
 </script>

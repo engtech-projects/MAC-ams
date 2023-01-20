@@ -36,7 +36,7 @@
 				<div class="col-md-12 text-right">
                     <a href="#"  onclick="$('#modal-create-class').modal('show')"class="btn btn-flat btn-sm bg-gradient-success">New Class</a>
 					<a href="#"  onclick="$('#modal-create-type').modal('show')" class="btn btn-flat btn-sm bg-gradient-success">New Type</a>
-					<a href="#"  data class="btn btn-flat btn-sm bg-gradient-success btn-create-account" data-remote="{{ route('accounts.create') }}">New Account</a>
+					<a href="#"  class="btn btn-flat btn-sm bg-gradient-success btn-create-account" data-remote="{{ route('accounts.create') }}">New Account</a>
                 </div>
                <div class="card-tools">
               </div>
@@ -51,6 +51,7 @@
 						<div class="col-md-3 col-xs-3 col-sm-3 text-center bordered-box-header">Bank Reconcillation </div>
 						<div class="col-md-1 col-xs-1 col-sm-1 text-center bordered-box-header">Edit</div>
 					</div>
+
 					@foreach ($organizedAccount as $key => $accounts)
 						<div class="row">
 							<div class="col-md-12 text-left " style="font-size:15px; font-weight:bold; border-bottom:1px dashed black; border-top:1px dashed black;">{{strtoupper($key)}}</div>
@@ -98,7 +99,7 @@
 						@endforeach
 					@endforeach
 				</div>
-				
+
             </div>
           </div>
         </div>
@@ -185,7 +186,7 @@
 							<input type="text" class="form-control form-control-sm rounded-0" id="account_type_name" name="account_type_name" required>
 						</div>
 					</div>
-					
+
 					<div class="col-md-12">
 						<div class="form-group">
 							<label for="" class="label-normal">Account Category</label>
@@ -194,7 +195,7 @@
 								@foreach($account_category as $category)
 									<option value="{{$category->account_category_id}}">{{$category->account_category}}</option>
 								@endforeach
-								
+
 							</select>
 						</div>
 					</div>

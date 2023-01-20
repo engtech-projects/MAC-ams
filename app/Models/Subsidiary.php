@@ -32,4 +32,12 @@ class Subsidiary extends Model
 		return $this->belongsTo(SubsidiaryCategory::class, 'sub_cat_id');
     }
 
+    public static function fetchBranch() {
+        $branch = Subsidiary::leftJoin("subsidiary_category","subsidiary.sub_cat_id", "=", "subsidiary_category.sub_cat_id")
+        ->select("subsidiary.*","subsidiary_category.*")
+        ->where("subsidiary_category.sub_cat_id", "=", 48)
+        ->get();
+        return $branch;
+    }
+
 }

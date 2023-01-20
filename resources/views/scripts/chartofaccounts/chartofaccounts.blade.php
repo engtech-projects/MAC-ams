@@ -1,6 +1,13 @@
 <script type="text/javascript">
 (function ($) {
   'use strict'
+
+
+
+
+
+
+
   $('form').attr('autocomplete','off');
     var Toast = Swal.mixin({
       toast: true,
@@ -11,7 +18,7 @@
 
     // accounts datatable
     var accountsTable = new toDataTable();
- 
+
     // var oTable;
 
   	$(document).on('click', '#chkSubAccount', function(){
@@ -19,16 +26,18 @@
   			$('#sltParentAccount').prop('disabled', false);
   			return;
   		}
-  		$('#sltParentAccount').prop('disabled', true);      
+  		$('#sltParentAccount').prop('disabled', true);
   	});
 
-	
+
+
+
     $(document).on('submit', '#frm-create-account', function(e){
       e.preventDefault();
 
       var form = $(this);
       var url = form.prop('action');
-      
+
     var posting = $.post(url, form.serializeArray());
         posting.done(function(response){
 
@@ -143,7 +152,7 @@
       modal.modal('show');
     });
 
-	
+
 
 
 	$(document).on('submit', '#form-class',function(e){
@@ -200,7 +209,7 @@
           type: 'PUT',
           data: form.serialize(),
           success: function(response) {
-            
+
             if(response.success) {
 
               Toast.fire({
@@ -250,15 +259,15 @@
 
             if( result ) {
 
-              let posting = $.post( 
-                url, { 
-                  id : accountId, 
+              let posting = $.post(
+                url, {
+                  id : accountId,
                   _token : "{{ csrf_token() }}" ,
                   status : status
                 });
 
                 posting.done(function(response){
-                    
+
                     console.log(response);
                     if(response.success) {
 
@@ -288,7 +297,7 @@
 
 
 
-    });  
+    });
 
 })(jQuery);
 
@@ -361,12 +370,12 @@ function accountsTableConfig() {
 
 
               if( full['parent_account'] ){
-                return `<div style="margin-left:20px; "> ${data} 
+                return `<div style="margin-left:20px; "> ${data}
                           <span class="float-right badge badge-secondary">${full.account_category}</span>
                         </div>`;
               }
-              
-              return `<div> ${data} 
+
+              return `<div> ${data}
                         <span class="float-right badge badge-secondary">${full.account_category}</span>
                       </div>`;
           }

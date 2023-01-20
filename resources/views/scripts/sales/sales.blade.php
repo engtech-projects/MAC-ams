@@ -1,5 +1,10 @@
 <script type="text/javascript">
 
+
+
+
+
+
 var Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
@@ -10,6 +15,8 @@ var Toast = Swal.mixin({
 
 (function ($) {
   'use strict'
+
+
 
   var totalAmount = 0;
   // daterange picker
@@ -28,9 +35,9 @@ var Toast = Swal.mixin({
   salesTable.setSelector($('#tbl-sales-list'))
           .setConfig(
             salesTableConfig(
-              $('#flt-status option:selected').val(), 
-              $('#flt-customer option:selected').val(), 
-              startDate.format('YYYY-MM-DD'), 
+              $('#flt-status option:selected').val(),
+              $('#flt-customer option:selected').val(),
+              startDate.format('YYYY-MM-DD'),
               endDate.format('YYYY-MM-DD')
             ),
           )
@@ -39,12 +46,18 @@ var Toast = Swal.mixin({
   invoiceTable.setSelector($('#tbl-invoice-list'))
               .setConfig(
                 invoiceTableConfig(
-                  $('#flt-status option:selected').val(), 
-                  startDate.format('YYYY-MM-DD'), 
+                  $('#flt-status option:selected').val(),
+                  startDate.format('YYYY-MM-DD'),
                   endDate.format('YYYY-MM-DD')
                 )
               )
               .initialize();
+
+
+    $('.select2').select2({
+        placeholder: 'Select',
+        allowClear: true,
+    });
 
   $(document).on('click', '.invoice-create-transaction', function(e){
       e.preventDefault();
@@ -52,7 +65,7 @@ var Toast = Swal.mixin({
         let target = $(this);
         let title = target.data('title');
         let route = target.data("remote");
-        
+
         invoiceFlyout.setTitle(title)
                     .setRoute(route)
                     .setCallback( function(){
@@ -78,7 +91,7 @@ var Toast = Swal.mixin({
     items = addItems();
 
     if( !items ) {
-      // change 
+      // change
       alert('no items/details');
       return false;
     }
@@ -96,7 +109,7 @@ var Toast = Swal.mixin({
                 icon: 'success',
                 title: response.message
               });
-              
+
             }else{
 
               Toast.fire({
@@ -150,15 +163,42 @@ var Toast = Swal.mixin({
     calculateAmount();
   });
 
+  function amountConverter(amount) {
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'PHP',
+
+    });
+
+    return formatter.format(amount)
+  }
+
   $(document).on('change', '.product-service-select', function(e){
     e.preventDefault();
 
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'PHP',
+
+    });
+
     var rate = $(this).find('option:selected').data('rate');
+
+
+
     var qty = $('input[name=qty]').val();
     var amount = initCalc(rate, qty);
+    /* var totalAmount = parseFloat(amount).toFixed(2)
+    var totalRate = parseFloat(rate).toFixed(2) */
 
-    $('input[name=rate]').val(rate);
-    $('input[name=amount]').val(amount);
+    $('input[name=rate]').val(amountConverter(rate));
+    $('input[name=amount]').val(amountConverter(amount));
+
+
+
+
+    //console.log(reverseFormatNumber(formatter.format(rate),'en'));
+
   });
 
   $(document).on('blur', 'input[name=qty]', function(e){
@@ -177,9 +217,9 @@ var Toast = Swal.mixin({
         salesTable.datatable.destroy();
         salesTable.setConfig(
                     salesTableConfig(
-                        $('#flt-status option:selected').val(), 
-                        $('#flt-customer option:selected').val(), 
-                        startDate.format('YYYY-MM-DD'), 
+                        $('#flt-status option:selected').val(),
+                        $('#flt-customer option:selected').val(),
+                        startDate.format('YYYY-MM-DD'),
                         endDate.format('YYYY-MM-DD')
                       )
                   ).initialize();
@@ -188,8 +228,8 @@ var Toast = Swal.mixin({
         invoiceTable.datatable.destroy();
         invoiceTable.setConfig(
                     invoiceTableConfig(
-                        $('#flt-status option:selected').val(), 
-                        startDate.format('YYYY-MM-DD'), 
+                        $('#flt-status option:selected').val(),
+                        startDate.format('YYYY-MM-DD'),
                         endDate.format('YYYY-MM-DD')
                       )
 
@@ -223,6 +263,20 @@ var Toast = Swal.mixin({
 
   cb(startDate, endDate);
 
+
+function reverseFormatNumber(val,locale){
+
+        /* var group = new Intl.NumberFormat(locale).format(1111).replace(/1/g, '');
+        var decimal = new Intl.NumberFormat(locale).format(1.1).replace(/1/g, ''); */
+        var group = Intl.NumberFormat(locale).format(11111).replace(/\p{Number}/gu, '');
+        var decimal = Intl.NumberFormat(locale).format(1.1).replace(/\p{Number}/gu, '');
+        var reversedVal = val.replace(new RegExp('\\' + group, 'g'), '');
+        reversedVal = reversedVal.replace(new RegExp('\\' + decimal, 'g'), '.');
+        return Number.isNaN(reversedVal)?0:reversedVal;
+}
+
+
+
   function addItems() {
 
     var items = [];
@@ -235,14 +289,17 @@ var Toast = Swal.mixin({
       let qty = cells.eq(3).text();
       let rate = cells.eq(4).text();
       let amount = cells.eq(5).text();
-      
+
+        var totalRate = Number(rate.replace(/[^0-9\.-]+/g,""));
+        var t_amount = Number(amount.replace(/[^0-9\.-]+/g,""));
+
       items.push(
         {
-          'item_id' : itemId, 
-          'description' : description, 
+          'item_id' : itemId,
+          'description' : description,
           'qty' : qty,
-          'rate' : rate,
-          'amount' : amount, 
+          'rate' : totalRate,
+          'amount' : t_amount
         }
       );
 
@@ -269,18 +326,20 @@ var Toast = Swal.mixin({
     $('.transaction-items').each(function(index, row){
       var cells = $(row).find('td');
       amount = cells.eq(5).text();
+      var t_amount = Number(amount.replace(/[^0-9\.-]+/g,""));
+
 
       // check amount. add additional functionality
-      if ( isNaN(amount) ) {
+      if ( isNaN(t_amount) ) {
         return false;
       }
 
-      amount = parseFloat(amount);
-      totalAmount += amount;
+
+      totalAmount += t_amount;
 
     });
 
-    $('#total-amount').html(totalAmount.toFixed(2)); 
+    $('#total-amount').html(amountConverter(totalAmount));
   }
 
 /* --------------------------------------------------------------------------------------------- */
@@ -289,27 +348,30 @@ var Toast = Swal.mixin({
   $(document).on('click', '.rcv-payment', function(e){
     e.preventDefault();
 
+
+
     let target = $(this);
     let title = target.data('title');
     let route = target.data('remote');
-  
+
     paymentFlyout.setTitle(title)
                   .setRoute(route)
                   .setCallback( function(){
                     $('.select2').select2({
                         placeholder: 'Select',
                         allowClear: true,
-                    });
-                  })
-                  .init();
+                    })
+                }).init();
   });
+
+
 
   $(document).on('click', '.copy-invoice', function(e){
     e.preventDefault();
     let target = $(this);
     let route = target.data('remote');
 	console.log(route);
-  
+
     copyInvoiceFlyout.setTitle('Invoice')
                   .setRoute(route)
                   .setCallback( function(){
@@ -357,7 +419,7 @@ var Toast = Swal.mixin({
           salesTable.datatable.ajax.reload();
           invoiceTable.datatable.ajax.reload();
           paymentFlyout.close();
-          
+
         });
   });
 
@@ -373,10 +435,13 @@ var Toast = Swal.mixin({
     return 'closed';
   }
 
+
   function amountReceived() {
 
     let payment = $('.txt-payment').val();
+    console.log(payment)
     $('#amount-received').text(payment);
+
   }
 
 })(jQuery);
@@ -451,11 +516,13 @@ function salesTableConfig(status, customer, from, to) {
         { data: "no" },
         { data: "customer" },
         { data: "due_date" },
-        { data: "balance", 
-          className: 'text-right',
+        { data: "balance",
+          className: 'text-right sales-balance',
+          render: $.fn.dataTable.render.number( ',', '.', 2 ,'₱')
         },
-        { data: "total",  
+        { data: "total",
           className: 'text-right',
+          render: $.fn.dataTable.render.number( ',', '.', 2, '₱')
         },
         { data: "status" },
     ],
@@ -463,7 +530,7 @@ function salesTableConfig(status, customer, from, to) {
       {
         className: 'text-right',
         render: function (data, type, full, meta) {
-           
+
             var remoteUrl = "{{ route('payment.create', ':id') }}";
             remoteUrl = remoteUrl.replace(':id', full.transaction_id);
             var action;
@@ -533,11 +600,13 @@ function invoiceTableConfig(status = '', from = '', to = '') {
       { data: "date" },
       { data: "no" },
       { data: "customer" },
-      { data: "amount",  
+      { data: "amount",
         className: 'text-right',
+        render: $.fn.dataTable.render.number( ',', '.', 2 )
       },
-      { data: "balance", 
+      { data: "balance",
         className: 'text-right',
+        render: $.fn.dataTable.render.number( ',', '.', 2 )
       },
       { data: "due_date" },
       { data: "status" },
@@ -546,13 +615,13 @@ function invoiceTableConfig(status = '', from = '', to = '') {
     {
       className: 'text-right',
       render: function (data, type, full, meta) {
-         
-          var remoteUrl = "{{ route('payment.create', ':id') }}";
+
+      var remoteUrl = "{{ route('payment.create', ':id') }}";
 		  var copyUrl = "{{ route('sales.create', ['type'=>':type']) }}";
-          remoteUrl = remoteUrl.replace(':id', full.transaction_id);
+      remoteUrl = remoteUrl.replace(':id', full.transaction_id);
 		  copyUrl = copyUrl.replace(':type', 'invoice');
 		  copyUrl += "?id=" + full.transaction_id;
-          var action;	
+          var action;
 
           if( full.status == 'open' ) {
             action = `<button type="button" class="btn btn-xs btn-default btn-flat coa-action rcv-payment" data-title="Receive Payment" data-remote="${remoteUrl}"><small>Receive payment</button>`;
@@ -630,11 +699,11 @@ function copyInvoice(e){
 
 // $(document).on('click', '.copy-invoice', function(e){
 // 	e.preventDefault();
-	
+
 // 	alert('copied!');
 // });
 
 
-  
+
 
 </script>
