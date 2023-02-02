@@ -17,7 +17,7 @@ class LoginController extends MainController
        }else{
              $this->middleware('guest')->except('userLogout');
        }
-       
+
     }
 
     public function index() {
@@ -36,16 +36,50 @@ class LoginController extends MainController
             return redirect()->intended('dashboard')
                         ->withSuccess('Signed in');
         }
-    	
+
     	return redirect("login")->withSuccess('Invalid Username or Password');
+
+
+
+        /* $fields = $request->validate([
+            'username'         => 'required|string',
+            'password'      => 'required|string'
+        ]);
+
+        $user = User::where('username', $fields['username'])->first();
+
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return response([
+                'message'   => 'Credentials not Found'
+            ], 401);
+        }
+
+        $token = $user->createToken('mac-ams-token')->plainTextToken;
+
+        $response = [
+            'user'          => $user,
+            'token'         => $token
+        ]; */
+
+        return response($response, 201);
     }
 
-    public function userLogout(Request $request) {
+    /* public function user(Request $request) {
+        return $request->user();
+    } */
 
-        Auth::logout();
+    public function userLogout() {
+
+        /* Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+
+        auth()->user()->tokens()->delete();
+
+        return [
+            'message'       => 'Logged out'
+        ]; */
     }
 
 }

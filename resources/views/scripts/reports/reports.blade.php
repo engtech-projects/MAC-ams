@@ -5,6 +5,8 @@
         var cashblotter_tbl
         fetchCashBlotter()
 
+        $('#total').insertAfter('#journal tr:first');
+
 
         var editCashblotterFlyOut = new GlobalWidget();
         var showCashblotterFlyOut = new GlobalWidget();
@@ -72,7 +74,7 @@
         totalCashCount()
 
 
-});
+    });
 
 
     }
@@ -323,6 +325,12 @@
         placeholder: 'Select-Officer',
         allowClear: true,
     });
+
+    $('.select-account').select2({
+        placeholder: 'Select-Account',
+        allowClear: true,
+    });
+
     $('.select-branch').select2({
         placeholder: 'Select-Branch',
         allowClear: true,
@@ -671,6 +679,22 @@
 				}
 			});
 		});
+
+
+
+
+
+
+        function formatAmount(amount) {
+                let number = Number(amount)
+                let formattedNumber = number.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                return formattedNumber
+        }
+
+
 		$(document).on('change', '#genLedgerAccountName', function(e){
 			var id = $(this).val();
 			var from = $('#genLedgerFrom').val();
@@ -684,44 +708,64 @@
 				data:{id:id,from:from,to:to},
 				dataType: "json",
 				success: function(data) {
+                    console.log(data)
 					generalLedger.fnClearTable();
 					generalLedger.fnDestroy();
-
 
 					if(data)
 					{
 						var vvid = '';
 						var tempContainer = '';
 						var container = '';
+                        let balance = 0
+                        let total_debits = 0,total_credits = 0
 						$.each(data, function(k,v){
 
 							if(vvid == ''){
+
 								container += `<tr>
-										<td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
+                                        <td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
 										<td></td>
 										<td></td>
 										<td></td>
 										<td></td>
 										<td></td>
 										<td></td>
-										<td>aa</td>
+										<td class="balance">${formatAmount(v.opening_balance)}</td>
+
 									</tr>`;
 								vvid = v.account_id;
-							}else{
-								if(vvid != v.account_id){
-									container += `<tr>
-										<td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
+							}else if(vvid != v.account_id){
+
+									container += `
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>${formatAmount(total_debits)}</td>
+                                        <td>${formatAmount(total_credits)}</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
 										<td></td>
 										<td></td>
 										<td></td>
 										<td></td>
 										<td></td>
 										<td></td>
-										<td>aa</td>
-									</tr>`;
+										<td class="balance">${formatAmount(v.opening_balance)}</td>
+									</tr>
+                                   `;
+                                   total_credits =0
+                                   total_debits = 0
 								vvid = v.account_id;
 								}
-							}
+                                total_debits+=Number(v.journal_details_debit)
+                                total_credits+=Number(v.journal_details_credit)
+
 							container +=
 								`<tr>
 									<td>${v.journal_date}</td>
@@ -729,11 +773,24 @@
 									<td>${v.source}</td>
 									<td>${(v.cheque_date == '') ? '/' : v.cheque_date}</td>
 									<td>${(v.cheque_no == '') ? '/' : v.cheque_no}</td>
-									<td>${v.journal_details_debit.toLocaleString("en-US")}</td>
-									<td>${v.journal_details_credit.toLocaleString("en-US")}</td>
-									<td>01292</td>
-								</tr>`;
+									<td>${formatAmount(v.journal_details_debit)}</td>
+									<td>${formatAmount(v.journal_details_credit)}</td>
+									<td class="journal_balance">${formatAmount(v.balance)}</td>
+								</tr>`
+
+
 						});
+                        container += `<tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>${formatAmount(total_debits)}</td>
+                                        <td>${formatAmount(total_credits)}</td>
+                                        <td></td>
+                                    </tr>`
+
 
 						$('#generalLedgerTblContainer').html(container)
 					}
@@ -745,6 +802,13 @@
 			});
 		});
 	})(jQuery);
+
+
+
+
+
+
+
 
 	function reload()
 	{

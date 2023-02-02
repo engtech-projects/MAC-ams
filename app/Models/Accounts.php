@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Accounts;
+use App\Models\journalEntryDetails;
 use App\Models\AccountType;
 
 class Accounts extends Model
@@ -27,6 +28,8 @@ class Accounts extends Model
 		return $this->hasMany(AccountType::class, 'account_type_id');
     }
 
+
+
     public function store(Array $data) {
         $account = new Accounts();
         $account->account_number = $data['account_number'];
@@ -43,6 +46,8 @@ class Accounts extends Model
         }
         return response()->json(array('success' => false, 'message' => 'Something went wrong!'), 200);
     }
+
+
 
     public static function fetch($isJson = false) {
 		$jsonData = [];
@@ -220,37 +225,42 @@ class Accounts extends Model
     //gerneralLedger (All Account)
 	public static function generalLedger_fetchAccounts($from='', $to='', $account_id='')
 	{
-		$query = DB::table("chart_of_accounts")->
-			select("chart_of_accounts.account_number",
-				"chart_of_accounts.account_name",
-				"chart_of_accounts.account_id",
-				"chart_of_accounts.status",
-				"journal_entry_details.journal_details_debit",
-				"journal_entry_details.journal_details_credit",
-				"journal_entry.source",
-				"journal_entry.cheque_no",
-				"journal_entry.journal_date",
-				"subsidiary.sub_name",
-				"journal_entry.cheque_date");
-				$query->join("journal_entry_details", function($join){
-					$join->on("chart_of_accounts.account_id", "=", "journal_entry_details.account_id");
-				})
-				->join("journal_entry", function($join){
-					$join->on("journal_entry_details.journal_id", "=", "journal_entry.journal_id");
-				})
-                ->join("subsidiary", function($join){
-					$join->on("journal_entry_details.subsidiary_id", "=", "subsidiary.sub_id");
-				})
-				->orderBy("chart_of_accounts.account_id","asc");
+		$journalEntries = JournalEntry::join('journal_book', 'journal_entry.book_id', '=', 'journal_book.book_id')
+        ->join('journal_entry_details', 'journal_entry_details.journal_id', '=', 'journal_entry.journal_id')
+        ->join('chart_of_accounts', 'journal_entry_details.account_id', '=', 'chart_of_accounts.account_id')
+        ->join('subsidiary', 'journal_entry_details.subsidiary_id', '=', 'subsidiary.sub_id')
+        ->join('opening_balance', 'chart_of_accounts.account_id','=','opening_balance.account_id')
+        ->select(
+            'chart_of_accounts.account_id',
+            'chart_of_accounts.account_number',
+            'chart_of_accounts.account_name',
+            'opening_balance.opening_balance',
+            'subsidiary.sub_name',
+            'journal_entry.journal_date',
+            'journal_entry.source',
+            'journal_entry.cheque_no',
+            'journal_entry.cheque_date',
+            'journal_entry_details.journal_id',
+            'journal_entry_details.journal_details_id',
+            'journal_entry_details.journal_details_debit',
+            'journal_entry_details.journal_details_credit',
+            'journal_entry_details.balance'
+        );
+
+
+
         if($from != '' && $to != '')
         {
-            $query->whereBetween("journal_entry.journal_date", [$from, $to]);
+            $journalEntries->whereBetween("journal_entry.journal_date", [$from, $to]);
+
         }
 		if($account_id != '')
 		{
-			$query->where('chart_of_accounts.account_id',$account_id);
+
+			$journalEntries->where('chart_of_accounts.account_id',$account_id);
 		}
-		return $query->get();
+
+		return $journalEntries->get();
 	}
 
 

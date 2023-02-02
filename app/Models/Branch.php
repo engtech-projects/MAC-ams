@@ -11,7 +11,6 @@ class Branch extends Model
 
     protected $table = 'branch';
     protected $primaryKey = 'branch_id';
-    protected $connection = 'mysql2';
 
     public static function fetchBranch() {
         return Branch::all();

@@ -23,9 +23,10 @@ class journalEntryDetails extends Model
 		'journal_details_credit',
 		'journal_details_ref_no',
 		'journal_details_description',
-		'status'
+		'status',
+        'balance'
     ];
-	
+
 	public function subsidiary(){
 		return $this->belongsTo(Subsidiary::class, 'subsidiary_id');
 	}

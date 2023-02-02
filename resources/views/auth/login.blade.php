@@ -35,7 +35,7 @@
     <div class="card-body">
       <p class="login-box-msg" style="font-size: 1.5rem;"><b>Login</b></p>
 
-      <form method="POST" action="{{ route('login.user') }}">
+      <form method="POST" id="handlelogin" action="{{route('login.user')}}" >
         @csrf
         @if (Session::has('success'))
         <div class="callout callout-danger">
@@ -47,15 +47,15 @@
 
         <div class="form-group">
           <label for="username" style="font-weight: normal;">Username</label>
-          <input type="text" class="form-control" id="username" name="username" required autofocus>
+          <input type="text" id="username" class="form-control" id="username" name="username" required autofocus>
           @if ($errors->has('username'))
             <span class="text-danger">{{ $errors->first('username') }}</span>
-            }
+
           @endif
         </div>
         <div class="form-group">
           <label for="password" style="font-weight: normal;">Password</label>
-          <input type="password" class="form-control" id="password" name="password" required>
+          <input type="password" id="password" class="form-control" id="password" name="password" required>
           @if ($errors->has('password'))
             <span class="text-danger">{{ $errors->first('password') }}</span>
           @endif
@@ -84,11 +84,37 @@
 </div>
 <!-- /.login-box -->
 
+
 <!-- jQuery -->
 <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+
+
+
+
 <!-- Bootstrap 4 -->
 <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('js/adminlte/adminlte.min.js') }}"></script>
+
+{{-- <script>
+
+    $(document).on('submit','#handlelogin',function(e) {
+        e.preventDefault();
+        var data = $("#handlelogin :input").serializeArray();
+        $.ajax({
+            type: "POST",
+            url: '{{route('login.user')}}',
+            data:data,
+            dataType: "json",
+            success: function (response) {
+                console.log(response.data)
+
+            }
+         })
+    })
+
+</script> --}}
+
+
 </body>
 </html>

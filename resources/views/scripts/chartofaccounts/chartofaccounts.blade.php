@@ -3,7 +3,7 @@
   'use strict'
 
 
-
+  $('#totalRow').insertAfter('#ledger tr:last');
 
 
 

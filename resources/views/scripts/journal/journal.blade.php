@@ -439,7 +439,7 @@
 		checkTotalAndAmount()
 	})
 	$(document).on('change', '.COASelect',function(e){
-		$(this).parent().siblings('.acctnu').first().find('.journal_details_account_no').text($('option:selected', this).attr('acct-num'));
+		var accnu = $(this).parent().siblings('.acctnu').first().find('.journal_details_account_no').text($('option:selected', this).attr('acct-num'));
 	});
 	$(document).on('click','.stStatus',function(e){
 		var journal_id = $(this).attr('value');
@@ -808,17 +808,15 @@
 		e.preventDefault();
 
 
-
-
 		var content = `<tr class='editable-table-row'>
 			<td class="acctnu" value="" >
 				<a href="#" class="editable-row-item journal_details_account_no"></a>
 			</td>
-			<td class='editable-table-data' width="250">
-				<select  fieldName="account_id" class="select-account form-control form-control-sm editable-row-item">
+			<td class='editable-table-data' value="" >
+				<select  fieldName="account_id" class="select-account form-control form-control-sm editable-row-item COASelect">
 					<option disabled value="" selected>-Select Account Name-</option>
 					@foreach($chartOfAccount as $account)
-						<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_name}}</option>
+						<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_number}} - {{$account->account_name}}</option>
 					@endforeach
 				</select>
 			</td>
