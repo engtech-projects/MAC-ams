@@ -723,6 +723,8 @@
 
 							if(vvid == ''){
 
+                                balance = v.opening_balance
+
 								container += `<tr>
                                         <td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
 										<td></td>
@@ -763,6 +765,8 @@
                                    total_debits = 0
 								vvid = v.account_id;
 								}
+                                balance+=Number(v.journal_details_debit)
+                                balance-=Number(v.journal_details_credit)
                                 total_debits+=Number(v.journal_details_debit)
                                 total_credits+=Number(v.journal_details_credit)
 
@@ -775,7 +779,7 @@
 									<td>${(v.cheque_no == '') ? '/' : v.cheque_no}</td>
 									<td>${formatAmount(v.journal_details_debit)}</td>
 									<td>${formatAmount(v.journal_details_credit)}</td>
-									<td class="journal_balance">${formatAmount(v.balance)}</td>
+									<td class="journal_balance">${formatAmount(balance)}</td>
 								</tr>`
 
 

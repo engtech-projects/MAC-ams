@@ -119,10 +119,8 @@ class ReportsController extends MainController
     public function calculateRunningBalance($data) {
             $balance = 0;
             foreach ($data as $transaction) {
-                $balance = $transaction->opening_balance;
                 $balance += $transaction->journal_details_debit;
                 $balance -= $transaction->journal_details_credit;
-                $transaction->balance = $balance;
 
             }
             return $data;
@@ -192,6 +190,7 @@ class ReportsController extends MainController
             return view('reports.sections.generalledger', $data);
 
     }
+
 
     public function trialBalance()
     {
