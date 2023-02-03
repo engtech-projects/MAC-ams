@@ -181,6 +181,9 @@
                                                         ?>
 
                                                     @elseif($id != $data->account_id)
+                                                    <?php
+                                                        $balance = $data->opening_balance;
+                                                    ?>
                                                         <tr class="totalRow">
                                                             <td></td>
                                                             <td></td>

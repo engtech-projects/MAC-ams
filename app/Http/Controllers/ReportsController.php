@@ -105,7 +105,6 @@ class ReportsController extends MainController
             $ledger = $this->calculateRunningBalance($journalEntries);
             return json_encode($journalEntries);
 
-
         } else {
 
             $journalEntries = Accounts::generalLedger_fetchAccounts();
