@@ -18,13 +18,86 @@ class AccountsController extends MainController
         $data = [
             'title' => 'Chart of Accounts',
             'accounts' => Accounts::fetch(),
+            'account_by_type' => $this->groupByAccountType($accountData),
 			'organizedAccount'=> $this->groupByType($accountData),
 			'account_category'=> AccountCategory::get(),
 			'accountTypes' => AccountType::orderBy('account_category_id')->get(),
-            'cashFlows'    => ['investing', 'financing', 'operating'] 
+            'cashFlows'    => ['investing', 'financing', 'operating']
         ];
     	return view('chartofaccounts.accounts', $data);
     }
+
+    public function groupByAccountType($data = [])
+	{
+		$currentType = '';
+		$temp = [];
+		$tempType = [];
+        $type ='';
+        $account_number = '';
+        $account = null;
+
+		if(count($data) > 0)
+		{
+			foreach($data as $key => $value)
+			{
+                //GET ACCOUNT TYPE
+				if($type == '')
+				{
+					$type = $value->account_type;
+                    $account_number = $value->account_no;
+                    $account = $value;
+				}else if($type != $value->account_type )
+				{
+
+					$type = $value->account_type;
+                    $account_number = $value->account_no;
+                    $account = $value;
+                    $account = null;
+					$tempType = [];
+				}
+
+                //GET ACCOUNT CATEGORY
+                if($currentType == '')
+                {
+                    $currentType = $value->account_category;
+                }else if($currentType != $value->account_category)
+                {
+                    $currentType = $value->account_category;
+                    $tempType = [];
+
+                }
+
+                //CHART OF ACCOUTNS ORGANIZED DATA
+				if($value->parent_account == '')
+				{
+					array_push($tempType,
+						['account_id' => $value->account_id,
+						'account_number' => $value->account_number,
+						'account_name' => $value->account_name,
+						'account_description' => $value->account_description,
+						'parent_account' => $value->parent_account,
+						'statement' => $value->statement,
+						'status' => $value->status,
+						'account_type_id' => $value->account_type_id,
+                        'account_type' => $value->account_type,
+						'created_at' => $value->created_at,
+						'updated_at' => $value->updated_at,
+						'account_type' => $value->account_type,
+						'account_category' => $value->account_category,
+						'bank_reconcillation' => $value->bank_reconcillation,
+						'child' => Accounts::where("parent_account", $value->account_id)->with(['accountType.accountCategory'])->get()]
+					);
+				}
+                $temp[$currentType][$account_number.' - '.$type] = $tempType;
+
+
+
+			}
+
+
+		}
+		return $temp;
+	}
 
 	public function groupByType($data = [])
 	{
@@ -34,19 +107,19 @@ class AccountsController extends MainController
 		if(count($data) > 0)
 		{
 			foreach($data as $key => $value)
-			{	
+			{
 				if($currentType == '')
 				{
 					$currentType = $value->account_category;
 				}else if($currentType != $value->account_category)
 				{
 					$currentType = $value->account_category;
-					$tempType = []; 
+					$tempType = [];
 				}
 
 				if($value->parent_account == '')
 				{
-					array_push($tempType, 
+					array_push($tempType,
 						['account_id' => $value->account_id,
 						'account_number' => $value->account_number,
 						'account_name' => $value->account_name,
@@ -55,6 +128,7 @@ class AccountsController extends MainController
 						'statement' => $value->statement,
 						'status' => $value->status,
 						'account_type_id' => $value->account_type_id,
+                        'account_type' => $value->account_type,
 						'created_at' => $value->created_at,
 						'updated_at' => $value->updated_at,
 						'account_type' => $value->account_type,
@@ -63,12 +137,12 @@ class AccountsController extends MainController
 						'child' => Accounts::where("parent_account", $value->account_id)->with(['accountType.accountCategory'])->get()]
 					);
 				}
-				
+
 				$temp[$currentType]['content'] = $tempType;
-				
+
 			}
-			
-			
+
+
 		}
 		return $temp;
 	}
@@ -78,7 +152,7 @@ class AccountsController extends MainController
 		$class = $request->class_name;
 		$cat = new AccountCategory;
 		$cat->account_category = $class;
-		
+
 		if($cat->save())
 		{
 			return 'true';
@@ -93,7 +167,7 @@ class AccountsController extends MainController
 		$type->account_type = $request->account_type_name;
 		$type->has_opening_balance = '0';
 		$type->account_category_id = $request->category_type_id;
-		
+
 		if($type->save())
 		{
 			return 'true';
@@ -101,7 +175,7 @@ class AccountsController extends MainController
 		return 'false';
 	}
 
-	
+
     public function populate() {
         return Accounts::fetch(true);
     }
@@ -110,7 +184,7 @@ class AccountsController extends MainController
         $data = [
             'accountTypes' => AccountType::orderBy('account_category_id')->get(),
             'accounts'     => Accounts::fetch(),
-            'cashFlows'    => ['investing', 'financing', 'operating'] 
+            'cashFlows'    => ['investing', 'financing', 'operating']
         ];
 
         return view('chartofaccounts.createaccount', $data);
@@ -135,7 +209,7 @@ class AccountsController extends MainController
             'account'      => Accounts::show($account->account_id),
             'accountTypes' => AccountType::orderBy('account_category_id')->get(),
             'accounts'     => Accounts::fetch(),
-            'cashFlows'    => ['investing', 'financing', 'operating'] 
+            'cashFlows'    => ['investing', 'financing', 'operating']
         ];
 
         return view('chartofaccounts.editaccount', $data);

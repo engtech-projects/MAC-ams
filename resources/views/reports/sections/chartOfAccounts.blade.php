@@ -96,7 +96,7 @@
 						@endforeach
 					@endforeach
 				</div>
-				
+
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@
 							<input type="text" class="form-control form-control-sm rounded-0" id="account_type_name" name="account_type_name" required>
 						</div>
 					</div>
-					
+
 					<div class="col-md-12">
 						<div class="form-group">
 							<label for="" class="label-normal">Account Category</label>

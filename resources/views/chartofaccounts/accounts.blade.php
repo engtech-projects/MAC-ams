@@ -32,6 +32,7 @@
         <div class="spacer" style="margin-top:20px;"></div>
         <div class="card">
           <div class="card-header">
+            {{-- {{dd($account_by_type)}} --}}
             <h3 class="card-title"> Chart of Accounts </h3>
 				<div class="col-md-12 text-right">
                     <a href="#"  onclick="$('#modal-create-class').modal('show')"class="btn btn-flat btn-sm bg-gradient-success">New Class</a>
@@ -46,35 +47,91 @@
             <div class="row">
 				<div class="col-md-12">
 					<div class="row">
-						<div class="col-md-2 col-xs-2 col-sm-2 text-center bordered-box-header">Account Number</div>
-						<div class="col-md-6 col-xs-6 col-sm-6 text-center bordered-box-header">Account Name</div>
-						<div class="col-md-3 col-xs-3 col-sm-3 text-center bordered-box-header">Bank Reconcillation </div>
-						<div class="col-md-1 col-xs-1 col-sm-1 text-center bordered-box-header">Edit</div>
+						<div class="col-md-4 col-xs-2 col-sm-2 text-center bordered-box-header">Account Number</div>
+						<div class="col-md-4 col-xs-6 col-sm-6 text-center bordered-box-header">Account Name</div>
+						<div class="col-md-2 col-xs-3 col-sm-3 text-center bordered-box-header">Bank Reconcillation </div>
+						<div class="col-md-2 col-xs-1 col-sm-1 text-center bordered-box-header">Edit</div>
 					</div>
 
-					@foreach ($organizedAccount as $key => $accounts)
+                     <?php $id = ''; ?>
+					@foreach ($account_by_type as $key => $accounts)
 						<div class="row">
-							<div class="col-md-12 text-left " style="font-size:15px; font-weight:bold; border-bottom:1px dashed black; border-top:1px dashed black;">{{strtoupper($key)}}</div>
+							<div class="col-md-12 text-left " style="font-size:25px; font-weight:bold; border-bottom:1px dashed black; border-top:1px dashed black;">{{strtoupper($key)}}</div>
+
 						</div>
-  						@foreach  ($accounts['content'] as $account)
-							<div class="row">
-								<div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
-								<div class="col-md-2 col-xs-2 col-sm-2 text-left ">{{ ucwords($account['account_number']) }}</div>
-								<div class="col-md-5 col-xs-5 col-sm-5 text-left ">{{ ucwords($account['account_name']) }}</div>
-								<div class="col-md-3 col-xs-3 col-sm-3 text-cgenter">{{ ucwords($account['bank_reconcillation']) }}</div>
-								<div class="col-md-1 col-xs-1 col-sm-1 text-center ">
-									<div class="btn-group">
-										<button type="button" class="btn btn-xs btn-default btn-flat coa-action">Report</button>
-										<a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
-										<span class="sr-only">Toggle Dropdown</span>
-										</a>
-										<div class="dropdown-menu dropdown-menu-right" role="menu" style="left:0;">
-										<a class="dropdown-item btn-edit-account" data-remote="{{ route('accounts.show', $account['account_id']) }}" href="#">Edit</a>
-										<a class="dropdown-item btn-set-status" data-status="{{$account['status']}}" data-id="{{$account['account_id']}}"  href="#">{{$account['status']}}</a>
-										</div>
-									</div>
-								</div>
-							</div>
+                        @foreach ($accounts as $key => $account )
+                        <div class="col-md-12 text-left " style="font-size:15px; font-weight:bold; border-bottom:1px solid black; black;">{{strtoupper($key)}}</div>
+
+
+                            @foreach ($accounts[$key] as $account )
+                                <div class="row">
+                                    <div class="col-md-2 col-xs-1 col-sm-1 text-left"></div>
+                                    <div class="col-md-4 col-xs-2 col-sm-2 text-left ">{{ ucwords($account['account_number']) }}</div>
+                                    <div class="col-md-4 col-xs-5 col-sm-5 text-left ">{{ ucwords($account['account_name']) }}</div>
+                                    <div class="col-md-1 col-xs-3 col-sm-3 text-cgenter">{{ ucwords($account['bank_reconcillation']) }}</div>
+                                    <div class="col-md-1 col-xs-1 col-sm-1 text-center ">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-xs btn-default btn-flat coa-action">Report</button>
+                                            <a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right" role="menu" style="left:0;">
+                                            <a class="dropdown-item btn-edit-account" data-remote="{{ route('accounts.show', $account['account_id']) }}" href="#">Edit</a>
+                                            <a class="dropdown-item btn-set-status" data-status="{{$account['status']}}" data-id="{{$account['account_id']}}"  href="#">{{$account['status']}}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @foreach($account["child"] as $child)
+                                    <div class="row">
+                                        <div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
+                                        <div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
+                                        <div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
+                                        <div class="col-md-3 col-xs-2 col-sm-2 text-left ">{{ ucwords($child['account_number']) }}</div>
+                                        <div class="col-md-3 col-xs-4 col-sm-4 text-left">{{ ucwords($child['account_name']) }}</div>
+                                        <div class="col-md-2 col-xs-3 col-sm-3 text-center">Yes</div>
+                                        <div class="col-md-1 col-xs-1 col-sm-1 text-center ">
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-xs btn-default btn-flat coa-action">Report</button>
+                                                <a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right" role="menu" style="left:0;">
+                                                <a class="dropdown-item btn-edit-account" data-remote="{{ route('accounts.show', $child['account_id']) }}" href="#">Edit</a>
+                                                <a class="dropdown-item btn-set-status" data-status="{{$child['status']}}" data-id="{{$child['account_id']}}"  href="#">{{$child['status']}}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endforeach
+                        @endforeach
+                        {{-- @foreach ($accounts['content'] as $key => $type )
+                            <div class="col-md-2 col-xs-2 col-sm-2 text-left ">{{strtoupper($key)}}</div>
+                            @foreach($accounts['content'][$key] as $account)
+
+                            <div class="row">
+                                <div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
+                                <div class="col-md-2 col-xs-2 col-sm-2 text-left ">{{ ucwords($account['account_number']) }}</div>
+                                <div class="col-md-5 col-xs-5 col-sm-5 text-left ">{{ ucwords($account['account_name']) }}</div>
+                                <div class="col-md-3 col-xs-3 col-sm-3 text-cgenter">{{ ucwords($account['bank_reconcillation']) }}</div>
+                                <div class="col-md-1 col-xs-1 col-sm-1 text-center ">
+
+                                    <h6>{{$id}}</h6>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-xs btn-default btn-flat coa-action">Report</button>
+                                        <a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" role="menu" style="left:0;">
+                                        <a class="dropdown-item btn-edit-account" data-remote="{{ route('accounts.show', $account['account_id']) }}" href="#">Edit</a>
+                                        <a class="dropdown-item btn-set-status" data-status="{{$account['status']}}" data-id="{{$account['account_id']}}"  href="#">{{$account['status']}}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 							@foreach($account["child"] as $child)
 								<div class="row">
 									<div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
@@ -97,6 +154,61 @@
 								</div>
 							@endforeach
 						@endforeach
+                        @endforeach --}}
+
+
+
+
+
+  						{{-- @foreach($accounts['content'] as $account)
+                              <div class="col-md-2 col-xs-2 col-sm-2 text-left ">{{ ucwords($account['account_type']) }}</div>
+                              <div class="col-md-2 col-xs-2 col-sm-2 text-left ">{{ ucwords($account['account_type']) }}</div>
+
+
+
+                            <div class="row">
+                                <div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
+                                <div class="col-md-2 col-xs-2 col-sm-2 text-left ">{{ ucwords($account['account_number']) }}</div>
+                                <div class="col-md-5 col-xs-5 col-sm-5 text-left ">{{ ucwords($account['account_name']) }}</div>
+                                <div class="col-md-3 col-xs-3 col-sm-3 text-cgenter">{{ ucwords($account['bank_reconcillation']) }}</div>
+                                <div class="col-md-1 col-xs-1 col-sm-1 text-center ">
+
+                                    <h6>{{$id}}</h6>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-xs btn-default btn-flat coa-action">Report</button>
+                                        <a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" role="menu" style="left:0;">
+                                        <a class="dropdown-item btn-edit-account" data-remote="{{ route('accounts.show', $account['account_id']) }}" href="#">Edit</a>
+                                        <a class="dropdown-item btn-set-status" data-status="{{$account['status']}}" data-id="{{$account['account_id']}}"  href="#">{{$account['status']}}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+							@foreach($account["child"] as $child)
+								<div class="row">
+									<div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
+									<div class="col-md-1 col-xs-1 col-sm-1 text-left"></div>
+									<div class="col-md-2 col-xs-2 col-sm-2 text-left ">{{ ucwords($child['account_number']) }}</div>
+									<div class="col-md-4 col-xs-4 col-sm-4 text- ">{{ ucwords($child['account_name']) }}</div>
+									<div class="col-md-3 col-xs-3 col-sm-3 text-cgenter ">Yes</div>
+									<div class="col-md-1 col-xs-1 col-sm-1 text-center ">
+										<div class="btn-group">
+											<button type="button" class="btn btn-xs btn-default btn-flat coa-action">Report</button>
+											<a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
+											<span class="sr-only">Toggle Dropdown</span>
+											</a>
+											<div class="dropdown-menu dropdown-menu-right" role="menu" style="left:0;">
+											<a class="dropdown-item btn-edit-account" data-remote="{{ route('accounts.show', $child['account_id']) }}" href="#">Edit</a>
+											<a class="dropdown-item btn-set-status" data-status="{{$child['status']}}" data-id="{{$child['account_id']}}"  href="#">{{$child['status']}}</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							@endforeach
+						@endforeach --}}
 					@endforeach
 				</div>
 

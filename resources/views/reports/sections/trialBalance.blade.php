@@ -15,7 +15,7 @@
 		background-color: #4ec891!important;
   		color: #fff!important;
 		border-radius:0px;
-		
+
 	}
 	.frm-header{
 		margin-bottom:10px;
@@ -49,7 +49,7 @@
 					<div class="col-md-8 frm-header">
 						<h4 ><b>Trial Balance</b></h4>
 					</div>
-					
+
 					<div class="col-md-12" style="height:20px;"></div>
 					<div class="col-md-2 col-xs-12">
 						<div class="box">
@@ -72,7 +72,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="col-md-12" style="height:20px;"></div>
 			</form>
 		</div>
@@ -89,10 +89,10 @@
 									<th>Account Name</th>
 									<th>Debit</th>
 									<th>Credit</th>
-									
+
 								</thead>
 								<tbody id="trialBalance">
-									<?php 
+									<?php
 										$totaldeb = 0;
 										$totalcred = 0;
 									?>
@@ -103,7 +103,7 @@
 										<td>{{number_format($data->total_debit, 2, '.', ',')}}</td>
 										<td>{{number_format($data->total_credit, 2, '.', ',')}}</td>
 									</tr>
-									<?php 
+									<?php
 										$totaldeb += $data->total_debit;
 										$totalcred += $data->total_credit;
 									?>
@@ -125,12 +125,11 @@
 	</div>
 	</div>
   </div>
-</section>	
+</section>
 <!-- /.content -->
 
 
 @endsection
-
 
 @section('footer-scripts')
   @include('scripts.reports.reports')

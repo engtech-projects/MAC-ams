@@ -5,6 +5,7 @@
         var cashblotter_tbl
         fetchCashBlotter()
 
+
         $('#total').insertAfter('#journal tr:first');
 
 
@@ -405,6 +406,32 @@
         }
 
     })
+
+
+    /*TRIAL BALANCE MODUKE SCRIPTS*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*END TRIAL BALANCE SCRIPTS*/
     $(document).on('click', '.remove-account-officer-collection', function(e){
         e.preventDefault();
         $(this).closest('tr').remove();

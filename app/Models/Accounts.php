@@ -48,13 +48,45 @@ class Accounts extends Model
     }
 
 
+    public static function fetchAccountByAccountType($isJson = false) {
+        $jsonData = [];
+        $data = DB::table('chart_of_accounts')
+                    ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
+                    ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
+                    ->select('chart_of_accounts.*', 'account_type.*', 'account_category.account_category.')
+                    ->where('status', 'active')
+                    ->orderBy('account_category.account_category_id', 'asc')
+                    ->orderBy('account_type.account_type_id', 'asc')
+                    ->get();
+
+		if(count($data) > 0)
+		{
+			if ($isJson) {
+				foreach ($data->toArray() as $key => $value) {
+					$row = [];
+					foreach ($value as $k => $v) {
+						if($k == 'account_type'){
+							$row[$k] = utf8_encode(ucfirst($v));
+							continue;
+						}
+						$row[$k] = utf8_encode($v);
+					}
+					$jsonData['data'][] = $row;
+				}
+				return json_encode($jsonData);
+			}
+		}
+
+        return $data;
+    }
+
 
     public static function fetch($isJson = false) {
 		$jsonData = [];
         $data = DB::table('chart_of_accounts')
                     ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
                     ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
-                    ->select('chart_of_accounts.*', 'account_type.account_type', 'account_type.account_type_id', 'account_category.account_category')
+                    ->select('chart_of_accounts.*', 'account_type.account_type', 'account_type.*', 'account_category.account_category')
                     ->where('status', 'active')
                     ->orderBy('account_category.account_category_id', 'asc')
                     ->orderBy('account_type.account_type_id', 'asc')

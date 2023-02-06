@@ -214,7 +214,7 @@ class ReportsController extends MainController
             'title' => 'Subsidiary Ledger',
             'trialbalanceList' => ''
         ];
-        return view('reports.sections.trialBalance', $data);
+        return view('reports.sections.bankReconcillation', $data);
     }
     public function cashPosition()
     {
@@ -223,7 +223,7 @@ class ReportsController extends MainController
             'trialbalanceList' => ''
         ];
 
-        return view('reports.sections.trialBalance', $data);
+        return view('reports.sections.cashPosition', $data);
     }
     public function cashTransactionBlotter()
     {
