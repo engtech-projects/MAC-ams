@@ -21,7 +21,7 @@
 	}
 	.dataTables_filter{
 		float:right!important;
-	}
+	}0
 </style>
 
 <!-- Main content -->
@@ -56,7 +56,7 @@
 							</select>
 						</div>
 					</div>
-					
+
 					<div class="col-md-12" style="height:20px;"></div>
 					<div class="col-md-2 col-xs-12">
 						<div class="box">
@@ -79,7 +79,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="col-md-12" style="height:20px;"></div>
 			</form>
 		</div>
@@ -107,7 +107,7 @@
 											<th>Date Posted</th>
 										</thead>
 										<tbody>
-											
+
 											<tr>
 												<td class="font-weight-bold">0000</td>
 												<td>Head Office</td>
@@ -176,7 +176,7 @@
 		</div>
 	</div>
   </div>
-</section>	
+</section>
 <!-- /.content -->
 
 

@@ -723,6 +723,7 @@
 
 
 		$(document).on('change', '#genLedgerAccountName', function(e){
+            e.preventDefault()
 			var id = $(this).val();
 			var from = $('#genLedgerFrom').val();
 			var to = $('#genLedgerTo').val();

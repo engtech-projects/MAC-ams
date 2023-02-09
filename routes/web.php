@@ -130,9 +130,6 @@ Route::get('reports/subsidiaryDelete', [ReportsController::class, 'subsidiaryDel
 
 Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');
 
-Route::get('reports/generalLedger/search',[ReportsController::class,'searchIndex'])->name('reports.searchLedger');
-Route::post('reports/generalLedger/searchResult',[ReportsController::class,'searchLedger'])->name('reports.searchLedgerResult');
-
 Route::post('reports/generalLedgerFetchAccount', [ReportsController::class, 'generalLedgerFetchAccount'])->name('reports.generalLedgerFetchAccount');
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
 

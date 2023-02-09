@@ -102,27 +102,15 @@ class ReportsController extends MainController
             $genLedgerTo = $request->genLedgerTo;
 
             $journalEntries = Accounts::generalLedger_fetchAccounts($genLedgerFrom, $genLedgerTo, $id);
-            $ledger = $this->calculateRunningBalance($journalEntries);
             return json_encode($journalEntries);
 
         } else {
-
             $journalEntries = Accounts::generalLedger_fetchAccounts();
-            $ledger = $this->calculateRunningBalance($journalEntries,'','');
-            return json_encode($ledger);
+            return json_encode($journalEntries);
 
         }
 
 
-    }
-    public function calculateRunningBalance($data) {
-            $balance = 0;
-            foreach ($data as $transaction) {
-                $balance += $transaction->journal_details_debit;
-                $balance -= $transaction->journal_details_credit;
-
-            }
-            return $data;
     }
 
 
@@ -178,8 +166,8 @@ class ReportsController extends MainController
     public function generalLedger()
     {
 
-            $journalEntries = Accounts::generalLedger_fetchAccounts();
-            $transactions = $this->calculateRunningBalance($journalEntries);
+            $transactions = Accounts::generalLedger_fetchAccounts();
+
             $data = [
                 'title' => 'General Ledger',
                 'chartOfAccount' => Accounts::get(),

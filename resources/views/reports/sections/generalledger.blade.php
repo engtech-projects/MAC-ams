@@ -95,7 +95,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-md-3 col-xs-12">
+					<div class="col-md-2 col-xs-12">
 						<div class="box">
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerFrom">From</label>
@@ -105,7 +105,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-md-3 col-xs-12">
+					<div class="col-md-2 col-xs-12">
 						<div class="box">
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerTo">To</label>
@@ -114,7 +114,14 @@
 								</div>
 							</div>
 						</div>
-                        <button type="button" class="btn btn-success">Search</button>
+
+					</div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="box pt-4">
+                            <button id="searchledger" class="btn btn-success" type="button">Search</button>
+                        </div>
+
+
 					</div>
 
 				</div>
