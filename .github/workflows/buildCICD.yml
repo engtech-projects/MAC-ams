@@ -40,11 +40,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ steps.vars.outputs.short_ref }}
-      - name: Build Laravel with Vue
+      - name: Build Laravel
         run: |
               composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-              npm ci
-              npm run production
               rm -rf .git
               rm -rf .gitignore
               git config --global user.email "engtechsolutions2020@gmail.com"
@@ -71,8 +69,6 @@ jobs:
       - name: Build Laravel
         run: |
               composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-              npm ci
-              npm run production
               rm -rf .git
               rm -rf .gitignore
               git config --global user.email "engtechsolutions2020@gmail.com"
