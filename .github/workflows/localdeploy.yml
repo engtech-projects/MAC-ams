@@ -1,16 +1,16 @@
 # Deploying to local staging server
-name: Deploy MAC_ams to Local
+name: Deploy MAC-ams to Local
 
 on:
   workflow_run:
-    workflows: MAC_ams Build and Push to CI-Pipeline Branch
+    workflows: MAC-ams Build and Push to CI-Pipeline Branch
     types:
       - completed
 env:
-  APP_NAME: "MAC_ams"
+  APP_NAME: "MAC-ams"
 
 concurrency:
-  group: "localdeploy MAC_ams"
+  group: "localdeploy MAC-ams"
   cancel-in-progress: false
 
 jobs:

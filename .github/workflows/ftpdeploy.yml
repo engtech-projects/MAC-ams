@@ -1,16 +1,16 @@
 # Deploying to local staging server
-name: Deploy MAC_ams to FTP SERVER
+name: Deploy MAC-ams to FTP SERVER
 
 on:
   workflow_run:
-    workflows: MAC_ams Build and Push to CI-Pipeline Branch
+    workflows: MAC-ams Build and Push to CI-Pipeline Branch
     types:
       - completed
 env:
-  APP_NAME: "MAC_ams"
+  APP_NAME: "MAC-ams"
 
 concurrency:
-  group: "deployftp MAC_ams"
+  group: "deployftp MAC-ams"
   cancel-in-progress: true
 
 jobs:
