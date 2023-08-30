@@ -209,21 +209,29 @@
 									<td class='editable-table-data journalNum' value="" ><a href="#" fieldName="journal_details_debit" id="debit" class=" editable-row-item"></a> </td>
 									<td class='editable-table-data journalNum' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
 									<td class='editable-table-data' value="" >
+										<?php
+										// echo '<pre>';
+										// var_export($data['subsidiaries']);
+										// echo '</pre>';
+														?>
 										<select  fieldName="subsidiary_id" class="select-account form-control form-control-sm editable-row-item">
 											<option disabled value="" selected>-Select S/L-</option>
 											<?php
 												$temp = '';
-												foreach($subsidiaries as $subsidiary){
-													if($temp == '')
-													{
-														$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
-														echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-													}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
-													{
-														echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-														$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+												foreach($subsidiaries as $subsidiary) {
+
+													if( is_array($subsidiary->toArray()["subsidiary_category"]) && ( $subsidiary->toArray()["subsidiary_category"] > 0) ){
+														if($temp == '')
+														{
+															$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+															echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+														}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
+														{
+															echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+															$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+														}
+														echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
 													}
-													echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
 												}
 											?>
 										</select>

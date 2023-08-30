@@ -741,6 +741,7 @@
 			winPrint.close();
 		}, 500);
 	})
+	
 	$(document).on('click','#edit_add_item', function(e){
 
 		e.preventDefault()
@@ -764,16 +765,18 @@
 					<?php
 						$temp = '';
 						foreach($subsidiaries as $subsidiary){
-							if($temp == '')
-							{
-								$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
-								echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-							}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
-							{
-								echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-								$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+							if( is_array($subsidiary->toArray()["subsidiary_category"]) && ( $subsidiary->toArray()["subsidiary_category"] > 0) ){
+								if($temp == '')
+								{
+									$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+									echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+								}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
+								{
+									echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+									$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+								}
+								echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
 							}
-							echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
 						}
 					?>
 				</select>
@@ -828,16 +831,18 @@
 					<?php
 						$temp = '';
 						foreach($subsidiaries as $subsidiary){
-							if($temp == '')
-							{
-								$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
-								echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-							}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
-							{
-								echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-								$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+							if( is_array($subsidiary->toArray()["subsidiary_category"]) && ( $subsidiary->toArray()["subsidiary_category"] > 0) ){
+								if($temp == '')
+								{
+									$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+									echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+								}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
+								{
+									echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+									$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+								}
+								echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
 							}
-							echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
 						}
 					?>
 				</select>
@@ -875,6 +880,7 @@
             allowClear: true,
         });
 	});
+
 	$(document).on('click','#open_voucher',function(e){
 		e.preventDefault();
 		setVoucherData();
