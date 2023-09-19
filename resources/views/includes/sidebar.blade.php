@@ -178,6 +178,14 @@
 						</a>
 					</li>
 					@endif
+					@if(checkUserHasAccessModule('sub-module','reports/journal_entry'))
+					<li class="nav-item">
+						<a href="{{ route('reports.journal_entry') }}" class="nav-link {{ (request()->is('reports/journal_entry')) ? 'active' : '' }}">
+							<i class="far fa-circle nav-icon"></i>
+							<p>Journal Entry</p>
+						</a>
+					</li>
+					@endif
 					@if(checkUserHasAccessModule('sub-module','reports/generalLedger'))
 					<li class="nav-item">
 						<a href="{{ route('reports.generalLedger') }}" class="nav-link {{ (request()->is('reports/generalLedger')) ? 'active' : '' }}">

@@ -53,6 +53,7 @@ class JournalController extends MainController
 			'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
 			'chartOfAccount' => Accounts::get()
 		];
+		
 	    return view('journal.sections.journalEntry', $data);
 	}
 
@@ -148,6 +149,10 @@ class JournalController extends MainController
 			'journalEntryList' => JournalEntry::fetch(),
 			'chartOfAccount' => Accounts::get()
 		];
+
+		// echo '<pre>';
+		// var_export($data['journalEntryList']->toArray());
+		// echo '</pre>';
 	    return view('journal.sections.journalEntryList', $data);
 	}
  	public function show($id) {}

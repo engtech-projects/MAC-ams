@@ -29,6 +29,7 @@ class journalEntry extends Model
 	public static function fetch($status = '', $from = '', $to='', $book_id='', $branch_id='')
 	{
 		$query = journalEntry::with(['journalDetails','bookDetails']);
+		// $query = journalEntry::with(['bookDetails']);
 		if($status != '')
 		{
 			$query->where('status', $status);
@@ -45,7 +46,7 @@ class journalEntry extends Model
 		{
 			$query->where('branch_id',$branch_id);
 		}
-		return $query->get();
+		return $query->limit(1000)->get();
 	}
 
 	public function journalDetails(){

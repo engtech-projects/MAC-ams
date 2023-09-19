@@ -114,18 +114,6 @@ class ReportsController extends MainController
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     public function subsidiaryViewInfo(Request $request)
     {
         $data = Subsidiary::where('sub_id', $request->id)->get();
@@ -134,6 +122,7 @@ class ReportsController extends MainController
         }
         return false;
     }
+
     public function subsidiaryDelete(Request $request)
     {
         if (Subsidiary::find($request->id)->delete()) {
@@ -188,6 +177,7 @@ class ReportsController extends MainController
         ];
         return view('reports.sections.trialBalance', $data);
     }
+
     public function incomeStatement()
     {
         $data = [
@@ -196,6 +186,7 @@ class ReportsController extends MainController
         ];
         return view('reports.sections.incomeStatement', $data);
     }
+
     public function bankReconcillation()
     {
         $data = [
@@ -204,6 +195,7 @@ class ReportsController extends MainController
         ];
         return view('reports.sections.bankReconcillation', $data);
     }
+
     public function cashPosition()
     {
         $data = [
@@ -213,6 +205,7 @@ class ReportsController extends MainController
 
         return view('reports.sections.cashPosition', $data);
     }
+
     public function cashTransactionBlotter()
     {
 
@@ -230,6 +223,7 @@ class ReportsController extends MainController
 
         return view('reports.sections.cashTransactionBlotter', $data);
     }
+    
     public function cashBlotterIndex()
     {
         $data = CashBlotter::fetchCashBlotter();
@@ -274,8 +268,6 @@ class ReportsController extends MainController
     public function showCashBlotter($id)
     {
     }
-
-
 
     public function editCashBlotter($id)
     {
@@ -408,8 +400,6 @@ class ReportsController extends MainController
         return view('reports.sections.chartOfAccounts', $data);
     }
 
-
-
     public function reportPrint(Request $request)
     {
         $print = new PrinterController;
@@ -437,5 +427,12 @@ class ReportsController extends MainController
                 break;
             default:
         }
+    }
+
+    public function journalEntry() {
+
+
+        return 'journal entry';
+
     }
 }
