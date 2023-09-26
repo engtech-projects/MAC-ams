@@ -30,7 +30,7 @@
 				</p>
 			</a>
 			</li>
-			@if(checkUserHasAccessModule('module','sales'))
+			<!-- @if(checkUserHasAccessModule('module','sales'))
 			<li class="nav-item {{ (isset($nav) && $nav[0] == 'sales') ? 'menu-open' : '' }} {{ (request()->is('sales') || request()->is('sales/invoice') ) ? 'menu-open' : '' }}">
 			<a href="{{ route('sales') }}" class="nav-link {{ (request()->is('sales') || (request()->is('sales/invoice')) || (request()->is('sales/customers')) || (request()->is('products_and_services'))) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-newspaper"></i>
@@ -73,7 +73,7 @@
 				</li>
 				@endif
 			</ul>
-			</li>
+			</li> -->
 			@endif
 			@if(checkUserHasAccessModule('module','journal'))
 			<li class="nav-item {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? 'menu-open' : '' }}">

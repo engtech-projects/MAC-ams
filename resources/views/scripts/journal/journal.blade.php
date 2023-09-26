@@ -301,9 +301,9 @@
 
     $(document).on('change','#amount',function(){
         if($.isNumeric($(this).val())) {
-            alert("Numeric")
+            console.log("Numeric")
         }else {
-            alert("String")
+            console.log("String")
         }
     })
 
