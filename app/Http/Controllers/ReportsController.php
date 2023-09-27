@@ -34,17 +34,17 @@ class ReportsController extends MainController
 
 
     
-	public function journalLedger()
+	public function journalLedger(Request $request)
     {
 		$transactions = Accounts::generalLedger_fetchAccounts();
 
 		 /* ----- start journal ledger ----- */
 
-		 $from = '2019-09-01';
-		 $to = '2019-09-30';
-		 $branch_id = '';
-		 $status = 'posted';
-		 $book_id = '';
+		 $from = $request->from?$request->from:'2019-09-01';
+		 $to = $request->to?$request->to:'2019-09-30';
+		 $branch_id = $request->branch_id?$request->branch_id:'';
+		 $status = $request->status?$request->status:'posted';
+		 $book_id = $request->book_id?$request->book_id:'';
  
  
 		 // $branch = Branch::find($branch_id);

@@ -32,7 +32,7 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" method="post" @submit.prevent="">
+			<form id="bookJournalForm" method="post" @submit.prevent="search">
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div style="display:flex;margin-bottom:32px;">
@@ -40,9 +40,9 @@
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="book_ref" style="flex:1" >By Book</label>
 							<div class="input-group" style="flex:3">
-								<select name="jlByBook" class="select-jl-bybook form-control form-control-sm" id="jlByBook">
-									@foreach ($journalBooks as $journalBook)
+								<select @change="logbook($event)" v-model="filter.book_id" name="jlByBook" class="select-jl-bybook form-control form-control-sm" id="jlByBook">
 									<option value="" disabled selected>-Select Book-</option>
+									@foreach ($journalBooks as $journalBook)
 									<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 									@endforeach
 								</select>
@@ -67,7 +67,7 @@
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="book_ref" style="flex:1" >Branch</label>
 							<div class="input-group" style="flex:3">
-								<select name="jlBranch" class="select-jl-branch form-control form-control-sm" id="jlBranch">
+								<select v-model="filter.branch_id" name="jlBranch" class="select-jl-branch form-control form-control-sm" id="jlBranch">
 									<option value="" disabled selected>-Select Branch-</option>
 									<option value="1">Butuan CIty Branch</option>
 									<option value="2">Nasipit Branch</option>
@@ -79,8 +79,9 @@
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="book_ref" style="flex:1" >Journal Status:</label>
 							<div class="input-group" style="flex:3">
-								<select name="jlStatus" class="select-jl-status form-control form-control-sm" id="jlStatus">
-									<option value="unposted" selected>Unposted</option>
+								<select v-model="filter.status" name="jlStatus" class="select-jl-status form-control form-control-sm" id="jlStatus">
+								<option value="posted" selected>Posted</option>
+									<option value="unposted">Unposted</option>
 								</select>
 							</div>
 						</div>
@@ -95,13 +96,13 @@
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="book_ref" style="flex:1" >From:</label>
 							<div class="input-group" style="flex:3">
-								<input type="date" class="form-control form-control-sm">
+								<input v-model="filter.from" type="date" value="{{request('from')}}" class="form-control form-control-sm">
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="book_ref" style="flex:1" >To:</label>
 							<div class="input-group" style="flex:3">
-								<input type="date" class="form-control form-control-sm">
+								<input  v-model="filter.to" type="date" value="{{request('to')}}" class="form-control form-control-sm">
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center;justify-content:right;">
@@ -420,13 +421,26 @@
 	new Vue({
 		el: '#app',
 		data: {
-			data: @json($jLedger)
+			data: @json($jLedger),
+			filter:{
+				from:@json(request('from'))?@json(request('from')):'',
+				to:@json(request('to'))?@json(request('to')):'',
+				branch_id:@json(request('branch_id'))?@json(request('branch_id')):'',
+				status:@json(request('status'))?@json(request('status')):'',
+				book_id:@json(request('book_id'))?@json(request('book_id')):''
+			}
 		},
 		methods: {
-			
+			search:function(){
+				console.log(this.filter);
+				window.location.href = "/reports/journalledger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&branch_id=' +  this.filter.branch_id + '&&status=' +  this.filter.status + '&&book_id=' +  this.filter.book_id;
+			},
+			logbook:function(e){
+				console.log(e);
+			}
 		},
 		mounted(){
-			console.log(this.data);
+			// console.log(this.data);
 		}
 	});
 </script>

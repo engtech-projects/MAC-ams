@@ -887,27 +887,27 @@
 
 	// Select for JournalLedger 
 
-	$('.select-jl-bybook').select2({
-        placeholder: 'By Book',
-        allowClear: true,
-    });
+	// $('.select-jl-bybook').select2({
+    //     placeholder: 'By Book',
+    //     allowClear: true,
+    // });
 
-	$('.select-jl-account-title').select2({
-        placeholder: 'Select Account Title',
-        allowClear: true,
-    });
-	$('.select-jl-subsidiary').select2({
-        placeholder: 'Select Subsidiary',
-        allowClear: true,
-    });
+	// $('.select-jl-account-title').select2({
+    //     placeholder: 'Select Account Title',
+    //     allowClear: true,
+    // });
+	// $('.select-jl-subsidiary').select2({
+    //     placeholder: 'Select Subsidiary',
+    //     allowClear: true,
+    // });
 	
-	$('.select-jl-branch').select2({
-        placeholder: 'Select Branch',
-        allowClear: true,
-    });
+	// $('.select-jl-branch').select2({
+    //     placeholder: 'Select Branch',
+    //     allowClear: true,
+    // });
 
-	$('.select-jl-status').select2({
-        placeholder: 'Select Status',
-        allowClear: true,
-    });
+	// $('.select-jl-status').select2({
+    //     placeholder: 'Select Status',
+    //     allowClear: true,
+    // });
 </script>
