@@ -32,7 +32,80 @@ class ReportsController extends MainController
 {
 
 
-    // invoice
+    
+	public function journalLedger()
+    {
+		$transactions = Accounts::generalLedger_fetchAccounts();
+
+		 /* ----- start journal ledger ----- */
+
+		 $from = '2019-09-01';
+		 $to = '2019-09-30';
+		 $branch_id = '';
+		 $status = 'posted';
+		 $book_id = '';
+ 
+ 
+		 // $branch = Branch::find($branch_id);
+		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC');
+ 
+		 $journal_ledger = [];
+ 
+		 foreach ($journal_entry as $entry) {
+ 
+			 $entries = [];
+ 
+			 foreach ($entry->journalDetails as $details) {
+				 
+				 $subsidiary = '';    
+ 
+				 if( $details->subsidiary_id ) {
+					 $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
+				 }
+ 
+				 $entries[] = [
+					 'account' => $details->journal_details_account_no,
+					 'title' => $details->journal_details_title,
+					 'subsidiary' => $subsidiary,
+					 'debit' => $details->journal_details_debit,
+					 'credit' => $details->journal_details_credit
+				 ];
+			 }
+ 
+			 $entry->reference_name = '';
+			 $branch = Branch::find($entry->branch_id);
+ 
+			 if( $branch ) {
+				 $entry->reference_name = $branch->branch_name;
+			 }
+ 
+			 $journal_ledger[] = [
+				 'date' =>  Carbon::parse($entry->journal_date)->format('m/d/Y'),
+				 'reference' => $entry->journal_no,
+				 'source' => $entry->source,
+				 'reference_name' => $entry->reference_name,
+				 'remarks' => $entry->remarks,
+				 'details' => $entries
+			 ];
+		 }
+ 
+ 
+			//  echo '<pre>';
+			//  var_export($journal_ledger);
+			//  echo '</pre>';
+ 
+		 /* ----- end journal ledger ----- */
+
+		$data = [
+			'title' => 'Journal Ledger',
+			'chartOfAccount' => Accounts::get(),
+			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
+			'transactions' => $transactions,
+			'jLedger' => $journal_ledger
+		];
+		return view('reports.sections.journalledger', $data);
+    }
+	// invoice
     public function subsidiaryLedger()
     {
 

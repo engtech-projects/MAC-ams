@@ -160,7 +160,7 @@
 			@endif
 
 			@if(checkUserHasAccessModule('module','reports'))
-			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/subsidiaryledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
+			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/journalledger') || request()->is('reports/subsidiaryledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
 					|| request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition') || request()->is('reports/cheque') || request()->is('reports/postDatedCheque')|| request()->is('reports/chartOfAccounts')) ? 'menu-open' : '' }}">
 			<a href="{{ route('sales') }}" class="nav-link {{  (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-clipboard-list"></i>
@@ -170,6 +170,12 @@
 				</p>
 			</a>
 				<ul class="nav nav-treeview">
+					<li class="nav-item">
+						<a href="{{ route('reports.journalLedger') }}" class="nav-link {{ (request()->is('reports/journalledger')) ? 'active' : '' }}">
+							<i class="far fa-circle nav-icon"></i>
+							<p>Journal Ledger</p>
+						</a>
+					</li>
 					@if(checkUserHasAccessModule('sub-module','reports/subsidiaryledger'))
 					<li class="nav-item">
 						<a href="{{ route('reports.subsidiaryledger') }}" class="nav-link {{ (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">

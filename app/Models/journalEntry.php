@@ -26,7 +26,7 @@ class journalEntry extends Model
 		'remarks',
     ];
 
-	public static function fetch($status = '', $from = '', $to='', $book_id='', $branch_id='')
+	public static function fetch($status = '', $from = '', $to='', $book_id='', $branch_id='', $order='')
 	{
 		$query = journalEntry::with(['journalDetails','bookDetails']);
 		// $query = journalEntry::with(['bookDetails']);
@@ -46,6 +46,10 @@ class journalEntry extends Model
 		{
 			$query->where('branch_id',$branch_id);
 		}
+		if( $order != '' ) {
+			$query->orderBy('journal_date', $order);
+		}
+
 		return $query->limit(1000)->get();
 	}
 

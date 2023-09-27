@@ -131,6 +131,7 @@ Route::post('reports/generalLedgerFetchAccount', [ReportsController::class, 'gen
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
 Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
 Route::get('reports/bankReconcillation', [ReportsController::class, 'bankReconcillation'])->name('reports.bankReconcillation');
+Route::get('reports/journalledger', [ReportsController::class, 'journalLedger'])->name('reports.journalLedger');
 
 
 Route::get('reports/cheque', [ReportsController::class, 'cheque'])->name('reports.cheque');
