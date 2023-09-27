@@ -41,12 +41,10 @@
 							<label class="label-normal" for="book_ref" style="flex:1" >By Book</label>
 							<div class="input-group" style="flex:3">
 								<select name="jlByBook" class="select-jl-bybook form-control form-control-sm" id="jlByBook">
-									<option value="" selected>-All-</option>
-									<option value="one">One</option>
-									<option value="two">Two</option>
-									<option value="three">Three</option>
-									<option value="four">Four</option>
-									<option value="five">Five</option>
+									@foreach ($journalBooks as $journalBook)
+									<option value="" disabled selected>-Select Book-</option>
+									<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
+									@endforeach
 								</select>
 							</div>
 						</div>
@@ -70,7 +68,9 @@
 							<label class="label-normal" for="book_ref" style="flex:1" >Branch</label>
 							<div class="input-group" style="flex:3">
 								<select name="jlBranch" class="select-jl-branch form-control form-control-sm" id="jlBranch">
-									<option value="" selected>-All-</option>
+									<option value="" disabled selected>-Select Branch-</option>
+									<option value="1">Butuan CIty Branch</option>
+									<option value="2">Nasipit Branch</option>
 								</select>
 							</div>
 						</div>
@@ -79,7 +79,9 @@
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="book_ref" style="flex:1" >Journal Status:</label>
 							<div class="input-group" style="flex:3">
-								<input type="text" class="form-control form-control-sm">
+								<select name="jlStatus" class="select-jl-status form-control form-control-sm" id="jlStatus">
+									<option value="unposted" selected>Unposted</option>
+								</select>
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center">

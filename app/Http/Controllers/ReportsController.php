@@ -23,6 +23,7 @@ use App\Models\CashBlotter;
 use App\Models\CashBreakdown;
 use App\Models\journalEntry;
 use App\Models\journalEntryDetails;
+use App\Models\JournalBook;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -100,6 +101,7 @@ class ReportsController extends MainController
 			'title' => 'Journal Ledger',
 			'chartOfAccount' => Accounts::get(),
 			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
+			'journalBooks' => JournalBook::getBookWithJournalCount(),
 			'transactions' => $transactions,
 			'jLedger' => $journal_ledger
 		];
