@@ -315,7 +315,7 @@
 										@endif
 										</tbody>
 									</table> -->
-									<table style="table-layout: fixed;" class="table table-bordered">
+									<table style="table-layout: fixed;" class="table table-bordered" id="journalLedgerTbl">
 										<thead>
 											<tr>
 												<th>Date</th>
