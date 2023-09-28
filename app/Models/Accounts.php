@@ -87,7 +87,7 @@ class Accounts extends Model
                     ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
                     ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
                     ->select('chart_of_accounts.*', 'account_type.account_type', 'account_type.*', 'account_category.account_category')
-                    ->where('status', 'active')
+                    ->where(['status' => 'active', 'type' => 'L'])
                     ->orderBy('account_category.account_category_id', 'asc')
                     ->orderBy('account_type.account_type_id', 'asc')
                     ->get();
