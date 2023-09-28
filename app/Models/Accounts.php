@@ -261,7 +261,7 @@ class Accounts extends Model
         ->join('journal_entry_details', 'journal_entry_details.journal_id', '=', 'journal_entry.journal_id')
         ->join('chart_of_accounts', 'journal_entry_details.account_id', '=', 'chart_of_accounts.account_id')
         ->join('subsidiary', 'journal_entry_details.subsidiary_id', '=', 'subsidiary.sub_id')
-        ->join('opening_balance', 'chart_of_accounts.account_id','=','opening_balance.account_id')
+        ->leftJoin('opening_balance', 'chart_of_accounts.account_id','=','opening_balance.account_id')
         ->select(
             'chart_of_accounts.account_id',
             'chart_of_accounts.account_number',
@@ -269,6 +269,7 @@ class Accounts extends Model
             'opening_balance.opening_balance',
             'subsidiary.sub_name',
             'journal_entry.journal_date',
+            'journal_entry.journal_no',
             'journal_entry.source',
             'journal_entry.cheque_no',
             'journal_entry.cheque_date',
@@ -279,21 +280,14 @@ class Accounts extends Model
             'journal_entry_details.balance'
         );
 
-
-
         if($from != '' && $to != '')
         {
             $journalEntries->whereBetween("journal_entry.journal_date", [$from, $to]);
-
         }
 		if($account_id != '')
 		{
-
-			$journalEntries->where('chart_of_accounts.account_id',$account_id);
+			$journalEntries->where('chart_of_accounts.account_id', $account_id);
 		}
 
-		return $journalEntries->get();
-	}
-
-
+		return $journalEntries->orderBy('chart_of_accounts.account_number', 'ASC')->orderBy('journal_entry.journal_date', 'ASC')->get();
 }
