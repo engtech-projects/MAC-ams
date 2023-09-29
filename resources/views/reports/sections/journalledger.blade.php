@@ -335,6 +335,9 @@
 											</tr>
 										</thead>
 										<tbody>
+											@if (sizeof($jLedger)==0)
+												<tr><td>No data found.</td></tr>
+											@endif
 											<tr style="border-bottom:2px solid #000;">
 												<td></td>
 												<td></td>

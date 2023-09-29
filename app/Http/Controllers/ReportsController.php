@@ -40,10 +40,10 @@ class ReportsController extends MainController
 
 		 /* ----- start journal ledger ----- */
 
-		 $from = $request->from?$request->from:'2019-09-01';
-		 $to = $request->to?$request->to:'2019-09-30';
+		 $from = $request->from?$request->from:'';
+		 $to = $request->to?$request->to:'';
 		 $branch_id = $request->branch_id?$request->branch_id:'';
-		 $status = $request->status?$request->status:'posted';
+		 $status = $request->status?$request->status:'';
 		 $book_id = $request->book_id?$request->book_id:'';
  
  
