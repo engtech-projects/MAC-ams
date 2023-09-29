@@ -580,7 +580,7 @@
 		}
 		var subsidiaryTbl = $('#subsidiaryledgerTbl').dataTable(dtbleOption);
 		var generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
-		var journalLedgerTbl = $('#journalLedgerTbl').dataTable(dtbleOption);
+		// var journalLedgerTbl = $('#journalLedgerTbl').dataTable(dtbleOption);
 
 		$('form').attr('autocomplete','off');
 
