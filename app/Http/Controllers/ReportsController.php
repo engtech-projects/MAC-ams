@@ -36,8 +36,6 @@ class ReportsController extends MainController
     
 	public function journalLedger(Request $request)
     {
-		$transactions = Accounts::generalLedger_fetchAccounts();
-
 		 /* ----- start journal ledger ----- */
 
 		 $from = $request->from?$request->from:'';
@@ -99,10 +97,7 @@ class ReportsController extends MainController
 
 		$data = [
 			'title' => 'Journal Ledger',
-			'chartOfAccount' => Accounts::get(),
-			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
 			'journalBooks' => JournalBook::getBookWithJournalCount(),
-			'transactions' => $transactions,
 			'jLedger' => $journal_ledger
 		];
 		return view('reports.sections.journalledger', $data);
@@ -227,18 +222,23 @@ class ReportsController extends MainController
         return $request;
     }
  */
-    public function generalLedger()
+    public function generalLedger(Request $request)
     {
 
-            $transactions = Accounts::generalLedger_fetchAccounts();
+		$from = $request->from?$request->from:'';
+		$to = $request->to?$request->to:'';
+		$account_id = $request->account_id?$request->account_id:'';
 
-            $data = [
-                'title' => 'General Ledger',
-                'chartOfAccount' => Accounts::get(),
-                'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
-                'transactions' => $transactions,
-            ];
-            return view('reports.sections.generalledger', $data);
+		$transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
+		// dd($transactions);
+
+		$data = [
+			'title' => 'General Ledger',
+			'chartOfAccount' => Accounts::get(),
+			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
+			'transactions' => $transactions,
+		];
+		return view('reports.sections.generalledger', $data);
 
     }
 

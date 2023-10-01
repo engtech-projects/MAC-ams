@@ -28,11 +28,11 @@
 </style>
 
 <!-- Main content -->
-<section class="content">
+<section class="content" id="app">
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" method="post">
+			<form id="bookJournalForm" @submit.prevent="search" method="post">
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div class="row">
@@ -58,7 +58,7 @@
                             </tbody>
                         </table> --}}
 					</div>
-					<div class="col-md-4 frm-header">
+					<!-- <div class="col-md-4 frm-header">
 						<label class="label-normal" for="gender">Select Report</label>
 						<div class="input-group">
 							<select name="gender" class="form-control form-control-sm" id="gender">
@@ -77,7 +77,7 @@
 								<option value="month_end_schedule_report">Month End Schedule Report</option>
 							</select>
 						</div>
-					</div>
+					</div> -->
 
 					<div class="col-md-12" style="height:20px;"></div>
 					<div class="col-md-6 col-xs-12">
@@ -85,7 +85,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">Account Name</label>
 								<div class="input-group">
-									<select name="accountName" class="select-account form-control form-control-sm" id="genLedgerAccountName">
+									<select name="accountName" v-model="filter.account_id" class="form-control form-control-sm" id="" required>
 										<option value="" selected>-All-</option>
 										@foreach($chartOfAccount as $data)
 											<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
@@ -100,7 +100,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerFrom">From</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="genLedgerFrom" id="genLedgerFrom"  placeholder="Book Reference" required>
+									<input required v-model="filter.from" value="{{request('from')}}" type="date" class="form-control form-control-sm rounded-0" name="genLedgerFrom" id="genLedgerFrom"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -110,7 +110,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerTo">To</label>
 								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="genLedgerTo" id="genLedgerTo"  placeholder="Book Reference" required>
+									<input required type="date" v-model="filter.to" value="{{request('to')}}" class="form-control form-control-sm rounded-0" name="genLedgerTo" id="genLedgerTo"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -118,7 +118,7 @@
 					</div>
                     <div class="col-md-2 col-xs-12">
                         <div class="box pt-4">
-                            <button id="searchledger" class="btn btn-success" type="button">Search</button>
+                            <button @click="search" id="searchledger" class="btn btn-success" type="button">Search</button>
                         </div>
 
 
@@ -259,6 +259,10 @@
 										@endif
 										</tbody>
 									</table>
+									<div style="display:flex;justify-content:flex-end;margin-top:32px;">
+										{{ $transactions->appends(request()->query())->links('pagination::bootstrap-4') }}
+									</div>
+									
 								</div>
 							</div>
 						</div>
@@ -272,7 +276,31 @@
 </section>
 <!-- /.content -->
 
-
+<script>
+	new Vue({
+		el: '#app',
+		data: {
+			data: @json($transactions),
+			filter:{
+				from:@json(request('from'))?@json(request('from')):'',
+				to:@json(request('to'))?@json(request('to')):'',
+				account_id:@json(request('account_id'))?@json(request('account_id')):''
+			}
+		},
+		methods: {
+			search:function(){
+				console.log(this.filter);
+				window.location.href = "/reports/generalLedger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&account_id=' +  this.filter.account_id;
+			},
+			logbook:function(e){
+				console.log(e);
+			}
+		},
+		mounted(){
+			// console.log(this.data);
+		}
+	});
+</script>
 @endsection
 
 
