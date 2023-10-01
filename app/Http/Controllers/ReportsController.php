@@ -98,7 +98,8 @@ class ReportsController extends MainController
 		$data = [
 			'title' => 'Journal Ledger',
 			'journalBooks' => JournalBook::getBookWithJournalCount(),
-			'jLedger' => $journal_ledger
+			'jLedger' => $journal_ledger,
+			'paginationLinks' => $journal_entry
 		];
 		return view('reports.sections.journalledger', $data);
     }

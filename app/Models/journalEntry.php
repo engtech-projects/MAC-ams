@@ -50,7 +50,7 @@ class journalEntry extends Model
 			$query->orderBy('journal_date', $order);
 		}
 
-		return $query->limit(1000)->get();
+		return $query->limit(1000)->paginate(10);
 	}
 
 	public function journalDetails(){
