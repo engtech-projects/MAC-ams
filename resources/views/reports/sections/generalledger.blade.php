@@ -285,12 +285,13 @@
 				from:@json(request('from'))?@json(request('from')):'',
 				to:@json(request('to'))?@json(request('to')):'',
 				account_id:@json(request('account_id'))?@json(request('account_id')):''
-			}
+			},
+			baseUrl: window.location.protocol + "//" + window.location.host
 		},
 		methods: {
 			search:function(){
 				console.log(this.filter);
-				window.location.href = "/reports/generalLedger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&account_id=' +  this.filter.account_id;
+				window.location.href = this.baseUrl + "/reports/generalLedger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&account_id=' +  this.filter.account_id;
 			},
 			logbook:function(e){
 				console.log(e);

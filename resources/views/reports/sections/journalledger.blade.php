@@ -368,19 +368,20 @@
 				branch_id:@json(request('branch_id'))?@json(request('branch_id')):'',
 				status:@json(request('status'))?@json(request('status')):'',
 				book_id:@json(request('book_id'))?@json(request('book_id')):''
-			}
+			},
+			baseUrl: window.location.protocol + "//" + window.location.host
 		},
 		methods: {
 			search:function(){
 				console.log(this.filter);
-				window.location.href = "/reports/journalledger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&branch_id=' +  this.filter.branch_id + '&&status=' +  this.filter.status + '&&book_id=' +  this.filter.book_id;
+				window.location.href = this.baseUrl + "/reports/journalledger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&branch_id=' +  this.filter.branch_id + '&&status=' +  this.filter.status + '&&book_id=' +  this.filter.book_id;
 			},
 			logbook:function(e){
 				console.log(e);
 			}
 		},
 		mounted(){
-			// console.log(this.data);
+			console.log(this.baseUrl);
 		}
 	});
 </script>
