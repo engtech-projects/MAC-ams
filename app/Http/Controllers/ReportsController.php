@@ -24,10 +24,12 @@ use App\Models\CashBreakdown;
 use App\Models\journalEntry;
 use App\Models\journalEntryDetails;
 use App\Models\JournalBook;
+use App\Models\TransactionDate;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ReportsController extends MainController
 {
@@ -244,11 +246,27 @@ class ReportsController extends MainController
     }
 
 
-    public function trialBalance()
+    public function trialBalance(Request $request)
     {
+		$accounts = [];
+		if($request->asof){
+			$accounts = Accounts::getTrialBalance($request->asof,TransactionDate::get_date());
+			$accounts = $accounts->toArray();
+		}
+		$currentPage = $request->page?$request->page:1;
+		$perPage = 25;
         $data = [
             'title' => 'Subsidiary Ledger',
-            'trialBalance' => Accounts::getTrialBalance(),
+            'trialBalance' => $accounts,
+			'paginated' => new LengthAwarePaginator(
+				array_slice($accounts, ($currentPage - 1) * $perPage, $perPage),
+				count($accounts),
+				$perPage,
+				$currentPage,
+				[
+					'path' => url()->current(), // Set the current URL as the base URL for pagination links
+				]
+			),
             'trialbalanceList' => ''
         ];
         return view('reports.sections.trialBalance', $data);
