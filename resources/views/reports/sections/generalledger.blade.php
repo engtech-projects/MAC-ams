@@ -147,6 +147,7 @@
 									<table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
 										<thead>
 											<th width="15%">Date</th>
+											<th>Reference</th>
 											<th width="26%">Preference Name</th>
 											<th>Source</th>
 											<th>Cheque Date</th>
@@ -165,7 +166,7 @@
                                                 $total_credits = 0; $total_debits = 0; $balance = 0;
                                             ?>
 
-                                                @foreach($transactions as $data)
+                                                @foreach(sortList($transactions, 'journal_no') as $data)
 
 
                                                     @if($id == '')
@@ -233,6 +234,7 @@
 
                                                         <tr id="journal">
                                                             <td>{{$data->journal_date}}</td>
+															<td>{{$data->journal_no}}</td>
                                                             <td>{{$data->sub_name}}</td>
                                                             <td>{{$data->source}}</td>
                                                             <td>{{($data->cheque_date == '') ? '/' : $data->cheque_date}}</td>
