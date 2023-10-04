@@ -230,8 +230,7 @@ class ReportsController extends MainController
 
 		$from = $request->from?$request->from:'';
 		$to = $request->to?$request->to:'';
-		$account_id = $request->account_id?$request->account_id:'';
-
+		$account_id = !$request->account_id||$request->account_id=='all'?'':$request->account_id;
 		$transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
 		// dd($transactions);
 

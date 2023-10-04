@@ -32,7 +32,7 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" @submit.prevent="search" method="post">
+			<form id="" method="get">
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div class="row">
@@ -85,8 +85,8 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">Account Name</label>
 								<div class="input-group">
-									<select name="accountName" v-model="filter.account_id" class="form-control form-control-sm" id="" required>
-										<option value="" selected>-All-</option>
+									<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="" value="{{request('account_id')}}" required>
+										<option value="all" selected>-All-</option>
 										@foreach($chartOfAccount as $data)
 											<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
 										@endforeach
@@ -100,7 +100,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerFrom">From</label>
 								<div class="input-group">
-									<input required v-model="filter.from" value="{{request('from')}}" type="date" class="form-control form-control-sm rounded-0" name="genLedgerFrom" id="genLedgerFrom"  placeholder="Book Reference" required>
+									<input required v-model="filter.from" value="{{request('from')}}" type="date" class="form-control form-control-sm rounded-0" name="from" id="genLedgerFrom"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -110,7 +110,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerTo">To</label>
 								<div class="input-group">
-									<input required type="date" v-model="filter.to" value="{{request('to')}}" class="form-control form-control-sm rounded-0" name="genLedgerTo" id="genLedgerTo"  placeholder="Book Reference" required>
+									<input required type="date" v-model="filter.to" value="{{request('to')}}" class="form-control form-control-sm rounded-0" name="to" id="genLedgerTo"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -118,7 +118,8 @@
 					</div>
                     <div class="col-md-2 col-xs-12">
                         <div class="box pt-4">
-                            <button @click="search" id="searchledger" class="btn btn-success" type="button">Search</button>
+							<input type="submit" class="btn btn-success" value="Search">
+                            <!-- <button id="searchledger" class="btn btn-success" type="button">Search</button> -->
                         </div>
 
 
@@ -282,11 +283,11 @@
 	new Vue({
 		el: '#app',
 		data: {
-			data: @json($transactions),
+			data: @json(sortList($transactions, 'journal_no')),
 			filter:{
 				from:@json(request('from'))?@json(request('from')):'',
 				to:@json(request('to'))?@json(request('to')):'',
-				account_id:@json(request('account_id'))?@json(request('account_id')):''
+				account_id:@json(request('account_id'))?@json(request('account_id')):'all'
 			},
 			baseUrl: window.location.protocol + "//" + window.location.host
 		},
@@ -300,7 +301,11 @@
 			}
 		},
 		mounted(){
-			// console.log(this.data);
+			// for(var i in this.data){
+			// 	if(this.data[i]){
+			// 		console.log(this.data[i]);
+			// 	}
+			// }
 		}
 	});
 </script>
