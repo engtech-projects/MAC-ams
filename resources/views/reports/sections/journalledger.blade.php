@@ -32,15 +32,15 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" method="post" @submit.prevent="search">
+			<form id="bookJournalForm" method="get">
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div style="display:flex;margin-bottom:32px;">
 					<div style="display:flex;flex:1;flex-direction:column;margin-right:32px;">
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="book_ref" style="flex:1" >By Book</label>
+							<label class="label-normal" for="book_id" style="flex:1" >By Book</label>
 							<div class="input-group" style="flex:3">
-								<select @change="logbook($event)" v-model="filter.book_id" name="jlByBook" class="select-jl-bybook form-control form-control-sm" id="jlByBook">
+								<select @change="logbook($event)" v-model="filter.book_id" name="book_id" class="select-jl-bybook form-control form-control-sm" id="book_id">
 									<option value="" disabled selected>-Select Book-</option>
 									@foreach ($journalBooks as $journalBook)
 									<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
@@ -65,9 +65,9 @@
 							</div>
 						</div> -->
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="book_ref" style="flex:1" >Branch</label>
+							<label class="label-normal" for="branch_id" style="flex:1" >Branch</label>
 							<div class="input-group" style="flex:3">
-								<select v-model="filter.branch_id" name="jlBranch" class="select-jl-branch form-control form-control-sm" id="jlBranch">
+								<select v-model="filter.branch_id" name="branch_id" class="select-jl-branch form-control form-control-sm" id="jlBranch">
 									<option value="" disabled selected>-Select Branch-</option>
 									<option value="1">Butuan CIty Branch</option>
 									<option value="2">Nasipit Branch</option>
@@ -77,16 +77,16 @@
 					</div>
 					<div style="display:flex;flex:1;flex-direction:column;margin-right:32px;">
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="book_ref" style="flex:1" >Journal Status:</label>
+							<label class="label-normal" for="status" style="flex:1" >Journal Status:</label>
 							<div class="input-group" style="flex:3">
-								<select v-model="filter.status" name="jlStatus" class="select-jl-status form-control form-control-sm" id="jlStatus">
+								<select v-model="filter.status" name="status" class="select-jl-status form-control form-control-sm" id="jlStatus">
 								<option value="posted" selected>Posted</option>
 									<option value="unposted">Unposted</option>
 								</select>
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="book_ref" style="flex:1" >Book Reference:</label>
+							<label class="label-normal" for="" style="flex:1" >Book Reference:</label>
 							<div class="input-group" style="flex:3">
 								<input type="text" class="form-control form-control-sm">
 							</div>
@@ -94,15 +94,15 @@
 					</div>
 					<div style="display:flex;flex:1;flex-direction:column;">
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="book_ref" style="flex:1" >From:</label>
+							<label class="label-normal" for="from" style="flex:1" >From:</label>
 							<div class="input-group" style="flex:3">
-								<input v-model="filter.from" type="date" value="{{request('from')}}" class="form-control form-control-sm">
+								<input v-model="filter.from" name="from" type="date" value="{{request('from')}}" class="form-control form-control-sm">
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="book_ref" style="flex:1" >To:</label>
+							<label class="label-normal" for="to" style="flex:1" >To:</label>
 							<div class="input-group" style="flex:3">
-								<input  v-model="filter.to" type="date" value="{{request('to')}}" class="form-control form-control-sm">
+								<input  v-model="filter.to" name="to" type="date" value="{{request('to')}}" class="form-control form-control-sm">
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center;justify-content:right;">
@@ -285,7 +285,7 @@
 											<tr style="border-bottom:2px solid #000;">
 												<td><b>{{$jl['date']}}</b></td>
 												<td>{{$jl['reference']}}</td>
-												<td>Advances</td>
+												<td>{{$jl['source']}}</td>
 												<td colspan="3">{{$jl['reference_name']}}</td>
 											</tr>
 												@foreach ($jl['details'] as $jld)
@@ -294,7 +294,7 @@
 													<td></td>
 													<td>{{$jld['account']}}</td>
 													<td>{{$jld['title']}}</td>
-													<td>{{$jld['account']}}</td>
+													<td>{{$jld['subsidiary']}}</td>
 													<td>{{$jld['debit']==0?'':number_format($jld['debit'], 2, '.', ',')}}</td>
 													<td>{{$jld['credit']==0?'':number_format($jld['credit'], 2, '.', ',')}}</td>
 												</tr>
@@ -381,7 +381,7 @@
 			}
 		},
 		mounted(){
-			console.log(this.baseUrl);
+			// console.log(this.data);
 		}
 	});
 </script>
