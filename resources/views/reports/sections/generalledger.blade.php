@@ -251,6 +251,7 @@
                                                 <tr class="totalRow">
                                                     <td></td>
                                                     <td></td>
+													<td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
