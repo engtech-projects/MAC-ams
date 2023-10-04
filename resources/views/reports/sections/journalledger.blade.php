@@ -255,7 +255,7 @@
 												<th>Date</th>
 												<th>Reference</th>
 												<th>Source</th>
-												<th>Reference</th>
+												<th>Reference Name</th>
 												<th></th>
 												<th></th>
 											</tr>
