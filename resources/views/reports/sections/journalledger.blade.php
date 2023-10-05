@@ -88,7 +88,7 @@
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="" style="flex:1" >Book Reference:</label>
 							<div class="input-group" style="flex:3">
-								<input type="text" class="form-control form-control-sm">
+								<input v-model="filter.journal_no" name="journal_no" value="{{request('journal_no')}}" type="text" class="form-control form-control-sm">
 							</div>
 						</div>
 					</div>
@@ -367,14 +367,15 @@
 				to:@json(request('to'))?@json(request('to')):'',
 				branch_id:@json(request('branch_id'))?@json(request('branch_id')):'',
 				status:@json(request('status'))?@json(request('status')):'',
-				book_id:@json(request('book_id'))?@json(request('book_id')):''
+				book_id:@json(request('book_id'))?@json(request('book_id')):'',
+				journal_no:@json(request('journal_no'))?@json(request('journal_no')):''
 			},
 			baseUrl: window.location.protocol + "//" + window.location.host
 		},
 		methods: {
 			search:function(){
 				console.log(this.filter);
-				window.location.href = this.baseUrl + "/reports/journalledger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&branch_id=' +  this.filter.branch_id + '&&status=' +  this.filter.status + '&&book_id=' +  this.filter.book_id;
+				window.location.href = this.baseUrl + "/reports/journalledger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&branch_id=' +  this.filter.branch_id + '&&status=' +  this.filter.status + '&&book_id=' +  this.filter.book_id + '&&journal_no=' +  this.filter.journal_no;
 			},
 			logbook:function(e){
 				console.log(e);

@@ -30,6 +30,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\Accounting;
+use App\Models\OpeningBalance;
 
 class ReportsController extends MainController
 {
@@ -40,15 +42,17 @@ class ReportsController extends MainController
     {
 		 /* ----- start journal ledger ----- */
 
-		 $from = $request->from?$request->from:'';
-		 $to = $request->to?$request->to:'';
-		 $branch_id = $request->branch_id?$request->branch_id:'';
-		 $status = $request->status?$request->status:'';
-		 $book_id = $request->book_id?$request->book_id:'';
+		$accounting = Accounting::getFiscalYear();
+        $from = $request->from ? $request->from : $accounting->start_date;
+        $to = $request->to ? $request->to : $accounting->end_date;
+        $branch_id = $request->branch_id ? $request->branch_id : '';
+        $status = $request->status ? $request->status : 'posted';
+        $book_id = $request->book_id ? $request->book_id: '';
+        $journal_no = $request->journal_no ? $request->journal_no: '';
  
  
 		 // $branch = Branch::find($branch_id);
-		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC');
+		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no);
  
 		 $journal_ledger = [];
  
