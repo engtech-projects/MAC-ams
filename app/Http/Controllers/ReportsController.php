@@ -231,16 +231,20 @@ class ReportsController extends MainController
  */
     public function generalLedger(Request $request)
     {
-
-		$from = $request->from?$request->from:'';
-		$to = $request->to?$request->to:'';
+        $accounting = Accounting::getFiscalYear();
+		$from = $request->from ? $request->from: $accounting->start_date;
+		$to = $request->to ? $request->to: $accounting->end_date;
 		$account_id = !$request->account_id||$request->account_id=='all'?'':$request->account_id;
 		$transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
 		// dd($transactions);
 
+
+        // echo '<pre>';
+        // var_export(Accounts::generalLedger_fetchAccounts()->toArray());
+        // echo '</pre>';
 		$data = [
 			'title' => 'General Ledger',
-			'chartOfAccount' => Accounts::get(),
+			'chartOfAccount' => Accounts::where(['type' => 'L'])->get(),
 			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
 			'transactions' => $transactions,
 		];
