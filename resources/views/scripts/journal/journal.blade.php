@@ -730,17 +730,7 @@
                 data: s_data,
                 dataType: "json",
                 success: function(data) {
-                    $('#journalEntryDetails').DataTable({
-                        pageLength: 10,
-                        "serverSide": true,
-                        "searching": true,
-                        "processing": true,
-                        "ajax": {
-                            url: "{{ route('journal.searchJournalEntry') }}",
-                            type: "GET",
-                            data: data
-                        }
-                    }).destroy();
+                    $('#journalEntryDetails').DataTable().destroy();
                     $('#journalEntryDetailsContent').html('');
 
                     $.each(data, function(k, v) {
