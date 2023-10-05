@@ -256,10 +256,9 @@ class ReportsController extends MainController
     public function trialBalance(Request $request)
     {
 		$accounts = [];
-		if($request->asof){
-			$accounts = Accounts::getTrialBalance($request->asof,TransactionDate::get_date());
-			$accounts = $accounts->toArray();
-		}
+		$fiscalYear = Accounting::getFiscalyear();
+		$accounts = Accounts::getTrialBalance($fiscalYear->start_date,TransactionDate::get_date());
+		$accounts = $accounts->toArray();
 		$currentPage = $request->page?$request->page:1;
 		$perPage = 25;
         $data = [
@@ -274,7 +273,8 @@ class ReportsController extends MainController
 					'path' => url()->current(), // Set the current URL as the base URL for pagination links
 				]
 			),
-            'trialbalanceList' => ''
+            'trialbalanceList' => '',
+			'transactionDate' => TransactionDate::get_date()
         ];
         return view('reports.sections.trialBalance', $data);
     }

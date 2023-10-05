@@ -57,7 +57,7 @@
 								<div class="form-group" style="flex:1">
 									<label class="label-normal" for="book_ref">As of</label>
 									<div class="input-group">
-										<input v-model="filter.asof" type="date" class="form-control form-control-sm rounded-0" name="asof" id="book_ref"  placeholder="Book Reference" required>
+										<input disabled v-model="filter.asof" type="date" class="form-control form-control-sm rounded-0" name="asof" id="book_ref"  placeholder="Book Reference" required>
 									</div>
 								</div>
 							</div>
@@ -140,7 +140,7 @@
 		el: '#app',
 		data: {
 			filter:{
-				asof:@json(request('asof'))?@json(request('asof')):'',
+				asof:@json($transactionDate),
 			},
 			baseUrl: window.location.protocol + "//" + window.location.host
 		},
