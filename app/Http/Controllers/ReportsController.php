@@ -30,6 +30,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\Accounting;
+use App\Models\OpeningBalance;
 
 class ReportsController extends MainController
 {
@@ -40,15 +42,17 @@ class ReportsController extends MainController
     {
 		 /* ----- start journal ledger ----- */
 
-		 $from = $request->from?$request->from:'';
-		 $to = $request->to?$request->to:'';
-		 $branch_id = $request->branch_id?$request->branch_id:'';
-		 $status = $request->status?$request->status:'';
-		 $book_id = $request->book_id?$request->book_id:'';
+		$accounting = Accounting::getFiscalYear();
+        $from = $request->from ? $request->from : $accounting->start_date;
+        $to = $request->to ? $request->to : $accounting->end_date;
+        $branch_id = $request->branch_id ? $request->branch_id : '';
+        $status = $request->status ? $request->status : 'posted';
+        $book_id = $request->book_id ? $request->book_id: '';
+        $journal_no = $request->journal_no ? $request->journal_no: '';
  
  
 		 // $branch = Branch::find($branch_id);
-		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC');
+		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no);
  
 		 $journal_ledger = [];
  
@@ -227,17 +231,20 @@ class ReportsController extends MainController
  */
     public function generalLedger(Request $request)
     {
-
-		$from = $request->from?$request->from:'';
-		$to = $request->to?$request->to:'';
-		$account_id = $request->account_id?$request->account_id:'';
-
+        $accounting = Accounting::getFiscalYear();
+		$from = $request->from ? $request->from: $accounting->start_date;
+		$to = $request->to ? $request->to: $accounting->end_date;
+		$account_id = !$request->account_id||$request->account_id=='all'?'':$request->account_id;
 		$transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
 		// dd($transactions);
 
+
+        // echo '<pre>';
+        // var_export(Accounts::generalLedger_fetchAccounts()->toArray());
+        // echo '</pre>';
 		$data = [
 			'title' => 'General Ledger',
-			'chartOfAccount' => Accounts::get(),
+			'chartOfAccount' => Accounts::where(['type' => 'L'])->get(),
 			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
 			'transactions' => $transactions,
 		];
@@ -249,10 +256,9 @@ class ReportsController extends MainController
     public function trialBalance(Request $request)
     {
 		$accounts = [];
-		if($request->asof){
-			$accounts = Accounts::getTrialBalance($request->asof,TransactionDate::get_date());
-			$accounts = $accounts->toArray();
-		}
+		$fiscalYear = Accounting::getFiscalyear();
+		$accounts = Accounts::getTrialBalance($fiscalYear->start_date,TransactionDate::get_date());
+		$accounts = $accounts->toArray();
 		$currentPage = $request->page?$request->page:1;
 		$perPage = 25;
         $data = [
@@ -267,7 +273,8 @@ class ReportsController extends MainController
 					'path' => url()->current(), // Set the current URL as the base URL for pagination links
 				]
 			),
-            'trialbalanceList' => ''
+            'trialbalanceList' => '',
+			'transactionDate' => TransactionDate::get_date()
         ];
         return view('reports.sections.trialBalance', $data);
     }

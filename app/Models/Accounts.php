@@ -261,8 +261,13 @@ class Accounts extends Model
         ->join('journal_entry_details', 'journal_entry_details.journal_id', '=', 'journal_entry.journal_id')
         ->join('chart_of_accounts', 'journal_entry_details.account_id', '=', 'chart_of_accounts.account_id')
         ->join('subsidiary', 'journal_entry_details.subsidiary_id', '=', 'subsidiary.sub_id')
+        ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
+        ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
         ->leftJoin('opening_balance', 'chart_of_accounts.account_id','=','opening_balance.account_id')
         ->select(
+            'account_category.account_category',
+            'account_category.to_increase',
+            'account_type.account_type',
             'chart_of_accounts.account_id',
             'chart_of_accounts.account_number',
             'chart_of_accounts.account_name',
@@ -277,7 +282,6 @@ class Accounts extends Model
             'journal_entry_details.journal_details_id',
             'journal_entry_details.journal_details_debit',
             'journal_entry_details.journal_details_credit',
-            'journal_entry_details.balance'
         );
 
         if($from != '' && $to != '')
@@ -289,6 +293,9 @@ class Accounts extends Model
 			$journalEntries->where('chart_of_accounts.account_id', $account_id);
 		}
 
-		return $journalEntries->orderBy('chart_of_accounts.account_number', 'ASC')->orderBy('journal_entry.journal_date', 'ASC')->paginate(25);
+		return $journalEntries->orderBy('chart_of_accounts.account_number', 'ASC')
+                                ->orderBy('journal_entry.journal_date', 'ASC')
+                                 ->orderBy('journal_entry_details.journal_id', 'ASC')
+                                ->paginate(50);
 }
 }
