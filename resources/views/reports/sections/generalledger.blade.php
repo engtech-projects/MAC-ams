@@ -199,6 +199,7 @@
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
+                                                            <td></td>
                                                             <td>{{number_format($total_debits,2,",",".")}}</td>
                                                             <td>{{number_format($total_credits,2,",",".")}}</td>
                                                             <td></td>
@@ -263,8 +264,8 @@
 										@endif
 										</tbody>
 									</table>
-									
-									
+
+
 								</div>
 							</div>
 						</div>
