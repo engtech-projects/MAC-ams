@@ -369,26 +369,39 @@
             if (parseFloat($('#debit_balance').text().float()) != 0) {
                 if (_st) {
                     var serialized = $(this).serializeArray();
+
+
                     var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
                     serialized.push({
                         name: 'amount',
                         value: amount
                     })
+                    var entry = {};
+                    serialized.map(function(i) {
+                        entry[i.name] = i.value;
+                    });
+
+                    var details = saveJournalEntryDetails('save');
+
+
+                    var data = Object.assign({
+                        "journal_entry": entry,
+                        "details": details
+                    });
                     $.ajax({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         type: "POST",
                         url: "{{ route('journal.saveJournalEntry') }}",
-                        data: serialized,
+                        data: data,
                         dataType: "json",
                         success: function(data) {
-                            if (data.message == 'save') {
-                                saveJournalEntryDetails(data.id, 'save');
-                            }
+                            toastr.success(data.message);
+                            reload();
                         },
-                        error: function() {
-                            console.log("Error");
+                        error: function(data) {
+                            toastr.error('Error');
                         }
                     });
                 } else {
@@ -1028,7 +1041,7 @@
             $('#JDetailsVoucher').modal('show');
         }
 
-        function saveJournalEntryDetails(jid, type) {
+        function saveJournalEntryDetails(type) {
             var elem = $('#tbl-create-edit-container');
             if (type == 'save') {
                 elem = $('#tbl-create-journal-container');
@@ -1036,40 +1049,21 @@
             var details = [];
             $.each(elem.find('tr'), function(k, v) {
                 var field = $(v).children()
-                console.log($(field[4]))
+                var accountName = $(field[1]).find('.select2').text().split("- ")
                 details.push({
                     journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
                     account_id: $(field[1]).find('.editable-row-item').val(),
+                    journal_details_title: accountName[1],
                     journal_details_debit: ($(field[2]).find('.editable-row-item').text() === '') ?
                         '0' : $(field[2]).find('.editable-row-item').text(),
                     journal_details_credit: ($(field[3]).find('.editable-row-item').text() === '') ?
                         '0' : $(field[3]).find('.editable-row-item').text(),
                     subsidiary_id: $(field[4]).find('.editable-row-item').val(),
                     journal_details_description: $(field[5]).find('.editable-row-item').text(),
-                    journal_id: jid,
                 });
             });
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "POST",
-                url: "{{ route('journal.saveJournalEntryDetails') }}",
-                data: {
-                    items: details,
-                    id: jid
-                },
-                dataType: "json",
-                success: function(data) {
-                    if (data.message == 'save') {
-                        toastr.success('Successfully Save');
-                        reload();
-                    }
-                },
-                error: function(data) {
-                    toastr.error('Error');
-                }
-            });
+            return details;
+
         }
 
         function getBalance() {
