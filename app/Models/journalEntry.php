@@ -22,6 +22,7 @@ class journalEntry extends Model
         'cheque_no',
         'cheque_date',
         'amount',
+        'status',
         'payee',
         'remarks',
     ];
@@ -78,6 +79,7 @@ class journalEntry extends Model
             'source' => $requestEntry["source"],
             'cheque_date' => $requestEntry["cheque_date"],
             'cheque_no' => $requestEntry["cheque_no"],
+            'status' => $requestEntry["status"],
             'payee' => $requestEntry["payee"],
             'remarks' => $requestEntry["remarks"],
             'amount' => $requestEntry["amount"]

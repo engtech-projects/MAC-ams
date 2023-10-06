@@ -516,7 +516,6 @@
                 data: s_data,
                 dataType: "json",
                 success: function(data) {
-                    console.log(data)
                     if (data.message == 'update') {
                         saveJournalEntryDetails(data.id, 'update')
                     }
