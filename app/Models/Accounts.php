@@ -296,6 +296,6 @@ class Accounts extends Model
 		return $journalEntries->orderBy('chart_of_accounts.account_number', 'ASC')
                                 ->orderBy('journal_entry.journal_date', 'ASC')
                                  ->orderBy('journal_entry_details.journal_id', 'ASC')
-                                ->paginate(50);
+                                ->get();
 }
 }

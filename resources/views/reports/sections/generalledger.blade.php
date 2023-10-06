@@ -167,7 +167,7 @@
                                                 $total_credits = 0; $total_debits = 0; $balance = 0;
                                             ?>
 
-                                                @foreach(sortList($transactions, 'journal_no') as $data)
+                                                @foreach($transactions as $data)
 
 
                                                     @if($id == '')
@@ -263,9 +263,7 @@
 										@endif
 										</tbody>
 									</table>
-									<div style="display:flex;justify-content:flex-end;margin-top:32px;">
-										{{ $transactions->appends(request()->query())->links('pagination::bootstrap-4') }}
-									</div>
+									
 									
 								</div>
 							</div>
@@ -284,7 +282,7 @@
 	new Vue({
 		el: '#app',
 		data: {
-			data: @json(sortList($transactions, 'journal_no')),
+			data: @json($transactions),
 			filter:{
 				from:@json(request('from'))?@json(request('from')):'',
 				to:@json(request('to'))?@json(request('to')):'',

@@ -341,9 +341,7 @@
 											@endforeach
 										</tbody>
 									</table>
-									<div style="display:flex;justify-content:flex-end;margin-top:32px;">
-										{{ $paginationLinks->appends(request()->query())->links('pagination::bootstrap-4') }}
-									</div>
+								
 								</div>
 							</div>
 						</div>
