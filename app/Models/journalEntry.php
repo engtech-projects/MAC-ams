@@ -49,9 +49,9 @@ class journalEntry extends Model
         if ($order != '') {
             $query->orderBy('journal_date', $order);
         }
-
-        return $query->limit(1000)->get();
-    }
+      
+		return $query->get();
+	}
 
     public function journalDetails()
     {

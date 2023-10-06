@@ -94,11 +94,6 @@ class ReportsController extends MainController
 			 ];
 		 }
 
-
-			//  echo '<pre>';
-			//  var_export($journal_ledger);
-			//  echo '</pre>';
-
 		 /* ----- end journal ledger ----- */
 
 		$data = [

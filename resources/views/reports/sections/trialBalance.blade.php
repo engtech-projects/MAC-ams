@@ -94,14 +94,14 @@
 
 								</thead>
 								<tbody id="trialBalance">
-									@if(count($paginated)==0)
+									@if(count($trialBalance)==0)
 									<tr><td>No data found.</td></tr>
 									@endif
 									<?php
 										$totaldeb = 0;
 										$totalcred = 0;
 									?>
-									@foreach($paginated as $data)
+									@foreach($trialBalance as $data)
 									<tr>
 										<td class="font-weight-bold">{{$data->account_number}}</td>
 										<td>{{$data->account_name}}</td>
@@ -121,9 +121,7 @@
 									</tr>
 								</tbody>
 							</table>
-							<div style="display:flex;justify-content:flex-end;margin-top:32px;">
-								{{ $paginated->appends(request()->query())->links('pagination::bootstrap-4') }}
-							</div>
+							
 						</div>
 					</div>
 				</div>
