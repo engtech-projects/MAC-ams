@@ -37,7 +37,7 @@ class ReportsController extends MainController
 {
 
 
-    
+
 	public function journalLedger(Request $request)
     {
 		 /* ----- start journal ledger ----- */
@@ -49,25 +49,25 @@ class ReportsController extends MainController
         $status = $request->status ? $request->status : 'posted';
         $book_id = $request->book_id ? $request->book_id: '';
         $journal_no = $request->journal_no ? $request->journal_no: '';
- 
- 
+
+
 		 // $branch = Branch::find($branch_id);
 		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no);
- 
+
 		 $journal_ledger = [];
- 
+
 		 foreach ($journal_entry as $entry) {
- 
+
 			 $entries = [];
- 
+
 			 foreach ($entry->journalDetails as $details) {
-				 
-				 $subsidiary = '';    
- 
+
+				 $subsidiary = '';
+
 				 if( $details->subsidiary_id ) {
 					 $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
 				 }
- 
+
 				 $entries[] = [
 					 'account' => $details->journal_details_account_no,
 					 'title' => $details->journal_details_title,
@@ -76,14 +76,14 @@ class ReportsController extends MainController
 					 'credit' => $details->journal_details_credit
 				 ];
 			 }
- 
+
 			 $entry->reference_name = '';
 			 $branch = Branch::find($entry->branch_id);
- 
+
 			 if( $branch ) {
 				 $entry->reference_name = $branch->branch_name;
 			 }
- 
+
 			 $journal_ledger[] = [
 				 'date' =>  Carbon::parse($entry->journal_date)->format('m/d/Y'),
 				 'reference' => $entry->journal_no,
@@ -93,12 +93,12 @@ class ReportsController extends MainController
 				 'details' => $entries
 			 ];
 		 }
- 
- 
+
+
 			//  echo '<pre>';
 			//  var_export($journal_ledger);
 			//  echo '</pre>';
- 
+
 		 /* ----- end journal ledger ----- */
 
 		$data = [
@@ -324,7 +324,7 @@ class ReportsController extends MainController
 
         return view('reports.sections.cashTransactionBlotter', $data);
     }
-    
+
     public function cashBlotterIndex()
     {
         $data = CashBlotter::fetchCashBlotter();
