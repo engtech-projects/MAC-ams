@@ -46,14 +46,12 @@ class ReportsController extends MainController
         $from = $request->from ? $request->from : $accounting->start_date;
         $to = $request->to ? $request->to : $accounting->end_date;
         $branch_id = $request->branch_id ? $request->branch_id : '';
-        $status = $request->status ? $request->status : 'posted';
+        $status = $request->status ? $request->status : null;
         $book_id = $request->book_id ? $request->book_id: '';
         $journal_no = $request->journal_no ? $request->journal_no: '';
 
-
 		 // $branch = Branch::find($branch_id);
 		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'DESC', $journal_no);
-
 		 $journal_ledger = [];
 
 		 foreach ($journal_entry as $entry) {
@@ -90,9 +88,11 @@ class ReportsController extends MainController
 				 'source' => $entry->source,
 				 'reference_name' => $entry->reference_name,
 				 'remarks' => $entry->remarks,
+                 'status' => $entry->status,
 				 'details' => $entries
 			 ];
 		 }
+
 
 		 /* ----- end journal ledger ----- */
 
