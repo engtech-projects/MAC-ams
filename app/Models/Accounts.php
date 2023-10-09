@@ -141,7 +141,8 @@ class Accounts extends Model
         $data = DB::table('chart_of_accounts')
             ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
             ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
-            ->select('chart_of_accounts.*', 'account_type.account_type', 'account_type.account_type_id', 'account_category.account_category')
+            ->leftJoin('opening_balance', 'chart_of_accounts.account_id', '=', 'opening_balance.account_id')
+            ->select('chart_of_accounts.*', 'opening_balance.opening_balance', 'account_type.account_type', 'account_type.account_type_id', 'account_category.account_category')
             ->where('status', 'active')
             ->where('chart_of_accounts.account_id', $account_id)
             ->first();
