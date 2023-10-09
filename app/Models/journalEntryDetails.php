@@ -22,7 +22,6 @@ class journalEntryDetails extends Model
         'journal_details_debit',
         'journal_details_credit',
         'journal_details_ref_no',
-        'journal_details_description',
         'status',
         'balance'
     ];

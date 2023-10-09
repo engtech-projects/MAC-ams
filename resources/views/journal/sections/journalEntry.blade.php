@@ -186,7 +186,6 @@
 								<th width="150">Debit</th>
 								<th width="150">Credit</th>
 								<th width="200">S/L</th>
-								<th width="200">Description</th>
 								<th class="text-right" width="50">Action</th>
 							</tr>
 						</thead>
@@ -236,8 +235,6 @@
 											?>
 										</select>
 									</td>
-									<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class=" editable-row-item"></a></td>
-
 									<td>
 										<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
 											<span>

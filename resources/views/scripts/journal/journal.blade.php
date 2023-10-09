@@ -115,7 +115,6 @@
 									<td class='editable-table-data' value="" >
 										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
 									</td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${(vv.journal_details_description == null) ? 'no description' : vv.journal_details_description}</label></td>
                                     <td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_debit}</label> </td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_credit}</label> </td>
 								</tr>
@@ -213,7 +212,6 @@
 									<td class='editable-table-data' value="" >
 										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
 									</td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${(vv.journal_details_description == null) ? 'no description' : vv.journal_details_description}</label></td>
                                     <td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_debit}</label> </td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_credit}</label> </td>
 								</tr>
@@ -580,7 +578,6 @@
 										@endforeach
 									</select>
 								</td>
-								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class=" editable-row-item">${(!vv.journal_details_description) ? '' : vv.journal_details_description}</a></td>
 								<td>
 									<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
 										<span>
@@ -678,7 +675,6 @@
 									<td class='editable-table-data' value="" >
 										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
 									</td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${(vv.journal_details_description == null) ? 'no description' : vv.journal_details_description}</label></td>
                                     <td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_debit)}</label> </td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_credit)}</label> </td>
 								</tr>
@@ -837,7 +833,6 @@
      ?>
 				</select>
 			</td>
-			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class="editable-row-item"></a> </td>
             <td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item"></a> </td>
 			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
 			<td>
@@ -900,8 +895,6 @@
      ?>
 				</select>
 			</td>
-			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class="editable-row-item"></a> </td>
-
 			<td>
 				<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
 					<span>
@@ -1058,7 +1051,6 @@
                     journal_details_credit: ($(field[3]).find('.editable-row-item').text() === '') ?
                         '0' : $(field[3]).find('.editable-row-item').text(),
                     subsidiary_id: $(field[4]).find('.editable-row-item').val(),
-                    journal_details_description: $(field[5]).find('.editable-row-item').text(),
                 });
             });
             return details;
@@ -1146,7 +1138,6 @@
             var accountId = formData[0].value;
             var debit = formData[1].value;
             var credit = formData[2].value;
-            var description = formData[3].value;
             // var personId = formData[4].value;
             var personName = $('select[name=person] option:selected').text();
             var personType = $('select[name=person] option:selected').data('type');
@@ -1156,7 +1147,6 @@
 				<td>${accountName}</td>
 				<td class="text-right">${debit}</td>
 				<td class="text-right">${credit}</td>
-				<td>${description}</td>
 				<td>${personName}</td>
 				<td class="text-center"><i class="fa fa-trash-alt fa-xs text-muted remove-items" aria-hidden="true"></i></td>
 			</tr>
