@@ -32,14 +32,44 @@
     .select2 {
         width: 100% !important
     }
+	#to-print {
+		display:none;
+		padding:32px;
+	}
+	@media print {
+		.no-print {
+			display: none;
+		}
+
+		/* Apply custom styles for printed pages */
+		/* body {
+			font-size: 12pt;
+			line-height: 1.5;
+			margin: 0;
+			padding: 0;
+		} */
+
+		/* Add page breaks if needed */
+		.page-break {
+			page-break-before: always;
+		}
+
+		#to-print {
+			display:block;
+		}
+	}
+
 </style>
 
 <!-- Main content -->
-<section class="content">
-  <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+<section class="content" id="app">
+  <div id="to-print">
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda veniam, nihil nesciunt suscipit provident adipisci, natus a nostrum odit non eligendi, ullam earum itaque voluptatum minus expedita quam! Qui, quaerat.</p>
+  </div>
+  <div class="container-fluid no-print" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="journalEntryForm" method="POST">
+			<form id="journalEntryForm" class="no-print" method="POST">
 				@csrf
 					<div class="row">
 						<div class="col-md-8 frm-header">
@@ -172,7 +202,7 @@
 		</div>
 		<div class="co-md-12" style="height:10px;"></div>
 		<div class="col-md-12">
-			<div class="col-md-12 text-right">
+			<div class="col-md-12 text-right no-print">
 				<button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i class="fa fa-plus"></i> Add Details </button>
 			</div>
 			<div class="co-md-12" style="height:10px;"></div>
@@ -282,7 +312,7 @@
   <div class="modal fade" id="JDetailsVoucher" tabindex="2" role="dialog" aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
-			<div class="modal-body"  >
+			<div class="modal-body" id="printContent">
 				<div class="container-fluid ">
 					<div id="ui-view">
 						<div class="card">
@@ -311,8 +341,7 @@
 									</div>
 									<div class="col-md-6">
 										<div class="col-md-12">
-											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_date"></strong></h6>
-
+											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp;<strong id="journal_voucher_date"></strong></h6>
 										</div>
 									</div>
 									<div class="col-md-6">
@@ -367,7 +396,7 @@
 								<div class="row">
 									<div class="col-lg-4 col-sm-5"></div>
 									<div class="col-lg-4 col-sm-5 ml-auto">
-									<table class="table table-clear">
+									<table class="table table-clear" style="padding-right:232px">
 										<tbody>
 										<tr>
 											<td class="left">
@@ -378,6 +407,9 @@
 										</tr>
 										</tbody>
 									</table>
+									<div>
+										<button @click="print" class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
+									</div>
 									</div>
 								</div>
 							</div>
@@ -392,7 +424,30 @@
 </section>
 <!-- /.content -->
 
-
+<script>
+	new Vue({
+		el: '#app',
+		data: {
+			baseUrl: window.location.protocol + "//" + window.location.host
+		},
+		methods: {
+			search:function(){
+				window.location.href = this.baseUrl + "/reports/trialBalance?asof=" + this.filter.asof;
+			},
+			print:function(){
+				var content = document.getElementById('printContent').innerHTML;
+				var toPrint = document.getElementById('to-print');
+				toPrint.innerHTML  = content;
+				setTimeout(()=>{
+					window.print();
+				},500);
+			},
+		},
+		mounted(){
+			// console.log(this.baseUrl);
+		}
+	});
+</script>
 @endsection
 @section('footer-scripts')
   @include('scripts.journal.journal')

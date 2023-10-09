@@ -958,6 +958,43 @@
 		}
 		return false;
 	}
+	// function formatDate(inputDate, outputFormat) {
+	// 	// Parse the input date in "y-m-d" format
+	// 	const parts = inputDate.split('-');
+	// 	const year = parseInt(parts[0]);
+	// 	const month = parseInt(parts[1]) - 1; // Adjust for JavaScript's 0-based month
+	// 	const day = parseInt(parts[2]);
+
+	// 	// Create a Date object
+	// 	const date = new Date(year, month, day);
+
+	// 	// Define a mapping of format tokens to their corresponding date components
+	// 	const formatTokens = {
+	// 		'yyyy': date.getFullYear(),
+	// 		'mm': String(date.getMonth() + 1).padStart(2, '0'),
+	// 		'dd': String(date.getDate()).padStart(2, '0')
+	// 	};
+
+	// 	// Replace format tokens with actual date components
+	// 	const formattedDate = outputFormat.replace(/yyyy|mm|dd/g, match => formatTokens[match]);
+
+	// 	return formattedDate;
+	// }
+
+	function formatDate(inputDate) {
+		const parts = inputDate.split('-');
+		const year = parseInt(parts[0]);
+		const month = parseInt(parts[1]) - 1; // Adjust for JavaScript's 0-based month
+		const day = parseInt(parts[2]);
+
+		const date = new Date(year, month, day);
+
+		const options = { year: 'numeric', month: 'long', day: 'numeric' };
+		const formattedDate = date.toLocaleDateString(undefined, options);
+
+		return formattedDate;
+	}
+
 	function setVoucherData()
 	{
 		// if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
@@ -965,10 +1002,10 @@
 		$('#journal_VoucherContent').html('')
 		$('#journal_voucher_pay').text($('#payee').val())
 		$('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
-		$('#journal_voucher_date').text($('#journal_date').val())
-		$('#journal_voucher_ref_no').text($('#JDetailsVoucher').val())
+		$('#journal_voucher_date').text($('#journal_date').val()?formatDate($('#journal_date').val()):'')
+		$('#journal_voucher_ref_no').text($('#LrefNo').html())
 		$('#journal_voucher_source').text($('#source').val())
-		$('#journal_voucher_particular').text($('#JDetailsVoucher').val())
+		$('#journal_voucher_particular').text($('#remarks').val())
 		$('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g,"")))
 /*         $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US")) */
 
