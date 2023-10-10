@@ -58,9 +58,8 @@ class ReportsController extends MainController
 
 			 $entries = [];
 
-			 foreach ($entry->journalDetails as $details) {
-
-				 $subsidiary = '';
+            foreach ($entry->journalDetails as $details) {
+                $subsidiary = '';
 
 				 if( $details->subsidiary_id ) {
 					 $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
@@ -94,15 +93,25 @@ class ReportsController extends MainController
 		 }
 
 
-		 /* ----- end journal ledger ----- */
 
-		$data = [
-			'title' => 'Journal Ledger',
-			'journalBooks' => JournalBook::getBookWithJournalCount(),
-			'jLedger' => $journal_ledger,
-			'paginationLinks' => $journal_entry
-		];
-		return view('reports.sections.journalledger', $data);
+        $currentPage = $request->page ? $request->page : 1;
+
+        /* ----- end journal ledger ----- */
+        $paginated = $this->paginate($journal_ledger, $currentPage);
+        $data = [
+            'title' => 'Journal Ledger',
+            'journalBooks' => JournalBook::getBookWithJournalCount(),
+            'jLedger' => $paginated,
+            'paginationLinks' => $journal_entry
+        ];
+
+
+        return view('reports.sections.journalledger', $data);
+    }
+
+    public function paginate($items, $currentPage, $perPage = 5, $page = null)
+    {
+        return new LengthAwarePaginator(array_slice($items, ($currentPage - 1) * $perPage, $perPage),count($items), $perPage, $currentPage, ['path' => url()->current()]);
     }
 	// invoice
     public function subsidiaryLedger()

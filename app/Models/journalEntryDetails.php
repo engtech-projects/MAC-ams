@@ -35,7 +35,7 @@ class journalEntryDetails extends Model
     {
         return $this->belongsTo(Subsidiary::class, 'subsidiary_id');
     }
-    public function chartOfAccount()
+    public function account()
     {
         return $this->belongsTo(Accounts::class, 'account_id');
     }

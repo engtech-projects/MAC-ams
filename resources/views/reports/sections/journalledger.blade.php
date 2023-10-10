@@ -341,7 +341,10 @@
 											@endforeach
 										</tbody>
 									</table>
-								
+                                    <div class="d-flex">
+                                        {{ $jLedger->links()}}
+                                        {{-- {!! $generalLedgerAccounts->paginationLinks() !!} --}}
+                                    </div>
 								</div>
 							</div>
 						</div>
