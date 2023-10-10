@@ -1006,7 +1006,7 @@
 		$('#journal_voucher_ref_no').text($('#LrefNo').html())
 		$('#journal_voucher_source').text($('#source').val())
 		$('#journal_voucher_particular').text($('#remarks').val())
-		$('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g,"")))
+		$('#journal_voucher_amount').text(formatCurrency(Number($('#amount').val().replace(/[^0-9\.-]+/g,""))))
 /*         $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US")) */
 
 		$('#journal_voucher_amount_in_words').text(numberToWords(parseFloat(Number($('#amount').val().replace(/[^0-9\.-]+/g,"")))))
@@ -1014,6 +1014,16 @@
 
 		$('#journal_total_debit_voucher').text($('#total_debit').text())
 		$('#journal_total_credit_voucher').text($('#total_credit').text())
+
+		function formatCurrency(number) {
+			// Check if the input is a valid number
+			if (isNaN(number)) {
+				return "Invalid Number";
+			}
+
+			// Use toLocaleString to format the number as currency
+			return number.toLocaleString('en-US');
+		}
 
 
 		$.each($('#tbl-create-journal-container').find('tr'), function(k,v){
@@ -1029,6 +1039,15 @@
 			);
 
 		});
+		$('#journal_VoucherContent').append(`
+			<tr style="border-top:4px dashed black;">
+				<td></td>
+				<td></td>
+				<td><b>TOTAL</b></td>
+				<td>₱ <strong id="journal_total_debit_voucher"></strong></td>
+				<td>₱ <strong id="journal_total_credit_voucher"></strong></td>
+			</tr>
+		`)
 		$('#JDetailsVoucher').modal('show');
 	}
 	function saveJournalEntryDetails(jid, type)
