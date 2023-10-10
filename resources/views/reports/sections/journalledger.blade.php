@@ -131,8 +131,8 @@
 					<!-- Table -->
 					<section class="content">
 						<div class="container-fluid">
-							<div class="row" >
-								<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-10 m-auto">
 									<div id="external_filter_container"></div>
 									<!-- <table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
 										<thead>
@@ -281,7 +281,7 @@
 												<td></td>
 											</tr>
 											@foreach ($jLedger as $jl)
-											<?php $totalDebit = 0; $totalCredit = 0; ?>
+											<?php $totalDebit = 0; $totalCredit = 0; $grandTotal =0; ?>
 											<tr style="border-bottom:2px solid #000;">
 												<td><b>{{$jl['date']}}</b></td>
 												<td>{{$jl['reference']}}</td>
@@ -299,6 +299,7 @@
 													<td>{{$jld['credit']==0?'':number_format($jld['credit'], 2, '.', ',')}}</td>
 												</tr>
 												@endforeach
+                                                <?php $grandTotal+=$totalDebit-$totalCredit ?>
 											<!-- <tr>
 												<td></td>
 												<td>1350</td>
@@ -340,6 +341,13 @@
 											</tr>
 											@endforeach
 										</tbody>
+                                        <tfoot>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="border-top:2px solid #000;border-bottom:2px solid #000;"><b>Grand Total</b></td>
+                                            <td style="border-top:2px solid #000;border-bottom:2px solid #000;"><b>{{number_format($grandTotal, 2, '.', ',') }}</b></td>
+                                        </tfoot>
 									</table>
                                     <div class="d-flex">
                                         {{ $jLedger->links()}}
