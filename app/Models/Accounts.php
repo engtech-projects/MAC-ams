@@ -152,10 +152,28 @@ class Accounts extends Model
     public function edit(Request $request, Accounts $account)
     {
 
-        if ($account->update($request->all())) {
-            return response()->json(array('success' => true, 'message' => 'Account has been updated!'), 200);
+        $message = "Account successfully updated.";
+        $code = 200;
+        try {
+            $account = self::findOrFail($account->account_id);
+            $account->update($request->all());
+            if ($account->openingBalance) {
+                $account->openingBalance->opening_balance = $request->opening_balance;
+                $account->openingBalance->save();
+            } else {
+                $account->openingBalance()->create([
+                    'opening_balance' => $request->opening_balance,
+                    'account_id' => $account->account_id,
+                    'starting_date' => now()
+                ]);
+                $message = "Account successfully created.";
+                $code = 201;
+            }
+        } catch (Exception $e) {
+            return response()->json(array('success' => false, 'error_message' => $e->getMessage(), 'message' => 'Failed on updating Account.!'), 422);
         }
-        return response()->json(array('success' => false, 'message' => 'Something went wrong!'), 200);
+        return response()->json(array('success' => true, 'message' => $message), $code);
+
     }
 
     # function that checks transaction that is linked to a particular account.

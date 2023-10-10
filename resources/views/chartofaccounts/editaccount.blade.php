@@ -93,7 +93,7 @@
       <div><label for="" class="label-normal">Balance</label></div>
       <div class="form-group row">
         <div class="col-sm-4">
-          <input type="text" value="{{ $account->opening_balance }}" class="form-control form-control-sm rounded-0 text-right">
+          <input type="text" value="{{ $account->opening_balance }}" name="opening_balance" class="form-control form-control-sm rounded-0 text-right">
         </div>
       </div>
     </div>
