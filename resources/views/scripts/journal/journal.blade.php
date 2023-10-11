@@ -158,6 +158,11 @@
             return formatter.format(amount)
         }
 
+        function reverseAmountConverter(val) {
+            const covertedNumber = Number(val.replace(/[^0-9.-]+/g, ""));
+            return covertedNumber
+        }
+
 
         $('tbodys .tbl-rows').click(function() {
             var id = $(this).data("id")
@@ -324,17 +329,42 @@
 
 
         $.fn.editable.defaults.mode = 'inline';
-        $('.editable-row-item').editable({
+
+        $('.records').editable({
             type: 'text',
             emptytext: '',
             showbuttons: false,
-            unsavedclass: null,
             toggle: 'manual',
             onblur: 'cancel',
-            inputclass: 'form-control form-control-sm block',
-            success: function(response, newValue) {}
-        });
+            inputclass: 'form-control form-control-sm block input-text',
+            display: function(value) {
+
+                $(this).text(amountConverter(value))
+            }
+        })
+
+        /*          $('.editable-row-item').editable({
+                    type: 'text',
+                    emptytext: '',
+                    showbuttons: false,
+                    unsavedclass: null,
+                    toggle: 'manual',
+                    onblur: 'cancel',
+                    inputclass: 'form-control form-control-sm block input-text',
+                    success: function(newValue) {
+                        var id = $(this).attr('id')
+                        var input = $('.input-text').val();
+                        switch (id) {
+                            case 'debit':
+                                $('a#debit').text(amountConverter(input))
+                        }
+
+                    }
+                }); */
+
+
         $(".editables").on("shown", function(e, editable) {
+
             console.log(editable.input.$input)
         });
 
@@ -796,66 +826,6 @@
             }, 500);
         })
 
-        $(document).on('click', '#edit_add_item', function(e) {
-
-            e.preventDefault()
-
-            var content = `<tr class='editable-table-row'>
-			<td class="acctnu" value="" >
-				<a href="#" class="editable-row-item journal_details_account_no"></a>
-			</td>
-			<td class='editable-table-data' value="" >
-				<select  fieldName="account_id" class="select-account form-control form-control-sm editable-row-item COASelect">
-					<option disabled value="" selected>-Select Account Name-</option>
-					@foreach ($chartOfAccount as $account)
-						<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_name }}</option>
-					@endforeach
-				</select>
-			</td>
-
-			<td class='editable-table-data' value="" >
-				<select  fieldName="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
-					<option disabled value="" selected>-Select S/L-</option>
-					<?php
-     $temp = '';
-     foreach ($subsidiaries as $subsidiary) {
-         if (is_array($subsidiary->toArray()['subsidiary_category']) && $subsidiary->toArray()['subsidiary_category'] > 0) {
-             if ($temp == '') {
-                 $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-                 echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-             } elseif ($temp != $subsidiary->toArray()['subsidiary_category']['sub_cat_name']) {
-                 echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-                 $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-             }
-             echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
-         }
-     }
-     ?>
-				</select>
-			</td>
-            <td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item"></a> </td>
-			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
-			<td>
-				<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
-					<span>
-						<i class="fas fa-trash" aria-hidden="true"></i>
-					</span>
-				</button>
-			</td>
-		</tr>`
-            $('#tbl-create-edit-container').append(content);
-            $('.editable-row-item').editable({
-                type: 'text',
-                emptytext: '',
-                showbuttons: false,
-                unsavedclass: null,
-                toggle: 'manual',
-                onblur: "cancel",
-                inputclass: 'form-control form-control-sm block',
-                success: function(response, newValue) {}
-            });
-        });
-
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
@@ -873,8 +843,8 @@
 					@endforeach
 				</select>
 			</td>
-            <td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item"></a> </td>
-			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
+            <td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class="records editable-row-item"></a> </td>
+			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class="records editable-row-item"></a> </td>
 			<td class='editable-table-data' width="250">
 				<select  fieldName="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
@@ -904,16 +874,18 @@
 			</td>
 		</tr>`
             $('#tbl-create-journal-container').append(content);
-            $('.editable-row-item').editable({
+            $('.records').editable({
                 type: 'text',
                 emptytext: '',
                 showbuttons: false,
-                unsavedclass: null,
                 toggle: 'manual',
-                onblur: "cancel",
-                inputclass: 'form-control form-control-sm block',
-                success: function(response, newValue) {}
-            });
+                onblur: 'cancel',
+                inputclass: 'form-control form-control-sm block input-text',
+                display: function(value) {
+
+                    $(this).text(amountConverter(value))
+                }
+            })
 
             $('.select-account').select2({
                 placeholder: 'Select',
@@ -954,7 +926,8 @@
             if (type == 'debit') {
                 $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
                     var field = $(v).children()
-                    var debitAmount = $(field[2]).find('.editable-row-item').text().float();
+                    let debitAmount = $(field[2]).find('.editable-row-item').text();
+                    debitAmount = reverseAmountConverter(debitAmount);
                     if (Number.isNaN(debitAmount)) {} else {
                         if ($.isNumeric(debitAmount)) {
                             total += debitAmount;
@@ -962,20 +935,12 @@
                     }
                 });
 
-                $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
-                    var field = $(v).children()
-                    var debitAmount = $(field[2]).find('.editable-row-item').text().float();
-                    if (Number.isNaN(debitAmount)) {} else {
-                        if ($.isNumeric(debitAmount)) {
-                            total += debitAmount;
-                        }
-                    }
-                });
                 return total;
             } else {
                 $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
                     var field = $(v).children()
-                    var creditAmount = parseFloat($(field[3]).find('.editable-row-item').text().float());
+                    let creditAmount = $(field[3]).find('.editable-row-item').text()
+                    creditAmount = reverseAmountConverter(creditAmount)
                     if (Number.isNaN(creditAmount)) {} else {
                         if ($.isNumeric(creditAmount)) {
                             total += creditAmount;
@@ -983,15 +948,7 @@
                     }
                 });
 
-                $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
-                    var field = $(v).children()
-                    var creditAmount = parseFloat($(field[3]).find('.editable-row-item').text().float());
-                    if (Number.isNaN(creditAmount)) {} else {
-                        if ($.isNumeric(creditAmount)) {
-                            total += creditAmount;
-                        }
-                    }
-                });
+
                 return total;
             }
             return false;
@@ -1042,14 +999,16 @@
             $.each(elem.find('tr'), function(k, v) {
                 var field = $(v).children()
                 var accountName = $(field[1]).find('.select2').text().split("- ")
+                var debit = ($(field[2]).find('.editable-row-item').text() === '') ?
+                    '0' : $(field[2]).find('.editable-row-item').text()
+                var credit = ($(field[3]).find('.editable-row-item').text() === '') ?
+                    '0' : $(field[3]).find('.editable-row-item').text()
                 details.push({
                     journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
                     account_id: $(field[1]).find('.editable-row-item').val(),
                     journal_details_title: accountName[1],
-                    journal_details_debit: ($(field[2]).find('.editable-row-item').text() === '') ?
-                        '0' : $(field[2]).find('.editable-row-item').text(),
-                    journal_details_credit: ($(field[3]).find('.editable-row-item').text() === '') ?
-                        '0' : $(field[3]).find('.editable-row-item').text(),
+                    journal_details_debit: reverseAmountConverter(debit),
+                    journal_details_credit: reverseAmountConverter(credit),
                     subsidiary_id: $(field[4]).find('.editable-row-item').val(),
                 });
             });

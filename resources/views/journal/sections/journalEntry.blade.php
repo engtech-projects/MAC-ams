@@ -233,12 +233,18 @@
 
 
                                             </td>
-                                            <td class='editable-table-data journalNum' value=""><a href="#"
-                                                    fieldName="journal_details_debit" id="debit"
-                                                    class=" editable-row-item"></a> </td>
-                                            <td class='editable-table-data journalNum' value=""><a href="#"
-                                                    fieldName="journal_details_credit" class=" editable-row-item"></a>
+                                            <td class='editable-table-data journalNum' id="deb" value="">
+                                                <a href="#" fieldName="journal_details_debit" id="debit"
+                                                    class="editable-row-item records">
+                                                </a>
                                             </td>
+
+                                            <td class='editable-table-data journalNum' id="cre" value="">
+                                                <a href="#" fieldName="journal_details_credit" id="credit"
+                                                    class="editable-row-item records">
+                                                </a>
+                                            </td>
+
                                             <td class='editable-table-data' value="">
                                                 <?php
                                                 // echo '<pre>';
