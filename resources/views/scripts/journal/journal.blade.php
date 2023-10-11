@@ -1012,9 +1012,6 @@
 		$('#journal_voucher_amount_in_words').text(numberToWords(parseFloat(Number($('#amount').val().replace(/[^0-9\.-]+/g,"")))))
 
 
-		$('#journal_total_debit_voucher').text($('#total_debit').text())
-		$('#journal_total_credit_voucher').text($('#total_credit').text())
-
 		function formatCurrency(number) {
 			// Check if the input is a valid number
 			if (isNaN(number)) {
@@ -1032,9 +1029,9 @@
 				<tr>
 					<td class="center">${$(field[0]).find('.editable-row-item').text()}</td>
 					<td class="left">${$(field[1]).find('.editable-row-item').find(":selected").text()}</td>
+					<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
 					<td class="left">${$(field[2]).find('.editable-row-item').text()}</td>
 					<td class="center">${$(field[3]).find('.editable-row-item').text()}</td>
-					<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
 				</tr>`
 			);
 
@@ -1048,6 +1045,8 @@
 				<td>₱ <strong id="journal_total_credit_voucher"></strong></td>
 			</tr>
 		`)
+		$('#journal_total_debit_voucher').text($('#total_debit').text())
+		$('#journal_total_credit_voucher').text($('#total_credit').text())
 		$('#JDetailsVoucher').modal('show');
 	}
 	function saveJournalEntryDetails(jid, type)
