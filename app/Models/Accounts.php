@@ -47,6 +47,7 @@ class Accounts extends Model
     {
         DB::beginTransaction();
         try {
+            $accounting = Accounting::getFiscalYear();
             $account = self::create([
                 'account_number' => $data['account_number'],
                 'account_name' => $data['account_name'],
@@ -60,6 +61,7 @@ class Accounts extends Model
             $account->openingBalance()->create([
                 'opening_balance' => $data["opening_balance"],
                 'starting_date' => $data['starting_date'],
+                'accounting_id' => $accounting->accounting_id,
                 'account_id' => $account->account_id,
             ]);
             DB::commit();
