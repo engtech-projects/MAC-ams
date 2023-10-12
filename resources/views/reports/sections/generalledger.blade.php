@@ -145,6 +145,72 @@
 							<div class="row" >
 								<div class="col-md-12">
 									<div id="external_filter_container"></div>
+
+									<table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
+										<thead>
+											<th width="15%">Date</th>
+											<th>Reference</th>
+											<th width="26%">Preference Name</th>
+											<th>Source</th>
+											<th>Cheque Date</th>
+											<th>Cheque No.</th>
+											<th class="text-right">Debit</th>
+											<th class="text-right">Credit</th>
+											<th class="text-right">Balance</th>
+										</thead>
+										<tbody id="generalLedgerTblContainer">
+
+											@foreach($journalItems as $items)
+
+											<tr class="account_name">
+                                                <td  class="font-weight-bold">{{$items['account_number']}} - {{$items['account_name']}}</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-right">{{number_format($items['opening_balance'], 2, ".", ",")}}</td>
+                                            </tr>
+
+                                            	@foreach($items['data'] as $data)
+
+                                            		<tr id="journal">
+                                                     	<td>{{ $data['journal_date'] }}</td>
+		                                                <td>{{ $data['journal_no'] }}</td>
+		                                                <td>{{ $data['sub_name'] }}</td>
+		                                                <td>{{ $data['source'] }}</td>
+		                                                <td>{{ $data['cheque_date'] }}</td>
+		                                                <td>{{ $data['cheque_no'] }}</td>
+		                                                <td class="text-right">{{ $data['debit'] }}</td>
+		                                                <td class="text-right">{{ $data['credit'] }}</td>
+		                                                <td class="text-right">{{ $data['balance'] }}</td>
+                                                    </tr>
+
+                                            	@endforeach
+
+
+											@endforeach
+
+										</tbody>
+
+									</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 									<table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
 										<thead>
 											<th width="15%">Date</th>
