@@ -132,7 +132,7 @@
 					<section class="content">
 						<div class="container-fluid">
 							<div class="row">
-								<div class="col-md-10 m-auto">
+								<div class="col-md-12">
 									<div id="external_filter_container"></div>
 									<!-- <table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
 										<thead>
@@ -252,12 +252,12 @@
 									<table style="table-layout: fixed;" class="table table-bordered" id="journalLedgerTbl">
 										<thead>
 											<tr>
-												<th>Date</th>
-												<th>Reference</th>
-												<th>Source</th>
-												<th>Reference Name</th>
-												<th></th>
-												<th></th>
+												<th width="10%">Date</th>
+												<th width="15%">Reference</th>
+												<th width="20%">Source</th>
+												<th width="20%">Reference Name</th>
+												<th width="15%"></th>
+												<th width="15%"></th>
 											</tr>
 											<tr>
 												<th></th>
@@ -330,8 +330,7 @@
 											</tr>
 											<tr>
 												<td></td>
-												<td colspan="2" style="font-size:16px">{{$jl['remarks']}}</td>
-												<td></td>
+												<td colspan="3" style="font-size:16px">{{$jl['remarks']}}</td>
 												<td></td>
 												<td></td>
 											</tr>
