@@ -68,6 +68,7 @@
       <div><label for="" class="label-normal">Opening Balance</label></div>
       <div class="form-group row">
         <div class="col-sm-4">
+
           <input type="text" name="opening_balance" id="openingbalance" class="form-control form-control-sm rounded-0 text-right" placeholder="0.00">
         </div>
         <label class="col-sm-2 col-form-label label-normal text-center">as of</label>
