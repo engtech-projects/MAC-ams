@@ -97,3 +97,23 @@ function checkUserHasAccessModule($type, $moduleName)
 		return false;
 	}
 }
+function sortList($data, $index){
+	// dd($data->toArray()['data']);
+	usort($data->toArray()['data'], function ($a, $b) use ($index) {
+		return customSort($a, $b, $index);
+	});
+	return $data;
+}
+
+function customSort($a, $b, $propertyToCompare) {
+	if($a[$propertyToCompare] && $b[$propertyToCompare]){
+		if ($a[$propertyToCompare] < $b[$propertyToCompare]) {
+			return -1; // $a comes before $b
+		} elseif ($a[$propertyToCompare] > $b[$propertyToCompare]) {
+			return 1; // $a comes after $b
+		} else {
+			return 0; // $a and $b are equal
+		}
+	}
+	return 0;
+}
