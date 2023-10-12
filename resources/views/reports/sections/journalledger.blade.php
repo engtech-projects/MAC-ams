@@ -280,8 +280,9 @@
 												<td></td>
 												<td></td>
 											</tr>
+                                            <?php  $grandTotal =0;  ?>
 											@foreach ($jLedger as $jl)
-											<?php $totalDebit = 0; $totalCredit = 0; $grandTotal =0; ?>
+											<?php $totalDebit = 0; $totalCredit = 0;?>
 											<tr style="border-bottom:2px solid #000;">
 												<td><b>{{$jl['date']}}</b></td>
 												<td>{{$jl['reference']}}</td>
@@ -298,8 +299,11 @@
 													<td>{{$jld['debit']==0?'':number_format($jld['debit'], 2, '.', ',')}}</td>
 													<td>{{$jld['credit']==0?'':number_format($jld['credit'], 2, '.', ',')}}</td>
 												</tr>
+
 												@endforeach
-                                                <?php $grandTotal+=$totalDebit-$totalCredit ?>
+
+
+
 											<!-- <tr>
 												<td></td>
 												<td>1350</td>
@@ -339,7 +343,10 @@
 												<td></td>
 												<td></td>
 											</tr>
+                                            <?php $grandTotal+=$totalDebit; ?>
+
 											@endforeach
+
 										</tbody>
                                         <tfoot>
                                             <td></td>
@@ -349,10 +356,9 @@
                                             <td style="border-top:2px solid #000;border-bottom:2px solid #000;"><b>{{number_format($grandTotal, 2, '.', ',') }}</b></td>
                                         </tfoot>
 									</table>
-                                    <div class="d-flex">
+                                    {{-- <div class="d-flex">
                                         {{ $jLedger->links()}}
-                                        {{-- {!! $generalLedgerAccounts->paginationLinks() !!} --}}
-                                    </div>
+                                    </div> --}}
 								</div>
 							</div>
 						</div>
