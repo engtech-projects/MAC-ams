@@ -93,28 +93,6 @@
 										<option value="2">Nasipit Branch</option>
 									</select>
 
-        .search-custom {
-            display: block;
-            position: absolute;
-            z-index: 999;
-            width: 100%;
-            margin: 0px !important;
-            color: #3d9970 !;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .dataTables_filter {
-            float: right !important;
-        }
-
-        .editable {
-            color: black;
-        }
-
-        .select2 {
-            width: 100% !important
-        }
     </style>
 
     <!-- Main content -->
