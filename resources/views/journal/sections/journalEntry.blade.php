@@ -93,200 +93,110 @@
 										<option value="2">Nasipit Branch</option>
 									</select>
 
-    </style>
-
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
-            <div class="row">
-                <div class="col-md-12">
-                    <form id="journalEntryForm" method="POST">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-8 frm-header">
-                                <h4><b>Journal Entry</b></h4>
-                            </div>
-                            <input type="hidden" name="journal_no" id="journal_no">
-                            <div class="col-md-4 frm-header">
-                                <label class="label-normal" for="date">Journal Date</label>
-                                <div class="input-group">
-                                    <input type="date" class="form-control form-control-sm rounded-0" name="journal_date"
-                                        id="journal_date" placeholder="Journal Date" required>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="branch_id">Branch</label>
-                                        <div class="input-group">
-                                            <select name="branch_id" class="select2 form-control form-control-sm"
-                                                id="branch_id" required>
-                                                <option value="" disabled selected>-Select Branch-</option>
-                                                <option value="1">Butuan CIty Branch</option>
-                                                <option value="2">Nasipit Branch</option>
-                                            </select>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="">Book Reference</label>
-                                        <div class="input-group">
-                                            <select name="book_id" class="select2 form-control form-control-sm"
-                                                id="book_id" required>
-                                                <option value="" disabled selected>-Select Book References-</option>
-                                                @foreach ($journalBooks as $journalBook)
-                                                    <option value="{{ $journalBook->book_id }}"
-                                                        _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
-                                                        book-src="{{ $journalBook->book_src }}">
-                                                        {{ $journalBook->book_code }} - {{ $journalBook->book_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="">Reference No.</label>
-                                        <div class="input-group">
-                                            <label class="label-normal" id="LrefNo"></label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="source">Source</label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm rounded-0"
-                                                name="source" id="source" placeholder="Source" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="cheque_no">Cheque No</label>
-                                        <div class="input-group">
-                                            <input type="Number" class="form-control form-control-sm rounded-0"
-                                                name="cheque_no" id="cheque_no" placeholder="Cheque No">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="cheque_date">Cheque Date</label>
-                                        <div class="input-group">
-                                            <input type="date" class="form-control form-control-sm rounded-0"
-                                                name="cheque_date" id="cheque_date" placeholder="Cheque Date">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="status">Status</label>
-                                        <div class="input-group">
-                                            <select name="status" class="select2 form-control form-control-sm"
-                                                id="status" required>
-                                                <option value="unposted" selected>Unposted</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="amount">Amount</label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm rounded-0"
-                                                name="amount_cur" id="amount" step="any" placeholder="Amount"
-                                                required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="payee">Payee</label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm rounded-0"
-                                                name="payee" id="payee" placeholder="Payee" required>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-4 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="remarks">Remarks (<font style="color:red;">
-                                                Separate with double colon (::) for the next remarks</font>)</label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-sm rounded-0"
-                                                name="remarks" id="remarks" placeholder="Remarks" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button id="btn_submit" style="display:none;"> SAVE</button>
-                    </form>
-                </div>
-                <div class="co-md-12" style="height:10px;"></div>
-                <div class="col-md-12">
-                    <div class="col-md-12 text-right">
-                        <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i class="fa fa-plus"></i>
-                            Add Details </button>
-                    </div>
-                    <div class="co-md-12" style="height:10px;"></div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <table class="table table-bordered table-sm" id="tbl-create-journal">
-                                <thead>
-                                    <tr class="text-center">
-                                        <th>Account #</th>
-                                        <th>Account Name</th>
-                                        <th>Debit</th=>
-                                        <th>Credit</th>
-                                        <th>S/L</th>
-                                        <th class="text-right" width="50">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbl-create-journal-container">
-                                    @for ($i = 0; $i < 1; $i++)
-                                        <tr class='editable-table-row'>
-                                            <td class="acctnu" value="">
-                                                <a href="#"
-                                                    class="editable-row-item journal_details_account_no"></a>
-                                            </td>
-                                            <td class='editable-table-data'>
-                                                <select fieldName="account_id"
-                                                    class="select-account form-control editable-row-item form-control-sm COASelect">
-                                                    <option disabled value="" selected>-Select Account Name-</option>
-                                                    @foreach ($chartOfAccount as $account)
-                                                        <option value="{{ $account->account_id }}"
-                                                            acct-num="{{ $account->account_number }}">
-                                                            {{ $account->account_number }}<span> - </span>
-                                                            {{ $account->account_name }}</span></option>
-                                                    @endforeach
-                                                </select>
+
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="cheque_no">Cheque No</label>
+									<div class="input-group">
+										<input type="Number" class="form-control form-control-sm rounded-0" name="cheque_no" id="cheque_no"  placeholder="Cheque No">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="cheque_date">Cheque Date</label>
+									<div class="input-group">
+										<input type="date" class="form-control form-control-sm rounded-0" name="cheque_date" id="cheque_date"  placeholder="Cheque Date">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="status">Status</label>
+									<div class="input-group">
+										<select name="status" class="select2 form-control form-control-sm" id="status" required>
+											<option value="unposted" selected>Unposted</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="amount">Amount</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="amount_cur" id="amount"  step="any" placeholder="Amount" required>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="payee">Payee</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="payee" id="payee"  placeholder="Payee" required >
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="remarks">Remarks (<font style="color:red;">Separate with double colon (::) for the next remarks</font>)</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="remarks" id="remarks"  placeholder="Remarks" required>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<button id="btn_submit" style="display:none;" > SAVE</button>
+			</form>
+		</div>
+		<div class="co-md-12" style="height:10px;"></div>
+		<div class="col-md-12">
+			<div class="col-md-12 text-right no-print">
+				<button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i class="fa fa-plus"></i> Add Details </button>
+			</div>
+			<div class="co-md-12" style="height:10px;"></div>
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-bordered table-sm" id="tbl-create-journal">
+						<thead>
+							<tr class="text-center">
+								<th>Account #</th>
+								<th width="200">Account Name</th>
+								<th width="150">Debit</th>
+								<th width="150">Credit</th>
+								<th width="200">S/L</th>
+								<th width="200">Description</th>
+								<th class="text-right" width="50">Action</th>
+							</tr>
+						</thead>
+						<tbody id="tbl-create-journal-container">
+							@for($i = 0; $i < 1; $i++)
+								<tr class='editable-table-row'>
+									<td class="acctnu" value="">
+										<a href="#" class="editable-row-item journal_details_account_no"></a>
+									</td>
+									<td class='editable-table-data' width="300">
+										<select  fieldName="account_id" class="select-account form-control editable-row-item form-control-sm COASelect">
+											<option disabled value="" selected>-Select Account Name-</option>
+											@foreach($chartOfAccount as $account)
+												<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_number}}<span> - </span> {{$account->account_name}}</span></option>
+											@endforeach
+										</select>
 
 
                                             </td>
@@ -448,49 +358,49 @@
                                                             id="journal_voucher_amount_in_words"
                                                             style="text-transform:capitalize;"></strong></h6>
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="table-responsive-sm" style="padding-top:5px;">
-                                            <table class="table table-striped"
-                                                style="border-top:4px dashed black;border-bottom:4px dashed black;">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">Account</th>
-                                                        <th>Title</th>
-                                                        <th>S/L</th>
-                                                        <th class="center">Debit</th>
-                                                        <th class="right">Credit</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="journal_VoucherContent">
+										</div>
+									</div>
+								</div>
+								<div class="table-responsive-sm" style="padding-top:5px;">
+									<table class="table table-striped" style="border-top:4px dashed black;">
+									<thead>
+										<tr>
+										<th class="center">Account</th>
+										<th>Title</th>
+										<th>S/L</th>
+										<th class="center">Debit</th>
+										<th class="right">Credit</th>
+										</tr>
+									</thead>
+									<tbody id="journal_VoucherContent">
 
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-4 col-sm-5"></div>
-                                            <div class="col-lg-4 col-sm-5 ml-auto">
-                                                <table class="table table-clear">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="left">
-                                                                <strong>TOTAL</strong>
-                                                            </td>
-                                                            <td class="left">₱ <strong
-                                                                    id="journal_total_debit_voucher"></strong></td>
-                                                            <td class="left">₱ <strong
-                                                                    id="journal_total_credit_voucher"></strong></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+									</tbody>
+									</table>
+								</div>
+								<div class="row">
+									<div class="col-lg-4 col-sm-5"></div>
+									<div class="col-lg-4 col-sm-5 ml-auto">
+									<!-- <table class="table table-clear" style="padding-right:232px">
+										<tbody>
+										<tr>
+											<td class="left">
+											<strong>TOTAL</strong>
+											</td>
+											<td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
+											<td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
+										</tr>
+										</tbody>
+									</table> -->
+									<div>
+										<button @click="print" class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
+									</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
                 </div>
             </div>
