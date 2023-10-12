@@ -10,20 +10,26 @@ class OpeningBalance extends Model
     use HasFactory;
 
     protected $table = 'opening_balance';
-	protected $primaryKey = 'opening_balance_id';
+    protected $primaryKey = 'opening_balance_id';
     public $timestamps = true;
 
     protected $fillable = [
-		'opening_balance',
-		'starting_date',
-		'account_id',
-		'accounting_id'
+        'opening_balance',
+        'starting_date',
+        'account_id',
+        'accounting_id'
     ];
 
+    public function account()
+    {
+        return $this->hasOne(Accounts::class, 'account_id');
+    }
 
-    public static function balance($account_id) {
 
-    	return OpeningBalance::where(['account_id' => $account_id])->get();
+    public static function balance($account_id)
+    {
+
+        return OpeningBalance::where(['account_id' => $account_id])->get();
 
     }
 }

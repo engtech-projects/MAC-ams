@@ -169,7 +169,6 @@
 
                                                 @foreach($transactions as $data)
 
-
                                                     @if($id == '')
                                                     <?php
                                                         $balance = $data->opening_balance;

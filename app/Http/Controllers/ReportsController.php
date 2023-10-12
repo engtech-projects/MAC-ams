@@ -46,23 +46,20 @@ class ReportsController extends MainController
         $from = $request->from ? $request->from : $accounting->start_date;
         $to = $request->to ? $request->to : $accounting->end_date;
         $branch_id = $request->branch_id ? $request->branch_id : '';
-        $status = $request->status ? $request->status : 'posted';
+        $status = $request->status ? $request->status : null;
         $book_id = $request->book_id ? $request->book_id: '';
         $journal_no = $request->journal_no ? $request->journal_no: '';
 
-
 		 // $branch = Branch::find($branch_id);
 		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'DESC', $journal_no);
-
 		 $journal_ledger = [];
 
 		 foreach ($journal_entry as $entry) {
 
 			 $entries = [];
 
-			 foreach ($entry->journalDetails as $details) {
-
-				 $subsidiary = '';
+            foreach ($entry->journalDetails as $details) {
+                $subsidiary = '';
 
 				 if( $details->subsidiary_id ) {
 					 $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
@@ -90,19 +87,32 @@ class ReportsController extends MainController
 				 'source' => $entry->source,
 				 'reference_name' => $entry->reference_name,
 				 'remarks' => $entry->remarks,
+                 'status' => $entry->status,
 				 'details' => $entries
 			 ];
 		 }
 
-		 /* ----- end journal ledger ----- */
 
-		$data = [
-			'title' => 'Journal Ledger',
-			'journalBooks' => JournalBook::getBookWithJournalCount(),
-			'jLedger' => $journal_ledger,
-			'paginationLinks' => $journal_entry
-		];
-		return view('reports.sections.journalledger', $data);
+
+        $currentPage = $request->page ? $request->page : 1;
+
+        /* ----- end journal ledger ----- */
+        $paginated = $this->paginate($journal_ledger, $currentPage);
+        $data = [
+            'title' => 'Journal Ledger',
+            'journalBooks' => JournalBook::getBookWithJournalCount(),
+            'jLedger' => $journal_ledger,
+            'paginated' => $paginated,
+            'paginationLinks' => $journal_entry
+        ];
+
+
+        return view('reports.sections.journalledger', $data);
+    }
+
+    public function paginate($items, $currentPage, $perPage = 5, $page = null)
+    {
+        return new LengthAwarePaginator(array_slice($items, ($currentPage - 1) * $perPage, $perPage),count($items), $perPage, $currentPage, ['path' => url()->current()]);
     }
 	// invoice
     public function subsidiaryLedger()

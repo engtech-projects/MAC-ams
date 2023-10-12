@@ -22,7 +22,6 @@ class journalEntryDetails extends Model
         'journal_details_debit',
         'journal_details_credit',
         'journal_details_ref_no',
-        'journal_details_description',
         'status',
         'balance'
     ];
@@ -36,7 +35,7 @@ class journalEntryDetails extends Model
     {
         return $this->belongsTo(Subsidiary::class, 'subsidiary_id');
     }
-    public function chartOfAccount()
+    public function account()
     {
         return $this->belongsTo(Accounts::class, 'account_id');
     }

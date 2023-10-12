@@ -13,9 +13,9 @@
             @else
               <option value="{{ $accountType->account_type_id }}">{{ ucfirst($accountType->account_type) }}</option>
             @endif
-              
+
           @endforeach
-        </select>              
+        </select>
       </div>
       <div class="form-group">
         <label for="" class="label-normal">Description</label>
@@ -53,7 +53,7 @@
             </div>
           @endif
 
-         
+
         @endforeach
       </div>
     </div>
@@ -89,11 +89,11 @@
           @endforeach
         </select>
       </div>
-       
+
       <div><label for="" class="label-normal">Balance</label></div>
       <div class="form-group row">
         <div class="col-sm-4">
-          <input type="text" class="form-control form-control-sm rounded-0 text-right" disabled>
+          <input type="text" value="{{ $account->opening_balance }}" name="opening_balance" class="form-control form-control-sm rounded-0 text-right">
         </div>
       </div>
     </div>

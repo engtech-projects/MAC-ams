@@ -191,6 +191,7 @@ class AccountsController extends MainController
     }
 
     public function store(Request $request) {
+
     	$account = new Accounts();
     	return $account->store($request->input());
     }

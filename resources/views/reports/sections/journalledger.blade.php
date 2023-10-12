@@ -131,7 +131,7 @@
 					<!-- Table -->
 					<section class="content">
 						<div class="container-fluid">
-							<div class="row" >
+							<div class="row">
 								<div class="col-md-12">
 									<div id="external_filter_container"></div>
 									<!-- <table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
@@ -252,12 +252,12 @@
 									<table style="table-layout: fixed;" class="table table-bordered" id="journalLedgerTbl">
 										<thead>
 											<tr>
-												<th>Date</th>
-												<th>Reference</th>
-												<th>Source</th>
-												<th>Reference Name</th>
-												<th></th>
-												<th></th>
+												<th width="10%">Date</th>
+												<th width="15%">Reference</th>
+												<th width="20%">Source</th>
+												<th width="20%">Reference Name</th>
+												<th width="15%"></th>
+												<th width="15%"></th>
 											</tr>
 											<tr>
 												<th></th>
@@ -280,8 +280,9 @@
 												<td></td>
 												<td></td>
 											</tr>
+                                            <?php  $grandTotal =0;  ?>
 											@foreach ($jLedger as $jl)
-											<?php $totalDebit = 0; $totalCredit = 0; ?>
+											<?php $totalDebit = 0; $totalCredit = 0;?>
 											<tr style="border-bottom:2px solid #000;">
 												<td><b>{{$jl['date']}}</b></td>
 												<td>{{$jl['reference']}}</td>
@@ -298,7 +299,11 @@
 													<td>{{$jld['debit']==0?'':number_format($jld['debit'], 2, '.', ',')}}</td>
 													<td>{{$jld['credit']==0?'':number_format($jld['credit'], 2, '.', ',')}}</td>
 												</tr>
+
 												@endforeach
+
+
+
 											<!-- <tr>
 												<td></td>
 												<td>1350</td>
@@ -325,8 +330,7 @@
 											</tr>
 											<tr>
 												<td></td>
-												<td colspan="2" style="font-size:16px">{{$jl['remarks']}}</td>
-												<td></td>
+												<td colspan="3" style="font-size:16px">{{$jl['remarks']}}</td>
 												<td></td>
 												<td></td>
 											</tr>
@@ -338,10 +342,22 @@
 												<td></td>
 												<td></td>
 											</tr>
+                                            <?php $grandTotal+=$totalDebit; ?>
+
 											@endforeach
+
 										</tbody>
+                                        <tfoot>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="border-top:2px solid #000;border-bottom:2px solid #000;"><b>Grand Total</b></td>
+                                            <td style="border-top:2px solid #000;border-bottom:2px solid #000;"><b>{{number_format($grandTotal, 2, '.', ',') }}</b></td>
+                                        </tfoot>
 									</table>
-								
+                                    {{-- <div class="d-flex">
+                                        {{ $jLedger->links()}}
+                                    </div> --}}
 								</div>
 							</div>
 						</div>
