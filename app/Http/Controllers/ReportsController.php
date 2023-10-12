@@ -318,7 +318,6 @@ class ReportsController extends MainController
         /* return AccountOfficer::leftjoin('branch','branch.branch_id','=','account_officer.branch_id')
         ->where('branch.branch_id','=',1)->get(); */
 
-
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',

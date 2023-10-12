@@ -2,17 +2,96 @@
 
 @section('content')
 
-    <style type="text/css">
-        a {
-            color: black !important;
-            font-style: normal !important;
-        }
+<style type="text/css">
+	a{
+		color:black!important;
+		font-style: normal!important;
+	}
+	.frm-header{
+		margin-bottom:10px;
+		padding-bottom:10px;
+		border-bottom:2px solid #4ec891;
+	}
+	.search-custom{
+		display:block;
+		position:absolute;
+		z-index:999;
+		width:100%;
+		margin:0px!important;
+		color:#3d9970!;
+		font-weight:bold;
+		font-size:14px;
+	}
+	.dataTables_filter{
+		float:right!important;
+	}
+	.editable
+	{
+		color:black;
+	}
+    .select2 {
+        width: 100% !important
+    }
+	#to-print {
+		display:none;
+		padding:32px;
+	}
+	@media print {
+		.no-print {
+			display: none;
+		}
 
-        .frm-header {
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #4ec891;
-        }
+		/* Apply custom styles for printed pages */
+		/* body {
+			font-size: 12pt;
+			line-height: 1.5;
+			margin: 0;
+			padding: 0;
+		} */
+
+		/* Add page breaks if needed */
+		.page-break {
+			page-break-before: always;
+		}
+
+		#to-print {
+			display:block;
+		}
+	}
+
+</style>
+
+<!-- Main content -->
+<section class="content" id="app">
+  <div id="to-print">
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda veniam, nihil nesciunt suscipit provident adipisci, natus a nostrum odit non eligendi, ullam earum itaque voluptatum minus expedita quam! Qui, quaerat.</p>
+  </div>
+  <div class="container-fluid no-print" style="padding:32px;background-color:#fff;min-height:900px;">
+	<div class="row">
+		<div class="col-md-12">
+			<form id="journalEntryForm" class="no-print" method="POST">
+				@csrf
+					<div class="row">
+						<div class="col-md-8 frm-header">
+							<h4 ><b>Journal Entry</b></h4>
+						</div>
+						<input type="hidden" name="journal_no" id="journal_no" >
+						<div class="col-md-4 frm-header">
+							<label class="label-normal" for="date">Journal Date</label>
+							<div class="input-group">
+							<input type="date" class="form-control form-control-sm rounded-0" name="journal_date" id="journal_date"  placeholder="Journal Date" required >
+							</div>
+						</div>
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="branch_id">Branch</label>
+									<div class="input-group">
+									<select name="branch_id" class="select2 form-control form-control-sm" id="branch_id" required>
+										<option value="" disabled selected>-Select Branch-</option>
+										<option value="1">Butuan CIty Branch</option>
+										<option value="2">Nasipit Branch</option>
+									</select>
 
         .search-custom {
             display: block;
@@ -441,7 +520,30 @@
     </section>
     <!-- /.content -->
 
-
+<script>
+	new Vue({
+		el: '#app',
+		data: {
+			baseUrl: window.location.protocol + "//" + window.location.host
+		},
+		methods: {
+			search:function(){
+				window.location.href = this.baseUrl + "/reports/trialBalance?asof=" + this.filter.asof;
+			},
+			print:function(){
+				var content = document.getElementById('printContent').innerHTML;
+				var toPrint = document.getElementById('to-print');
+				toPrint.innerHTML  = content;
+				setTimeout(()=>{
+					window.print();
+				},500);
+			},
+		},
+		mounted(){
+			// console.log(this.baseUrl);
+		}
+	});
+</script>
 @endsection
 @section('footer-scripts')
     @include('scripts.journal.journal')
