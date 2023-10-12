@@ -237,9 +237,9 @@
                                   <td>
                                     <select class="account-officer select-officer form-control form-control-sm rounded-0" name="accountofficer_id" id="accountofficer_id" form="frm-add-account-officer-details">
                                         <option class="default-select" value="" disabled selected>Select-Officer</option>
-                                        {{-- @foreach ($account_officers as $account_officer)
-                                            <option value="{{$account_officer->accountofficer_id}}">{{$account_officer->officer_name." ".$account_officer->officer_lname}}</option>
-                                        @endforeach --}}
+                                         @foreach ($account_officers as $account_officer)
+                                            <option value="{{$account_officer->accountofficer_id}}">{{$account_officer->name}}</option>
+                                        @endforeach
 
                                     </select>
                                   </td>
