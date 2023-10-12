@@ -14,33 +14,37 @@ class JournalBook extends Model
     protected $primaryKey = 'book_id';
 
     protected $fillable = [
-    	'book_code',
-    	'book_name',
-    	'book_src',
-    	'book_ref',
-    	'book_head',
-    	'book_flag',
+        'book_code',
+        'book_name',
+        'book_src',
+        'book_ref',
+        'book_head',
+        'book_flag',
     ];
 
-	public static function getBookWithJournalCount()
-	{
-		return DB::table("journal_book")
-			->leftJoin("journal_entry", function($join){
-				$join->on("journal_book.book_id", "=", "journal_entry.book_id");
-			})
-			->selectRaw("journal_book.*, COUNT(journal_entry.journal_id) as ccount")
-			->groupBy("journal_book.book_id")
-			->get();
-	}
+    public static function getBookWithJournalCount()
+    {
+        return DB::table("journal_book")
+            ->leftJoin("journal_entry", function ($join) {
+                $join->on("journal_book.book_id", "=", "journal_entry.book_id");
+            })
+            ->selectRaw("journal_book.*, COUNT(journal_entry.journal_id) as ccount")
+            ->groupBy("journal_book.book_id")
+            ->get();
+    }
 
-	public function checkBookCode($code,$id)
-	{
-		$data = $this->where('book_code', $code)->Where('book_id',$id)->get();
-		if(count($data) > 0)
-		{
-			return true;
-		}
-		return false;
-	}
+    public function checkBookCode($code, $id)
+    {
+        $data = $this->where('book_code', $code)->Where('book_id', $id)->get();
+        if (count($data) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function journalEntries()
+    {
+        return $this->hasMany(journalEntry::class, 'book_id','book_id');
+    }
 
 }
