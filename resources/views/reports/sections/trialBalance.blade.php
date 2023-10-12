@@ -42,7 +42,7 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form @submit.prevent="search" id="bookJournalForm" method="get">
+			<form id="bookJournalForm" method="get">
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div class="row">
@@ -57,7 +57,7 @@
 								<div class="form-group" style="flex:1">
 									<label class="label-normal" for="book_ref">As of</label>
 									<div class="input-group">
-										<input v-model="filter.asof" type="date" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+										<input disabled v-model="filter.asof" type="date" class="form-control form-control-sm rounded-0" name="asof" id="book_ref"  placeholder="Book Reference" required>
 									</div>
 								</div>
 							</div>
@@ -94,14 +94,14 @@
 
 								</thead>
 								<tbody id="trialBalance">
-									@if(count($paginated)==0)
+									@if(count($trialBalance)==0)
 									<tr><td>No data found.</td></tr>
 									@endif
 									<?php
 										$totaldeb = 0;
 										$totalcred = 0;
 									?>
-									@foreach($paginated as $data)
+									@foreach($trialBalance as $data)
 									<tr>
 										<td class="font-weight-bold">{{$data->account_number}}</td>
 										<td>{{$data->account_name}}</td>
@@ -121,9 +121,7 @@
 									</tr>
 								</tbody>
 							</table>
-							<div style="display:flex;justify-content:flex-end;margin-top:32px;">
-								{{ $paginated->appends(request()->query())->links('pagination::bootstrap-4') }}
-							</div>
+							
 						</div>
 					</div>
 				</div>
@@ -140,7 +138,7 @@
 		el: '#app',
 		data: {
 			filter:{
-				asof:@json(request('asof'))?@json(request('asof')):'',
+				asof:@json($transactionDate),
 			},
 			baseUrl: window.location.protocol + "//" + window.location.host
 		},

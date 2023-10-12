@@ -10,4 +10,9 @@ class Accounting extends Model
     use HasFactory;
 	protected $primaryKey = "accounting_id";
 	protected $table = "accounting";
+
+
+	public static function getFiscalYear() {
+		return Accounting::find(1);
+	}
 }

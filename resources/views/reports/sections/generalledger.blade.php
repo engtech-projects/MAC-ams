@@ -32,7 +32,7 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" @submit.prevent="search" method="post">
+			<form id="" method="get">
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div class="row">
@@ -85,8 +85,8 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">Account Name</label>
 								<div class="input-group">
-									<select name="accountName" v-model="filter.account_id" class="form-control form-control-sm" id="" required>
-										<option value="" selected>-All-</option>
+									<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="" value="{{request('account_id')}}" required>
+										<option value="all" selected>-All-</option>
 										@foreach($chartOfAccount as $data)
 											<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
 										@endforeach
@@ -100,7 +100,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerFrom">From</label>
 								<div class="input-group">
-									<input required v-model="filter.from" value="{{request('from')}}" type="date" class="form-control form-control-sm rounded-0" name="genLedgerFrom" id="genLedgerFrom"  placeholder="Book Reference" required>
+									<input required v-model="filter.from" value="{{request('from')}}" type="date" class="form-control form-control-sm rounded-0" name="from" id="genLedgerFrom"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -110,7 +110,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="genLedgerTo">To</label>
 								<div class="input-group">
-									<input required type="date" v-model="filter.to" value="{{request('to')}}" class="form-control form-control-sm rounded-0" name="genLedgerTo" id="genLedgerTo"  placeholder="Book Reference" required>
+									<input required type="date" v-model="filter.to" value="{{request('to')}}" class="form-control form-control-sm rounded-0" name="to" id="genLedgerTo"  placeholder="Book Reference" required>
 								</div>
 							</div>
 						</div>
@@ -118,7 +118,8 @@
 					</div>
                     <div class="col-md-2 col-xs-12">
                         <div class="box pt-4">
-                            <button @click="search" id="searchledger" class="btn btn-success" type="button">Search</button>
+							<input type="submit" class="btn btn-success" value="Search">
+                            <!-- <button id="searchledger" class="btn btn-success" type="button">Search</button> -->
                         </div>
 
 
@@ -147,6 +148,7 @@
 									<table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
 										<thead>
 											<th width="15%">Date</th>
+											<th>Reference</th>
 											<th width="26%">Preference Name</th>
 											<th>Source</th>
 											<th>Cheque Date</th>
@@ -197,6 +199,7 @@
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
+                                                            <td></td>
                                                             <td>{{number_format($total_debits,2,",",".")}}</td>
                                                             <td>{{number_format($total_credits,2,",",".")}}</td>
                                                             <td></td>
@@ -233,6 +236,7 @@
 
                                                         <tr id="journal">
                                                             <td>{{$data->journal_date}}</td>
+															<td>{{$data->journal_no}}</td>
                                                             <td>{{$data->sub_name}}</td>
                                                             <td>{{$data->source}}</td>
                                                             <td>{{($data->cheque_date == '') ? '/' : $data->cheque_date}}</td>
@@ -248,6 +252,7 @@
                                                 <tr class="totalRow">
                                                     <td></td>
                                                     <td></td>
+													<td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
@@ -259,10 +264,8 @@
 										@endif
 										</tbody>
 									</table>
-									<div style="display:flex;justify-content:flex-end;margin-top:32px;">
-										{{ $transactions->appends(request()->query())->links('pagination::bootstrap-4') }}
-									</div>
-									
+
+
 								</div>
 							</div>
 						</div>
@@ -284,7 +287,7 @@
 			filter:{
 				from:@json(request('from'))?@json(request('from')):'',
 				to:@json(request('to'))?@json(request('to')):'',
-				account_id:@json(request('account_id'))?@json(request('account_id')):''
+				account_id:@json(request('account_id'))?@json(request('account_id')):'all'
 			},
 			baseUrl: window.location.protocol + "//" + window.location.host
 		},
@@ -298,7 +301,11 @@
 			}
 		},
 		mounted(){
-			// console.log(this.data);
+			// for(var i in this.data){
+			// 	if(this.data[i]){
+			// 		console.log(this.data[i]);
+			// 	}
+			// }
 		}
 	});
 </script>
