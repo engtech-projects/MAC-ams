@@ -30,6 +30,14 @@ class journalEntryDetails extends Model
     {
         return $this->belongsTo(journalEntry::class, 'journal_id');
     }
+    public function scopeDebit($query)
+    {
+        return $query->where('journal_details_credit', '=', 0);
+    }
+    public function scopeCredit($query)
+    {
+        return $query->where('journal_details_debit','=',0);
+    }
 
     public function subsidiary()
     {

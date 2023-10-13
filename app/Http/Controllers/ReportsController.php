@@ -317,10 +317,18 @@ class ReportsController extends MainController
     {
         $journalBook = new JournalBook();
 
-        $book = $journalBook->first();
+        $cashReceived = $journalBook->cashReceivedBook()->with(['journalEntries.journalDetails' => function($query) {
+            $query->debit();
+        }])->get(['book_id','book_name','book_ref']);
+
+
+
+        $data = [
+            'cash_received' => $cashReceived,
+        ];
 
         return response()->json([
-            'data' => $book
+            'data' => $data
         ]);
 
         /* return AccountOfficer::leftjoin('branch','branch.branch_id','=','account_officer.branch_id')

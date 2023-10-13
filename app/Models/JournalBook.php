@@ -10,6 +10,12 @@ class JournalBook extends Model
 {
     use HasFactory;
 
+
+    const CASH_RECEIVED_BOOK = [1, 9];
+    const CASH_PAID_BOOK = [6,8];
+
+
+
     protected $table = 'journal_book';
     protected $primaryKey = 'book_id';
 
@@ -33,6 +39,15 @@ class JournalBook extends Model
             ->get();
     }
 
+    public function scopeCashReceivedBook($query)
+    {
+        return $query->whereIn('book_id', self::CASH_RECEIVED_BOOK);
+    }
+    public function scopeCashPaidBook($query)
+    {
+        return $query->whereIn('book_id',self::CASH_PAID_BOOK);
+    }
+
     public function checkBookCode($code, $id)
     {
         $data = $this->where('book_code', $code)->Where('book_id', $id)->get();
@@ -44,7 +59,7 @@ class JournalBook extends Model
 
     public function journalEntries()
     {
-        return $this->hasMany(journalEntry::class, 'book_id','book_id');
+        return $this->hasMany(journalEntry::class, 'book_id', 'book_id');
     }
 
 }
