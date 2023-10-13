@@ -241,17 +241,74 @@ class ReportsController extends MainController
 		$to = $request->to ? $request->to: $accounting->end_date;
 		$account_id = !$request->account_id||$request->account_id=='all'?'':$request->account_id;
 		$transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
-		// dd($transactions);
+		
+        $journalItems = array();
+        foreach ($transactions->toArray() as $key => $value) {
 
+           if( !array_key_exists($value['account_number'], $journalItems) )  {
+                
+                $journalItems[$value['account_number']]['account_id'] = $value['account_id'];
+                $journalItems[$value['account_number']]['account_number'] = $value['account_number'];
+                $journalItems[$value['account_number']]['account_name'] = $value['account_name'];
+                $journalItems[$value['account_number']]['to_increase'] = $value['to_increase'];
+                $journalItems[$value['account_number']]['opening_balance'] = $value['opening_balance'];
+
+                $journalItems[$value['account_number']]['data'][] = [
+                    'sub_name' => $value['sub_name'],
+                    'journal_date' => $value['journal_date'],
+                    'journal_no' => $value['journal_no'],
+                    'source' => $value['source'],
+                    'cheque_no' =>$value['cheque_no'],
+                    'cheque_date' => $value['cheque_date'],
+                    'journal_id' =>$value['journal_id'],
+                    'debit' => $value['journal_details_debit'],
+                    'credit' => $value['journal_details_credit'],
+                ];
+           }else{
+                $journalItems[$value['account_number']]['data'][] = [
+                    'sub_name' => $value['sub_name'],
+                    'journal_date' => $value['journal_date'],
+                    'journal_no' => $value['journal_no'],
+                    'source' => $value['source'],
+                    'cheque_no' =>$value['cheque_no'],
+                    'cheque_date' => $value['cheque_date'],
+                    'journal_id' =>$value['journal_id'],
+                    'debit' => $value['journal_details_debit'],
+                    'credit' => $value['journal_details_credit'],
+                ];
+           }
+        }
+
+        foreach ($journalItems as $key => $entry) {
+
+            $balance = 0;
+            $balance = $entry['opening_balance'];
+
+            foreach ($entry['data'] as $k => $entries) {
+
+                if( $entry['to_increase'] == 'debit' ){
+                    $balance += $entries['debit'];
+                    $balance -= $entries['credit'];
+                }
+
+                if( $entry['to_increase'] == 'credit' ) {
+                    $balance += $entries['credit'];
+                    $balance -= $entries['debit'];
+                }
+
+                $journalItems[$key]['data'][$k]['balance'] = $balance;
+            }
+        }
 
         // echo '<pre>';
-        // var_export(Accounts::generalLedger_fetchAccounts()->toArray());
+        // var_export($journalItems);
         // echo '</pre>';
 		$data = [
 			'title' => 'General Ledger',
 			'chartOfAccount' => Accounts::where(['type' => 'L'])->get(),
 			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
 			'transactions' => $transactions,
+            'journalItems' => $journalItems
 		];
 		return view('reports.sections.generalledger', $data);
 
