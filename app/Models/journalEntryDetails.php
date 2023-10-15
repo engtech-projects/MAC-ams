@@ -9,10 +9,13 @@ use Illuminate\Http\Request;
 class journalEntryDetails extends Model
 {
     use HasFactory;
+
+
     protected $table = 'journal_entry_details';
     protected $primaryKey = 'journal_details_id';
     public $timestamps = false;
 
+    const CASH_ON_HAND_ACC = 3;
     protected $fillable = [
         'journal_id',
         'account_id',
@@ -30,13 +33,18 @@ class journalEntryDetails extends Model
     {
         return $this->belongsTo(journalEntry::class, 'journal_id');
     }
+
     public function scopeDebit($query)
     {
         return $query->where('journal_details_credit', '=', 0);
     }
+    public function scopeCashOnHand($query)
+    {
+        return $query->where('account_id', self::CASH_ON_HAND_ACC);
+    }
     public function scopeCredit($query)
     {
-        return $query->where('journal_details_debit','=',0);
+        return $query->where('journal_details_debit', '=', 0);
     }
 
     public function subsidiary()

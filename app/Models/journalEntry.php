@@ -13,6 +13,9 @@ class journalEntry extends Model
     protected $primaryKey = 'journal_id';
     public $timestamps = true;
 
+    const STATUS_POSTED = 'posted';
+    const CASH_RECEIVED_ACC = [];
+
     protected $fillable = [
         'journal_no',
         'journal_date',
@@ -30,6 +33,11 @@ class journalEntry extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class,'branch_id');
+    }
+
+    public function scopePosted($query)
+    {
+        return $query->where('status',self::STATUS_POSTED);
     }
 
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'DESC', $journal_no = '')

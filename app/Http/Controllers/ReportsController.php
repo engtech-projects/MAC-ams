@@ -27,6 +27,7 @@ use App\Models\JournalBook;
 use App\Models\TransactionDate;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -316,25 +317,55 @@ class ReportsController extends MainController
     public function cashTransactionBlotter(Request $request)
     {
         $journalBook = new JournalBook();
+        $branchId = 1;
+        $books = $journalBook->whereIn('book_id', $journalBook::CASH_BLOTTER_BOOKS)->with([
+            'journalEntries' => function ($query) use ($branchId) {
+                $query->select(['book_id', 'journal_no', 'journal_date', 'branch_id', 'journal_id', 'source', 'cheque_date', 'cheque_no'])->posted()
+                    ->when($branchId, function ($query, $branchId) {
+                        $query->where('branch_id', $branchId);
+                    })->with([
+                            'branch' => function ($query) {
+                                $query->select('branch_id', 'branch_name');
+                            }
+                        ])->whereHas('journalDetails', function ($query) {
+                            $query->where('account_id', 3);
+                        })->with('journalDetails', function ($query) {
+                    $query->select('journal_id', 'account_id', 'journal_details_debit', 'journal_details_credit')->where('account_id', 3);
+                });
+            }
+        ])->get(['book_id', 'book_name', 'book_code', 'book_ref']);
 
-        $cashReceived = $journalBook->cashReceivedBook()->with(['journalEntries.journalDetails' => function($query) {
-            $query->debit();
-        }])->get(['book_id','book_name','book_ref']);
-
-
-
+        $collection = collect($books);
         $data = [
-            'cash_received' => $cashReceived,
+            "cash_received" => $collection->filter(function ($item) {
+                return in_array($item["book_id"], [1, 9]);
+            })->values(),
+            "cash_paid" => $collection->filter(function ($item) {
+                return in_array($item["book_id"], [6, 8]);
+            })->values()
+
         ];
 
-        return response()->json([
-            'data' => $data
-        ]);
+/*         $data["cash_paid"] = collect($data["cash_paid"])->map(function ($cashPaid) {
+            $cashPaid["entries"] = collect($cashPaid["journalEntries"])->map(function ($entry) {
+                if (isset($entry["journalDetails"])) {
 
-        /* return AccountOfficer::leftjoin('branch','branch.branch_id','=','account_officer.branch_id')
+                    return $entry;
+                }
+
+            });
+
+
+            unset($cashPaid["journalEntries"]);
+            return $cashPaid;
+        }); */
+
+
+
+/*         return AccountOfficer::leftjoin('branch','branch.branch_id','=','account_officer.branch_id')
         ->where('branch.branch_id','=',1)->get(); */
 
-        /* $data = [
+        $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
             'cash_blotter' => CashBlotter::fetchCashBlotter(),
@@ -342,7 +373,7 @@ class ReportsController extends MainController
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
 
-        return view('reports.sections.cashTransactionBlotter', $data); */
+        return view('reports.sections.cashTransactionBlotter', $data);
     }
 
     public function cashBlotterIndex()

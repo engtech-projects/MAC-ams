@@ -11,7 +11,7 @@ class JournalBook extends Model
     use HasFactory;
 
 
-    const CASH_RECEIVED_BOOK = [1, 9];
+    const CASH_BLOTTER_BOOKS = [1, 9,6,8];
     const CASH_PAID_BOOK = [6,8];
 
 
