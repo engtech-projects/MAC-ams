@@ -328,43 +328,67 @@ class ReportsController extends MainController
                                 $query->select('branch_id', 'branch_name');
                             }
                         ])->whereHas('journalDetails', function ($query) {
-                            $query->where('account_id', 3);
+                            $query->whereIn('account_id', [Accounts::CASH_ON_HAND_ACC, Accounts::CASH_IN_BANK_BDO_ACC, Accounts::CASH_IN_BANK_MYB_ACC]);
                         })->with('journalDetails', function ($query) {
-                    $query->select('journal_id', 'account_id', 'journal_details_debit', 'journal_details_credit')->whereIn(
-                        'account_id',
-                        [Accounts::CASH_ON_HAND_ACC, Accounts::CASH_IN_BANK_BDO_ACC, Accounts::CASH_IN_BANK_MYB_ACC]
-                    );
+                    $query->select('journal_id', 'account_id', 'journal_details_debit', 'journal_details_credit');
                 });
             }
         ])->get(['book_id', 'book_name', 'book_code', 'book_ref']);
 
         $collection = collect($books);
         $data = [
-            "cash_received" => $collection->filter(function ($cashReceived) {
+            "cash_received" => $collection->filter(function ($item) {
+                return in_array($item["book_id"], [1, 9]);
+            })->map(function ($item) {
+            $cashReceived = collect($item);
+            $cashReceived["journal_entries"] = collect($cashReceived["journal_entries"])->map(function ($entry) {
+                $entry["journal_details"] = collect($entry["journal_details"])->filter(function ($detail) {
+                    return $detail["account_id"] == 3 && $detail["journal_details_credit"] == 0;
+                })->values();
+                return $entry;
+            })->map(function ($entry) {
+                if (count($entry["journal_details"]) > 0) {
+                    return $entry;
+                }
+            })->filter()->values();
+            return $cashReceived;
+        })->values(),
+            /* "cash_received" => $collection->filter(function ($cashReceived) {
                 return in_array($cashReceived["book_id"], [1, 9]);
             })->map(function ($cashReceived) {
             $cashReceived["journal_entries"] = collect($cashReceived["journalEntries"])->map(function ($entry) {
-                $entry["journal_details"] = collect($entry["journalDetails"])->filter(function ($detail) {
+                $entry["journalDetails"] = collect($entry["journalDetails"])->filter(function ($detail) {
                     return $detail["account_id"] == 3 && $detail["journal_details_credit"] == 0;
                 })->all();
-                unset($entry["journalDetails"]);
-                return $entry["journal_entries"];
-            })->all();
+                return $entry;
+            })->values();
             return $cashReceived;
         })->values(),
             "cash_paid" => $collection->filter(function ($cashPaid) {
-                return in_array($cashPaid["book_id"], [6, 8]);
+                return in_array($cashPaid["book_id"], [6,8]);
             })->map(function ($cashPaid) {
             $cashPaid["journal_entries"] = collect($cashPaid["journalEntries"])->map(function ($entry) {
-                $entry["journal_details"] = collect($entry["journalDetails"])->filter(function ($detail) {
+                $entry["details"] = collect($entry["journalDetails"])->filter(function ($detail) {
                     return $detail["account_id"] == 3 && $detail["journal_details_debit"] == 0;
+                })->values()->all();
+                unset($entry["journalDetails"]);
+                return $entry;
+            })->values()->all();
+            return $cashPaid;
+        })->values()->all(),
+            "pos_payments" => $collection->filter(function ($posPayment) {
+                return in_array($posPayment["book_id"], [6, 8]);
+            })->map(function ($posPayment) {
+            $posPayment["journal_entries"] = collect($posPayment["journalEntries"])->map(function ($entry) {
+                $entry["details"] = collect($entry["journalDetails"])->filter(function ($detail) {
+                    return $detail["account_id"] == 177;
                 })->all();
                 unset($entry["journalDetails"]);
                 return $entry["journal_entries"];
             })->all();
-            return $cashPaid;
-        })->values()];
-
+            return $posPayment;
+        })->values(), */
+        ];
         return response()->json([
             'data' => $data
         ]);
