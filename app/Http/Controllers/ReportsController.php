@@ -330,7 +330,7 @@ class ReportsController extends MainController
                         ])->whereHas('journalDetails', function ($query) {
                             $query->whereIn('account_id', [Accounts::CASH_ON_HAND_ACC, Accounts::CASH_IN_BANK_BDO_ACC, Accounts::CASH_IN_BANK_MYB_ACC]);
                         })->with('journalDetails', function ($query) {
-                    $query->select('journal_id', 'account_id', 'journal_details_debit', 'journal_details_credit');
+                    $query->select('journal_id', 'account_id', 'journal_details_debit as cash_in', 'journal_details_credit as cash_out');
                 });
             }
         ])->get(['book_id', 'book_name', 'book_code', 'book_ref']);
@@ -343,7 +343,7 @@ class ReportsController extends MainController
             $cashReceived = collect($item);
             $cashReceived["journal_entries"] = collect($cashReceived["journal_entries"])->map(function ($entry) {
                 $entry["journal_details"] = collect($entry["journal_details"])->filter(function ($detail) {
-                    return $detail["account_id"] == 3 && $detail["journal_details_credit"] == 0;
+                    return $detail["account_id"] == 3 && $detail["cash_out"] == 0;
                 })->values();
                 return $entry;
             })->map(function ($entry) {
