@@ -88,7 +88,7 @@ function checkUserHasAccessModule($type, $moduleName)
 	}else if($type == 'sub-module')
 	{
 		foreach($user['accessibilities'] as $accessibility){
-			
+
 			if($accessibility['subModuleList']['route'] == $moduleName)
 			{
 				return true;
