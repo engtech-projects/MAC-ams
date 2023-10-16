@@ -12,6 +12,7 @@ class JournalBook extends Model
 
 
     const CASH_BLOTTER_BOOKS = [1, 9,6,8];
+    const LOAN_PAYMENTS_BOOK = 9;
     const CASH_PAID_BOOK = [6,8];
 
 

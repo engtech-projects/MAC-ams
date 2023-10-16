@@ -20,6 +20,10 @@ class Accounts extends Model
     public $timestamps = true;
 
 
+    const CASH_ON_HAND_ACC = 3;
+    const CASH_IN_BANK_BDO_ACC = 177;
+    const CASH_IN_BANK_MYB_ACC = 9;
+
     protected $fillable = [
         'account_number',
         'account_name',
