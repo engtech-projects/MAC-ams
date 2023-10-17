@@ -189,7 +189,7 @@
         $('.select-officer').append('<option value="" disabled selected text="Select-Officer">')
         $.ajax({
             type: "get",
-            url: "/reports/cashTransactionBlotter/fetchaccountofficer/"+branch_id,
+            url: "<?= config('app.url') ?>/reports/cashTransactionBlotter/fetchaccountofficer/"+branch_id,
             dataType: "json",
             success: function (response) {
                 var data = response.data
@@ -855,7 +855,8 @@
             searching: true,
             type:"GET",
             ajax:{
-				url:"{{route('reports.cashblotter')}}",
+                url:"<?= config('app.url') ?>/reports/cashTransactionBlotter",
+/* 				url:"{{route('reports.cashblotter')}}", */
             },
             columns:[
                 {data:"branch_code"},
@@ -891,7 +892,7 @@
         })
     }
 
-	// Select for JournalLedger 
+	// Select for JournalLedger
 
 	// $('.select-jl-bybook').select2({
     //     placeholder: 'By Book',
@@ -906,7 +907,7 @@
     //     placeholder: 'Select Subsidiary',
     //     allowClear: true,
     // });
-	
+
 	// $('.select-jl-branch').select2({
     //     placeholder: 'Select Branch',
     //     allowClear: true,
