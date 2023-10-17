@@ -82,7 +82,6 @@
         </div>
 
     </div>
-
 	<div class="row">
         <div class="col-md-12 mt-5">
             <table id="cash-blotter-tbl"  class="table table-sm table-bordered">

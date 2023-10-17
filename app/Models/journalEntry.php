@@ -103,21 +103,21 @@ class journalEntry extends Model
         return $journalEntry;
     }
 
-    public function getCashBlotterEntries($request)
+    public function getCashBlotterEntries($branchId, $collectionId)
     {
-        $date = Carbon::createFromFormat('Y-m-d', '2023-10-12');
-        $branchId = 1;
+
         $books = new JournalBook();
+        $collectionBreakdown = new CollectionBreakdown();
         $books = $books->getCashBlotterBooks();
-        $collectionBreakdown = CollectionBreakdown::getCollectionBreakdownById($request->input('collection_id'));
-        $transactionDate = $collectionBreakdown->transaction_date;
+        $collectionBreakdown = $collectionBreakdown->getCollectionBreakdownById($collectionId);
+        $transactionDate = $collectionBreakdown ? $collectionBreakdown->transaction_date : null;
         $entries = [];
 
         foreach ($books as $bKey => $book) {
             $entries[] = $book->load([
-                'journalEntries' => function ($query) use ($branchId,$transactionDate) {
-                    $query->select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date','journal_date', 'source','journal_no', 'branch_id')
-                        ->whereDate('journal_date','=',$transactionDate)
+                'journalEntries' => function ($query) use ($branchId, $transactionDate) {
+                    $query->select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
+                        ->whereDate('journal_date', '=', $transactionDate)
                         ->posted()
                         ->when($branchId, function ($query, $branchId) {
                             $query->where('branch_id', $branchId);
@@ -140,7 +140,7 @@ class journalEntry extends Model
         $collection = [
             'begining_balance' => [
                 'transaction_date' => $transactionDate,
-                'total' => $collectionBreakdown->total
+                'total' => $collectionBreakdown ? $collectionBreakdown->total : 0
             ],
             'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
