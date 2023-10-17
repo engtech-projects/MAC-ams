@@ -69,7 +69,7 @@ class journalEntry extends Model
 
     public function journalDetails()
     {
-        return $this->hasMany(JournalEntryDetails::class, 'journal_id');
+        return $this->hasMany(journalEntryDetails::class, 'journal_id');
     }
     public function bookDetails()
     {
