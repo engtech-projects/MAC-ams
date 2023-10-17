@@ -318,21 +318,17 @@ class ReportsController extends MainController
     {
 
         $journalEntries = new journalEntry();
-        $data = $journalEntries->getCashBlotterEntries($request);
-        return response()->json([
-            'data' => $data
-        ]);
+        $cashTransaction = $journalEntries->getCashBlotterEntries($request);
 
 
-        /* $data = [
+        $data = [
             'title' => 'Cashier Transaction Blotter',
-            'trialbalanceList' => '',
-            'cash_blotter' => CashBlotter::fetchCashBlotter(),
+            'cash_blotter' => $cashTransaction,
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
 
-        return view('reports.sections.cashTransactionBlotter', $data); */
+        return view('reports.sections.cashTransactionBlotter', $data);
     }
 
     public function cashBlotterIndex()
