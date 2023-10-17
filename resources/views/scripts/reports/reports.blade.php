@@ -875,7 +875,12 @@
                         showCashBlotterUrl = showCashBlotterUrl.replace(':id', cashblotter_id);
                         var action;
                         /* '<button class="mr-1 btn btn-xs btn-warning"><i class="fas fa-xs fa-edit edit-cashblotter" data-title="Cash Transaction Blotter (Edit)" data-remote="'+editCashBlotterUrl+'"></i></button>'+ */
-                        return '<button class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye view-cashblotter" data-title="Cash Transaction Blotter (Preview)" data-remote="'+showCashBlotterUrl+'"></i></button>'+
+                        // return '<button class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye view-cashblotter" data-title="Cash Transaction Blotter (Preview)" data-remote="'+showCashBlotterUrl+'"></i></button>'+
+                        // '<button class="mr-1 btn btn-xs btn-warning" id="update-cashblotter" data-id="'+data.cashblotter_id+'"><i class="fas fa-xs fa-edit"></i></button>'+
+                        // '<button class="mr-1 btn btn-xs btn-danger"><i class="fas fa-xs fa-trash delete-cashblotter"></i></button>'+
+                        // '<button class="mr-1 btn btn-xs btn-primary"><i class="fas fa-xs fa-download download-cashblotter"></i></button>'+
+                        // '<button class="mr-1 btn btn-xs btn-default"><i class="fas fa-xs fa-print print-cashblotter"></i></button>'
+						return '<button class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye" data-toggle="modal" data-target="#cashBlotterPreviewModal"></i></button>'+
                         '<button class="mr-1 btn btn-xs btn-warning" id="update-cashblotter" data-id="'+data.cashblotter_id+'"><i class="fas fa-xs fa-edit"></i></button>'+
                         '<button class="mr-1 btn btn-xs btn-danger"><i class="fas fa-xs fa-trash delete-cashblotter"></i></button>'+
                         '<button class="mr-1 btn btn-xs btn-primary"><i class="fas fa-xs fa-download download-cashblotter"></i></button>'+
