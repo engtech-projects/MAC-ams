@@ -11,9 +11,13 @@ class JournalBook extends Model
     use HasFactory;
 
 
-    const CASH_BLOTTER_BOOKS = [1, 9,6,8];
+    const CASH_BLOTTER_BOOKS = [1, 9, 6, 8];
     const LOAN_PAYMENTS_BOOK = 9;
-    const CASH_PAID_BOOK = [6,8];
+    const CASH_PAID_BOOK = [6, 8];
+    const POS_PAYMENT_BOOK = 9;
+    const CASH_RECEIVED_BOOKS = [1, 9];
+    const BOOK_CREDIT = 'credit';
+    const BOOK_DEBIT = 'debit';
 
 
 
@@ -46,7 +50,7 @@ class JournalBook extends Model
     }
     public function scopeCashPaidBook($query)
     {
-        return $query->whereIn('book_id',self::CASH_PAID_BOOK);
+        return $query->whereIn('book_id', self::CASH_PAID_BOOK);
     }
 
     public function checkBookCode($code, $id)
@@ -61,6 +65,12 @@ class JournalBook extends Model
     public function journalEntries()
     {
         return $this->hasMany(journalEntry::class, 'book_id', 'book_id');
+    }
+
+    public function getCashBlotterBooks()
+    {
+        $books = self::whereIn('book_id', self::CASH_BLOTTER_BOOKS)->get();
+        return $books;
     }
 
 }

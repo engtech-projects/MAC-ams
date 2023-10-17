@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class journalEntry extends Model
 {
@@ -32,12 +33,12 @@ class journalEntry extends Model
 
     public function branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id');
+        return $this->belongsTo(Branch::class, 'branch_id');
     }
 
     public function scopePosted($query)
     {
-        return $query->where('status',self::STATUS_POSTED);
+        return $query->where('status', self::STATUS_POSTED);
     }
 
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'DESC', $journal_no = '')
@@ -101,6 +102,76 @@ class journalEntry extends Model
         $journalEntry->journalDetails()->createMany($requestDetails);
 
         return $journalEntry;
+    }
+
+    public function getCashBlotterEntries($request)
+    {
+        $date = Carbon::createFromFormat('Y-m-d', '2023-10-12');
+        $branchId = 1;
+        $books = new JournalBook();
+        $books = $books->getCashBlotterBooks();
+        $beginningBalance = CashBreakdown::getBeginningBalance($date);
+        $entries = [];
+
+        foreach ($books as $bKey => $book) {
+            $entries[] = $book->load([
+                'journalEntries' => function ($query) use ($branchId) {
+                    $query->select('journal_id', 'book_id', 'status', 'branch_id')
+                        ->posted()
+                        ->when($branchId, function ($query, $branchId) {
+                            $query->where('branch_id', $branchId);
+                        })->with([
+                                'branch' => function ($query) {
+                                    $query->select('branch_id', 'branch_name');
+                                },
+                                'journalDetails' => function ($query) {
+                                    $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')->whereIn('account_id', [
+                                        Accounts::CASH_IN_BANK_BDO_ACC,
+                                        Accounts::CASH_IN_BANK_MYB_ACC,
+                                        Accounts::CASH_ON_HAND_ACC
+                                    ]);
+                                }
+                            ]);
+                }
+            ]);
+        }
+
+        $collection = [
+            'begining_balance' => $beginningBalance,
+            'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
+            'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
+            'pos_payment' => $this->mapCashBlotterEntries($entries, JournalBook::POS_PAYMENT_BOOK, Accounts::CASH_IN_BANK_BDO_ACC, journalBook::BOOK_DEBIT),
+        ];
+        return $collection;
+    }
+    public function mapCashBlotterEntries($entries, $books = [], $account, $type)
+    {
+        $data = collect($entries)->filter(function ($item) use ($books) {
+
+            if (is_array($books)) {
+                return in_array($item["book_id"], $books);
+            } else {
+                return $item["book_id"] == $books;
+            }
+
+        })->map(function ($item) use ($account, $type) {
+            $book = collect($item);
+            $book["journal_entries"] = collect($book["journal_entries"])->map(function ($entry) use ($account, $type) {
+                $entry["journal_details"] = collect($entry["journal_details"])->filter(function ($detail) use ($account, $type) {
+                    if ($type === JournalBook::BOOK_DEBIT) {
+                        return $detail["account_id"] == $account && $detail["cash_out"] == 0;
+                    }
+                    return $detail["account_id"] == $account && $detail["cash_in"] == 0;
+                })->values();
+                return $entry;
+            })->map(function ($entry) {
+                if (count($entry["journal_details"]) > 0) {
+                    return $entry;
+                }
+            })->filter()->values();
+            return $book;
+        })->values();
+        return $data;
     }
 
 }
