@@ -319,6 +319,8 @@ class ReportsController extends MainController
 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
+
+        return response()->json(['data' => $cashTransactionsEntries]);
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
