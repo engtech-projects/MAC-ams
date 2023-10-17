@@ -100,7 +100,6 @@ class journalEntry extends Model
 
         ]);
         $journalEntry->journalDetails()->createMany($requestDetails);
-
         return $journalEntry;
     }
 
@@ -142,7 +141,7 @@ class journalEntry extends Model
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'pos_payment' => $this->mapCashBlotterEntries($entries, JournalBook::POS_PAYMENT_BOOK, Accounts::CASH_IN_BANK_BDO_ACC, journalBook::BOOK_DEBIT),
         ];
-        return $collection;
+        return collect($collection);
     }
     public function mapCashBlotterEntries($entries, $books = [], $account, $type)
     {

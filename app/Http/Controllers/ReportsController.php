@@ -318,12 +318,12 @@ class ReportsController extends MainController
     {
 
         $journalEntries = new journalEntry();
-        $cashTransaction = $journalEntries->getCashBlotterEntries($request);
-
-
+        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
         $data = [
             'title' => 'Cashier Transaction Blotter',
-            'cash_blotter' => $cashTransaction,
+            'trialbalanceList' => '',
+            'cashTransactions' => $cashTransactionsEntries,
+            'cash_blotter' => CashBlotter::fetchCashBlotter(),
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
