@@ -36,11 +36,5 @@ class CashBreakdown extends Model
         $cash_breakdown = CashBreakdown::where('cashblotter_id', '=', $cashblotter_id)->first();
         return $cash_breakdown;
     }
-    public static function getBeginningBalance($transactionDate)
-    {
-        $date = $transactionDate->format('Y-m-d');
-        $beginningBalance = CashBreakdown::whereDate('created_at', '=', $date)->pluck('total_amount')->first();
-        return $beginningBalance;
 
-    }
 }

@@ -69,7 +69,7 @@ class JournalBook extends Model
 
     public function getCashBlotterBooks()
     {
-        $books = self::whereIn('book_id', self::CASH_BLOTTER_BOOKS)->get();
+        $books = self::whereIn('book_id', self::CASH_BLOTTER_BOOKS)->get(['book_id','book_code','book_name']);
         return $books;
     }
 

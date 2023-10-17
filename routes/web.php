@@ -139,6 +139,7 @@ Route::get('reports/chartOfAccounts', [ReportsController::class, 'chartOfAccount
 Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedCheque'])->name('reports.postDatedCheque');
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
+Route::get('reports/showTransactionBlotter', [ReportsController::class, 'showCashTransactionBlotter'])->name('reports.showCashTransactionBlotter');
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
 

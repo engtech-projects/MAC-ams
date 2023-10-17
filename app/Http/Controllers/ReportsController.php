@@ -333,6 +333,10 @@ class ReportsController extends MainController
         return view('reports.sections.cashTransactionBlotter', $data);
     }
 
+    public function showCashTransactionBlotter(Request $request)
+    {
+        return response()->json(['data' => 'tommy']);
+    }
     public function cashBlotterIndex()
     {
         $data = CashBlotter::fetchCashBlotter();

@@ -109,13 +109,13 @@ class journalEntry extends Model
         $branchId = 1;
         $books = new JournalBook();
         $books = $books->getCashBlotterBooks();
-        $beginningBalance = CashBreakdown::getBeginningBalance($date);
+        $beginningBalance = CollectionBreakdown::getCollectionBreakdownById($request->input('collection_id'));
         $entries = [];
 
         foreach ($books as $bKey => $book) {
             $entries[] = $book->load([
                 'journalEntries' => function ($query) use ($branchId) {
-                    $query->select('journal_id', 'book_id', 'status', 'branch_id')
+                    $query->select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'source','journal_no', 'branch_id')
                         ->posted()
                         ->when($branchId, function ($query, $branchId) {
                             $query->where('branch_id', $branchId);
@@ -136,9 +136,12 @@ class journalEntry extends Model
         }
 
         $collection = [
-            'begining_balance' => $beginningBalance,
-            'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
-            'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
+            'begining_balance' => [
+                'transaction_date' => $beginningBalance->transaction_date,
+                'total' => $beginningBalance->total
+            ],
+            'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
+            'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
             'pos_payment' => $this->mapCashBlotterEntries($entries, JournalBook::POS_PAYMENT_BOOK, Accounts::CASH_IN_BANK_BDO_ACC, journalBook::BOOK_DEBIT),
         ];
         return collect($collection);
