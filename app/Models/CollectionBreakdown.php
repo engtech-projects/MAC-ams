@@ -12,7 +12,7 @@ class CollectionBreakdown extends Model
     protected $primaryKey = 'collection_id';
     protected $table = 'collection_breakdown';
 
-    public function getCollectionBreakdownById($id)
+    public static function getCollectionBreakdownById($id)
     {
         $collectionBreakdown = CollectionBreakdown::find($id);
         return $collectionBreakdown;

@@ -103,13 +103,14 @@ class journalEntry extends Model
         return $journalEntry;
     }
 
-    public function getCashBlotterEntries($branchId, $collectionId)
+    public function getCashBlotterEntries($request)
     {
 
         $books = new JournalBook();
         $collectionBreakdown = new CollectionBreakdown();
         $books = $books->getCashBlotterBooks();
-        $collectionBreakdown = $collectionBreakdown->getCollectionBreakdownById($collectionId);
+        $collectionBreakdown = CollectionBreakdown::getCollectionBreakdownById($request->collection_id);
+        $branchId = $request->branch_id;
         $transactionDate = $collectionBreakdown ? $collectionBreakdown->transaction_date : null;
         $entries = [];
 
