@@ -109,13 +109,15 @@ class journalEntry extends Model
         $branchId = 1;
         $books = new JournalBook();
         $books = $books->getCashBlotterBooks();
-        $beginningBalance = CollectionBreakdown::getCollectionBreakdownById($request->input('collection_id'));
+        $collectionBreakdown = CollectionBreakdown::getCollectionBreakdownById($request->input('collection_id'));
+        $transactionDate = $collectionBreakdown->transaction_date;
         $entries = [];
 
         foreach ($books as $bKey => $book) {
             $entries[] = $book->load([
-                'journalEntries' => function ($query) use ($branchId) {
-                    $query->select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'source','journal_no', 'branch_id')
+                'journalEntries' => function ($query) use ($branchId,$transactionDate) {
+                    $query->select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date','journal_date', 'source','journal_no', 'branch_id')
+                        ->whereDate('journal_date','=',$transactionDate)
                         ->posted()
                         ->when($branchId, function ($query, $branchId) {
                             $query->where('branch_id', $branchId);
@@ -137,8 +139,8 @@ class journalEntry extends Model
 
         $collection = [
             'begining_balance' => [
-                'transaction_date' => $beginningBalance->transaction_date,
-                'total' => $beginningBalance->total
+                'transaction_date' => $transactionDate,
+                'total' => $collectionBreakdown->total
             ],
             'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
