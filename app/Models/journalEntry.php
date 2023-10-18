@@ -141,7 +141,7 @@ class journalEntry extends Model
         $collection = [
             'begining_balance' => [
                 'transaction_date' => $transactionDate,
-                'total' => $collectionBreakdown ? $collectionBreakdown->total : 0
+                'total' => $collection ? $collection->total : 0
             ],
             'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
