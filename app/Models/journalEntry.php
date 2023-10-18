@@ -108,7 +108,7 @@ class journalEntry extends Model
 
         $books = new JournalBook();
         $collectionBreakdown = new CollectionBreakdown();
-        $collections = $collectionBreakdown->getCollectionById($id);
+        $collections = $collectionBreakdown->getCollectionBreakdown($id);
         $books = $books->getCashBlotterBooks();
         $prevCollection = $collectionBreakdown->getPreviousCollection($id);
         $branchId = 1;

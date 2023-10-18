@@ -20,7 +20,7 @@ class CollectionBreakdown extends Model
 
     public static function getCollectionById($id)
     {
-        $collection = CollectionBreakdown::with(['accountOfficerCollection'])->find($id);
+        $collection = CollectionBreakdown::with(['accountOfficerCollection'])->where('collection_id', $id)->first();
         return $collection;
     }
     public static function getCollectionBreakdownByBranch($branchId)
@@ -44,6 +44,12 @@ class CollectionBreakdown extends Model
             'transaction_date' => $collection->transaction_date,
             'total' => $previousCollection->total
         ];
+    }
+
+    public function getCollectionBreakdown($id)
+    {
+        $collections = $this->getCollectionById($id);
+        return $collections;
     }
 
 }
