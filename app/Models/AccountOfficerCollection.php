@@ -10,13 +10,14 @@ class AccountOfficerCollection extends Model
     use HasFactory;
 
 
-    protected $table = 'ao_collection';
-    protected $primaryKey = 'aocollection_id';
+    protected $table = 'collection_ao';
+    protected $primaryKey = 'collection_ao_id';
 
     protected $fillable = [
-        'remarks',
-        'total_amount',
-        'accountofficer_id',
-        'cashblotter_id'
+        'collection_id',
+        'representative',
+        'grp',
+        'note',
+        'total'
     ];
 }

@@ -13,9 +13,14 @@ class CollectionBreakdown extends Model
     protected $primaryKey = 'collection_id';
     protected $table = 'collection_breakdown';
 
+    public function accountOfficerCollection()
+    {
+        return $this->hasMany(AccountOfficerCollection::class, 'collection_id');
+    }
+
     public static function getCollectionById($id)
     {
-        $collection = CollectionBreakdown::find($id);
+        $collection = CollectionBreakdown::with(['accountOfficerCollection'])->find($id);
         return $collection;
     }
     public static function getCollectionBreakdownByBranch($branchId)
@@ -40,4 +45,5 @@ class CollectionBreakdown extends Model
             'total' => $previousCollection->total
         ];
     }
+
 }
