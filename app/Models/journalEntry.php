@@ -111,7 +111,7 @@ class journalEntry extends Model
         $books = $books->getCashBlotterBooks();
         $collection = $collectionBreakdown->getPreviousCollection($id);
         $branchId = 1;
-        $transactionDate = $collection ? $collection->transaction_date : null;
+        $transactionDate = $collection ? $collection["transaction_date"] : null;
         $entries = [];
 
         foreach ($books as $bKey => $book) {
@@ -140,8 +140,8 @@ class journalEntry extends Model
 
         $collection = [
             'begining_balance' => [
-                'transaction_date' => $transactionDate,
-                'total' => $collection ? $collection->total : 0
+                'transaction_date' => $collection ? $collection["prev_transaction_date"] : null,
+                'total' => $collection ? $collection["total"] : 0
             ],
             'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
