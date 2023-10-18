@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CollectionBreakdown;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Transactions;
@@ -314,11 +315,34 @@ class ReportsController extends MainController
         return view('reports.sections.cashPosition', $data);
     }
 
-    public function cashTransactionBlotter(Request $request)
+    public function cashTransactionBlotter()
+    {
+        $branchId = 1;
+        return response()->json(
+            [
+                'data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)
+            ]
+        );
+        /* $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
+
+        return response()->json(['data' => $cashTransactionsEntries]);
+        $data = [
+            'title' => 'Cashier Transaction Blotter',
+            'trialbalanceList' => '',
+            'cashTransactions' => $cashTransactionsEntries,
+            'cash_blotter' => CashBlotter::fetchCashBlotter(),
+            'branches' => Branch::fetchBranch(),
+            'account_officers' => AccountOfficer::fetchAccountOfficer(),
+        ];
+
+        return view('reports.sections.cashTransactionBlotter', $data); */
+    }
+
+    public function showCashTransactionBlotter($id)
     {
 
         $journalEntries = new journalEntry();
-        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
+        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id);
 
         return response()->json(['data' => $cashTransactionsEntries]);
         $data = [
@@ -331,11 +355,6 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.cashTransactionBlotter', $data);
-    }
-
-    public function showCashTransactionBlotter(Request $request)
-    {
-        return response()->json(['data' => 'tommy']);
     }
     public function cashBlotterIndex()
     {
