@@ -11,11 +11,13 @@ class JournalBook extends Model
     use HasFactory;
 
 
-    const CASH_BLOTTER_BOOKS = [1, 9, 6, 8];
+    const CASH_BLOTTER_BOOKS = [1, 9, 6, 8,7,4];
     const LOAN_PAYMENTS_BOOK = 9;
-    const CASH_PAID_BOOK = [6, 8];
+    const CASH_PAID_BOOK = [6, 8,7];
     const POS_PAYMENT_BOOK = [9];
     const COLLECTION_DEPOSITS_BOOK = 7;
+    CONST INTER_BRANCH_BOOKS = [9,4];
+    const CASH_RECEIPT_BOOK_BOOK = 4;
     const CASH_RECEIVED_BOOKS = [1, 9];
     const BOOK_CREDIT = 'credit';
     const BOOK_DEBIT = 'debit';

@@ -338,11 +338,11 @@ class ReportsController extends MainController
         return view('reports.sections.cashTransactionBlotter', $data); */
     }
 
-    public function showCashTransactionBlotter($id)
+    public function showCashTransactionBlotter($id,Request $request)
     {
 
         $journalEntries = new journalEntry();
-        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id);
+        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id,$request->branch_id);
 
         return response()->json(['data' => $cashTransactionsEntries]);
         $data = [
