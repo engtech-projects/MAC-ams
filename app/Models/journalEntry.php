@@ -103,7 +103,8 @@ class journalEntry extends Model
         return $journalEntry;
     }
 
-    public function getCashBlotterEntries($id,$branchId)
+
+    public function getCashBlotterEntries($id, $branchId)
     {
 
         $books = new JournalBook();
@@ -167,10 +168,27 @@ class journalEntry extends Model
             'pos_payment' => $this->mapCashBlotterEntries($entries, JournalBook::LOAN_PAYMENTS_BOOK, Accounts::CASH_IN_BANK_BDO_ACC, journalBook::BOOK_DEBIT, 'pos_payment'),
             'check_payment' => $this->mapCashBlotterEntries($entries, JournalBook::POS_PAYMENT_BOOK, Accounts::PAYABLE_CHECK_ACC, journalBook::BOOK_DEBIT, 'check_payment'),
             'pdc_deposit' => $this->mapCashBlotterEntries($entries, JournalBook::COLLECTION_DEPOSITS_BOOK, Accounts::PAYABLE_CHECK_ACC, journalBook::BOOK_CREDIT, 'pdc_deposit'),
-            'inter_branch' => $this->mapCashBlotterEntries($entries, JournalBook::INTER_BRANCH_BOOKS, Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC, null, 'inter_branch'),
+            'interbranch' => $this->getInterBranchEntries($transactionDate),
             'collections' => $collections
         ];
         return collect($collectionEntries);
+    }
+
+    public function getInterBranchEntries($transactionDate)
+    {
+        $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
+            ->whereDate('journal_date', '=', $transactionDate)
+            ->whereIn('book_id', JournalBook::INTER_BRANCH_BOOKS)
+            ->posted()
+            ->with([
+                'journalDetails' => function ($query) {
+                    $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')->whereIn('account_id', [
+                        Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC,
+                    ]);
+                }
+            ])->get();
+
+        return $this->mapCashBlotterEntries($entries, JournalBook::INTER_BRANCH_BOOKS, Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC, null, 'inter_branch');
     }
     public function mapCashBlotterEntries($entries, $books = [], $account, $type, $transaction = null)
     {
