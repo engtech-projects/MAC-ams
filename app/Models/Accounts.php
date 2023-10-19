@@ -23,6 +23,7 @@ class Accounts extends Model
     const CASH_ON_HAND_ACC = 3;
     const CASH_IN_BANK_BDO_ACC = 177;
     const CASH_IN_BANK_MYB_ACC = 9;
+    const PAYABLE_CHECK_ACC = 58;
 
     protected $fillable = [
         'account_number',

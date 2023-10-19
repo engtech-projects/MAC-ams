@@ -127,7 +127,8 @@ class journalEntry extends Model
                         $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')->whereIn('account_id', [
                             Accounts::CASH_IN_BANK_BDO_ACC,
                             Accounts::CASH_IN_BANK_MYB_ACC,
-                            Accounts::CASH_ON_HAND_ACC
+                            Accounts::CASH_ON_HAND_ACC,
+                            Accounts::PAYABLE_CHECK_ACC
                         ]);
                     }
                 ])->get();
@@ -164,7 +165,9 @@ class journalEntry extends Model
             ],
             'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
-            'pos_payment' => $this->mapCashBlotterEntries($entries, JournalBook::POS_PAYMENT_BOOK, Accounts::CASH_IN_BANK_BDO_ACC, journalBook::BOOK_DEBIT, 'pos_payment'),
+            'pos_payment' => $this->mapCashBlotterEntries($entries, JournalBook::LOAN_PAYMENTS_BOOK, Accounts::CASH_IN_BANK_BDO_ACC, journalBook::BOOK_DEBIT, 'pos_payment'),
+            'check_payment' => $this->mapCashBlotterEntries($entries, JournalBook::POS_PAYMENT_BOOK, Accounts::PAYABLE_CHECK_ACC, journalBook::BOOK_DEBIT, 'check_payment'),
+            'pdc_deposit' => $this->mapCashBlotterEntries($entries, JournalBook::COLLECTION_DEPOSITS_BOOK, Accounts::PAYABLE_CHECK_ACC, journalBook::BOOK_CREDIT, 'pdc_deposit'),
             'collections' => $collections
         ];
         return collect($collectionEntries);
@@ -188,8 +191,10 @@ class journalEntry extends Model
                 }
                 return $detail["account_id"] == $account && $detail["cash_in"] == 0;
             })->map(function ($detail) use ($transaction) {
-                if ($transaction === 'pos_payment') {
+                if ($transaction === 'pos_payment' || $transaction == 'check_payment') {
                     $detail["cash_out"] = $detail["cash_in"];
+                }else if($transaction == 'pdc_deposit') {
+                    $detail["cash_in"] = $detail["cash_out"];
                 }
                 return $detail;
             })->filter()->values();
@@ -198,7 +203,7 @@ class journalEntry extends Model
             if (count($entry["journal_details"]) > 0) {
                 return $entry;
             }
-        })->values();
+        })->filter()->values();
         return $data;
     }
 
