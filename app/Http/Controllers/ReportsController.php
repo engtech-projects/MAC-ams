@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CollectionBreakdown;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Transactions;
@@ -27,6 +28,7 @@ use App\Models\JournalBook;
 use App\Models\TransactionDate;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -38,59 +40,59 @@ class ReportsController extends MainController
 
 
 
-	public function journalLedger(Request $request)
+    public function journalLedger(Request $request)
     {
-		 /* ----- start journal ledger ----- */
+        /* ----- start journal ledger ----- */
 
-		$accounting = Accounting::getFiscalYear();
+        $accounting = Accounting::getFiscalYear();
         $from = $request->from ? $request->from : $accounting->start_date;
         $to = $request->to ? $request->to : $accounting->end_date;
         $branch_id = $request->branch_id ? $request->branch_id : '';
         $status = $request->status ? $request->status : null;
-        $book_id = $request->book_id ? $request->book_id: '';
-        $journal_no = $request->journal_no ? $request->journal_no: '';
+        $book_id = $request->book_id ? $request->book_id : '';
+        $journal_no = $request->journal_no ? $request->journal_no : '';
 
-		 // $branch = Branch::find($branch_id);
-		 $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'DESC', $journal_no);
-		 $journal_ledger = [];
+        // $branch = Branch::find($branch_id);
+        $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'DESC', $journal_no);
+        $journal_ledger = [];
 
-		 foreach ($journal_entry as $entry) {
+        foreach ($journal_entry as $entry) {
 
-			 $entries = [];
+            $entries = [];
 
             foreach ($entry->journalDetails as $details) {
                 $subsidiary = '';
 
-				 if( $details->subsidiary_id ) {
-					 $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
-				 }
+                if ($details->subsidiary_id) {
+                    $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
+                }
 
-				 $entries[] = [
-					 'account' => $details->journal_details_account_no,
-					 'title' => $details->journal_details_title,
-					 'subsidiary' => $subsidiary,
-					 'debit' => $details->journal_details_debit,
-					 'credit' => $details->journal_details_credit
-				 ];
-			 }
+                $entries[] = [
+                    'account' => $details->journal_details_account_no,
+                    'title' => $details->journal_details_title,
+                    'subsidiary' => $subsidiary,
+                    'debit' => $details->journal_details_debit,
+                    'credit' => $details->journal_details_credit
+                ];
+            }
 
-			 $entry->reference_name = '';
-			 $branch = Branch::find($entry->branch_id);
+            $entry->reference_name = '';
+            $branch = Branch::find($entry->branch_id);
 
-			 if( $branch ) {
-				 $entry->reference_name = $branch->branch_name;
-			 }
+            if ($branch) {
+                $entry->reference_name = $branch->branch_name;
+            }
 
-			 $journal_ledger[] = [
-				 'date' =>  Carbon::parse($entry->journal_date)->format('m/d/Y'),
-				 'reference' => $entry->journal_no,
-				 'source' => $entry->source,
-				 'reference_name' => $entry->reference_name,
-				 'remarks' => $entry->remarks,
-                 'status' => $entry->status,
-				 'details' => $entries
-			 ];
-		 }
+            $journal_ledger[] = [
+                'date' => Carbon::parse($entry->journal_date)->format('m/d/Y'),
+                'reference' => $entry->journal_no,
+                'source' => $entry->source,
+                'reference_name' => $entry->reference_name,
+                'remarks' => $entry->remarks,
+                'status' => $entry->status,
+                'details' => $entries
+            ];
+        }
 
 
 
@@ -112,9 +114,9 @@ class ReportsController extends MainController
 
     public function paginate($items, $currentPage, $perPage = 5, $page = null)
     {
-        return new LengthAwarePaginator(array_slice($items, ($currentPage - 1) * $perPage, $perPage),count($items), $perPage, $currentPage, ['path' => url()->current()]);
+        return new LengthAwarePaginator(array_slice($items, ($currentPage - 1) * $perPage, $perPage), count($items), $perPage, $currentPage, ['path' => url()->current()]);
     }
-	// invoice
+    // invoice
     public function subsidiaryLedger()
     {
 
@@ -149,7 +151,7 @@ class ReportsController extends MainController
                 return json_encode(['message' => 'save', 'sub_id' => $sub->sub_id]);
             }
         } else {
-            $sub  = Subsidiary::find($request->sub_id);
+            $sub = Subsidiary::find($request->sub_id);
             $sub->sub_cat_id = $request->sub_cat_id;
             $sub->sub_name = $request->sub_name;
             $sub->sub_address = $request->sub_address;
@@ -241,12 +243,12 @@ class ReportsController extends MainController
 		$to = $request->to ? $request->to: $accounting->end_date;
 		$account_id = !$request->account_id||$request->account_id=='all'?'':$request->account_id;
 		$transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
-		
+
         $journalItems = array();
         foreach ($transactions->toArray() as $key => $value) {
 
            if( !array_key_exists($value['account_number'], $journalItems) )  {
-                
+
                 $journalItems[$value['account_number']]['account_id'] = $value['account_id'];
                 $journalItems[$value['account_number']]['account_number'] = $value['account_number'];
                 $journalItems[$value['account_number']]['account_name'] = $value['account_name'];
@@ -317,26 +319,27 @@ class ReportsController extends MainController
 
     public function trialBalance(Request $request)
     {
-		$accounts = [];
-		$fiscalYear = Accounting::getFiscalyear();
-		$accounts = Accounts::getTrialBalance($fiscalYear->start_date,TransactionDate::get_date());
-		$accounts = $accounts->toArray();
-		$currentPage = $request->page?$request->page:1;
-		$perPage = 25;
+        $accounts = [];
+        $fiscalYear = Accounting::getFiscalyear();
+        $accounts = Accounts::getTrialBalance($fiscalYear->start_date, TransactionDate::get_date());
+        $accounts = $accounts->toArray();
+        $currentPage = $request->page ? $request->page : 1;
+        $perPage = 25;
         $data = [
             'title' => 'Subsidiary Ledger',
             'trialBalance' => $accounts,
-			'paginated' => new LengthAwarePaginator(
-				array_slice($accounts, ($currentPage - 1) * $perPage, $perPage),
-				count($accounts),
-				$perPage,
-				$currentPage,
-				[
-					'path' => url()->current(), // Set the current URL as the base URL for pagination links
-				]
-			),
+            'paginated' => new LengthAwarePaginator(
+                array_slice($accounts, ($currentPage - 1) * $perPage, $perPage),
+                count($accounts),
+                $perPage,
+                $currentPage,
+                [
+                    'path' => url()->current(),
+                    // Set the current URL as the base URL for pagination links
+                ]
+            ),
             'trialbalanceList' => '',
-			'transactionDate' => TransactionDate::get_date()
+            'transactionDate' => TransactionDate::get_date()
         ];
         return view('reports.sections.trialBalance', $data);
     }
@@ -371,26 +374,48 @@ class ReportsController extends MainController
 
     public function cashTransactionBlotter()
     {
+        $branchId = 1;
+        return response()->json(
+            [
+                'data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)
+            ]
+        );
+        /* $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
-        /* return AccountOfficer::leftjoin('branch','branch.branch_id','=','account_officer.branch_id')
-        ->where('branch.branch_id','=',1)->get(); */
-
+        return response()->json(['data' => $cashTransactionsEntries]);
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
-            'cash_blotter'  => CashBlotter::fetchCashBlotter(),
+            'cashTransactions' => $cashTransactionsEntries,
+            'cash_blotter' => CashBlotter::fetchCashBlotter(),
             'branches' => Branch::fetchBranch(),
-            'account_officers'      =>      AccountOfficer::fetchAccountOfficer(),
+            'account_officers' => AccountOfficer::fetchAccountOfficer(),
+        ];
+
+        return view('reports.sections.cashTransactionBlotter', $data); */
+    }
+
+    public function showCashTransactionBlotter($id,Request $request)
+    {
+
+        $journalEntries = new journalEntry();
+        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id,$request->branch_id);
+        $data = [
+            'title' => 'Cashier Transaction Blotter',
+            'trialbalanceList' => '',
+            'cashTransactions' => $cashTransactionsEntries,
+            'cash_blotter' => CashBlotter::fetchCashBlotter(),
+            'branches' => Branch::fetchBranch(),
+            'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
 
         return view('reports.sections.cashTransactionBlotter', $data);
     }
-
     public function cashBlotterIndex()
     {
         $data = CashBlotter::fetchCashBlotter();
         return response()->json([
-            'data'      =>      $data
+            'data' => $data
         ]);
     }
 
@@ -398,33 +423,32 @@ class ReportsController extends MainController
     {
         $ao_officer = AccountOfficer::getAccountOfficerByBranchId($id);
         return response()->json([
-            'data'      =>      $ao_officer
+            'data' => $ao_officer
         ], 200);
     }
 
     public function storeCashBlotter(Request $request)
     {
         $cashblotter = new CashBlotter();
-        $cashblotter->transaction_date      =   $request['transaction_date'];
-        $cashblotter->total_collection      =   $request['totalcash_count'];
-        $cashblotter->branch_id             =   $request['branch_id'];
+        $cashblotter->transaction_date = $request['transaction_date'];
+        $cashblotter->total_collection = $request['totalcash_count'];
+        $cashblotter->branch_id = $request['branch_id'];
         $cashblotter->save();
 
 
         $cashblotter_id = $cashblotter->cashblotter_id;
 
-        $ao_collection =  json_decode($request['ao_collection']);
-        $branch_collection  = json_decode($request['branch_collection']);
+        $ao_collection = json_decode($request['ao_collection']);
+        $branch_collection = json_decode($request['branch_collection']);
         $this->storeAoCollection($cashblotter_id, $ao_collection);
         $this->storeBranchCollection($cashblotter_id, $branch_collection);
         $this->storeCashBreakdown($cashblotter_id, $request);
 
 
         return response()->json([
-            'success'       =>      true,
-            'message'       =>      'Cash Transaction Blotter created'
+            'success' => true,
+            'message' => 'Cash Transaction Blotter created'
         ], 201);
-        return response()->json(array('success' => false, 'message' => 'Something went wrong!'), 522);
     }
 
     public function showCashBlotter($id)
@@ -434,27 +458,27 @@ class ReportsController extends MainController
     public function editCashBlotter($id)
     {
         $cashblotter = CashBlotter::fetchCashBlotterById($id);
-        $cash_breakdown =  CashBreakdown::fetchCashBreakdownByCashblotterId($id);
+        $cash_breakdown = CashBreakdown::fetchCashBreakdownByCashblotterId($id);
         $data = [
-            'cashblotter_id'        =>      $id,
-            'cash_blotter'           =>      $cashblotter,
-            'cash_breakdown'         =>      $cash_breakdown,
-            'branches'              =>      Subsidiary::fetchBranch(),
-            'account_officers'      =>      AccountOfficer::fetchAccountOfficer(),
+            'cashblotter_id' => $id,
+            'cash_blotter' => $cashblotter,
+            'cash_breakdown' => $cash_breakdown,
+            'branches' => Subsidiary::fetchBranch(),
+            'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
         if ($cash_breakdown == null) {
             return response()->json([
-                'success'       =>      false,
-                'message'       =>      'No cash breakdown found'
+                'success' => false,
+                'message' => 'No cash breakdown found'
             ], 422);
-        } else if ($cashblotter   ==   null) {
+        } else if ($cashblotter == null) {
             return response()->json([
-                'success'       =>      false,
-                'message'       =>      'No cash blotter found'
+                'success' => false,
+                'message' => 'No cash blotter found'
             ], 422);
         } else {
             return response()->json([
-                'data'      =>      $data
+                'data' => $data
             ], 200);
         }
     }
@@ -464,7 +488,7 @@ class ReportsController extends MainController
     {
         $cashblotter = CashBlotter::findOrFail($id);
         return response()->json([
-            'data'      =>      $cashblotter
+            'data' => $cashblotter
         ]);
     }
 
@@ -476,12 +500,12 @@ class ReportsController extends MainController
         $now = Carbon::now();
         foreach ($ao_collection as $item) {
             $aocollection_data[] = [
-                'remarks'               =>  $item->remarks,
-                'total_amount'          =>  $item->totalamount,
-                'accountofficer_id'     =>  $item->accountofficer_id,
-                'cashblotter_id'        =>  $cashblotter_id,
-                'created_at'            =>  $now,
-                'updated_at'            =>  $now,
+                'remarks' => $item->remarks,
+                'total_amount' => $item->totalamount,
+                'accountofficer_id' => $item->accountofficer_id,
+                'cashblotter_id' => $cashblotter_id,
+                'created_at' => $now,
+                'updated_at' => $now,
 
             ];
         }
@@ -495,11 +519,11 @@ class ReportsController extends MainController
         $now = Carbon::now();
         foreach ($branch_collection as $item) {
             $aocollection_data[] = [
-                'total_amount'          =>  $item->totalamount,
-                'branch_id'             =>  $item->branch_id,
-                'cashblotter_id'        =>  $cashblotter_id,
-                'created_at'            =>  $now,
-                'updated_at'            =>  $now,
+                'total_amount' => $item->totalamount,
+                'branch_id' => $item->branch_id,
+                'cashblotter_id' => $cashblotter_id,
+                'created_at' => $now,
+                'updated_at' => $now,
 
             ];
         }
@@ -511,18 +535,18 @@ class ReportsController extends MainController
     private function storeCashBreakdown($cashblotter_id, $request)
     {
         $cash_breakdown = new CashBreakdown();
-        $cash_breakdown->onethousand_pesos      =       $request['onethousand'];
-        $cash_breakdown->fivehundred_pesos      =       $request['fivehundred'];
-        $cash_breakdown->twohundred_pesos       =       $request['twohundred'];
-        $cash_breakdown->onehundred_pesos       =       $request['onehundred'];
-        $cash_breakdown->fifty_pesos            =       $request['fifty'];
-        $cash_breakdown->twenty_pesos           =       $request['twenty'];
-        $cash_breakdown->ten_pesos              =       $request['ten'];
-        $cash_breakdown->five_pesos             =       $request['five'];
-        $cash_breakdown->one_peso               =       $request['one'];
-        $cash_breakdown->one_centavo            =       $request['centavo'];
-        $cash_breakdown->total_amount           =       $request['totalcash_count'];
-        $cash_breakdown->cashblotter_id         =       $cashblotter_id;
+        $cash_breakdown->onethousand_pesos = $request['onethousand'];
+        $cash_breakdown->fivehundred_pesos = $request['fivehundred'];
+        $cash_breakdown->twohundred_pesos = $request['twohundred'];
+        $cash_breakdown->onehundred_pesos = $request['onehundred'];
+        $cash_breakdown->fifty_pesos = $request['fifty'];
+        $cash_breakdown->twenty_pesos = $request['twenty'];
+        $cash_breakdown->ten_pesos = $request['ten'];
+        $cash_breakdown->five_pesos = $request['five'];
+        $cash_breakdown->one_peso = $request['one'];
+        $cash_breakdown->one_centavo = $request['centavo'];
+        $cash_breakdown->total_amount = $request['totalcash_count'];
+        $cash_breakdown->cashblotter_id = $cashblotter_id;
 
         $cash_breakdown->save();
     }
@@ -557,7 +581,7 @@ class ReportsController extends MainController
             'organizedAccount' => AccountsController::groupByType($accountData),
             'account_category' => AccountCategory::get(),
             'accountTypes' => AccountType::orderBy('account_category_id')->get(),
-            'cashFlows'    => ['investing', 'financing', 'operating']
+            'cashFlows' => ['investing', 'financing', 'operating']
         ];
         return view('reports.sections.chartOfAccounts', $data);
     }
@@ -591,7 +615,16 @@ class ReportsController extends MainController
         }
     }
 
-    public function journalEntry() {
+
+    public function cashBlotter(Request $request)
+    {
+        return response()->json([
+            'data' => $request
+        ]);
+    }
+
+    public function journalEntry()
+    {
 
 
         return 'journal entry';

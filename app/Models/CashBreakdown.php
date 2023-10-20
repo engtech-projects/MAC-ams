@@ -26,9 +26,15 @@ class CashBreakdown extends Model
         'total_amount',
         'cashblotter_id'
     ];
+    protected $casts = [
+        'created_at'  => 'date:Y-m-d',
 
-    public static function fetchCashBreakdownByCashblotterId($cashblotter_id) {
-        $cash_breakdown =  CashBreakdown::where('cashblotter_id','=',$cashblotter_id)->first();
+    ];
+
+    public static function fetchCashBreakdownByCashblotterId($cashblotter_id)
+    {
+        $cash_breakdown = CashBreakdown::where('cashblotter_id', '=', $cashblotter_id)->first();
         return $cash_breakdown;
     }
+
 }

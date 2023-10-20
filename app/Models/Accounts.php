@@ -20,6 +20,12 @@ class Accounts extends Model
     public $timestamps = true;
 
 
+    const CASH_ON_HAND_ACC = 3;
+    const CASH_IN_BANK_BDO_ACC = 177;
+    const CASH_IN_BANK_MYB_ACC = 9;
+    const PAYABLE_CHECK_ACC = 58;
+    const DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC = 67;
+
     protected $fillable = [
         'account_number',
         'account_name',

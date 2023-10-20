@@ -103,6 +103,471 @@
 
   {{-- MODAL --}}
 
+  <div class="modal fade" id="cashBlotterPreviewModal" tabindex="2" role="dialog"
+            aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container-fluid ">
+                            <div id="ui-view">
+                                <div class="card">
+                                    <div class="card-body" id="journal_toPrintVouch">
+                                        <link rel="stylesheet"
+                                            href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
+                                        <link rel="stylesheet"
+                                            href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+                                        <link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
+                                        <div class="col-md-12">
+                                            <img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"
+                                                class="img img-fluid">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h3 style="text-align:center">Cashier's Transaction Blotter</h3>
+                                        </div>
+                                        <div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Transaction Date: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="">October 13, 2023 10:38 AM</strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="">00001 MAIN BRANCH - BUTUAN BRANCH</strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <!-- <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="journal_voucher_date"></strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="journal_voucher_ref_no"></strong></h6>
+
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                        <!-- <div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong
+                                                            id="journal_voucher_source"></strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong
+                                                            id="journal_voucher_particular"></strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Amount : &nbsp;&nbsp;&nbsp; ₱ <strong
+                                                            id="journal_voucher_amount"></strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
+                                                            id="journal_voucher_amount_in_words"
+                                                            style="text-transform:capitalize;"></strong></h6>
+
+										</div> -->
+									</div>
+								</div>
+								<div class="table-responsive-sm" style="padding-top:5px;">
+									<table class="table table-striped" style="border-top:4px dashed black;">
+									<thead>
+										<tr>
+										<th class="center">DATE</th>
+										<th>REFERENCE</th>
+										<th>REFERENCE NAME</th>
+										<th>SOURCE</th>
+										<th>CHK DATE</th>
+										<th>CHK NO.</th>
+										<th class="center">CASH IN</th>
+										<th class="right">CASH OUT</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><strong>Beginning Balance</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong>100,000</strong></td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>10/13/2023</td>
+											<td>CDB-G05E21</td>
+											<td>MAIN BRANCH - BUTUAN BRANCH</td>
+											<td>POS - TRANS</td>
+											<td>10/02/2023</td>
+											<td>10/13/2023</td>
+											<td>10,000</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>10/13/2023</td>
+											<td>CDB-G05E21</td>
+											<td>MAIN BRANCH - BUTUAN BRANCH</td>
+											<td>POS - TRANS</td>
+											<td>10/02/2023</td>
+											<td>10/13/2023</td>
+											<td>10,000</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td>10/13/2023</td>
+											<td>CDB-G05E21</td>
+											<td>MAIN BRANCH - BUTUAN BRANCH</td>
+											<td>POS - TRANS</td>
+											<td>10/02/2023</td>
+											<td>10/13/2023</td>
+											<td></td>
+											<td>10,000</td>
+										</tr>
+										<tr>
+											<td>10/13/2023</td>
+											<td>CDB-G05E21</td>
+											<td>MAIN BRANCH - BUTUAN BRANCH</td>
+											<td>POS - TRANS</td>
+											<td>10/02/2023</td>
+											<td>10/13/2023</td>
+											<td></td>
+											<td>10,000</td>
+										</tr>
+										<tr>
+											<td>10/13/2023</td>
+											<td>CDB-G05E21</td>
+											<td>MAIN BRANCH - BUTUAN BRANCH</td>
+											<td>POS - TRANS</td>
+											<td>10/02/2023</td>
+											<td>10/13/2023</td>
+											<td></td>
+											<td>10,000</td>
+										</tr>
+										<tr>
+											<td>10/13/2023</td>
+											<td>CDB-G05E21</td>
+											<td>MAIN BRANCH - BUTUAN BRANCH</td>
+											<td>POS - TRANS</td>
+											<td>10/02/2023</td>
+											<td>10/13/2023</td>
+											<td></td>
+											<td>10,000</td>
+										</tr>
+										<tr>
+											<td><strong>Cash Ending Balance</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong>100,000</strong></td>
+										</tr>
+										<tr>
+											<td><strong>Non Cash Received</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td><strong>POS Payment</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td>10/13/2023</td>
+											<td>CDB-G05E21</td>
+											<td>MAIN BRANCH - BUTUAN BRANCH</td>
+											<td>POS - TRANS</td>
+											<td>10/02/2023</td>
+											<td>10/13/2023</td>
+											<td>10,000</td>
+											<td>10,000</td>
+										</tr>
+										<tr>
+											<td><strong>Check Payment</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td><strong>PDC Deposit</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td><strong>Inter-branch Payment</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td><strong>COCI Beginning Balance</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td><strong>COCI Received</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td><strong>COCI Encashment</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr>
+											<td><strong>COCI Ending Balance</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong></strong></td>
+										</tr>
+										<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
+											<td><strong>TOTAL</strong></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td><strong>421,000</strong></td>
+											<td><strong>421,000</strong></td>
+										</tr>
+									</tbody>
+									</table>
+									<div class="row">
+										<div class="col-md-4">
+											<table class="table table-striped">
+												<thead>
+													<th>Cash Breakdown</th>
+													<th>Pc(s)</th>
+													<th>Total Amount</th>
+												</thead>
+												<tbody>
+													<tr>
+														<td>1,000</td>
+														<td>3</td>
+														<td>3,000</td>
+													</tr>
+													<tr>
+														<td>500</td>
+														<td>3</td>
+														<td>1,500</td>
+													</tr>
+													<tr>
+														<td>200</td>
+														<td>3</td>
+														<td>600</td>
+													</tr>
+													<tr>
+														<td>100</td>
+														<td>3</td>
+														<td>300</td>
+													</tr>
+													<tr>
+														<td>50</td>
+														<td>3</td>
+														<td>150</td>
+													</tr>
+													<tr>
+														<td>20</td>
+														<td>3</td>
+														<td>60</td>
+													</tr>
+													<tr>
+														<td>10</td>
+														<td>3</td>
+														<td>30</td>
+													</tr>
+													<tr>
+														<td>1.00</td>
+														<td>3</td>
+														<td>3.00</td>
+													</tr>
+													<tr style="border-top:4px dashed black;">
+														<td><strong>TOTAL CASH COUNT</strong></td>
+														<td></td>
+														<td><strong>25,000</strong></td>
+													</tr>
+													<tr style="border-bottom:4px dashed black;">
+														<td><strong>TOTAL OTHERS</strong></td>
+														<td></td>
+														<td><strong>25,000</strong></td>
+													</tr>
+													<tr>
+														<td><strong>TOTAL RECEIVED</strong></td>
+														<td></td>
+														<td><strong>50,000</strong></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<div class="col-md-4">
+										<table class="table table-striped">
+											<thead>
+												<th>Account Officer</th>
+												<th>Total Amount</th>
+											</thead>
+											<tbody>
+												<tr>
+													<td>jml-452433-221</td>
+													<td>3,000</td>
+												</tr>
+												<tr>
+													<td>jml-452433-221</td>
+													<td>3,000</td>
+												</tr>
+												<tr>
+													<td>jml-452433-221</td>
+													<td>3,000</td>
+												</tr>
+												<tr>
+													<td>jml-452433-221</td>
+													<td>3,000</td>
+												</tr>
+												<tr>
+													<td>jml-452433-221</td>
+													<td>3,000</td>
+												</tr>
+												<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
+													<td><strong>TOTAL COLLECTION</strong></td>
+													<td><strong>25,000</strong></td>
+												</tr>
+											</tbody>
+										</table>
+										</div>
+										<div class="col-md-4">
+										<table class="table table-striped">
+											<thead>
+												<th>Other Cash Received</th>
+												<th>Total Amount</th>
+											</thead>
+											<tbody>
+												<tr>
+													<td></td>
+													<td>3,000</td>
+												</tr>
+												<tr>
+													<td></td>
+													<td>3,000</td>
+												</tr>
+												<tr>
+													<td></td>
+													<td>3,000</td>
+												</tr>
+												<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
+													<td><strong>TOTAL CASH OTHERS</strong></td>
+													<td><strong>25,000</strong></td>
+												</tr>
+											</tbody>
+										</table>
+										</div>
+									</div>
+								</div>
+								<div style="margin-top: 24px;">
+									<p style="font-size:16px;"><span style="padding-left:32px">I HEREBY CERTIFY that the above total cash and COCI is in my possession as my CASH ON HAND.</span> </br> <span>As Branch Cashier I am aware the the said amount is my cash accountability to MICRO ACCESS LOAN CORP.</span></p>
+									<div style="display:flex;margin-top:45px;">
+										<div style="flex:1;border-bottom:1px solid #000;margin-right:32px;padding-bottom:32px;">
+											<span>Prepared By:</span>
+										</div>
+										<div style="flex:1;border-bottom:1px solid #000;margin-right:32px;padding-bottom:32px;">
+											<span>Certified Corrected By:</span>
+										</div>
+										<div style="flex:1;border-bottom:1px solid #000;margin-right:32px;padding-bottom:32px;">
+											<span>Approved By:</span>
+										</div>
+										<div style="flex:1">
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-lg-4 col-sm-5">
+									</div>
+									<div class="col-lg-4 col-sm-5 ml-auto">
+									<!-- <table class="table table-clear" style="padding-right:232px">
+										<tbody>
+										<tr>
+											<td class="left">
+											<strong>TOTAL</strong>
+											</td>
+											<td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
+											<td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
+										</tr>
+										</tbody>
+									</table> -->
+									<div>
+										<button @click="print" class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
+									</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+                </div>
+            </div>
+        </div>
+
   <div class="modal fade bd-example-modal-lg" id="Mymodal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">

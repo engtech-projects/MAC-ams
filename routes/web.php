@@ -31,6 +31,9 @@ use App\Http\Controllers\UserProfileController;
 
 // LoginController
 Route::get('/', [LoginController::class, 'index'])->name('/');
+Route::get('get-token',function() {
+    return response()->json(['data' => csrf_token()]);
+});
 Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user');
 Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::get('logout',[LoginController::class, 'userLogout'])->name('logout');
@@ -139,6 +142,7 @@ Route::get('reports/chartOfAccounts', [ReportsController::class, 'chartOfAccount
 Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedCheque'])->name('reports.postDatedCheque');
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
+Route::post('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashTransactionBlotter'])->name('reports.showCashTransactionBlotter');
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
 
