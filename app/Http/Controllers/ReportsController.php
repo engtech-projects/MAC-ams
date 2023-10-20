@@ -400,8 +400,6 @@ class ReportsController extends MainController
 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id,$request->branch_id);
-
-        return response()->json(['data' => $cashTransactionsEntries]);
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
@@ -451,7 +449,6 @@ class ReportsController extends MainController
             'success' => true,
             'message' => 'Cash Transaction Blotter created'
         ], 201);
-        return response()->json(array('success' => false, 'message' => 'Something went wrong!'), 522);
     }
 
     public function showCashBlotter($id)
