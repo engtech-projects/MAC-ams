@@ -145,6 +145,7 @@
 							<div class="row" >
 								<div class="col-md-12">
 									<div id="external_filter_container"></div>
+
 									<table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
 										<thead>
 											<th width="15%">Date</th>
@@ -153,118 +154,85 @@
 											<th>Source</th>
 											<th>Cheque Date</th>
 											<th>Cheque No.</th>
-											<th>Debit</th>
-											<th>Credit</th>
-											<th>Balance</th>
+											<th class="text-right">Debit</th>
+											<th class="text-right">Credit</th>
+											<th class="text-right">Balance</th>
 										</thead>
 										<tbody id="generalLedgerTblContainer">
-											<?php
-												$id = '';
-											?>
-											@if(!empty($generalLedgerAccounts))
 
-                                            <?php
-                                                $total_credits = 0; $total_debits = 0; $balance = 0;
-                                            ?>
+											@foreach($journalItems as $items)
 
-                                                @foreach($transactions as $data)
+											<?php 
+                                        		$totalDebit = 0;
+                                        		$totalCredit = 0;
+                                        		$balance = 0;
+                                        	?>
 
-                                                    @if($id == '')
-                                                    <?php
-                                                        $balance = $data->opening_balance;
-                                                    ?>
-                                                        <tr class="account_name">
-                                                            <td  class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td>{{number_format($data->opening_balance, 2, ".", ",")}}</td>
-                                                        </tr>
+											<tr class="account_name">
+                                                <td  class="font-weight-bold">{{$items['account_number']}} - {{$items['account_name']}}</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-right">{{number_format($items['opening_balance'], 2, ".", ",")}}</td>
+                                            </tr>
 
-                                                        <?php
-                                                            $id = $data->account_id;
-                                                        ?>
+                                            	@foreach($items['data'] as $data)
 
-                                                    @elseif($id != $data->account_id)
-                                                    <?php
-                                                        $balance = $data->opening_balance;
-                                                    ?>
-                                                        <tr class="totalRow">
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td>{{number_format($total_debits,2,",",".")}}</td>
-                                                            <td>{{number_format($total_credits,2,",",".")}}</td>
-                                                            <td></td>
-                                                        </tr>
+                                            		<?php 
+	                                            		$totalDebit += $data['debit'];
+	                                            		$totalCredit += $data['credit'];
+	                                            		$balance = $data['balance'];
+	                                            	?>
 
-                                                        <tr class="account_name">
-                                                            <td  class="font-weight-bold">{{$data->account_number}} - {{$data->account_name}}</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td class="debit"></td>
-                                                            <td class="credit"></td>
-                                                            <td class="balance">{{number_format($data->opening_balance, 2, ".", ",")}}</td>
-                                                        </tr>
+                                            		<tr id="journal">
+                                                     	<td>{{ $data['journal_date'] }}</td>
+		                                                <td>{{ $data['journal_no'] }}</td>
+		                                                <td>{{ $data['sub_name'] }}</td>
+		                                                <td>{{ $data['source'] }}</td>
+		                                                <td>{{ $data['cheque_date'] }}</td>
+		                                                <td>{{ $data['cheque_no'] }}</td>
+		                                                <td class="text-right">{{ $data['debit'] }}</td>
+		                                                <td class="text-right">{{ $data['credit'] }}</td>
+		                                                <td class="text-right">{{ $data['balance'] }}</td>
+                                                    </tr>
 
-                                                        <?php
-                                                            $total_credits=0;
-                                                            $total_debits=0;
-                                                            $id = $data->account_id;
+                                            	@endforeach
 
-                                                        ?>
+                                            	<tr class="account_name">
+	                                                <td></td>
+	                                                <td></td>
+	                                                <td class="font-weight-bold">Total</td>
+	                                                <td></td>
+	                                                <td></td>
+	                                                <td></td>
+	                                                <td class="font-weight-bold text-right">{{ number_format($totalDebit, 2, ".", ",") }}</td>
+	                                                <td class="font-weight-bold text-right">{{ number_format($totalCredit, 2, ".", ",") }}</td>
+	                                                <td></td>
+	                                            </tr>
 
-                                                    @endif
+	                                            <tr class="account_name">
+	                                                <td></td>
+	                                                <td></td>
+	                                                <td class="font-weight-bold">Net movement</td>
+	                                                <td></td>
+	                                                <td></td>
+	                                                <td></td>
+	                                               	<td></td>
+	                                                <td></td>
+	                                                <td class="font-weight-bold text-right">{{ number_format($balance, 2, ".", ",") }}</td>
+	                                            </tr>
 
-                                                        <?php
 
-                                                            $balance-=$data->journal_details_credit;
-                                                            $balance+=$data->journal_details_debit;
+											@endforeach
 
-                                                            $total_credits+=$data->journal_details_credit;
-                                                            $total_debits+=$data->journal_details_debit;
-                                                        ?>
-
-                                                        <tr id="journal">
-                                                            <td>{{$data->journal_date}}</td>
-															<td>{{$data->journal_no}}</td>
-                                                            <td>{{$data->sub_name}}</td>
-                                                            <td>{{$data->source}}</td>
-                                                            <td>{{($data->cheque_date == '') ? '/' : $data->cheque_date}}</td>
-                                                            <td>{{($data->cheque_no == '') ? '/' : $data->cheque_no}}</td>
-                                                            <td>{{number_format($data->journal_details_debit, 2, ".", ",")}}</td>
-                                                            <td>{{number_format($data->journal_details_credit, 2, ".", ",")}}</td>
-                                                            <td>{{number_format($balance, 2, ".", ",")}}</td>
-
-                                                        </tr>
-
-                                            @endforeach
-
-                                                <tr class="totalRow">
-                                                    <td></td>
-                                                    <td></td>
-													<td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td>{{number_format($total_debits,2,".",",")}}</td>
-                                                    <td>{{number_format($total_credits,2,".",",")}}</td>
-                                                    <td></td>
-                                                </tr>
-
-										@endif
 										</tbody>
+
 									</table>
-
-
+								
 								</div>
 							</div>
 						</div>
