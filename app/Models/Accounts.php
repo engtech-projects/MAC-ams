@@ -46,7 +46,10 @@ class Accounts extends Model
     {
         return $this->hasOne(OpeningBalance::class, 'account_id');
     }
-
+    public function journalDetails()
+    {
+        return $this->hasMany(journalEntryDetails::class,'account_id');
+    }
 
 
     public function store(array $data)

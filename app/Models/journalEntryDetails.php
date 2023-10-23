@@ -33,6 +33,14 @@ class journalEntryDetails extends Model
     {
         return $this->belongsTo(journalEntry::class, 'journal_id');
     }
+    public function journalEntry()
+    {
+        return $this->belongsTo(journalEntry::class, 'journal_id');
+    }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 
     public function scopeDebit($query)
     {

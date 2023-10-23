@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CollectionBreakdown;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Transactions;
@@ -239,15 +240,15 @@ class ReportsController extends MainController
     public function generalLedger(Request $request)
     {
         $accounting = Accounting::getFiscalYear();
-		$from = $request->from ? $request->from: $accounting->start_date;
-		$to = $request->to ? $request->to: $accounting->end_date;
-		$account_id = !$request->account_id||$request->account_id=='all'?'':$request->account_id;
-		$transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
+        $from = $request->from ? $request->from : $accounting->start_date;
+        $to = $request->to ? $request->to : $accounting->end_date;
+        $account_id = !$request->account_id || $request->account_id == 'all' ? '' : $request->account_id;
+        $transactions = Accounts::generalLedger_fetchAccounts($from, $to, $account_id);
 
         $journalItems = array();
         foreach ($transactions->toArray() as $key => $value) {
 
-           if( !array_key_exists($value['account_number'], $journalItems) )  {
+            if (!array_key_exists($value['account_number'], $journalItems)) {
 
                 $journalItems[$value['account_number']]['account_id'] = $value['account_id'];
                 $journalItems[$value['account_number']]['account_number'] = $value['account_number'];
@@ -260,25 +261,25 @@ class ReportsController extends MainController
                     'journal_date' => $value['journal_date'],
                     'journal_no' => $value['journal_no'],
                     'source' => $value['source'],
-                    'cheque_no' =>$value['cheque_no'],
+                    'cheque_no' => $value['cheque_no'],
                     'cheque_date' => $value['cheque_date'],
-                    'journal_id' =>$value['journal_id'],
+                    'journal_id' => $value['journal_id'],
                     'debit' => $value['journal_details_debit'],
                     'credit' => $value['journal_details_credit'],
                 ];
-           }else{
+            } else {
                 $journalItems[$value['account_number']]['data'][] = [
                     'sub_name' => $value['sub_name'],
                     'journal_date' => $value['journal_date'],
                     'journal_no' => $value['journal_no'],
                     'source' => $value['source'],
-                    'cheque_no' =>$value['cheque_no'],
+                    'cheque_no' => $value['cheque_no'],
                     'cheque_date' => $value['cheque_date'],
-                    'journal_id' =>$value['journal_id'],
+                    'journal_id' => $value['journal_id'],
                     'debit' => $value['journal_details_debit'],
                     'credit' => $value['journal_details_credit'],
                 ];
-           }
+            }
         }
 
         foreach ($journalItems as $key => $entry) {
@@ -288,12 +289,12 @@ class ReportsController extends MainController
 
             foreach ($entry['data'] as $k => $entries) {
 
-                if( $entry['to_increase'] == 'debit' ){
+                if ($entry['to_increase'] == 'debit') {
                     $balance += $entries['debit'];
                     $balance -= $entries['credit'];
                 }
 
-                if( $entry['to_increase'] == 'credit' ) {
+                if ($entry['to_increase'] == 'credit') {
                     $balance += $entries['credit'];
                     $balance -= $entries['debit'];
                 }
@@ -305,14 +306,14 @@ class ReportsController extends MainController
         // echo '<pre>';
         // var_export($journalItems);
         // echo '</pre>';
-		$data = [
-			'title' => 'General Ledger',
-			'chartOfAccount' => Accounts::where(['type' => 'L'])->get(),
-			'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
-			'transactions' => $transactions,
+        $data = [
+            'title' => 'General Ledger',
+            'chartOfAccount' => Accounts::where(['type' => 'L'])->get(),
+            'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
+            'transactions' => $transactions,
             'journalItems' => $journalItems
-		];
-		return view('reports.sections.generalledger', $data);
+        ];
+        return view('reports.sections.generalledger', $data);
 
     }
 
@@ -395,11 +396,11 @@ class ReportsController extends MainController
         return view('reports.sections.cashTransactionBlotter', $data); */
     }
 
-    public function showCashTransactionBlotter($id,Request $request)
+    public function showCashTransactionBlotter($id, Request $request)
     {
 
         $journalEntries = new journalEntry();
-        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id,$request->branch_id);
+        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
@@ -613,6 +614,30 @@ class ReportsController extends MainController
                 break;
             default:
         }
+    }
+
+    public function revenueMinusExpense()
+    {
+        $accountType = new AccountType();
+
+        $data = collect($accountType->getRevenueAndExpense());
+        $revenue = [];
+        $expense = [];
+        $data->map(function ($item) use (&$revenue, &$expense) {
+            if ($item->account_category_id === AccountCategory::REVENUE_TYPE) {
+                $revenue[] = $item;
+            } else {
+                $expense[] = $item;
+            }
+            return $item;
+        });
+        return new JsonResponse([
+            'message' => 'Revenue Minus Expense fetched.',
+            'data' => [
+                'revenue' => $revenue,
+                'expense' => $expense
+            ]
+        ]);
     }
 
 

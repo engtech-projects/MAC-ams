@@ -41,6 +41,7 @@ class journalEntry extends Model
         return $query->where('status', self::STATUS_POSTED);
     }
 
+
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'DESC', $journal_no = '')
     {
         $query = journalEntry::with(['journalDetails', 'bookDetails']);
