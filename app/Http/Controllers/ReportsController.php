@@ -616,11 +616,10 @@ class ReportsController extends MainController
         }
     }
 
-    public function revenueMinusExpense()
+    public function revenueMinusExpense(Request $request)
     {
         $accountType = new AccountType();
-
-        $data = collect($accountType->getRevenueAndExpense());
+        $data = collect($accountType->getRevenueAndExpense($request->input()));
         $revenue = [];
         $expense = [];
         $data->map(function ($item) use (&$revenue, &$expense) {

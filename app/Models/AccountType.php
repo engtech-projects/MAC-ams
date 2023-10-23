@@ -35,17 +35,19 @@ class AccountType extends Model
         return $this->hasMany(Accounts::class, 'account_type_id');
     }
 
-    public function getRevenueAndExpense()
+    public function getRevenueAndExpense($filter)
     {
+
         $data = $this->revenueAndExpense([AccountCategory::REVENUE_TYPE, AccountCategory::EXPENSE_TYPE])
             ->with([
-                'accounts' => function ($q) {
+                'accounts' => function ($q) use ($filter) {
                     $q->select('account_id', 'account_type_id')
                         ->whereHas('journalDetails')
-                        ->with('journalDetails', function ($query) {
+                        ->with('journalDetails', function ($query) use ($filter) {
                             $query->select('account_id', 'journal_id', 'journal_details_debit', 'journal_details_credit')
-                                ->with('journalEntry', function ($query) {
-                                    $query->select('journal_id', 'branch_id')
+                                ->with('journalEntry', function ($query) use ($filter) {
+                                    $query->select('journal_id', 'branch_id','journal_date')
+                                        ->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]])
                                         ->posted()
                                         ->with('branch:branch_id,branch_name');
                                 });
