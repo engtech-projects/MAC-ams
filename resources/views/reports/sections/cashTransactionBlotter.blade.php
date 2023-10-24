@@ -141,7 +141,7 @@
                                             <div class="col-md-6">
                                                 <div class="col-md-12">
                                                     <h6 class="mb-4">Transaction Date: &nbsp;&nbsp;&nbsp; <strong
-                                                            id="">October 13, 2023 10:38 AM</strong></h6>
+                                                            id="">@{{formatDate(collections.transaction_date)}}</strong></h6>
 
                                                 </div>
                                             </div>
@@ -419,58 +419,58 @@
 												<tbody>
 													<tr>
 														<td>1,000</td>
-														<td>3</td>
-														<td>3,000</td>
+														<td>@{{collections.p_1000}}</td>
+														<td>@{{formatCurrency(1000 * parseFloat(collections.p_1000))}}</td>
 													</tr>
 													<tr>
 														<td>500</td>
-														<td>3</td>
-														<td>1,500</td>
+														<td>@{{collections.p_500}}</td>
+														<td>@{{formatCurrency(500 * parseFloat(collections.p_500))}}</td>
 													</tr>
 													<tr>
 														<td>200</td>
-														<td>3</td>
-														<td>600</td>
+														<td>@{{collections.p_200}}</td>
+														<td>@{{formatCurrency(200 * parseFloat(collections.p_200))}}</td>
 													</tr>
 													<tr>
 														<td>100</td>
-														<td>3</td>
-														<td>300</td>
+														<td>@{{collections.p_100}}</td>
+														<td>@{{formatCurrency(100 * parseFloat(collections.p_100))}}</td>
 													</tr>
 													<tr>
 														<td>50</td>
-														<td>3</td>
-														<td>150</td>
+														<td>@{{collections.p_50}}</td>
+														<td>@{{formatCurrency(50 * parseFloat(collections.p_50))}}</td>
 													</tr>
 													<tr>
 														<td>20</td>
-														<td>3</td>
-														<td>60</td>
+														<td>@{{collections.p_20}}</td>
+														<td>@{{formatCurrency(20 * parseFloat(collections.p_20))}}</td>
 													</tr>
 													<tr>
 														<td>10</td>
-														<td>3</td>
-														<td>30</td>
+														<td>@{{collections.p_10}}</td>
+														<td>@{{formatCurrency(10 * parseFloat(collections.p_10))}}</td>
 													</tr>
 													<tr>
-														<td>1.00</td>
-														<td>3</td>
-														<td>3.00</td>
+														<td>1</td>
+														<td>@{{collections.p_1}}</td>
+														<td>@{{formatCurrency(1 * parseFloat(collections.p_1))}}</td>
 													</tr>
 													<tr style="border-top:4px dashed black;">
 														<td><strong>TOTAL CASH COUNT</strong></td>
 														<td></td>
-														<td><strong>25,000</strong></td>
+														<td><strong>@{{formatCurrency(parseFloat(collections.total))}}</strong></td>
 													</tr>
 													<tr style="border-bottom:4px dashed black;">
 														<td><strong>TOTAL OTHERS</strong></td>
 														<td></td>
-														<td><strong>25,000</strong></td>
+														<td><strong>0.00</strong></td>
 													</tr>
 													<tr>
 														<td><strong>TOTAL RECEIVED</strong></td>
 														<td></td>
-														<td><strong>50,000</strong></td>
+														<td><strong>@{{formatCurrency(0 + parseFloat(collections.total))}}</strong></td>
 													</tr>
 												</tbody>
 											</table>
@@ -482,7 +482,11 @@
 												<th>Total Amount</th>
 											</thead>
 											<tbody>
-												<tr>
+												<tr v-for="officer in collections.account_officer_collection">
+													<td>@{{officer.representative}}</td>
+													<td>@{{formatCurrency(officer.total)}}</td>
+												</tr>
+												<!-- <tr>
 													<td>jml-452433-221</td>
 													<td>3,000</td>
 												</tr>
@@ -497,14 +501,10 @@
 												<tr>
 													<td>jml-452433-221</td>
 													<td>3,000</td>
-												</tr>
-												<tr>
-													<td>jml-452433-221</td>
-													<td>3,000</td>
-												</tr>
+												</tr> -->
 												<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 													<td><strong>TOTAL COLLECTION</strong></td>
-													<td><strong>25,000</strong></td>
+													<td><strong>@{{formatCurrency(collections.total_accountofficer)}}</strong></td>
 												</tr>
 											</tbody>
 										</table>
@@ -836,7 +836,7 @@
 						coci_received:[],
 						coci_encashment:[],
 					},
-			collection:[],
+			collections:{transaction_date:''},
 		},
 		methods: {
 			showCashBlotter:function(id,branch){
@@ -844,8 +844,13 @@
                     .then(response => {
                         // this.responseData = response.data;
 						// this.entries = response.data['entries'];
+						this.collections = response.data['entries']['collections'];
 						this.arrangeData( response.data['entries']);
-						console.log(response.data);
+						this.collections.total_accountofficer = 0;
+						for(var i in this.collections.account_officer_collection){
+							this.collections.total_accountofficer += parseFloat(this.collections.account_officer_collection[i].total);
+						}
+						console.log(this.collections);
                     })
                     .catch(error => {
                         console.error(error);
@@ -859,6 +864,10 @@
 							this.entries[i] = data[k];
 						}
 					}
+					// if(i == 'collections'){
+					// 	this.collections = entry;
+					// 	console.log(this.collections);
+					// }
 				}
 				console.log(this.entries);
 			},
@@ -885,7 +894,32 @@
 				amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 				return amount;
+			},
+			formatDate:function(inputDate) {
+				const months = [
+					"January", "February", "March", "April", "May", "June", "July",
+					"August", "September", "October", "November", "December"
+				];
+
+				const dateParts = inputDate.split('-');
+				if (dateParts.length !== 3) {
+					return "Invalid Date";
 				}
+
+				const year = dateParts[0];
+				const month = parseInt(dateParts[1], 10);
+				const day = parseInt(dateParts[2], 10);
+
+				const formattedDate = new Date(year, month - 1, day).toLocaleDateString('en-US', {
+					month: 'long',
+					day: 'numeric',
+					year: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit'
+				});
+
+				return formattedDate;
+			}
 		},
 		computed:{
 			filteredCashBlotter:function(){
