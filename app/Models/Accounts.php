@@ -39,7 +39,7 @@ class Accounts extends Model
 
     public function accountType()
     {
-        return $this->hasMany(AccountType::class, 'account_type_id');
+        return $this->belongsTo(AccountType::class, 'account_type_id');
     }
 
     public function openingBalance()

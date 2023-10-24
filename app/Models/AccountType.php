@@ -37,7 +37,21 @@ class AccountType extends Model
 
     public function getRevenueAndExpense($filter)
     {
-
+        /* $data = journalEntry::with([
+            'journalDetails' => function ($query) {
+                $query->select(['journal_id', 'account_id', 'journal_details_debit', 'journal_details_credit'])
+                    ->with([
+                        'account' => function ($query) {
+                            $query->select(['account_id', 'account_name', 'account_type_id'])->with(['accountType' => function($query){
+                                $query->with('accountCategory');
+                            }]);
+                        }
+                    ]);
+            }
+        ])
+            ->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]])
+            ->get();
+        dd($data[0]->journalDetails->toArray()); */
         $data = $this->revenueAndExpense([AccountCategory::REVENUE_TYPE, AccountCategory::EXPENSE_TYPE])
             ->with([
                 'accounts' => function ($q) use ($filter) {
@@ -45,11 +59,10 @@ class AccountType extends Model
                         ->whereHas('journalDetails')
                         ->with('journalDetails', function ($query) use ($filter) {
                             $query->select('account_id', 'journal_id', 'journal_details_debit', 'journal_details_credit')
-                                ->with('journalEntry', function ($query) use ($filter) {
-                                    $query->select('journal_id', 'branch_id','journal_date')
-                                        ->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]])
-                                        ->posted()
-                                        ->with('branch:branch_id,branch_name');
+                                ->whereHas('journalEntry', function ($query) use ($filter) {
+                                    $query->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]])
+                                        ->with('journalEntry:journal_id');
+
                                 });
                         });
                 }
