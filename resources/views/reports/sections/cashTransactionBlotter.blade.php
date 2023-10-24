@@ -35,7 +35,7 @@
 </style>
 
 <!-- Main content -->
-<section class="content">
+<section class="content" id="app">
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
     <div class="row">
 
@@ -51,7 +51,7 @@
                         <label for="branch">Branch</label>
                         <div class="input-group">
 
-                            <select class="select-branch form-control form-control-sm" name="">
+                            <select class="select-branch form-control form-control-sm" name="branch_id">
                                 <option value="" disabled selected>-Select Branch-</option>
                                 @foreach ($branches as $branch)
                                     <option value="{{$branch->branch_id}}">{{$branch->branch_name}}</option>
@@ -62,7 +62,7 @@
                     <div class="col-md-3">
                         <label for="branch">Transaction Date</label>
                         <div class="input-group">
-                            <input type="date" class="form-control form-control-sm">
+                            <input type="date" name="transaction_date" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -84,7 +84,7 @@
     </div>
 	<div class="row">
         <div class="col-md-12 mt-5">
-            <table id="cash-blotter-tbl"  class="table table-sm table-bordered">
+            <table id="cash-blotter-tbls"  class="table table-sm table-bordered">
                 <thead>
                     <th>Code</th>
                     <th>Branch</th>
@@ -93,6 +93,19 @@
                     <th>Action</th>
                 </thead>
                 <tbody>
+					<tr v-for="d in data">
+						<td>@{{ d.branch_code }}</td>
+						<td>@{{ d.branch_name }}</td>
+						<td>@{{ d.transaction_date }}</td>
+						<td>@{{ d.total_collection }}</td>
+						<td>
+							<button @click="showCashBlotter(d.collection_id,d.branch_id)" class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye" data-toggle="modal" data-target="#cashBlotterPreviewModal"></i></button>
+							<button class="mr-1 btn btn-xs btn-warning" id="update-cashblotter"><i class="fas fa-xs fa-edit"></i></button>
+							<button class="mr-1 btn btn-xs btn-danger"><i class="fas fa-xs fa-trash delete-cashblotter"></i></button>
+							<button class="mr-1 btn btn-xs btn-primary"><i class="fas fa-xs fa-download download-cashblotter"></i></button>
+							<button class="mr-1 btn btn-xs btn-default"><i class="fas fa-xs fa-print print-cashblotter"></i></button>
+						</td>
+					</tr>
                 </tbody>
             </table>
         </div>
@@ -200,7 +213,10 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr>
+										<tr v-for="fb in filteredCashBlotter.rows">
+											<td v-for="f in fb" v-html="f"></td>
+										</tr>
+										<!-- <tr>
 											<td><strong>Beginning Balance</strong></td>
 											<td></td>
 											<td></td>
@@ -379,7 +395,7 @@
 											<td></td>
 											<td></td>
 											<td><strong></strong></td>
-										</tr>
+										</tr>-->
 										<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 											<td><strong>TOTAL</strong></td>
 											<td></td>
@@ -387,9 +403,9 @@
 											<td></td>
 											<td></td>
 											<td></td>
-											<td><strong>421,000</strong></td>
-											<td><strong>421,000</strong></td>
-										</tr>
+											<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashin)}}</strong></td>
+											<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashout)}}</strong></td>
+										</tr> 
 									</tbody>
 									</table>
 									<div class="row">
@@ -554,7 +570,7 @@
 										</tbody>
 									</table> -->
 									<div>
-										<button @click="print" class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
+										<button class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
 									</div>
 									</div>
 								</div>
@@ -802,7 +818,130 @@
 
 
 </section>
+<script>
+	new Vue({
+		el: '#app',
+		data: {
+			data: @json($cash_blotter),
+			entries:{
+						begining_balance:{},
+						cash_received:[],
+						cash_paid:[],
+						non_cash_received:[],
+						pos_payment:[],
+						check_payment:[],
+						pdc_deposit:[],
+						interbranch:[],
+						coci_beginning_balance:[],
+						coci_received:[],
+						coci_encashment:[],
+					},
+			collection:[],
+		},
+		methods: {
+			showCashBlotter:function(id,branch){
+				axios.get('/reports/cashTransactionBlotter/showcashblotter/' + id,{params:{branch_id:branch}}) // Replace with your API endpoint
+                    .then(response => {
+                        // this.responseData = response.data;
+						// this.entries = response.data['entries'];
+						this.arrangeData( response.data['entries']);
+						console.log(response.data);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+			},
+			arrangeData:function(data){
+				for(var i in this.entries){
+					var entry = this.entries[i];
+					for(var k in data){
+						if(i == k){
+							this.entries[i] = data[k];
+						}
+					}
+				}
+				console.log(this.entries);
+			},
+			upperWords:function(inputString) {
+				var stringWithSpaces = inputString.replace(/_/g, ' ');
+				var words = stringWithSpaces.split(' ');
+				for (var i = 0; i < words.length; i++) {
+					words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+				}
+				var result = words.join(' ');
 
+				return result;
+			},
+			noZero:function(val){
+				return val==0?'':this.formatCurrency(val);
+			},
+			formatCurrency:function(amount) {
+				amount = parseFloat(amount);
+				if (isNaN(amount)) {
+					return "Invalid Number";
+				}
+				amount = amount.toFixed(2);
+
+				amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+				return amount;
+				}
+		},
+		computed:{
+			filteredCashBlotter:function(){
+				var rows = [];
+				var cashEndingBalance = 0;
+				totalCashIn = 0;
+				totalCashOut = 0;
+				for(var i in this.entries){
+					var entry = this.entries[i];
+					var row = ['','','','','','','',''];
+					if(i.toLowerCase() != 'collections'){
+						if(i.toLowerCase() == 'begining_balance'){
+							cashEndingBalance += parseFloat(entry.total);
+							totalCashIn += parseFloat(entry.total);
+							row[0] = '<b>Beginning Balance</b>';
+							row[6] = `<b>` + this.formatCurrency(entry.total) + `</b>`;
+							rows.push(row);
+						}else{
+							row[0] = '<b>' + this.upperWords(i) + '</b>';
+							rows.push(row);
+							for(var k in entry){
+								var journal = entry[k];
+								totalCashIn += parseFloat(journal.journal_details[0].cash_in);
+								totalCashOut += parseFloat(journal.journal_details[0].cash_out);
+								if(i == 'cash_received'){
+									cashEndingBalance += parseFloat(journal.journal_details[0].cash_in);
+								}else if(i == 'cash_paid'){
+									cashEndingBalance -= parseFloat(journal.journal_details[0].cash_out);
+								}
+								var mrow = ['','','','','','','',''];
+								mrow[0] = journal.journal_date;
+								mrow[1] = journal.journal_no;
+								mrow[2] = journal.branch.branch_name;
+								mrow[3] = journal.source;
+								mrow[4] = journal.cheque_date;
+								mrow[5] = journal.cheque_no;
+								mrow[6] = journal.journal_details?this.noZero(journal.journal_details[0].cash_in):'';
+								mrow[7] = journal.journal_details?this.noZero(journal.journal_details[0].cash_out):'';
+								rows.push(mrow);
+							}
+							if(i == 'cash_paid'){
+								rows.push(['<b>Cash Ending Balance</b>','','','','','',cashEndingBalance>0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':'',cashEndingBalance<=0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':''])
+							}
+						}
+						// 
+						
+					}
+				}
+				return {rows:rows,total:{cashin:totalCashIn,cashout:totalCashOut}};
+			}
+		},
+		mounted(){
+			// console.log(this.data);
+		}
+	});
+</script>
 
 @endsection
 
