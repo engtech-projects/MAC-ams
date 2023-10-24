@@ -189,7 +189,7 @@
         $('.select-officer').append('<option value="" disabled selected text="Select-Officer">')
         $.ajax({
             type: "get",
-            url: "<?= config('app.url') ?>/reports/cashTransactionBlotter/fetchaccountofficer/"+branch_id,
+            url: "{{route('reports.fetchAccountOfficer',['id' => 'branch_id'])}}".replace('branch_id', branch_id),
             dataType: "json",
             success: function (response) {
                 var data = response.data

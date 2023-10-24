@@ -97,7 +97,7 @@
 						<td>@{{ d.branch_code }}</td>
 						<td>@{{ d.branch_name }}</td>
 						<td>@{{ d.transaction_date }}</td>
-						<td>@{{ d.total_collection }}</td>
+						<td>@{{ formatCurrency(d.total) }}</td>
 						<td>
 							<button @click="showCashBlotter(d.collection_id,d.branch_id)" class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye" data-toggle="modal" data-target="#cashBlotterPreviewModal"></i></button>
 							<button class="mr-1 btn btn-xs btn-warning" id="update-cashblotter"><i class="fas fa-xs fa-edit"></i></button>
@@ -850,7 +850,7 @@
 						for(var i in this.collections.account_officer_collection){
 							this.collections.total_accountofficer += parseFloat(this.collections.account_officer_collection[i].total);
 						}
-						console.log(this.collections);
+						// console.log(this.collections);
                     })
                     .catch(error => {
                         console.error(error);
@@ -869,7 +869,7 @@
 					// 	console.log(this.collections);
 					// }
 				}
-				console.log(this.entries);
+				// console.log(this.entries);
 			},
 			upperWords:function(inputString) {
 				var stringWithSpaces = inputString.replace(/_/g, ' ');
