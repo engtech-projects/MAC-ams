@@ -86,7 +86,6 @@
         <div class="col-md-12 mt-5">
             <table id="cash-blotter-tbls"  class="table table-sm table-bordered">
                 <thead>
-                    <th>Code</th>
                     <th>Branch</th>
                     <th>Transaction Date</th>
                     <th>Total Branch Collection</th>
@@ -94,8 +93,7 @@
                 </thead>
                 <tbody>
 					<tr v-for="d in data">
-						<td>@{{ d.branch_code }}</td>
-						<td>@{{ d.branch_name }}</td>
+						<td>@{{ d.branch_id }}</td>
 						<td>@{{ d.transaction_date }}</td>
 						<td>@{{ formatCurrency(d.total) }}</td>
 						<td>
