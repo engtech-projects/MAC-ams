@@ -838,7 +838,8 @@
 		},
 		methods: {
 			showCashBlotter:function(id,branch){
-				axios.get('/reports/cashTransactionBlotter/showcashblotter/' + id,{params:{branch_id:branch}}) // Replace with your API endpoint
+				var url = "{{route('reports.showCashBlotter',['id'=>'cid'])}}".replace('cid', id);
+				axios.get(url,{params:{branch_id:branch}}) // Replace with your API endpoint
                     .then(response => {
                         // this.responseData = response.data;
 						// this.entries = response.data['entries'];
