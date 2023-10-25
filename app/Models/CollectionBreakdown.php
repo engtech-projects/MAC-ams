@@ -13,6 +13,7 @@ class CollectionBreakdown extends Model
     use HasFactory;
 
     const COLLECTION_GRP_ACCOUNT_OFFICER = "account_officer";
+    const COLLECTION_FLAG = "P";
 
     protected $primaryKey = 'collection_id';
     protected $table = 'collection_breakdown';
@@ -57,9 +58,15 @@ class CollectionBreakdown extends Model
 
     public function createCollection(array $attributes)
     {
-        return DB::transaction(function () use ($attributes, &$collection) {
-            $collection = self::create($attributes)->accountOfficerCollection()->createMany($attributes["collection_ao"]);
+        $collection_ao = collect($attributes["collection_ao"])->map(function ($value) {
+            $value["flag"] = CollectionBreakdown::COLLECTION_FLAG;
+            $value["grp"] = CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER;
 
+            return $value;
+        })->values();
+
+        return DB::transaction(function () use ($attributes, $collection_ao) {
+           self::create($attributes)->accountOfficerCollection()->createMany($collection_ao);
         });
 
     }
