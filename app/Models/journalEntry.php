@@ -38,7 +38,7 @@ class journalEntry extends Model
 
     public function scopePosted($query)
     {
-        return $query->where('status', self::STATUS_POSTED);
+        return $query->where('journal_entry.status', self::STATUS_POSTED);
     }
 
 
@@ -203,7 +203,6 @@ class journalEntry extends Model
 
         })->map(function ($item) use ($account, $type, $transaction) {
             $entry = collect($item);
-
             $entry["journal_details"] = collect($entry["journal_details"])->filter(function ($detail) use ($account, $type, $transaction) {
                 if ($type === JournalBook::BOOK_DEBIT) {
                     return $detail["account_id"] == $account && $detail["cash_out"] == 0;

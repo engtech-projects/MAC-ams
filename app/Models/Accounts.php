@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Models\Accounts;
 use App\Models\journalEntryDetails;
@@ -42,13 +43,23 @@ class Accounts extends Model
         return $this->belongsTo(AccountType::class, 'account_type_id');
     }
 
+    public function scopeRevenueAndExpense($query, $types)
+    {
+        return $query->whereIn('account_category_id', $types);
+    }
+
     public function openingBalance()
     {
         return $this->hasOne(OpeningBalance::class, 'account_id');
     }
     public function journalDetails()
     {
-        return $this->hasMany(journalEntryDetails::class,'account_id');
+        return $this->hasMany(journalEntryDetails::class, 'account_id');
+    }
+
+    public function journalEntries()
+    {
+        return $this->hasManyThrough(journalEntry::class, journalEntryDetails::class, 'account_id', 'journal_id', 'account_id')->distinct();
     }
 
 
@@ -358,5 +369,74 @@ class Accounts extends Model
             ->orderBy('journal_entry.journal_date', 'ASC')
             ->orderBy('journal_entry_details.journal_id', 'ASC')
             ->get();
+    }
+
+    public function getRevenueAndExpense($filter)
+    {
+        $filterDate = function ($query) use ($filter) {
+            return $query->when($filter, function ($q) use ($filter) {
+                return $q->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]]);
+            });
+        };
+
+        $data = Accounts::whereHas('accountType', function ($query) {
+            $query->whereIn('account_category_id', [AccountCategory::REVENUE_TYPE, AccountCategory::EXPENSE_TYPE]);
+        })->with('accountType', function ($query) {
+            $query->select(['account_type_id', 'account_category_id'])
+                ->with('accountCategory:account_category_id,account_category');
+        })->whereHas('journalEntries', $filterDate)
+            ->with([
+                'journalEntries' => function ($query) use ($filter, $filterDate) {
+                    $query->select([
+                        'journal_entry.journal_id',
+                        'journal_entry.journal_no',
+                        'journal_entry.journal_date',
+                        'journal_entry.branch_id',
+                        'journal_entry.source',
+                        'journal_entry.cheque_date',
+                        'journal_entry.amount',
+                        'journal_entry.status',
+                        'journal_entry.payee',
+                        'journal_entry.remarks',
+                    ])->posted()
+                        ->when($filter, $filterDate);
+                },
+                'journalEntries.journalDetails' => function ($query) {
+                    $query->select([
+                        'journal_entry_details.journal_id',
+                        'journal_entry_details.account_id',
+                        'journal_entry_details.journal_details_debit AS cash_in',
+                        'journal_entry_details.journal_details_credit AS cash_out'
+                    ])
+                        ->orderBy('journal_entry_details.account_id', 'ASC');
+                },
+            ])->get(['account_id', 'account_number', 'account_name', 'account_type_id', 'type']);
+
+
+        return collect($data);
+    }
+    public static function AccountMapping($collection)
+    {
+        $newCollection = collect($collection)->groupBy(function ($item) {
+            return $item["accountType"]["accountCategory"]["account_category"] === "income" ? 'revenue' : 'expense';
+        })->map(function ($items, $category) {
+            return collect($items)->map(function ($item) use ($category) {
+                $type = $item["type"];
+                $item["journal_entries"] = collect($item["journalEntries"])->map(function ($entry, $key) use ($type) {
+                    $entry["journal_entry_details"] = collect($entry["journalDetails"])->groupBy('account_id')
+                        ->map(function ($detail, $key) use ($type) {
+                            return collect($detail)->filter(function ($val) use ($type) {
+                                return !empty($type === 'L' && (floatval($val['cash_in']) > 0) || $type === 'R' && (floatval($val['cash_in']) > 0));
+                            })->values()->all();
+                        })->filter()->values()->toArray();
+
+                    unset($entry["journalDetails"]);
+                    return $entry;
+                })->values()->all();
+                return $item;
+            })->values()->all();
+        });
+
+        return $newCollection;
     }
 }

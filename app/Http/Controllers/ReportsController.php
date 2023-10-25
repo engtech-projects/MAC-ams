@@ -618,25 +618,10 @@ class ReportsController extends MainController
 
     public function revenueMinusExpense(Request $request)
     {
-        $accountType = new AccountType();
-        $data = collect($accountType->getRevenueAndExpense($request->input()));
-        $revenue = [];
-        $expense = [];
-        $data->map(function ($item) use (&$revenue, &$expense) {
-            if ($item->account_category_id === AccountCategory::REVENUE_TYPE) {
-                $revenue[] = $item;
-            } else {
-                $expense[] = $item;
-            }
-            return $item;
-        });
-        return new JsonResponse([
-            'message' => 'Revenue Minus Expense fetched.',
-            'data' => [
-                'revenue' => $revenue,
-                'expense' => $expense
-            ]
-        ]);
+        $accounts = new Accounts();
+        $data = $accounts->getRevenueAndExpense($request->input());
+        $data = Accounts::AccountMapping($data);
+        return $data;
     }
 
 
