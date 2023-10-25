@@ -220,7 +220,7 @@
 					<li class="nav-item">
 						<a href="{{ route('reports.bankReconcillation') }}" class="nav-link {{ (request()->is('reports/bankReconcillation')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
-							<p>Bank Reconcillation</p>
+							<p>Bank Reconciliation</p>
 						</a>
 					</li>
 					@endif
@@ -236,7 +236,7 @@
 					<li class="nav-item">
 						<a href="{{ route('reports.cashTransactionBlotter') }}" class="nav-link {{ (request()->is('reports/cashTransactionBlotter')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
-							<p>Cash Tranasction Blotter</p>
+							<p>Cash Transaction Blotter</p>
 						</a>
 					</li>
 					@endif

@@ -634,52 +634,52 @@
                                 <tbody>
                                     <tr class="cash-breakdown">
                                       <td>₱1000</td>
-                                      <td><input type="number" name="onethousand" id="onethousand" class="form-control form-control-sm pcs" required></td>
+                                      <td><input type="number" name="p_1000" id="onethousand" class="form-control form-control-sm pcs" required></td>
                                       <td id="onethousandtotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱500</td>
-                                        <td><input type="number" name="fivehundred" id="fivehundred" class="form-control form-control-sm pcs" required></td>
+                                        <td><input type="number" name="p_500" id="fivehundred" class="form-control form-control-sm pcs" required></td>
                                         <td id="fivehundredtotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱200</td>
-                                        <td><input type="number" name="twohundred" id="twohundred" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="p_200" id="twohundred" class="form-control form-control-sm" required></td>
                                         <td id="twohundredtotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱100</td>
-                                        <td><input type="number" name="onehundred" id="onehundred" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="p_100" id="onehundred" class="form-control form-control-sm" required></td>
                                         <td id="onehundredtotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱50</td>
-                                        <td><input type="number" name="fifty" id="fifty" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="p_50" id="fifty" class="form-control form-control-sm" required></td>
                                         <td id="fiftytotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱20</td>
-                                        <td><input type="number" name="twenty" id="twenty" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="p_20" id="twenty" class="form-control form-control-sm" required></td>
                                         <td id="twentytotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱10</td>
-                                        <td><input type="number" name="ten" id="ten" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="p_10" id="ten" class="form-control form-control-sm" required></td>
                                         <td id="tentotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱5</td>
-                                        <td><input type="number" name="five" id="five" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="p_5" id="five" class="form-control form-control-sm" required></td>
                                         <td id="fivetotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱1</td>
-                                        <td><input type="number" name="one" id="one" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="p_1" id="one" class="form-control form-control-sm" required></td>
                                         <td id="onetotalamount" class="total">0</td>
                                     </tr>
                                     <tr class="cash-breakdown">
                                         <td>₱0.25</td>
-                                        <td><input type="number" name="centavo" id="centavo" class="form-control form-control-sm" required></td>
+                                        <td><input type="number" name="c_25" id="centavo" class="form-control form-control-sm" required></td>
                                         <td id="centavototalamount" class="total">0</td>
                                     </tr>
 

@@ -222,14 +222,14 @@
             return false
         }
 
-        formData.push({name:'totalcash_count',value:totalcash_count})
-        formData.push({name:'ao_collection',value:JSON.stringify(aocollection_items)})
+        formData.push({name:'total',value:totalcash_count})
+        formData.push({name:'collection_ao',value:aocollection_items})
         formData.push({name:'branch_collection',value:JSON.stringify(branchcollection_items)})
-
+		// console.log(formData);
         $.ajax({
 				type:'POST',
 				dataType: "json",
-				url:"{{route('reports.storeCashBlotter')}}",
+				url:"{{route('create.collection.breakdown')}}",
 				data:formData,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -240,7 +240,6 @@
                     $('#cash-blotter-tbl').DataTable().ajax.reload();
                     $('#Mymodal').modal('hide')
                     reset()
-
                 },
                 error:function(data){
                     console.log(data)
@@ -279,9 +278,10 @@
 
         items.push(
             {
-            'accountofficer_id' : accountofficer_id,
-            'remarks' : remarks,
-            'totalamount':totalamount
+            'representative' : accountofficer_id,
+            'note' : remarks,
+            'total':totalamount,
+			'grp':'collection officer'
             }
         );
 
