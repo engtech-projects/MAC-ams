@@ -97,7 +97,42 @@
                                 </div>
                             </div>
                         </div>
-
+					
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="">Book Reference</label>
+									<div class="input-group">
+									<select name="book_id" class="select2 form-control form-control-sm" id="book_id" required>
+										<option value="" disabled selected>-Select Book References-</option>
+										@foreach($journalBooks as $journalBook)
+											<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
+										@endforeach
+									</select>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="">Reference No.</label>
+									<div class="input-group">
+										<label class="label-normal" id="LrefNo" ></label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="source">Source</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="source" id="source"  placeholder="Source" required>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
