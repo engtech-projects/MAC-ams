@@ -225,12 +225,16 @@
         formData.push({name:'total',value:totalcash_count})
         formData.push({name:'collection_ao',value:aocollection_items})
         formData.push({name:'branch_collection',value:JSON.stringify(branchcollection_items)})
-		// console.log(formData);
+		var fdata = {};
+		for(var i in formData){
+			var fd = formData[i];
+			fdata[fd.name] = fd.value;
+		}
         $.ajax({
 				type:'POST',
 				dataType: "json",
 				url:"{{route('create.collection.breakdown')}}",
-				data:formData,
+				data:fdata,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
