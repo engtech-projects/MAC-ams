@@ -451,9 +451,19 @@
 														<td>@{{formatCurrency(10 * parseFloat(collections.p_10))}}</td>
 													</tr>
 													<tr>
+														<td>5</td>
+														<td>@{{collections.p_5}}</td>
+														<td>@{{formatCurrency(5 * parseFloat(collections.p_5))}}</td>
+													</tr>
+													<tr>
 														<td>1</td>
 														<td>@{{collections.p_1}}</td>
 														<td>@{{formatCurrency(1 * parseFloat(collections.p_1))}}</td>
+													</tr>
+													<tr>
+														<td>0.25</td>
+														<td>@{{collections.c_25}}</td>
+														<td>@{{formatCurrency(0.25 * parseFloat(collections.c_25))}}</td>
 													</tr>
 													<tr style="border-top:4px dashed black;">
 														<td><strong>TOTAL CASH COUNT</strong></td>
