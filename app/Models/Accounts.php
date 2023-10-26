@@ -54,14 +54,8 @@ class Accounts extends Model
     }
     public function journalDetails()
     {
-        return $this->hasMany(journalEntryDetails::class, 'account_id');
+        return $this->hasMany(journalEntryDetails::class, 'journal_id', 'journal_id');
     }
-
-    public function journalEntries()
-    {
-        return $this->hasManyThrough(journalEntry::class, journalEntryDetails::class, 'account_id', 'journal_id', 'account_id')->distinct();
-    }
-
 
     public function store(array $data)
     {
@@ -371,22 +365,108 @@ class Accounts extends Model
             ->get();
     }
 
+
+    public function getEntriesRevenueAndExpense($filter)
+    {
+        $result = Accounts::select([
+            'accounts.account_id',
+            'accounts.account_name',
+
+            'type.account_type_id',
+            'type.account_type',
+
+            'cat.account_category',
+            'cat.account_category_id',
+
+            'details.journal_details_debit',
+            'details.journal_details_credit',
+
+            'j_entry.journal_id',
+            'j_entry.journal_date',
+            'j_entry.journal_no',
+            'type.account_no'
+        ])
+            ->join('account_type as type', 'accounts.account_type_id', '=', 'type.account_type_id')
+            ->join('account_category as cat', 'type.account_category_id', '=', 'cat.account_category_id')
+            ->join('journal_entry_details as details', 'accounts.account_id', '=', 'details.account_id')
+            ->join('journal_entry as j_entry', 'j_entry.journal_id', '=', 'details.journal_id')
+            ->whereIn('cat.account_category_id', [AccountCategory::REVENUE_TYPE, AccountCategory::EXPENSE_TYPE])
+            ->when($filter, function ($query) use ($filter) {
+                $query->whereBetween('j_entry.journal_date', [$filter['date_from'], $filter['date_to']]);
+            })
+            ->from('chart_of_accounts as accounts')
+            ->get();
+
+        $collection = collect($result)->groupBy('account_category')->map(function ($categoryGroup) {
+
+            return [
+                'category_id' => $categoryGroup[0]->account_category_id,
+                'account_category' => $categoryGroup[0]->account_category,
+                'accounts' => collect($categoryGroup)->groupBy('account_id')->map(function ($accountGroup) {
+
+                    return [
+                        "account_id" => $accountGroup[0]->account_id,
+                        "account_name" => $accountGroup[0]->account_name,
+                        'journal_entries' => collect($accountGroup)->groupBy('journal_id')->map(function ($entry) use($accountGroup) {
+                            return [
+                                'journal_id' => $entry[0]["journal_id"],
+                                'journal_no' => $entry[0]['journal_no'],
+                                'journal_date' => $entry[0]['journal_date'],
+                                'journal_details' => collect($accountGroup)->map(function ($item,$key) {
+                                    return [
+                                        "journal_details_debit" => $item["journal_details_debit"],
+                                        "journal_details_credit" => $item["journal_details_credit"]
+                                    ];
+                                })->values()
+
+                            ];
+                        })->values()->toArray()
+                    ];
+                })->values()
+            ];
+        })->values()->all();
+
+        return $collection;
+
+
+
+        /* $entries = journalEntry::whereHas('journalDetails', function ($query) use ($filter) {
+            $query->when($filter, function ($query) use ($filter) {
+                $query->whereBetween('journal_date', [$filter['date_from'], $filter['date_to']]);
+            })->whereHas('account.accountType.accountCategory', function ($query) {
+                $query->whereIn('account_category.account_category_id', [AccountCategory::REVENUE_TYPE, AccountCategory::EXPENSE_TYPE]);
+            });
+        })->with([
+                    'journalDetails' => function ($query) {
+                        $query->select(['journal_id', 'account_id', 'journal_details_debit as cash_in', 'journal_details_credit as cash_out'])
+                            ->with('account:account_id,account_name,account_type_id,account_number,type', 'account.accountType:account_type_id,account_type', 'account.accountType.accountCategory:account_category_id,account_category');
+                    }
+                ])->get(); */
+
+
+    }
+
     public function getRevenueAndExpense($filter)
     {
-        $filterDate = function ($query) use ($filter) {
-            return $query->when($filter, function ($q) use ($filter) {
-                return $q->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]]);
-            });
-        };
+        ;
 
         $data = Accounts::whereHas('accountType', function ($query) {
             $query->whereIn('account_category_id', [AccountCategory::REVENUE_TYPE, AccountCategory::EXPENSE_TYPE]);
         })->with('accountType', function ($query) {
             $query->select(['account_type_id', 'account_category_id'])
                 ->with('accountCategory:account_category_id,account_category');
-        })->whereHas('journalEntries', $filterDate)
+        })->whereHas('journalDetails')
             ->with([
-                'journalEntries' => function ($query) use ($filter, $filterDate) {
+                'journalDetails' => function ($query) {
+                    $query->select([
+                        'journal_entry_details.journal_id',
+                        'journal_entry_details.account_id',
+                        'journal_entry_details.journal_details_debit AS cash_in',
+                        'journal_entry_details.journal_details_credit AS cash_out'
+                    ])
+                        ->orderBy('journal_entry_details.account_id', 'ASC');
+                },
+                'journalDetails.journalEntry' => function ($query) use ($filter) {
                     $query->select([
                         'journal_entry.journal_id',
                         'journal_entry.journal_no',
@@ -399,16 +479,9 @@ class Accounts extends Model
                         'journal_entry.payee',
                         'journal_entry.remarks',
                     ])->posted()
-                        ->when($filter, $filterDate);
-                },
-                'journalEntries.journalDetails' => function ($query) {
-                    $query->select([
-                        'journal_entry_details.journal_id',
-                        'journal_entry_details.account_id',
-                        'journal_entry_details.journal_details_debit AS cash_in',
-                        'journal_entry_details.journal_details_credit AS cash_out'
-                    ])
-                        ->orderBy('journal_entry_details.account_id', 'ASC');
+                        ->when($filter, function ($query, $filter) {
+                            $query->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]]);
+                        });
                 },
             ])->get(['account_id', 'account_number', 'account_name', 'account_type_id', 'type']);
 
