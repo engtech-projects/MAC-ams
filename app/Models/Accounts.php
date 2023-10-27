@@ -52,9 +52,18 @@ class Accounts extends Model
     {
         return $this->hasOne(OpeningBalance::class, 'account_id');
     }
+    public function entries()
+    {
+        return $this->hasManyThrough(journalEntry::class, journalEntryDetails::class, 'account_id', 'journal_id', 'account_id', 'journal_id');
+    }
     public function journalDetails()
     {
-        return $this->hasMany(journalEntryDetails::class, 'journal_id', 'journal_id');
+        return $this->hasMany(journalEntryDetails::class, 'journal_id', 'account_id');
+    }
+
+    public function journalEntries()
+    {
+        return $this->belongsToMany(journalEntry::class, 'journal_entry_details', 'journal_id', 'account_id');
     }
 
     public function store(array $data)
@@ -368,7 +377,7 @@ class Accounts extends Model
 
     public function getEntriesRevenueAndExpense($filter)
     {
-        $result = Accounts::select([
+        /* $result = Accounts::select([
             'accounts.account_id',
             'accounts.account_name',
 
@@ -395,36 +404,88 @@ class Accounts extends Model
                 $query->whereBetween('j_entry.journal_date', [$filter['date_from'], $filter['date_to']]);
             })
             ->from('chart_of_accounts as accounts')
-            ->get();
+            ->get(); */
 
-        $collection = collect($result)->groupBy('account_category')->map(function ($categoryGroup) {
+        $accounts = collect();
+        Accounts::select('chart_of_accounts.account_id', 'chart_of_accounts.account_name', 'details.journal_id', 'category.account_category')->join('account_type as type', 'type.account_type_id', '=', 'chart_of_accounts.account_type_id')
+            ->join('account_category as category', 'category.account_category_id', '=', 'type.account_category_id')
+            ->join('journal_entry_details as details', 'details.account_id', '=', 'chart_of_accounts.account_id')
+            ->whereIn('category.account_category_id', [4, 5])
+            ->orderBy('chart_of_accounts.account_id')
+            ->chunk(500, function ($collections) use (&$accounts) {
+                foreach($collections as $account) {
+                    $accounts->push($account);
+                }
 
-            return [
-                'category_id' => $categoryGroup[0]->account_category_id,
-                'account_category' => $categoryGroup[0]->account_category,
-                'accounts' => collect($categoryGroup)->groupBy('account_id')->map(function ($accountGroup) {
 
-                    return [
-                        "account_id" => $accountGroup[0]->account_id,
-                        "account_name" => $accountGroup[0]->account_name,
-                        'journal_entries' => collect($accountGroup)->groupBy('journal_id')->map(function ($entry) use($accountGroup) {
-                            return [
-                                'journal_id' => $entry[0]["journal_id"],
-                                'journal_no' => $entry[0]['journal_no'],
-                                'journal_date' => $entry[0]['journal_date'],
-                                'journal_details' => collect($accountGroup)->map(function ($item,$key) {
-                                    return [
-                                        "journal_details_debit" => $item["journal_details_debit"],
-                                        "journal_details_credit" => $item["journal_details_credit"]
-                                    ];
-                                })->values()
+            });
 
-                            ];
-                        })->values()->toArray()
-                    ];
-                })->values()
-            ];
-        })->values()->all();
+        $accounts = collect($accounts)->groupBy(function ($item) {
+        })->map(function ($categoryGroup) {
+            $account = collect($categoryGroup)->map(function ($item) {
+
+                return [
+                    "account_id" => $item["account_id"],
+                    "account_name" => $item["account_name"],
+                    "account_category" => $item["account_category"],
+                ];
+            })->values();
+
+            return $account;
+        });
+        return $accounts;
+
+
+        /* $result = Accounts::from('chart_of_accounts AS account')
+            ->select([
+                'account.account_id',
+                'account.account_name',
+                'category.account_category_id',
+                'account.account_number',
+                'entry.journal_id'
+            ])
+            ->join('account_type as type', 'type.account_type_id', '=', 'account.account_type_id')
+            ->join('journal_entry_details as entry_details', 'entry_details.account_id','=', 'account.account_id')
+            ->join('journal_entry as entry', 'entry.journal_id' ,'=', 'entry_details.journal_id')
+            ->join('account_category as category', 'category.account_category_id', '=', 'type.account_category_id')
+            ->whereIn('category.account_category_id',[4,5])
+            ->chunk(1000, function(Collection $accountsCollection) {
+                $accounts= [];
+                foreach($accountsCollection as $account) {
+                    $accounts[] = $account;
+                }
+                return $accounts;
+            }); */
+
+
+        /*  $collection = collect($result)->groupBy('account_category')->map(function ($categoryGroup) {
+
+             return [
+                 'category_id' => $categoryGroup[0]->account_category_id,
+                 'account_category' => $categoryGroup[0]->account_category,
+                 'accounts' => collect($categoryGroup)->groupBy('account_id')->map(function ($accountGroup) {
+
+                     return [
+                         "account_id" => $accountGroup[0]->account_id,
+                         "account_name" => $accountGroup[0]->account_name,
+                         'journal_entries' => collect($accountGroup)->groupBy('journal_id')->map(function ($entry) use($accountGroup) {
+                             return [
+                                 'journal_id' => $entry[0]["journal_id"],
+                                 'journal_no' => $entry[0]['journal_no'],
+                                 'journal_date' => $entry[0]['journal_date'],
+                                 'journal_details' => collect($accountGroup)->map(function ($item,$key) {
+                                     return [
+                                         "journal_details_debit" => $item["journal_details_debit"],
+                                         "journal_details_credit" => $item["journal_details_credit"]
+                                     ];
+                                 })->values()
+
+                             ];
+                         })->values()->toArray()
+                     ];
+                 })->values()
+             ];
+         })->values()->all(); */
 
         return $collection;
 

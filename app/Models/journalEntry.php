@@ -68,9 +68,14 @@ class journalEntry extends Model
         return $query->limit(1000)->get();
     }
 
+    public function details()
+    {
+        return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id');
+    }
+
     public function journalDetails()
     {
-        return $this->hasMany(journalEntryDetails::class, 'journal_id','journal_id');
+        return $this->hasManyThrough(Accounts::class,'journal_entry_details','account_id','journal_id','journal_id');
     }
     public function bookDetails()
     {
