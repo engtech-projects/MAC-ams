@@ -36,9 +36,23 @@ class journalEntry extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
+
     public function scopePosted($query)
     {
         return $query->where('journal_entry.status', self::STATUS_POSTED);
+    }
+
+    public function jDetails()
+    {
+        /* return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id'); */
+        /*  return $this->belongsToMany(journalEntry::class,'journal_entry_details','journal_id','account_id'); */
+        return $this->hasManyThrough(Accounts::class, journalEntryDetails::class, 'journal_id', 'account_id');
+    }
+
+
+    public function journalEntryDetails()
+    {
+        return $this->hasManyThrough(journalEntryDetails::class, journalEntry::class, 'journal_id', 'account_id');
     }
 
 
@@ -70,12 +84,12 @@ class journalEntry extends Model
 
     public function details()
     {
-        return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id');
+        return $this->hasMany(journalEntryDetails::class, 'journal_id', 'journal_id');
     }
 
     public function journalDetails()
     {
-        return $this->hasManyThrough(Accounts::class,'journal_entry_details','account_id','journal_id','journal_id');
+        return $this->hasManyThrough(Accounts::class, 'journal_entry_details', 'account_id', 'journal_id', 'journal_id');
     }
     public function bookDetails()
     {
