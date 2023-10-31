@@ -274,7 +274,7 @@
         $('.aocollection-items').each(function(index, row){
 
         let cells = $(row).find('td');
-        let accountofficer_id = cells.eq(0).data('id');
+        let accountofficer_id = cells.eq(0).val();
         let remarks = cells.eq(1).text();
         let totalamount = Number(cells.eq(2).text().replace(/[^0-9\.-]+/g,""))
 
@@ -391,7 +391,7 @@
             var name =  $('.select-officer option:selected').text();
             var markup = `
                 <tr class="aocollection-items">
-                <td data-id="${accountofficer_id}" >${name}</td>
+                <td data-id="${accountofficer_id}" >${accountofficer_id}</td>
                 <td class="text-right">${remarks}</td>
                 <td id="total_amount">${total_amount}</td>
                 <td><button id="btn-remove-account-officer-collection" class="btn btn-xs btn-danger remove-account-officer-collection">
