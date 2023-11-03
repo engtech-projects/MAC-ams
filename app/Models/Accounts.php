@@ -452,7 +452,7 @@ class Accounts extends Model
             ->whereIn('acc_categ.account_category_id', [4, 5])
             ->where('sub.sub_id', 5)
             ->orderBy('entry.journal_id', 'desc')
-            ->where('sub.sub_id',$filter["subsidiary_id"])
+            ->where('sub.sub_id', $filter["subsidiary_id"])
             ->whereBetween("entry.journal_date", [$filter["date_from"], $filter["date_to"]])
             ->chunk(500, function (Collection $items) use (&$accountsJournalEntries) {
                 foreach ($items as $item) {
@@ -460,43 +460,79 @@ class Accounts extends Model
                 }
             });
 
-            $accountsJournalEntries = $this->mapRevenueMinusExpenseCollection($accountsJournalEntries);
+        $accountsJournalEntries = $this->mapRevenueMinusExpenseCollection($accountsJournalEntries);
 
 
 
         return $accountsJournalEntries;
     }
 
-    public function mapRevenueMinusExpenseCollection($accountsJournalEntries) {
-        $accountsJournalEntries = collect($accountsJournalEntries)->map(function ($item) use ($accountsJournalEntries) {
-            $accounts = [
-                "account_id" => $item["account_id"],
-                "account_name" => $item["account_name"],
-                "account_category" => $item["account_category"],
-                "account_category_id" => $item["account_category_id"]
-            ];
-            $accounts["entries"] = collect($accountsJournalEntries)->filter(function ($item) use (&$accounts) {
-
-                return $item["account_id"] === $accounts["account_id"] && $item["journal_details_debit"] != 0;
-            })->map(function ($item) {
-                return [
-                    "journal_id" => $item["journal_id"],
-                    "journal_no" => $item["journal_no"],
-                    "journal_date" => $item["journal_date"],
-                    "source" => $item["source"],
-                    "debit" => floatVal($item["journal_details_debit"]),
-                    "account" => $item["account_id"],
-                    "branch_name" => $item["branch_name"],
-                    "sub_id" => $item["sub_id"],
-                    "subsidiary_name" => $item["sub_name"],
-                ];
-            })->values();
-
-
-            return $accounts;
-        })->groupBy(function ($groupCategory) {
+    public function mapRevenueMinusExpenseCollection($accountsJournalEntries)
+    {
+        $accountsJournalEntries = collect($accountsJournalEntries)->groupBy(function ($groupCategory) {
             return $groupCategory["account_category"];
-        });
+        })->map(function ($accounts) use ($accountsJournalEntries) {
+            $groupAccounts = collect($accounts)->map(function ($account) use ($accountsJournalEntries) {
+
+                $groupAccounts = [
+                    "account_id" => $account["account_id"],
+                    "account_name" => $account["account_name"],
+                    "account_category" => $account["account_category"],
+                    "account_category_id" => $account["account_category_id"],
+                ];
+
+                $groupAccounts["entries"] = collect($accountsJournalEntries)->filter(function ($item) use (&$groupAccounts) {
+                    return $item["account_id"] === $groupAccounts["account_id"] && $item["journal_details_debit"] != 0;
+                })->map(function($item) {
+                    return [
+                        "journal_id" => $item["journal_id"],
+                        "journal_no" => $item["journal_no"],
+                        "source" => $item["source"],
+                        "journal_details_debit" => floatVal($item["journal_id"]),
+                        "subsidiary_id" => $item["subsidiary_id"],
+                        "subsidiary_name" => $item["subsidiary_name"],
+                        "branch" => $item["branch_name"],
+
+                    ];
+                })->values();
+                return $groupAccounts;
+
+            })->unique()->values();
+
+            return $groupAccounts;
+            /* return [
+                "account_id" => $account[0]["account_id"],
+                "account_name" => $account[0]["account_name"],
+                "account_category" => $account[0]["account_category"],
+                "account_category_id" => $account[0]["account_category_id"],
+
+            ]; */
+            /*   $accounts = [
+                  "account_id" => $item["account_id"],
+                  "account_name" => $item["account_name"],
+                  "account_category" => $item["account_category"],
+                  "account_category_id" => $item["account_category_id"],
+              ];
+              $accounts["entries"] = collect($accountsJournalEntries)->filter(function ($item) use (&$accounts) {
+                  return $item["account_id"] === $accounts["account_id"] && $item["journal_details_debit"] != 0;
+              })->map(function ($item) {
+                  return [
+                      "journal_id" => $item["journal_id"],
+                      "journal_no" => $item["journal_no"],
+                      "journal_date" => $item["journal_date"],
+                      "source" => $item["source"],
+                      "debit" => floatVal($item["journal_details_debit"]),
+                      "account" => $item["account_id"],
+                      "branch_name" => $item["branch_name"],
+                      "sub_id" => $item["sub_id"],
+                      "subsidiary_name" => $item["sub_name"],
+                  ];
+              })->values();
+
+              return $accounts; */
+        }); /* ->groupBy(function ($groupCategory) {
+          return $groupCategory["account_category"];
+      }); */
 
         return $accountsJournalEntries;
     }
