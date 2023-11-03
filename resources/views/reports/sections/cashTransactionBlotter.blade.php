@@ -545,7 +545,7 @@
 												</thead>
 												<tbody>
 													<tr v-for="officer in collections.account_officer_collection">
-														<td>@{{officer.representative}}</td>
+														<td>@{{officer.representative}} ; @{{officer.note}}</td>
 														<td>@{{formatCurrency(officer.total)}}</td>
 													</tr>
 												
