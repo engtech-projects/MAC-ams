@@ -78,9 +78,9 @@ class CollectionBreakdown extends Model
         $prevTransactionDate = Carbon::parse($transactionDate)->subDay();
         $previousCollection = $this->getCollectionByTransactionDate($prevTransactionDate, $collection->branch_id);
         return [
-            'prev_transaction_date' => $previousCollection->transaction_date,
+            'prev_transaction_date' => isset($previousCollection->transaction_date)?$previousCollection->transaction_date:'',
             'transaction_date' => $collection->transaction_date,
-            'total' => $previousCollection->total
+            'total' => isset($previousCollection->total)?$previousCollection->total:0
         ];
     }
 

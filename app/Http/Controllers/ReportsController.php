@@ -375,24 +375,23 @@ class ReportsController extends MainController
     public function cashTransactionBlotter()
     {
         $branchId = 1;
-        return response()->json(
-            [
-                'data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)
-            ]
-        );
-        /* $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
+        // return response()->json(
+        //     [
+        //         'data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)
+        //     ]
+        // );
+        // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
-        return response()->json(['data' => $cashTransactionsEntries]);
+        // return response()->json(['data' => $cashTransactionsEntries]);
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
-            'cashTransactions' => $cashTransactionsEntries,
-            'cash_blotter' => CashBlotter::fetchCashBlotter(),
+            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId),
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
-
-        return view('reports.sections.cashTransactionBlotter', $data); */
+		// dd($data);
+        return view('reports.sections.cashTransactionBlotter', $data);
     }
 
     public function showCashTransactionBlotter($id,Request $request)
@@ -451,8 +450,13 @@ class ReportsController extends MainController
         ], 201);
     }
 
-    public function showCashBlotter($id)
+    public function showCashBlotter($id, Request $request)
     {
+		$journalEntries = new journalEntry();
+        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id,$request->branch_id);
+		return response()->json([
+            'entries' => $cashTransactionsEntries
+        ], 200);
     }
 
     public function editCashBlotter($id)

@@ -189,7 +189,7 @@
         $('.select-officer').append('<option value="" disabled selected text="Select-Officer">')
         $.ajax({
             type: "get",
-            url: "<?= config('app.url') ?>/reports/cashTransactionBlotter/fetchaccountofficer/"+branch_id,
+            url: "{{route('reports.fetchAccountOfficer',['id' => 'branch_id'])}}".replace('branch_id', branch_id),
             dataType: "json",
             success: function (response) {
                 var data = response.data
@@ -222,15 +222,19 @@
             return false
         }
 
-        formData.push({name:'totalcash_count',value:totalcash_count})
-        formData.push({name:'ao_collection',value:JSON.stringify(aocollection_items)})
+        formData.push({name:'total',value:totalcash_count})
+        formData.push({name:'collection_ao',value:aocollection_items})
         formData.push({name:'branch_collection',value:JSON.stringify(branchcollection_items)})
-
+		var fdata = {};
+		for(var i in formData){
+			var fd = formData[i];
+			fdata[fd.name] = fd.value;
+		}
         $.ajax({
 				type:'POST',
 				dataType: "json",
-				url:"{{route('reports.storeCashBlotter')}}",
-				data:formData,
+				url:"{{route('create.collection.breakdown')}}",
+				data:fdata,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -240,7 +244,6 @@
                     $('#cash-blotter-tbl').DataTable().ajax.reload();
                     $('#Mymodal').modal('hide')
                     reset()
-
                 },
                 error:function(data){
                     console.log(data)
@@ -271,7 +274,7 @@
         $('.aocollection-items').each(function(index, row){
 
         let cells = $(row).find('td');
-        let accountofficer_id = cells.eq(0).data('id');
+        let accountofficer_id = cells.eq(0).text();
         let remarks = cells.eq(1).text();
         let totalamount = Number(cells.eq(2).text().replace(/[^0-9\.-]+/g,""))
 
@@ -279,17 +282,18 @@
 
         items.push(
             {
-            'accountofficer_id' : accountofficer_id,
-            'remarks' : remarks,
-            'totalamount':totalamount
+            'representative' : accountofficer_id,
+            'note' : remarks,
+            'total':totalamount,
+			'grp':'collection officer'
             }
         );
 
         });
-
         if( items.length ) {
             return items
         }
+		
         return false;
     }
     function addBranchCollection() {
@@ -387,7 +391,7 @@
             var name =  $('.select-officer option:selected').text();
             var markup = `
                 <tr class="aocollection-items">
-                <td data-id="${accountofficer_id}" >${name}</td>
+                <td data-id="${accountofficer_id}" >${accountofficer_id}</td>
                 <td class="text-right">${remarks}</td>
                 <td id="total_amount">${total_amount}</td>
                 <td><button id="btn-remove-account-officer-collection" class="btn btn-xs btn-danger remove-account-officer-collection">
