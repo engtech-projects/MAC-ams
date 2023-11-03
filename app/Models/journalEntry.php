@@ -178,6 +178,7 @@ class journalEntry extends Model
     {
         $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
             ->whereDate('journal_date', '=', $transactionDate)
+            ->with('branch:branch_id,branch_name')
             ->whereIn('book_id', JournalBook::INTER_BRANCH_BOOKS)
             ->posted()
             ->with([
