@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RevenueMinusExpenseRequest;
 use App\Models\CollectionBreakdown;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -616,10 +617,10 @@ class ReportsController extends MainController
         }
     }
 
-    public function revenueMinusExpense(Request $request)
+    public function revenueMinusExpense(RevenueMinusExpenseRequest $request)
     {
         $accounts = new Accounts();
-        $data = $accounts->getRevenueAndExpense($request->input());
+        $data = $accounts->getRevenueAndExpense($request->validated());
         return new JsonResponse(["data" => $data],200);
     }
 
