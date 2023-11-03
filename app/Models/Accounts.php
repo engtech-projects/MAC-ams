@@ -487,10 +487,11 @@ class Accounts extends Model
                     return [
                         "journal_id" => $item["journal_id"],
                         "journal_no" => $item["journal_no"],
+                        "journal_date" => $item["journal_date"],
                         "source" => $item["source"],
-                        "journal_details_debit" => floatVal($item["journal_id"]),
-                        "subsidiary_id" => $item["subsidiary_id"],
-                        "subsidiary_name" => $item["subsidiary_name"],
+                        "journal_details_debit" => floatVal($item["journal_details_debit"]),
+                        "subsidiary_id" => $item["sub_id"],
+                        "subsidiary_name" => $item["sub_name"],
                         "branch" => $item["branch_name"],
 
                     ];
