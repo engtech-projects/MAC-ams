@@ -401,7 +401,7 @@ class Accounts extends Model
                 'account.account_id',
                 'account.account_name',
                 'acc_categ.account_category',
-                'sub.sub_id',
+                'detail.subsidiary_id',
                 'sub.sub_name',
                 'branch.branch_name',
                 'acc_type.account_no as account_type_no',
@@ -415,16 +415,14 @@ class Accounts extends Model
             ->join('subsidiary as sub', 'sub.sub_id', '=', 'detail.subsidiary_id')
             ->join('branch', 'branch.branch_id', '=', 'entry.branch_id')
             ->whereIn('acc_categ.account_category_id', [4, 5])
-            ->where('sub.sub_id', 5)
             ->orderBy('entry.journal_id', 'desc')
-            ->where('sub.sub_id', $filter["subsidiary_id"])
+            ->where('detail.subsidiary_id', $filter["subsidiary_id"])
             ->whereBetween("entry.journal_date", [$filter["date_from"], $filter["date_to"]])
             ->chunk(500, function (Collection $items) use (&$accountsJournalEntries) {
                 foreach ($items as $item) {
                     $accountsJournalEntries->push($item);
                 }
             });
-
         $accountsJournalEntries = $this->mapRevenueMinusExpenseCollection($accountsJournalEntries);
 
         return $accountsJournalEntries;
@@ -436,7 +434,6 @@ class Accounts extends Model
             return $groupCategory["account_category"];
         })->map(function ($accounts) use ($accountsJournalEntries) {
             $groupAccounts = collect($accounts)->map(function ($account) use ($accountsJournalEntries) {
-
                 $groupAccounts = [
                     "account_id" => $account["account_id"],
                     "account_name" => $account["account_name"],
@@ -445,15 +442,16 @@ class Accounts extends Model
                 ];
 
                 $groupAccounts["entries"] = collect($accountsJournalEntries)->filter(function ($item) use (&$groupAccounts) {
-                    return $item["account_id"] === $groupAccounts["account_id"] && $item["journal_details_debit"] != 0;
+                    return $item["account_id"] === $groupAccounts["account_id"] && floatVal($item["journal_details_debit"]) != 0;
                 })->map(function($item) {
                     return [
                         "journal_id" => $item["journal_id"],
                         "journal_no" => $item["journal_no"],
                         "journal_date" => $item["journal_date"],
+                        "account_id" => $item["account_id"],
                         "source" => $item["source"],
                         "journal_details_debit" => floatVal($item["journal_details_debit"]),
-                        "subsidiary_id" => $item["sub_id"],
+                        "subsidiary_id" => $item["subsidiary_id"],
                         "subsidiary_name" => $item["sub_name"],
                         "branch" => $item["branch_name"],
 
