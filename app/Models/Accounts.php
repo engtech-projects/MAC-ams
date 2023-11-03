@@ -387,41 +387,6 @@ class Accounts extends Model
     }
 
 
-    public function getEntriesRevenueAndExpense($filter)
-    {
-        $accountCollections = collect();
-        Accounts::whereHas('accountType.accountCategory', function ($query) {
-            $query->whereIn('account_category.account_category_id', [4, 5]);
-        })->whereHas('journalEntryDetails.journalEntry', function ($query) use ($filter) {
-            $query->when($filter["subsidiary_id"] != "All", function ($query) use ($filter) {
-                $query->where('subsidiary_id', $filter["subsidiary_id"]);
-            })->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]]);
-        })->with([
-                    'accountType' => function ($query) {
-                        $query->select('account_type_id')->withAggregate('accountCategory as account_category', 'account_category')
-                            ->withAggregate('accountCategory as to_increase', 'to_increase');
-                    }
-                ])->with([
-                    'journalEntryDetails' => function ($query) use ($filter) {
-                        $query->withAggregate('subsidiary as subsidiary', 'sub_name');
-                        $query->whereHas('journalEntry', function ($query) use ($filter) {
-                            $query->when($filter["subsidiary_id"] != "All", function ($query) use ($filter) {
-                                $query->where('subsidiary_id', $filter["subsidiary_id"]);
-                            })->whereBetween('journal_date', [$filter["date_from"], $filter["date_to"]]);
-                        })->with('journalEntry', function ($query) use ($filter) {
-                            $query->select('journal_id', 'journal_date', 'journal_no', 'branch_id', 'source')
-                                ->withAggregate('branch as branch_name', 'branch_name');
-                        })->orderBy('journal_id');
-                    }
-                ])->chunk(500, function ($items) use (&$accountCollections) {
-                    foreach ($items as $item) {
-                        $accountCollections->push($item);
-                    }
-
-                });
-        return $this->AccountMapping($accountCollections);
-    }
-
     public function getRevenueAndExpense($filter)
     {
         $accountsJournalEntries = collect();
@@ -462,8 +427,6 @@ class Accounts extends Model
 
         $accountsJournalEntries = $this->mapRevenueMinusExpenseCollection($accountsJournalEntries);
 
-
-
         return $accountsJournalEntries;
     }
 
@@ -501,79 +464,8 @@ class Accounts extends Model
             })->unique()->values();
 
             return $groupAccounts;
-            /* return [
-                "account_id" => $account[0]["account_id"],
-                "account_name" => $account[0]["account_name"],
-                "account_category" => $account[0]["account_category"],
-                "account_category_id" => $account[0]["account_category_id"],
-
-            ]; */
-            /*   $accounts = [
-                  "account_id" => $item["account_id"],
-                  "account_name" => $item["account_name"],
-                  "account_category" => $item["account_category"],
-                  "account_category_id" => $item["account_category_id"],
-              ];
-              $accounts["entries"] = collect($accountsJournalEntries)->filter(function ($item) use (&$accounts) {
-                  return $item["account_id"] === $accounts["account_id"] && $item["journal_details_debit"] != 0;
-              })->map(function ($item) {
-                  return [
-                      "journal_id" => $item["journal_id"],
-                      "journal_no" => $item["journal_no"],
-                      "journal_date" => $item["journal_date"],
-                      "source" => $item["source"],
-                      "debit" => floatVal($item["journal_details_debit"]),
-                      "account" => $item["account_id"],
-                      "branch_name" => $item["branch_name"],
-                      "sub_id" => $item["sub_id"],
-                      "subsidiary_name" => $item["sub_name"],
-                  ];
-              })->values();
-
-              return $accounts; */
-        }); /* ->groupBy(function ($groupCategory) {
-          return $groupCategory["account_category"];
-      }); */
-
-        return $accountsJournalEntries;
-    }
-    public static function AccountMapping($accountCollections)
-    {
-        $accountCollections = collect($accountCollections)->map(function ($item) {
-            $accountCategory = $item->accountType["to_increase"];
-            $item["j_entries"] = collect($item->journalEntryDetails)->map(function ($item) {
-                $journalEntries = [
-                    "journal_id" => $item["journal_id"],
-                    "journal_details_account_no" => $item["journal_details_account_no"],
-                    "journal_date" => $item->journalEntry["journal_date"],
-                    "journal_no" => $item->journalEntry["journal_no"],
-                    "j_details" => [
-                        "subsidiary" => $item["subsidiary"],
-                        "branch" => $item->journalEntry["branch_name"],
-                        "cash_in" => floatVal($item["journal_details_debit"]),
-                        "cash_out" => floatVal($item["journal_details_credit"]),
-
-                    ]
-                ];
-
-                return $journalEntries;
-            })->filter(function ($item) use ($accountCategory) {
-                if ($accountCategory === "credit") {
-                    return $item["j_details"]["cash_out"] > 0;
-                }
-                return $item["j_details"]["cash_in"] > 0;
-            })->filter()->values();
-            return $item;
-        })->map(function ($item) {
-            unset($item->journalEntryDetails);
-            return $item;
-        })->filter(function ($item) {
-            return !empty($item["j_entries"]->toArray());
-        })->groupBy(function ($item) {
-            return $item->accountType->account_category === "income" ? "revenue" : "expense";
         });
 
-
-        return $accountCollections;
+        return $accountsJournalEntries;
     }
 }
