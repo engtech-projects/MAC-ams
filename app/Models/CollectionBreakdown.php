@@ -6,12 +6,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
+use DB;
+
 class CollectionBreakdown extends Model
 {
     use HasFactory;
 
+    const COLLECTION_GRP_ACCOUNT_OFFICER = "account_officer";
+    const COLLECTION_FLAG = "P";
+
     protected $primaryKey = 'collection_id';
     protected $table = 'collection_breakdown';
+    public $timestamps = false;
+
+    protected $fillable = [
+        "p_1000",
+        "p_500",
+        "p_200",
+        "p_100",
+        "p_50",
+        "p_20",
+        "p_10",
+        "p_5",
+        "p_1",
+        "c_25",
+        "transaction_date",
+        "branch_id",
+        "total",
+    ];
+
 
     public function accountOfficerCollection()
     {
@@ -31,6 +54,21 @@ class CollectionBreakdown extends Model
     {
         $collection = CollectionBreakdown::where('branch_id', $branchId)->whereDate('transaction_date', '=', $transactionDate)->first();
         return $collection;
+    }
+
+    public function createCollection(array $attributes)
+    {
+        $collection_ao = collect($attributes["collection_ao"])->map(function ($value) {
+            $value["flag"] = CollectionBreakdown::COLLECTION_FLAG;
+            $value["grp"] = CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER;
+
+            return $value;
+        })->values();
+
+        return DB::transaction(function () use ($attributes, $collection_ao) {
+           self::create($attributes)->accountOfficerCollection()->createMany($collection_ao);
+        });
+
     }
 
     public function getPreviousCollection($id)

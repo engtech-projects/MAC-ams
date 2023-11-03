@@ -12,6 +12,7 @@ class AccountOfficerCollection extends Model
 
     protected $table = 'collection_ao';
     protected $primaryKey = 'collection_ao_id';
+    public $timestamps = false;
 
     protected $fillable = [
         'collection_id',
@@ -20,4 +21,10 @@ class AccountOfficerCollection extends Model
         'note',
         'total'
     ];
+
+    public function collection()
+    {
+        return $this->belongsTo(CollectionBreakdown::class,'collection_id');
+
+    }
 }
