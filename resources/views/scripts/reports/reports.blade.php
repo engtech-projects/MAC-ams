@@ -274,7 +274,7 @@
         $('.aocollection-items').each(function(index, row){
 
         let cells = $(row).find('td');
-        let accountofficer_id = cells.eq(0).val();
+        let accountofficer_id = cells.eq(0).text();
         let remarks = cells.eq(1).text();
         let totalamount = Number(cells.eq(2).text().replace(/[^0-9\.-]+/g,""))
 
@@ -290,10 +290,10 @@
         );
 
         });
-
         if( items.length ) {
             return items
         }
+		
         return false;
     }
     function addBranchCollection() {
