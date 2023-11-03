@@ -619,10 +619,8 @@ class ReportsController extends MainController
     public function revenueMinusExpense(Request $request)
     {
         $accounts = new Accounts();
-        $data = $accounts->getEntriesRevenueAndExpense($request->input());
-        return $data;
-        $data = Accounts::AccountMapping($data);
-        return $data;
+        $data = $accounts->getRevenueAndExpense($request->input());
+        return new JsonResponse(["data" => $data],200);
     }
 
 
