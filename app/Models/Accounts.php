@@ -397,6 +397,7 @@ class Accounts extends Model
                 'entry.journal_date',
                 'entry.source',
                 'detail.journal_details_debit',
+                'detail.journal_details_credit',
                 'account.account_number',
                 'account.account_id',
                 'account.account_name',
@@ -405,7 +406,8 @@ class Accounts extends Model
                 'sub.sub_name',
                 'branch.branch_name',
                 'acc_type.account_no as account_type_no',
-                'acc_categ.account_category_id'
+                'acc_categ.account_category_id',
+                'acc_categ.to_increase'
 
             ])
             ->join('chart_of_accounts as account', 'account.account_id', '=', 'detail.account_id')
@@ -440,28 +442,44 @@ class Accounts extends Model
                     "account_category" => $account["account_category"],
                     "account_category_id" => $account["account_category_id"],
                 ];
-
                 $groupAccounts["entries"] = collect($accountsJournalEntries)->filter(function ($item) use (&$groupAccounts) {
-                    return $item["account_id"] === $groupAccounts["account_id"] && floatVal($item["journal_details_debit"]) != 0;
-                })->map(function($item) {
-                    return [
+                    $filteredAccounts = $item["account_id"] === $groupAccounts["account_id"];
+                    return $filteredAccounts;
+                })->map(function ($item, $category) {
+                    $details = [
                         "journal_id" => $item["journal_id"],
                         "journal_no" => $item["journal_no"],
                         "journal_date" => $item["journal_date"],
                         "account_id" => $item["account_id"],
                         "source" => $item["source"],
-                        "journal_details_debit" => floatVal($item["journal_details_debit"]),
                         "subsidiary_id" => $item["subsidiary_id"],
                         "subsidiary_name" => $item["sub_name"],
                         "branch" => $item["branch_name"],
+                        "to_increase" => $item["to_increase"],
+                        "credit" => $item["journal_details_credit"],
+                        "debit" => $item["journal_details_debit"]
 
                     ];
-                })->values();
+                    return $details;
+                })->filter(function ($item) {
+                    if ($item["to_increase"] === "credit") {
+                        return $item["credit"] > 0;
+                    } else {
+                        return $item["debit"] > 0;
+                    }
+                })->filter()->values();
                 return $groupAccounts;
-
             })->unique()->values();
-
             return $groupAccounts;
+        })->map(function ($item) {
+            $accounts = collect($item)->map(function ($item) {
+                if (count($item["entries"]) > 0) {
+                    return $item;
+                } else {
+                    unset($item);
+                }
+            })->filter()->values();
+            return $accounts;
         });
 
         return $accountsJournalEntries;
