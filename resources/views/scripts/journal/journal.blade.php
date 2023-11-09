@@ -787,9 +787,10 @@
 							<td>${v.journal_date}</td>
 							<td class="nav-link ${status}"><b>${v.status}</b></td>
 							<td>
-								<button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-sm bg-gradient-danger JnalDelete">Delete</button>
-								<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
-								<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
+                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
+                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i class="fa fa-edit"></i></button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs bg-gradient-success stStatus"><i class="fa fa-check"></i></button>
 							</td>
 						</tr>`
                         );
