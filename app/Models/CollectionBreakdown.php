@@ -52,7 +52,11 @@ class CollectionBreakdown extends Model
     }
     public function getCollectionByTransactionDate($transactionDate, $branchId)
     {
-        $collection = CollectionBreakdown::where('branch_id', $branchId)->whereDate('transaction_date', '=', $transactionDate)->first();
+
+        $collection = CollectionBreakdown::whereDate('transaction_date','<', $transactionDate)
+        ->where('branch_id',$branchId)
+        ->orderBy('collection_id','DESC')
+        ->first();
         return $collection;
     }
 
@@ -75,12 +79,12 @@ class CollectionBreakdown extends Model
     {
         $collection = $this->getCollectionById($id);
         $transactionDate = Carbon::createFromFormat('Y-m-d', $collection->transaction_date);
-        $prevTransactionDate = Carbon::parse($transactionDate)->subDay();
-        $previousCollection = $this->getCollectionByTransactionDate($prevTransactionDate, $collection->branch_id);
+
+        $previousCollection = $this->getCollectionByTransactionDate($transactionDate, $collection->branch_id);
         return [
             'prev_transaction_date' => isset($previousCollection->transaction_date)?$previousCollection->transaction_date:'',
             'transaction_date' => $collection->transaction_date,
-            'total' => isset($previousCollection->total)?$previousCollection->total:0
+            'total' => isset($previousCollection->total) ? $previousCollection->total:0
         ];
     }
 
