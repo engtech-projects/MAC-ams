@@ -32,12 +32,12 @@ use App\Http\Controllers\CollectionController;
 
 // LoginController
 Route::get('/', [LoginController::class, 'index'])->name('/');
-Route::get('get-token',function() {
+Route::get('get-token', function () {
     return response()->json(['data' => csrf_token()]);
 });
 Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user');
 Route::get('login', [LoginController::class, 'index'])->name('login');
-Route::get('logout',[LoginController::class, 'userLogout'])->name('logout');
+Route::get('logout', [LoginController::class, 'userLogout'])->name('logout');
 /* Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user'); */
 // DashboardController
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -156,6 +156,7 @@ Route::get('reports/cashTransactionBlotter/showcashblotter/{id}', [ReportsContro
 Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsController::class, 'editCashBlotter'])->name('reports.editCashBlotter');
 Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter');
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
+Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses');
 
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');

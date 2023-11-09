@@ -15,4 +15,5 @@ class Branch extends Model
     public static function fetchBranch() {
         return Branch::all();
     }
+
 }
