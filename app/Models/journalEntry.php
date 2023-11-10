@@ -119,7 +119,7 @@ class journalEntry extends Model
             'amount' => $requestEntry["amount"]
 
         ]);
-        $journalEntry->journalDetails()->createMany($requestDetails);
+        $journalEntry->details()->createMany($requestDetails);
         return $journalEntry;
     }
 
