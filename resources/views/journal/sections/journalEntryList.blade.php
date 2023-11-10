@@ -1,146 +1,150 @@
 @extends('layouts.app')
 
 @section('content')
+    <style type="text/css">
+        .frm-header {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4ec891;
+        }
+        .tbl-row {
+            cursor: pointer;
+        }
 
-<style type="text/css">
-	.frm-header{
-		margin-bottom:10px;
-		padding-bottom:10px;
-		border-bottom:2px solid #4ec891;
-	}
-    .tbl-row {
-        cursor: pointer;
-    }
-	.search-custom{
-		display:block;
-		position:absolute;
-		z-index:999;
-		width:100%;
-		margin:0px!important;
-		color:#3d9970!;
-		font-weight:bold;
-		font-size:14px;
-	}
-	.dataTables_filter{
-		float:right!important;
-	}
-	.label-sty{
-		color:#344069!important;
-	}
-	a{
-		color:#101b27!important;
-	}
-	.page-item.active .page-link{
-		color:white!important;
-	}
-    #account-details {
-        padding: 50px;
-        display: none;
-    }
-    .editable-container.editable-inline,
-    .editable-container.editable-inline .control-group.form-group,
-    .editable-container.editable-inline .control-group.form-group .editable-input,
-    .editable-container.editable-inline .control-group.form-group .editable-input textarea,
-    .editable-container.editable-inline .control-group.form-group .editable-input select,
-    .editable-container.editable-inline .control-group.form-group .editable-input input:not([type=radio]):not([type=checkbox]):not([type=submit]) {
-        width: 100%;
-    }
+        .search-custom {
+            display: block;
+            position: absolute;
+            z-index: 999;
+            width: 100%;
+            margin: 0px !important;
+            color: #3d9970 !;
+            font-weight: bold;
+            font-size: 14px;
+        }
 
-</style>
-<!-- Main content -->
-<section class="content">
-  <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
-	<div class="row">
-		<div class="col-md-12">
-			<form id="SearchJournalForm" method="post">
-				@csrf
-				<div class="row">
-					<div class="col-md-12 frm-header">
-						<h4 ><b>Journal Entry List</b></h4>
-					</div>
-					<div class="col-md-12" style="height:20px;"></div>
-					<div class="col-md-4 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="branch_id">Branch</label>
-								<div class="input-group">
-									<select name="s_branch_id" class="form-control form-control-sm select2" id="s_branch_id">
-										<option value="" disabled selected>-All-</option>
-										<option value="1">Butuan City Branch</option>
-										<option value="2">Nasipit Branch</option>
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-4 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="branch_id">Book Reference</label>
-								<div class="input-group">
-									<select name="s_book_id" class="select2 form-control form-control-sm" id="s_book_id" >
-										<option value="" disabled selected>-All-</option>
-										@foreach($journalBooks as $journalBook)
-											<option value="{{$journalBook->book_id}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
-										@endforeach
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-4 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="s_status">Status</label>
-								<div class="input-group">
-									<select name="s_status" class="select2 form-control form-control-sm" id="s_status">
-											<option value="" selected>-All-</option>
-											<option value="unposted">Unposted</option>
-											<option value="posted">Posted</option>
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-5 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="s_from">From</label>
-								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="s_from" id="s_from"  placeholder="Book Reference" required>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-5 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="s_to">To</label>
-								<div class="input-group">
-									<input disabled type="date" class="form-control form-control-sm rounded-0" name="s_to" id="s_to"  placeholder="Book Reference" required>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-2 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="book_ref">To</label>
-								<div class="input-group">
-									<button class="btn btn-flat btn-sm bg-gradient-success" id="searchJournal" >SEARCH</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-12" style="height:20px;"></div>
-			</form>
-		</div>
-		<div class="co-md-12" style="height:10px;"></div>
-		<div class="col-md-12">
-			<!-- Table -->
-			<section class="content">
-{{--                 <a class="" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+        .dataTables_filter {
+            float: right !important;
+        }
+
+        .label-sty {
+            color: #344069 !important;
+        }
+
+        a {
+            color: #101b27 !important;
+        }
+
+        .page-item.active .page-link {
+            color: white !important;
+        }
+
+        #account-details {
+            padding: 50px;
+            display: none;
+        }
+    </style>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="SearchJournalForm" method="post">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-12 frm-header">
+                                <h4><b>Journal Entry List</b></h4>
+                            </div>
+                            <div class="col-md-12" style="height:20px;"></div>
+                            <div class="col-md-4 col-xs-12">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="branch_id">Branch</label>
+                                        <div class="input-group">
+                                            <select name="s_branch_id" class="form-control form-control-sm select2"
+                                                id="s_branch_id">
+                                                <option value="" disabled selected>-All-</option>
+                                                <option value="1">Butuan CIty Branch</option>
+                                                <option value="2">Nasipit Branch</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="branch_id">Book Reference</label>
+                                        <div class="input-group">
+                                            <select name="s_book_id" class="select2 form-control form-control-sm"
+                                                id="s_book_id">
+                                                <option value="" disabled selected>-All-</option>
+                                                @foreach ($journalBooks as $journalBook)
+                                                    <option value="{{ $journalBook->book_id }}">
+                                                        {{ $journalBook->book_code }} - {{ $journalBook->book_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="s_status">Status</label>
+                                        <div class="input-group">
+                                            <select name="s_status" class="select2 form-control form-control-sm"
+                                                id="s_status">
+                                                <option value="" selected>-All-</option>
+                                                <option value="unposted">Unposted</option>
+                                                <option value="posted">Posted</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 col-xs-12">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="s_from">From</label>
+                                        <div class="input-group">
+                                            <input type="date" class="form-control form-control-sm rounded-0"
+                                                name="s_from" id="s_from" placeholder="Book Reference" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 col-xs-12">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="s_to">To</label>
+                                        <div class="input-group">
+                                            <input disabled type="date" class="form-control form-control-sm rounded-0"
+                                                name="s_to" id="s_to" placeholder="Book Reference" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-12">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="book_ref">To</label>
+                                        <div class="input-group">
+                                            <button class="btn btn-flat btn-sm bg-gradient-success"
+                                                id="searchJournal">SEARCH</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12" style="height:20px;"></div>
+                    </form>
+                </div>
+                <div class="co-md-12" style="height:10px;"></div>
+                <div class="col-md-12">
+                    <!-- Table -->
+                    <section class="content">
+                        {{--                 <a class="" data-widget="control-sidebar" data-slide="true" href="#" role="button">
                     <i class="fas fa-cog"></i>
                 </a> --}}
 
@@ -195,32 +199,49 @@
                                                 <th>S/L</th>
                                                 <th width="150">Debit</th>
 								                <th width="150">Credit</th>
-
                                             </tr>
-                                        </thead>
-                                        <tbody id="tbl-preview-container">
-                                        </tbody>
-                                        <tfoot>
-                                            <tr class="text-center">
-                                                <th></th>
-                                                <th width="200"></th>
-                                                <th width="200">TOTAL</th>
-                                                <th width="150" id="vtotal_debit">0</th>
-                                                <th width="150" id="vtotal_credit">0</th>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                <div id="account-details">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm" id="tbl-create-journal">
+                                                <thead>
+                                                    <tr class="text-center">
+                                                        <th>Account #</th>
+                                                        <th>Account Name</th>
 
-                                            </tr>
-                                            <tr class="text-center">
-                                                <th></th>
-                                                <th width="200"></th>
-                                                <th width="200">BALANCE</th>
-                                                <th width="150" id="vbalance_debit">0</th>
-                                                <th width="150" id="vbalance_credit">0</th>
+                                                        <th>S/L</th>
+                                                        <th width="150">Debit</th>
+                                                        <th width="150">Credit</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbl-preview-container">
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="text-center">
+                                                        <th></th>
+                                                        <th width="200"></th>
+                                                        <th width="200">TOTAL</th>
+                                                        <th width="150" id="vtotal_debit">0</th>
+                                                        <th width="150" id="vtotal_credit">0</th>
+
+                                                    </tr>
+                                                    <tr class="text-center">
+                                                        <th></th>
+                                                        <th width="200"></th>
+                                                        <th width="200">BALANCE</th>
+                                                        <th width="150" id="vbalance_debit">0</th>
+                                                        <th width="150" id="vbalance_credit">0</th>
 
 
-                                            </tr>
+                                                    </tr>
 
-                                        </tfoot>
-                                    </table>
+                                                </tfoot>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                         </div> -->
@@ -373,14 +394,12 @@
 											<th width="150" class="text-left" id="vbalance_debit">0</th>
 											<th width="150" class="text-left" id="vcredit"></th>
 										</tr>
-
-									</tfoot>
-								</table>
-								</div>
-							</div>
-							<div class="col-md-12" style="height:20px;"></div>
-							<div class="col-md-12 text-right" id="posted-content">
-
+                                        </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" style="height:20px;"></div>
+                                <div class="col-md-12 text-right" id="posted-content">
 							</div>
 						</div>
 						<!-- Button trigger modal -->
@@ -583,120 +602,131 @@
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="modal-body"  >
+                        <div class="container-fluid ">
+                            <div id="ui-view">
+                                <div class="card">
 
-				<div class="container-fluid ">
-					<div id="ui-view">
-						<div class="card">
+                                    <div class="card-body" id="toPrintVouch">
+                                        <link rel="stylesheet"
+                                            href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
+                                        <link rel="stylesheet"
+                                            href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+                                        <link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
+                                        <div class="col-md-12">
+                                            <img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"
+                                                class="img img-fluid">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h3 style="text-align:center">Journal Voucher</h3>
+                                        </div>
+                                        <div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_pay"></strong></h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_branch"></strong></h6>
 
-							<div class="card-body" id="toPrintVouch">
-								<link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
-								<link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
-								<link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
-								<div class="col-md-12">
-									<img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"  class="img img-fluid">
-								</div>
-								<div class="col-md-12">
-									<h3 style="text-align:center">Journal Voucher</h3>
-								</div>
-								<div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
-									<div class="col-md-6">
-										<div class="col-md-12">
-											<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="voucher_pay"></strong></h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_date"></strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_ref_no"></strong></h6>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_source"></strong></h6>
+
+	                                                </div>
+	                                            </div>
+	                                            <div class="col-md-12">
+	                                                <div class="col-md-12">
+	                                                    <h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong
+	                                                            id="voucher_particular"></strong></h6>
+											</div>
 										</div>
-									</div>
-									<div class="col-md-6">
 										<div class="col-md-12">
-											<h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong id="voucher_branch"></strong></h6>
+											<div class="col-md-12">
+												<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; <strong id="voucher_amount"></strong></h6>
+	                                                </div>
+	                                            </div>
+	                                            <div class="col-md-12">
+	                                                <div class="col-md-12">
+	                                                    <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
+	                                                            id="voucher_amount_in_words"
+	                                                            style="text-transform:capitalize;"></strong></h6>
 
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="col-md-12">
-											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong id="voucher_date"></strong></h6>
+	                                                </div>
+	                                            </div>
+                                        </div>
+                                        <div class="table-responsive-sm" style="padding-top:5px;">
+                                            <table class="table table-striped"
+                                                style="border-top:4px dashed black;border-bottom:4px dashed black;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">Account</th>
+                                                        <th>Title</th>
+                                                        <th>S/L</th>
+                                                        <th class="center">Debit</th>
+                                                        <th class="right">Credit</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="journalVoucherContent">
 
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="col-md-12">
-											<h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong id="voucher_ref_no"></strong></h6>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-4 col-sm-5"></div>
+                                            <div class="col-lg-4 col-sm-5 ml-auto">
+                                                <table class="table table-clear">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="left">
+                                                                <strong>TOTAL</strong>
+                                                            </td>
+                                                            <td class="left"><strong id="total_debit_voucher"></strong>
+                                                            </td>
+                                                            <td class="left"><strong id="total_credit_voucher"></strong>
+                                                            </td>
+                                                        </tr>
 
-										</div>
-									</div>
-								</div>
-								<div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong id="voucher_source"></strong></h6>
+                                                    </tbody>
+                                                </table>
 
-										</div>
-									</div>
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong id="voucher_particular"></strong></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-										</div>
-									</div>
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; <strong id="voucher_amount"></strong></h6>
+                </div>
+            </div>
+        </div>
 
-										</div>
-									</div>
-									<div class="col-md-12">
-										<div class="col-md-12">
-											<h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong id="voucher_amount_in_words" style="text-transform:capitalize;"></strong></h6>
-
-										</div>
-									</div>
-								</div>
-								<div class="table-responsive-sm" style="padding-top:5px;">
-									<table class="table table-striped" style="border-top:4px dashed black;border-bottom:4px dashed black;">
-									<thead>
-										<tr>
-										<th class="center">Account</th>
-										<th>Title</th>
-										<th>S/L</th>
-										<th class="center">Debit</th>
-										<th class="right">Credit</th>
-										</tr>
-									</thead>
-									<tbody id="journalVoucherContent">
-
-									</tbody>
-									</table>
-								</div>
-								<div class="row">
-									<div class="col-lg-4 col-sm-5"></div>
-									<div class="col-lg-4 col-sm-5 ml-auto">
-									<table class="table table-clear">
-										<tbody>
-										<tr>
-											<td class="left">
-											<strong>TOTAL</strong>
-											</td>
-											<td class="left"><strong id="total_debit_voucher"></strong></td>
-											<td class="left"><strong id="total_credit_voucher"></strong></td>
-										</tr>
-
-										</tbody>
-									</table>
-
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-		</div>
-	</div>
-</div>
-
-<!-- /.content -->
-@endsection
+        <!-- /.content -->
+    @endsection
 
 
-@section('footer-scripts')
- 	@include('scripts.journal.journal')
-@endsection
+    @section('footer-scripts')
+        @include('scripts.journal.journal')
+    @endsection
