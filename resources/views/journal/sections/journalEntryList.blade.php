@@ -185,7 +185,6 @@
                                                 <th>Account Name</th>
 
                                                 <th>S/L</th>
-                                                <th>Description</th>
                                                 <th width="150">Debit</th>
 								                <th width="150">Credit</th>
 
@@ -206,7 +205,6 @@
                                             </tr>
                                             <tr class="text-center">
                                                 <th></th>
-                                                <th width="200"></th>
                                                 <th width="200"></th>
                                                 <th width="200">BALANCE</th>
                                                 <th width="150" id="vbalance_debit">0</th>
@@ -348,7 +346,6 @@
 											<th>Account #</th>
 											<th>Account Name</th>
 											<th>S/L</th>
-											<th>Description</th>
                                             <th>Debit</th>
                                             <th>Credit</th>
 										</tr>
@@ -366,7 +363,6 @@
 										</tr>
 										<tr class="text-center">
 											<th></th>
-                                            <th></th>
                                             <th></th>
 											<th width="200">BALANCE</th>
 											<th width="150" class="text-left" id="vdebit">0</th>
@@ -539,7 +535,6 @@
 										<th width="150">Debit</th>
 										<th width="150">Credit</th>
 										<th width="200">S/L</th>
-										<th width="200">Description</th>
 										<th class="text-right" width="50">Action</th>
 									</tr>
 								</thead>
@@ -554,7 +549,6 @@
 										<th width="150" id="edit_total_debit">0</th>
 										<th width="150" id="edit_total_credit">0</th>
 										<th width="200"></th>
-										<th width="200"></th>
 										<th class="text-right" width="50"></th>
 									</tr>
 									<tr class="text-center">
@@ -562,7 +556,6 @@
 										<th width="200">BALANCE</th>
 										<th width="150" id="edit_balance_debit">0</th>
 										<th width="150"></th>
-										<th width="200"></th>
 										<th width="200"></th>
 										<th class="text-right" width="50"></th>
 									</tr>

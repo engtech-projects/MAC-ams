@@ -42,18 +42,13 @@ class journalEntry extends Model
         return $query->where('journal_entry.status', self::STATUS_POSTED);
     }
 
-    public function jDetails()
-    {
-        /* return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id'); */
-        /*  return $this->belongsToMany(journalEntry::class,'journal_entry_details','journal_id','account_id'); */
-        return $this->hasManyThrough(Accounts::class, journalEntryDetails::class, 'journal_id', 'account_id');
-    }
-
 
     public function journalEntryDetails()
     {
-        return $this->hasManyThrough(journalEntryDetails::class, journalEntry::class, 'journal_id', 'account_id');
+        return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id');
     }
+
+
 
 
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'DESC', $journal_no = '')

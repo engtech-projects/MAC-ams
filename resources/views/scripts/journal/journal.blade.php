@@ -586,10 +586,10 @@
                             $('#edit_amount').val(v.amount);
                             $('#edit_payee').val(v.payee);
                             $('#edit_remarks').val(v.remarks);
-                            $.each(v.journal_details, function(kk, vv) {
+                            $.each(v.journal_entry_details, function(kk, vv) {
                                 $('#tbl-create-edit-container').append(`<tr class='editable-table-row'>
 								<td class="acctnu" value="" >
-									<a href="#" class="editable-row-item journal_details_account_no">${vv.chart_of_account.account_number}</a>
+									<a href="#" class="editable-row-item journal_details_account_no">${vv.account.account_number}</a>
 								</td>
 								<td class='editable-table-data' value="" >
 									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item COASelect">
