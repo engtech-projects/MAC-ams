@@ -842,10 +842,8 @@
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
-
-
             var content = `<tr class='editable-table-row'>
-			<td class="acctnu" value="" >
+			<td class="acctnu" value="">
 				<a href="#" class="editable-row-item journal_details_account_no"></a>
 			</td>
 			<td class='editable-table-data' value="" >

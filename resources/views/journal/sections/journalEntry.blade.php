@@ -105,7 +105,7 @@
                                 </div>
                             </div>
                         </div>
-					
+
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -311,8 +311,8 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                        </div>
                     </div>
+                </div>
                 </div>
                 <div class="col-md-12 text-right">
                     <button class="btn btn-flat btn-sm bg-gradient-info" id="open_voucher">VOUCHER</button>
