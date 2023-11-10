@@ -89,7 +89,7 @@ class journalEntry extends Model
 
     public function journalDetails()
     {
-        return $this->hasManyThrough(Accounts::class, 'journal_entry_details', 'account_id', 'journal_id', 'journal_id');
+        return $this->hasManyThrough(Accounts::class, journalEntryDetails::class, 'journal_id', 'account_id');
     }
     public function bookDetails()
     {
