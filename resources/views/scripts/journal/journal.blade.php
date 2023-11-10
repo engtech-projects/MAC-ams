@@ -489,15 +489,14 @@
             });
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
-
-            $('#total_debit').text(getTotal('debit').toLocaleString("en-US"));
-            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US"));
+            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
             getBalance()
             checkTotalAndAmount()
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
-            $('#total_credit').text(getTotal('credit').toLocaleString("en-US"));
-            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US"));
+            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
             getBalance()
             checkTotalAndAmount()
         })
@@ -1020,11 +1019,11 @@
         function getBalance() {
             $('#balance_debit').text(
                 (parseFloat($('#total_debit').text().replace(",", "")) - parseFloat($('#total_credit').text()
-                    .replace(",", ""))).toLocaleString("en-US")
+                    .replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
             );
             $('#edit_balance_debit').text(
                 (parseFloat($('#edit_total_debit').text().replace(",", "")) - parseFloat($('#edit_total_credit')
-                    .text().replace(",", ""))).toLocaleString("en-US")
+                    .text().replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
             );
         }
 
