@@ -1,3 +1,8 @@
+<style type="text/css">
+    .editable-buttons {
+       display: none !important;
+    }
+</style>
 <script type="text/javascript">
     (function($) {
         'use strict'
@@ -596,23 +601,8 @@
 										@endforeach
 									</select>
 								</td>
-                            </td>
-                            <td class='editable-table-data journalNum' id="deb" value="">
-                                <a href="#" fieldName="journal_details_debit" id="debit"
-                                                    class="editable-row-item records">
-                                                    ${parseFloat(vv.journal_details_debit)}
-                                                </a>
-                                            </td>
-
-                                            <td class='editable-table-data journalNum' id="cre" value="">
-                                                <a href="#" fieldName="journal_details_credit" id="credit"
-                                                    class="editable-row-item records">
-                                                    ${parseFloat(vv.journal_details_credit)}
-
-                                                </a>
-                                            </td>
-
-
+                                <td class='editable-table-data text-left' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">₱${parseFloat(vv.journal_details_debit)}</a> </td>
+                                <td class='editable-table-data text-left' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">₱${parseFloat(vv.journal_details_credit)}</a> </td>
 								<td class='editable-table-data' value="" >
 									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
 										@foreach ($subsidiaries as $subsidiary)
@@ -639,9 +629,9 @@
                                 balance = parseFloat(total_debit) - parseFloat(
                                     total_credit)
                             });
-                            $('#edit_total_debit').text(total_debit)
-                            $('#edit_total_credit').text(total_credit)
-                            $('#edit_balance_debit').text(balance)
+                            $('#edit_total_debit').text(Number(total_debit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            $('#edit_total_credit').text(Number(total_credit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            $('#edit_balance_debit').text(Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                         });
                     }
                 },
@@ -681,7 +671,7 @@
                                 'NO CHEQUE');
                             $('#vjournal_status').text(v.status);
                             $('#vjournal_amount, #voucher_amount').text(parseFloat(v
-                                .amount).toLocaleString("en-US"));
+                                .amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
                             $('#voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
@@ -690,7 +680,7 @@
                                     `<li>${vv}</li>`
                                 );
                             });
-                            $('#vjournal_branch, #voucher_branch').text(v.branch_id);
+                            $('#vjournal_branch, #voucher_branch').text(v.branch.branch_name);
                             $('#vjournal_cheque_date').text(v.cheque_date);
                             if (v.status == 'unposted') {
                                 content =
@@ -717,8 +707,8 @@
 									<td class='editable-table-data' value="" >
 										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
 									</td>
-                                    <td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_debit)}</label> </td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_credit)}</label> </td>
+                                    <td class='editable-table-data text-left' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_debit)}</label> </td>
+									<td class='editable-table-data text-left' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_credit)}</label> </td>
 								</tr>
 							`);
                                 $('#journalVoucherContent').append(`
@@ -856,8 +846,8 @@
 					@endforeach
 				</select>
 			</td>
-            <td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class="records editable-row-item"></a> </td>
-			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class="records editable-row-item"></a> </td>
+            <td class='editable-table-data text-left' value="" ><a href="#" fieldName="journal_details_debit"class="records editable-row-item"></a> </td>
+			<td class='editable-table-data text-left' value="" ><a href="#" fieldName="journal_details_credit" class="records editable-row-item"></a> </td>
 			<td class='editable-table-data' width="250">
 				<select  fieldName="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
@@ -977,7 +967,7 @@
             $('#journal_voucher_ref_no').text($('#JDetailsVoucher').val())
             $('#journal_voucher_source').text($('#source').val())
             $('#journal_voucher_particular').text($('#JDetailsVoucher').val())
-            $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
+            $('#journal_voucher_amount').text($('#amount').val())
             /*         $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US")) */
 
             $('#journal_voucher_amount_in_words').text(numberToWords(parseFloat(Number($('#amount').val().replace(
