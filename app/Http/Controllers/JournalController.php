@@ -74,7 +74,7 @@ class JournalController extends MainController
     }
     public function JournalEntryFetch(Request $request)
     {
-        return json_encode(['message' => 'fetch', 'data' => JournalEntry::with(['journalDetails.chartOfAccount', 'bookDetails', 'journalDetails.subsidiary'])->where('journal_id', $request->journal_id)->get()]);
+        return json_encode(['message' => 'fetch', 'data' => JournalEntry::with(['bookDetails', 'journalDetails'])->where('journal_id', $request->journal_id)->get()]);
     }
     public function JournalEntryDelete(Request $request)
     {

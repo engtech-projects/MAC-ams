@@ -36,10 +36,25 @@ class journalEntry extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
+
     public function scopePosted($query)
     {
-        return $query->where('status', self::STATUS_POSTED);
+        return $query->where('journal_entry.status', self::STATUS_POSTED);
     }
+
+    public function jDetails()
+    {
+        /* return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id'); */
+        /*  return $this->belongsToMany(journalEntry::class,'journal_entry_details','journal_id','account_id'); */
+        return $this->hasManyThrough(Accounts::class, journalEntryDetails::class, 'journal_id', 'account_id');
+    }
+
+
+    public function journalEntryDetails()
+    {
+        return $this->hasManyThrough(journalEntryDetails::class, journalEntry::class, 'journal_id', 'account_id');
+    }
+
 
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'DESC', $journal_no = '')
     {
@@ -67,9 +82,14 @@ class journalEntry extends Model
         return $query->limit(1000)->get();
     }
 
+    public function details()
+    {
+        return $this->hasMany(journalEntryDetails::class, 'journal_id', 'journal_id');
+    }
+
     public function journalDetails()
     {
-        return $this->hasMany(journalEntryDetails::class, 'journal_id');
+        return $this->hasManyThrough(Accounts::class, journalEntryDetails::class, 'journal_id', 'account_id');
     }
     public function bookDetails()
     {
@@ -99,7 +119,7 @@ class journalEntry extends Model
             'amount' => $requestEntry["amount"]
 
         ]);
-        $journalEntry->journalDetails()->createMany($requestDetails);
+        $journalEntry->details()->createMany($requestDetails);
         return $journalEntry;
     }
 
@@ -203,7 +223,6 @@ class journalEntry extends Model
 
         })->map(function ($item) use ($account, $type, $transaction) {
             $entry = collect($item);
-
             $entry["journal_details"] = collect($entry["journal_details"])->filter(function ($detail) use ($account, $type, $transaction) {
                 if ($type === JournalBook::BOOK_DEBIT) {
                     return $detail["account_id"] == $account && $detail["cash_out"] == 0;

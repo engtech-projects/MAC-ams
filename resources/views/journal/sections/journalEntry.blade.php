@@ -58,6 +58,14 @@
 			display:block;
 		}
 	}
+	.editable-container.editable-inline,
+    .editable-container.editable-inline .control-group.form-group,
+    .editable-container.editable-inline .control-group.form-group .editable-input,
+    .editable-container.editable-inline .control-group.form-group .editable-input textarea,
+    .editable-container.editable-inline .control-group.form-group .editable-input select,
+    .editable-container.editable-inline .control-group.form-group .editable-input input:not([type=radio]):not([type=checkbox]):not([type=submit]) {
+        width: 100%;
+    }
 
 </style>
 
@@ -154,7 +162,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-2 col-xs-12">
+						<div class="col-md-4 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="status">Status</label>
@@ -166,7 +174,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-3 col-xs-12">
+						<div class="col-md-4 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="amount">Amount</label>
@@ -176,7 +184,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-3 col-xs-12">
+						<div class="col-md-4 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="payee">Payee</label>
@@ -186,7 +194,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4 col-xs-12">
+						<div class="col-md-6 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="remarks">Remarks (<font style="color:red;">Separate with double colon (::) for the next remarks</font>)</label>
@@ -208,16 +216,15 @@
 			<div class="co-md-12" style="height:10px;"></div>
 			<div class="row">
 				<div class="col-md-12">
-					<table class="table table-bordered table-sm" id="tbl-create-journal">
+					<table class="table table-bordered table-sm text-center" id="tbl-create-journal" style="table-layout: fixed;">
 						<thead>
 							<tr class="text-center">
-								<th>Account #</th>
-								<th width="200">Account Name</th>
-								<th width="150">Debit</th>
-								<th width="150">Credit</th>
-								<th width="200">S/L</th>
-								<th width="200">Description</th>
-								<th class="text-right" width="50">Action</th>
+								<th style="width: 10%;">Account #</th>
+								<th style="width: 30%;">Account Name</th>
+								<th style="width: 15%;">Debit</th>
+								<th style="width: 15%;">Credit</th>
+								<th style="width: 30%;">S/L</th>
+								<th style="width: 5%;">Action</th>
 							</tr>
 						</thead>
 						<tbody id="tbl-create-journal-container">
@@ -226,18 +233,25 @@
 									<td class="acctnu" value="">
 										<a href="#" class="editable-row-item journal_details_account_no"></a>
 									</td>
-									<td class='editable-table-data' width="300">
+									<td class='editable-table-data'>
 										<select  fieldName="account_id" class="select-account form-control editable-row-item form-control-sm COASelect">
 											<option disabled value="" selected>-Select Account Name-</option>
 											@foreach($chartOfAccount as $account)
 												<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_number}}<span> - </span> {{$account->account_name}}</span></option>
 											@endforeach
 										</select>
-
-
 									</td>
-									<td class='editable-table-data journalNum' value="" ><a href="#" fieldName="journal_details_debit" id="debit" class=" editable-row-item"></a> </td>
-									<td class='editable-table-data journalNum' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item"></a> </td>
+									<td class='editable-table-data journalNum text-center' id="deb" value="">
+                                                <a href="#" fieldName="journal_details_debit" id="debit"
+                                                    class="editable-row-item records">
+                                                </a>
+                                            </td>
+
+                                            <td class='editable-table-data journalNum text-center' id="cre" value="">
+                                                <a href="#" fieldName="journal_details_credit" id="credit"
+                                                    class="editable-row-item records">
+                                                </a>
+                                            </td>
 									<td class='editable-table-data' value="" >
 										<?php
 										// echo '<pre>';
@@ -249,7 +263,6 @@
 											<?php
 												$temp = '';
 												foreach($subsidiaries as $subsidiary) {
-
 													if( is_array($subsidiary->toArray()["subsidiary_category"]) && ( $subsidiary->toArray()["subsidiary_category"] > 0) ){
 														if($temp == '')
 														{
@@ -266,8 +279,6 @@
 											?>
 										</select>
 									</td>
-									<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_description" class=" editable-row-item"></a></td>
-
 									<td>
 										<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
 											<span>
@@ -277,28 +288,25 @@
 									</td>
 								</tr>
 							@endfor
-
-						</tbody>
-						<tfoot>
-							<tr class="text-center">
-								<th></th>
-								<th width="200">TOTAL</th>
-								<th width="150" id="total_debit">0</th>
-								<th width="150" id="total_credit">0</th>
-								<th width="200"></th>
-								<th width="200"></th>
-								<th class="text-right" width="50"></th>
-							</tr>
-							<tr class="text-center">
-								<th></th>
-								<th width="200">BALANCE</th>
-								<th width="150" id="balance_debit">0</th>
-								<th width="150"></th>
-								<th width="200"></th>
-								<th width="200"></th>
-								<th class="text-right" width="50"></th>
-							</tr>
-						</tfoot>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="text-center">
+                                        <th></th>
+                                        <th>TOTAL</th>
+                                        <th width="150">₱<span id="total_debit">0</span></th>
+                                        <th width="150">₱<span id="total_credit">0</span></th>
+                                        <th></th>
+                                        <th class="text-right" width="50"></th>
+                                    </tr>
+                                    <tr class="text-center">
+                                        <th></th>
+                                        <th>BALANCE</th>
+                                        <th>₱<span id="balance_debit">0</span></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th class="text-right" width="50"></th>
+                                    </tr>
+                                </tfoot>
 					</table>
 					</div>
 				</div>

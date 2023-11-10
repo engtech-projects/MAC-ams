@@ -489,15 +489,14 @@
             });
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
-
-            $('#total_debit').text(getTotal('debit').toLocaleString("en-US"));
-            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US"));
+            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
             getBalance()
             checkTotalAndAmount()
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
-            $('#total_credit').text(getTotal('credit').toLocaleString("en-US"));
-            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US"));
+            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
             getBalance()
             checkTotalAndAmount()
         })
@@ -787,9 +786,10 @@
 							<td>${v.journal_date}</td>
 							<td class="nav-link ${status}"><b>${v.status}</b></td>
 							<td>
-								<button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-sm bg-gradient-danger JnalDelete">Delete</button>
-								<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalView bg-gradient-primary">View</button>
-								<button value="${v.journal_id}" class="btn btn-flat btn-sm JnalEdit bg-gradient-info">Edit</button>
+                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
+                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i class="fa fa-edit"></i></button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs bg-gradient-success stStatus"><i class="fa fa-check"></i></button>
 							</td>
 						</tr>`
                         );
@@ -1031,11 +1031,11 @@
         function getBalance() {
             $('#balance_debit').text(
                 (parseFloat($('#total_debit').text().replace(",", "")) - parseFloat($('#total_credit').text()
-                    .replace(",", ""))).toLocaleString("en-US")
+                    .replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
             );
             $('#edit_balance_debit').text(
                 (parseFloat($('#edit_total_debit').text().replace(",", "")) - parseFloat($('#edit_total_credit')
-                    .text().replace(",", ""))).toLocaleString("en-US")
+                    .text().replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
             );
         }
 

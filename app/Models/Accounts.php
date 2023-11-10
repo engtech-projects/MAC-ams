@@ -5,11 +5,15 @@ namespace App\Models;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Models\Accounts;
 use App\Models\journalEntryDetails;
 use App\Models\AccountType;
+
 
 class Accounts extends Model
 {
@@ -39,15 +43,40 @@ class Accounts extends Model
 
     public function accountType()
     {
-        return $this->hasMany(AccountType::class, 'account_type_id');
+        return $this->belongsTo(AccountType::class, 'account_type_id');
+    }
+
+    public function scopeRevenueAndExpense($query, $types)
+    {
+        return $query->whereIn('account_category_id', $types);
     }
 
     public function openingBalance()
     {
         return $this->hasOne(OpeningBalance::class, 'account_id');
     }
+    public function jEntries()
+    {
+        return $this->hasManyThrough(journalEntry::class, journalEntryDetails::class, 'account_id', 'journal_id');
+    }
 
+    public function journalEntryDetails()
+    {
+        return $this->hasManyThrough(journalEntryDetails::class, journalEntry::class, 'journal_id', 'account_id');
+    }
+    public function entries()
+    {
+        return $this->hasManyThrough(journalEntry::class, journalEntryDetails::class, 'account_id', 'journal_id', 'account_id', 'journal_id');
+    }
+    public function journalDetails()
+    {
+        return $this->hasMany(journalEntryDetails::class, 'journal_id', 'account_id');
+    }
 
+    public function journalEntries()
+    {
+        return $this->belongsToMany(journalEntry::class, 'journal_entry_details', 'journal_id', 'account_id');
+    }
 
     public function store(array $data)
     {
@@ -355,5 +384,104 @@ class Accounts extends Model
             ->orderBy('journal_entry.journal_date', 'ASC')
             ->orderBy('journal_entry_details.journal_id', 'ASC')
             ->get();
+    }
+
+
+    public function getRevenueAndExpense($filter)
+    {
+        $accountsJournalEntries = collect();
+        journalEntryDetails::from('journal_entry_details as detail')
+            ->select([
+                'detail.journal_id',
+                'entry.journal_no',
+                'entry.journal_date',
+                'entry.source',
+                'detail.journal_details_debit',
+                'detail.journal_details_credit',
+                'account.account_number',
+                'account.account_id',
+                'account.account_name',
+                'acc_categ.account_category',
+                'detail.subsidiary_id',
+                'sub.sub_name',
+                'branch.branch_name',
+                'acc_type.account_no as account_type_no',
+                'acc_categ.account_category_id',
+                'acc_categ.to_increase'
+
+            ])
+            ->join('chart_of_accounts as account', 'account.account_id', '=', 'detail.account_id')
+            ->join('account_type as acc_type', 'acc_type.account_type_id', 'account.account_type_id')
+            ->join('account_category as acc_categ', 'acc_categ.account_category_id', '=', 'acc_type.account_category_id')
+            ->join('journal_entry as entry', 'entry.journal_id', '=', 'detail.journal_id')
+            ->join('subsidiary as sub', 'sub.sub_id', '=', 'detail.subsidiary_id')
+            ->join('branch', 'branch.branch_id', '=', 'entry.branch_id')
+            ->whereIn('acc_categ.account_category_id', [4, 5])
+            ->orderBy('entry.journal_id', 'desc')
+            ->where('detail.subsidiary_id', $filter["subsidiary_id"])
+            ->whereBetween("entry.journal_date", [$filter["date_from"], $filter["date_to"]])
+            ->chunk(500, function (Collection $items) use (&$accountsJournalEntries) {
+                foreach ($items as $item) {
+                    $accountsJournalEntries->push($item);
+                }
+            });
+        $accountsJournalEntries = $this->mapRevenueMinusExpenseCollection($accountsJournalEntries);
+
+        return $accountsJournalEntries;
+    }
+
+    public function mapRevenueMinusExpenseCollection($accountsJournalEntries)
+    {
+        $accountsJournalEntries = collect($accountsJournalEntries)->groupBy(function ($groupCategory) {
+            return $groupCategory["account_category"];
+        })->map(function ($accounts) use ($accountsJournalEntries) {
+            $groupAccounts = collect($accounts)->map(function ($account) use ($accountsJournalEntries) {
+                $groupAccounts = [
+                    "account_id" => $account["account_id"],
+                    "account_name" => $account["account_name"],
+                    "account_category" => $account["account_category"],
+                    "account_category_id" => $account["account_category_id"],
+                ];
+                $groupAccounts["entries"] = collect($accountsJournalEntries)->filter(function ($item) use (&$groupAccounts) {
+                    $filteredAccounts = $item["account_id"] === $groupAccounts["account_id"];
+                    return $filteredAccounts;
+                })->map(function ($item, $category) {
+                    $details = [
+                        "journal_id" => $item["journal_id"],
+                        "journal_no" => $item["journal_no"],
+                        "journal_date" => $item["journal_date"],
+                        "account_id" => $item["account_id"],
+                        "source" => $item["source"],
+                        "subsidiary_id" => $item["subsidiary_id"],
+                        "subsidiary_name" => $item["sub_name"],
+                        "branch" => $item["branch_name"],
+                        "to_increase" => $item["to_increase"],
+                        "credit" => $item["journal_details_credit"],
+                        "debit" => $item["journal_details_debit"]
+
+                    ];
+                    return $details;
+                })->filter(function ($item) {
+                    if ($item["to_increase"] === "credit") {
+                        return $item["credit"] > 0;
+                    } else {
+                        return $item["debit"] > 0;
+                    }
+                })->filter()->values();
+                return $groupAccounts;
+            })->unique()->values();
+            return $groupAccounts;
+        })->map(function ($item) {
+            $accounts = collect($item)->map(function ($item) {
+                if (count($item["entries"]) > 0) {
+                    return $item;
+                } else {
+                    unset($item);
+                }
+            })->filter()->values();
+            return $accounts;
+        });
+
+        return $accountsJournalEntries;
     }
 }
