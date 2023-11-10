@@ -135,7 +135,6 @@
                             $('#vbalance_debit').text(amountConverter((parseFloat(
                                 total_debit) - parseFloat(total_credit))))
                         });
-                        console.log
                     }
 
                 },
@@ -202,15 +201,15 @@
 										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
                             }
                             $('#posted-content').html(content);
-                            $.each(v.journal_details, function(kk, vv) {
+                            $.each(v.journal_entry_details, function(kk, vv) {
                                 total_debit += parseFloat(vv
                                     .journal_details_debit);
                                 total_credit += parseFloat(vv
                                     .journal_details_credit);
                                 $('#tbl-preview-container').append(`
 								<tr class='editable-table-row'>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_number}</label></td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_name}</label> </td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
                                     <td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_debit}</label> </td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_credit}</label> </td>
 
@@ -223,8 +222,8 @@
 							`);
                                 $('#journalVoucherContent').append(`
 								<tr>
-									<td class="center">${vv.chart_of_account.account_number}</td>
-									<td class="left">${vv.chart_of_account.account_name}</td>
+									<td class="center">${vv.account.account_number}</td>
+									<td class="left">${vv.account.account_name}</td>
 									<td class="left">${vv.subsidiary.sub_name}</td>
 									<td class="center">${vv.journal_details_debit}</td>
 									<td class="right">${vv.journal_details_credit}</td>
@@ -569,7 +568,6 @@
                 dataType: "json",
                 success: function(response) {
                     if (response.message == 'fetch') {
-                        console.log(response.data);
                         $.each(response.data, function(k, v) {
                             var total_debit = 0;
                             var total_credit = 0;
@@ -599,8 +597,23 @@
 										@endforeach
 									</select>
 								</td>
-								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
-								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
+                            </td>
+                            <td class='editable-table-data journalNum' id="deb" value="">
+                                <a href="#" fieldName="journal_details_debit" id="debit"
+                                                    class="editable-row-item records">
+                                                    ${parseFloat(vv.journal_details_debit)}
+                                                </a>
+                                            </td>
+
+                                            <td class='editable-table-data journalNum' id="cre" value="">
+                                                <a href="#" fieldName="journal_details_credit" id="credit"
+                                                    class="editable-row-item records">
+                                                    ${parseFloat(vv.journal_details_credit)}
+
+                                                </a>
+                                            </td>
+
+
 								<td class='editable-table-data' value="" >
 									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
 										@foreach ($subsidiaries as $subsidiary)
@@ -691,7 +704,7 @@
 										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
                             }
                             $('#posted-content').html(content);
-                            $.each(v.journal_details, function(kk, vv) {
+                            $.each(v.journal_entry_details, function(kk, vv) {
                                 total_debit += parseFloat(vv
                                     .journal_details_debit);
                                 total_credit += parseFloat(vv
@@ -699,8 +712,8 @@
                                 console.log(v.journal_details)
                                 $('#tbl-create-journalview-container').append(`
 								<tr class='editable-table-row'>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_number}</label></td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_name}</label> </td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
 
 									<td class='editable-table-data' value="" >
 										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
@@ -711,8 +724,8 @@
 							`);
                                 $('#journalVoucherContent').append(`
 								<tr>
-									<td class="center">${vv.chart_of_account.account_number}</td>
-									<td class="left">${vv.chart_of_account.account_name}</td>
+									<td class="center">${vv.account.account_number}</td>
+									<td class="left">${vv.account.account_name}</td>
 									<td class="left">${vv.subsidiary.sub_name}</td>
 									<td class="center">${amountConverter(vv.journal_details_debit)}</td>
 									<td class="right">${amountConverter(vv.journal_details_credit)}</td>

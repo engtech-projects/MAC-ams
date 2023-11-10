@@ -195,8 +195,6 @@
                                         <tfoot>
                                             <tr class="text-center">
                                                 <th></th>
-
-                                                <th width="200"></th>
                                                 <th width="200"></th>
                                                 <th width="200">TOTAL</th>
                                                 <th width="150" id="vtotal_debit">0</th>
@@ -355,7 +353,6 @@
 									<tfoot>
 										<tr class="text-center">
 											<th></th>
-                                            <th></th>
                                             <th></th>
 											<th width="200">TOTAL</th>
 											<th width="150" class="text-left" id="vtotal_debit">0</th>
