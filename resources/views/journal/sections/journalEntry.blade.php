@@ -97,7 +97,7 @@
 									<div class="input-group">
 									<select name="branch_id" class="select2 form-control form-control-sm" id="branch_id" required>
 										<option value="" disabled selected>-Select Branch-</option>
-										<option value="1">Butuan CIty Branch</option>
+										<option value="1">Butuan City Branch</option>
 										<option value="2">Nasipit Branch</option>
 									</select>
 

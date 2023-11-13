@@ -64,7 +64,7 @@
                                             <select name="s_branch_id" class="form-control form-control-sm select2"
                                                 id="s_branch_id">
                                                 <option value="" disabled selected>-All-</option>
-                                                <option value="1">Butuan CIty Branch</option>
+                                                <option value="1">Butuan City Branch</option>
                                                 <option value="2">Nasipit Branch</option>
                                             </select>
                                         </div>
@@ -442,7 +442,7 @@
                                                             id="edit_branch_id" required>
                                                             <option value="" disabled selected>-Select Branch-
                                                             </option>
-                                                            <option value="1">Butuan CIty Branch</option>
+                                                            <option value="1">Butuan City Branch</option>
                                                             <option value="2">Nasipit Branch</option>
                                                         </select>
                                                     </div>
