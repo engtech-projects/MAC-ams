@@ -488,14 +488,22 @@
             });
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
-            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
-            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
             getBalance()
             checkTotalAndAmount()
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
-            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
-            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
             getBalance()
             checkTotalAndAmount()
         })
@@ -854,8 +862,17 @@
 					@endforeach
 				</select>
 			</td>
-            <td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class="records editable-row-item"></a> </td>
-			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class="records editable-row-item"></a> </td>
+            <td class='editable-table-data journalNum text-center' id="deb" value="">
+                                                <a href="#" fieldName="journal_details_debit" id="debit"
+                                                    class="editable-row-item records">
+                                                </a>
+                                            </td>
+
+                                            <td class='editable-table-data journalNum text-center' id="cre" value="">
+                                                <a href="#" fieldName="journal_details_credit" id="credit"
+                                                    class="editable-row-item records">
+                                                </a>
+                                            </td>
 			<td class='editable-table-data' width="250">
 				<select  fieldName="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
@@ -1030,11 +1047,15 @@
         function getBalance() {
             $('#balance_debit').text(
                 (parseFloat($('#total_debit').text().replace(",", "")) - parseFloat($('#total_credit').text()
-                    .replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
+                    .replace(",", ""))).toLocaleString("en-US", {
+                    minimumFractionDigits: 2
+                })
             );
             $('#edit_balance_debit').text(
                 (parseFloat($('#edit_total_debit').text().replace(",", "")) - parseFloat($('#edit_total_credit')
-                    .text().replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
+                    .text().replace(",", ""))).toLocaleString("en-US", {
+                    minimumFractionDigits: 2
+                })
             );
         }
 
