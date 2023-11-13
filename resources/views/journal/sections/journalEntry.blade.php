@@ -97,7 +97,7 @@
 									<div class="input-group">
 									<select name="branch_id" class="select2 form-control form-control-sm" id="branch_id" required>
 										<option value="" disabled selected>-Select Branch-</option>
-										<option value="1">Butuan City Branch</option>
+										<option value="1">Butuan CIty Branch</option>
 										<option value="2">Nasipit Branch</option>
 									</select>
 
@@ -242,13 +242,13 @@
 
 
                                             </td>
-                                            <td class='editable-table-data journalNum text-left' id="deb" value="">
+                                            <td class='editable-table-data journalNum text-center' id="deb" value="">
                                                 <a href="#" fieldName="journal_details_debit" id="debit"
                                                     class="editable-row-item records">
                                                 </a>
                                             </td>
 
-                                            <td class='editable-table-data journalNum text-left' id="cre" value="">
+                                            <td class='editable-table-data journalNum text-center' id="cre" value="">
                                                 <a href="#" fieldName="journal_details_credit" id="credit"
                                                     class="editable-row-item records">
                                                 </a>
@@ -293,18 +293,18 @@
 
                                 </tbody>
                                 <tfoot>
-                                    <tr class="text-left">
+                                    <tr class="text-center">
                                         <th></th>
                                         <th>TOTAL</th>
-                                        <th width="150" class="text-left">₱<span id="total_debit">0</span></th>
-                                        <th width="150" class="text-left">₱<span id="total_credit">0</span></th>
+                                        <th width="150">₱<span id="total_debit">0</span></th>
+                                        <th width="150">₱<span id="total_credit">0</span></th>
                                         <th></th>
                                         <th class="text-right" width="50"></th>
                                     </tr>
-                                    <tr class="text-left">
+                                    <tr class="text-center">
                                         <th></th>
                                         <th>BALANCE</th>
-                                        <th class="text-left">₱<span id="balance_debit">0</span></th>
+                                        <th>₱<span id="balance_debit">0</span></th>
                                         <th></th>
                                         <th></th>
                                         <th class="text-right" width="50"></th>
@@ -389,7 +389,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="col-md-12">
-                                                    <h6 class="mb-4">Amount : &nbsp;&nbsp;&nbsp; <strong
+                                                    <h6 class="mb-4">Amount : &nbsp;&nbsp;&nbsp; ₱ <strong
                                                             id="journal_voucher_amount"></strong></h6>
 
                                                 </div>

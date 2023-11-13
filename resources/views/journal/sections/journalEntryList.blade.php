@@ -7,6 +7,7 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #4ec891;
         }
+
         .tbl-row {
             cursor: pointer;
         }
@@ -149,56 +150,53 @@
                 </a> --}}
 
 
-				<div class="container-fluid">
-					<div class="col-md-12">
-						<table id="journalEntryDetails"  class="table table-bordered">
-							<thead>
-								<th>Book Code</th>
-								<th>Journal #</th>
-								<th>Source</th>
-								<th>Amount</th>
-								<th>Remarks</th>
-								<th>Journal Date</th>
-								<th>Status</th>
-								<th width="150">Action</th>
-							</thead>
-							<tbody id="journalEntryDetailsContent">
-								@foreach($journalEntryList as $journal)
-									<tr class="tbl-row" data-id="{{$journal->journal_id}}" >
-										<td class="font-weight-bold">{{$journal->bookDetails->book_code}}</td>
-										<td class="font-weight-bold">{{$journal->journal_no}}</td>
-										<td>{{$journal->source}}</td>
-										<td class="journal-amount">{{$journal->amount}}</td>
-										<?php $remarks = explode('::', $journal->remarks)?>
-											<td>
-												@foreach($remarks as $remark)
-													<li> {{$remark}}</li>
-												@endforeach
-											</td>
-										<td>{{$journal->journal_date}}</td>
-										<td class="nav-link {{($journal->status  == 'posted') ? 'text-success' : 'text-danger">Journal Entry</a>'}}"><b>{{ucfirst($journal->status)}}</b></td>
-										<td>
-											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
-											<button value="{{$journal->journal_id}}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
-											<button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i class="fa fa-edit"></i></button>
-                                            <button value="{{$journal->journal_id}}" {{($journal->status  == 'posted') ? 'disabled' : ''}} class="btn btn-flat btn-xs bg-gradient-success stStatus"><i class="fa fa-check"></i></button>
-										</td>
-									</tr>
-								@endforeach
-							</tbody>
-						</table>
-                        <!-- <div id="account-details">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <table class="table table-bordered table-sm" id="tbl-create-journal">
-                                        <thead>
-                                            <tr class="text-center">
-                                                <th>Account #</th>
-                                                <th>Account Name</th>
-
-                                                <th>S/L</th>
-                                                <th width="150">Debit</th>
-								                <th width="150">Credit</th>
+                        <div class="container-fluid">
+                            <div class="col-md-12">
+                                <table id="journalEntryDetails" class="table table-bordered">
+                                    <thead>
+                                        <th>Book Code</th>
+                                        <th>Journal #</th>
+                                        <th>Source</th>
+                                        <th>Amount</th>
+                                        <th>Remarks</th>
+                                        <th>Journal Date</th>
+                                        <th>Status</th>
+                                        <th width="150">Action</th>
+                                    </thead>
+                                    <tbody id="journalEntryDetailsContent">
+                                        @foreach ($journalEntryList as $journal)
+                                            <tr class="tbl-row" data-id="{{ $journal->journal_id }}">
+                                                <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td>
+                                                <td class="font-weight-bold">{{ $journal->journal_no }}</td>
+                                                <td>{{ $journal->source }}</td>
+                                                <td class="journal-amount">{{ $journal->amount }}</td>
+                                                <?php $remarks = explode('::', $journal->remarks); ?>
+                                                <td>
+                                                    @foreach ($remarks as $remark)
+                                                        <li> {{ $remark }}</li>
+                                                    @endforeach
+                                                </td>
+                                                <td>{{ $journal->journal_date }}</td>
+                                                <td
+                                                    class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
+                                                    <b>{{ ucfirst($journal->status) }}</b></td>
+                                                <td>
+                                                    <button value="{{ $journal->journal_id }}"
+                                                        {{ $journal->status == 'posted' ? 'disabled' : '' }}
+                                                        class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i
+                                                            class="fa fa-trash"></i></button>
+                                                    <button value="{{ $journal->journal_id }}"
+                                                        class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i
+                                                            class="fa fa-eye"></i></button>
+                                                    <button value="{{ $journal->journal_id }}"
+                                                        {{ $journal->status == 'posted' ? 'disabled' : '' }}
+                                                        class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i
+                                                            class="fa fa-edit"></i></button>
+                                                    <button value="{{ $journal->journal_id }}"
+                                                        {{ $journal->status == 'posted' ? 'disabled' : '' }}
+                                                        class="btn btn-flat btn-xs bg-gradient-success stStatus"><i
+                                                            class="fa fa-check"></i></button>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -244,364 +242,405 @@
                                         </div>
                                     </div>
                                 </div>
-                        </div> -->
-					</div>
-				</div>
-			</section>
-			<!-- /.Table -->
-			</div>
-		</div>
-	</div>
-  </div>
-  <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal" aria-hidden="true">
-	<div class="modal-dialog modal-xl" role="document">
-		<div class="modal-content">
-			<div class="modal-body">
-				<div class="container-fluid ">
-					<div class="col-md-12">
-						<div class="row">
-							<div class="col-md-8 frm-header">
-								<h4 ><b>Journal Entry (Preview)</b></h4>
-							</div>
-							<div class="col-md-4 frm-header">
-								<label class="label-bold label-sty" for="date">Journal Date</label>
-								<div class="input-group">
-									<label class="label-bold" id="vjournal_date"></label>
-								</div>
-							</div>
-							<div class="col-md-3 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="branch_id">Branch</label>
-										<div class="input-group">
-											<label class="label-normal" id="vjournal_branch" ></label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-3 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="">Book Reference</label>
-										<div class="input-group">
-											<label class="label-normal"  id="vjournal_book_reference" ></label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-2 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="source">Source</label>
-										<div class="input-group">
-											<label class="label-normal"  id="vjournal_source"></label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-2 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="cheque_no">Cheque No</label>
-										<div class="input-group">
-										<label class="label-normal"  id="vjournal_cheque" ></label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-2 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="cheque_no">Cheque Date</label>
-										<div class="input-group">
-											<label class="label-bold" id="vjournal_cheque_date"></label>
-										</div>
-									</div>
-								</div>
-							</div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- /.Table -->
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container-fluid ">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-8 frm-header">
+                                        <h4><b>Journal Entry (Preview)</b></h4>
+                                    </div>
+                                    <div class="col-md-4 frm-header">
+                                        <label class="label-bold label-sty" for="date">Journal Date</label>
+                                        <div class="input-group">
+                                            <label class="label-bold" id="vjournal_date"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="branch_id">Branch</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_branch"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="">Book Reference</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_book_reference"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="source">Source</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_source"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="cheque_no">Cheque No</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_cheque"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="cheque_no">Cheque Date</label>
+                                                <div class="input-group">
+                                                    <label class="label-bold" id="vjournal_cheque_date"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-							<div class="col-md-3 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="amount">Amount</label>
-										<div class="input-group">
-											<label class="label-normal" style="font-size:40px;">₱ <font  id="vjournal_amount"></font></label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-3 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="payee">Payee</label>
-										<div class="input-group">
-											<label class="label-normal" id="vjournal_payee" >Book_no</label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-4 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="remarks">Remarks</label>
-										<div class="input-group">
-										<label class="label-normal" id="vjournal_remarks"></label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-2 col-xs-12">
-								<div class="box">
-									<div class="form-group">
-										<label class="label-bold label-sty" for="status">Status</label>
-										<div class="input-group">
-											<label class="label-normal"  id="vjournal_status" ></label>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="co-md-12" style="height:10px;"></div>
-					<div class="col-md-12">
-						<div class="co-md-12" style="height:10px;"></div>
-						<div class="row">
-							<div class="col-md-12">
-								<table class="table table-bordered table-sm text-center" id="tbl-create-journal">
-									<thead>
-										<tr class="text-center">
-											<th style="width: 10%;">Account #</th>
-											<th style="width: 30%;">Account Name</th>
-											<th style="width: 30%;">S/L</th>
-											<th style="width: 15%;">Debit</th>
-											<th style="width: 15%;">Credit</th>
-										</tr>
-									</thead>
-									<tbody id="tbl-create-journalview-container">
-									</tbody>
-									<tfoot>
-										<tr>
-											<th></th>
-                                            <th></th>
-											<th width="200">TOTAL</th>
-											<th width="150" class="text-left" id="vtotal_debit">0</th>
-											<th width="150" class="text-left" id="vtotal_credit">0</th>
-										</tr>
-										<tr>
-											<th></th>
-                                            <th></th>
-											<th width="200">BALANCE</th>
-											<th width="150" class="text-left" id="vbalance_debit">0</th>
-											<th width="150" class="text-left" id="vcredit"></th>
-										</tr>
-                                        </tfoot>
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="amount">Amount</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" style="font-size:40px;">₱ <font
+                                                            id="vjournal_amount"></font></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="payee">Payee</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_payee">Book_no</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="remarks">Remarks</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_remarks"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="status">Status</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_status"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="co-md-12" style="height:10px;"></div>
+                            <div class="col-md-12">
+                                <div class="co-md-12" style="height:10px;"></div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered table-sm" id="tbl-create-journal">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th>Account #</th>
+                                                    <th>Account Name</th>
+                                                    <th>S/L</th>
+                                                    <th>Debit</th>
+                                                    <th>Credit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbl-create-journalview-container">
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="text-center">
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th width="200">TOTAL</th>
+                                                    <th width="150" class="text-left" id="vtotal_debit">0</th>
+                                                    <th width="150" class="text-left" id="vtotal_credit">0</th>
+                                                </tr>
+                                                <tr class="text-center">
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th width="200">BALANCE</th>
+                                                    <th width="150" class="text-left" id="vdebit">0</th>
+                                                    <th width="150" class="text-left" id="vcredit">0</th>
+                                                </tr>
+
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
                                 <div class="col-md-12" style="height:20px;"></div>
                                 <div class="col-md-12 text-right" id="posted-content">
-							</div>
-						</div>
-						<!-- Button trigger modal -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit" aria-hidden="true">
-	<div class="modal-dialog modal-xl" role="document">
-		<div class="modal-content">
-			<div class="modal-body">
-				<div class="container-fluid ">
-					<div class="col-md-12">
-						<form id="journalEntryFormEdit" method="POST">
-							@csrf
-							<input type="hidden" class="form-control form-control-sm rounded-0" name="edit_journal_id" id="edit_journal_id"  placeholder="" >
-								<div class="row">
-									<div class="col-md-8 frm-header">
-										<h4 ><b>Journal Entry (Edit)</b></h4>
-									</div>
-									<div class="col-md-4 frm-header">
-										<label class="label-normal" for="date">Journal Date</label>
-										<div class="input-group">
-										<input type="date" class="form-control form-control-sm rounded-0" name="edit_journal_date" id="edit_journal_date"  placeholder="Journal Date" required >
-										</div>
-									</div>
-									<div class="col-md-2 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_branch_id">Branch</label>
-												<div class="input-group">
-												<select name="edit_branch_id" class="form-control form-control-sm" id="edit_branch_id" required>
-													<option value="" disabled selected>-Select Branch-</option>
-													<option value="1">Butuan City Branch</option>
-													<option value="2">Nasipit Branch</option>
-												</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-2 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="">Book Reference</label>
-												<div class="input-group">
-												<select name="edit_book_id" class="form-control form-control-sm" id="edit_book_id" required>
-													<option value="" disabled selected>-Select Book References-</option>
-													@foreach($journalBooks as $journalBook)
-														<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
-													@endforeach
-												</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-2 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="">Reference No.</label>
-												<div class="input-group">
-													<label class="label-normal" id="edit_LrefNo" ></label>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-2 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_source">Source</label>
-												<div class="input-group">
-													<input type="text" class="form-control form-control-sm rounded-0" name="edit_source" id="edit_source"  placeholder="Source" required>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-2 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_cheque_no">Cheque No</label>
-												<div class="input-group">
-													<input type="Number" class="form-control form-control-sm rounded-0" name="edit_cheque_no" id="edit_cheque_no"  placeholder="Cheque No">
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-2 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_cheque_date">Cheque Date</label>
-												<div class="input-group">
-													<input type="date" class="form-control form-control-sm rounded-0" name="edit_cheque_date" id="edit_cheque_date"  placeholder="Cheque Date">
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_status">Status</label>
-												<div class="input-group">
-													<select name="edit_status" class="form-control form-control-sm" id="edit_status" required>
-														<option value="unposted" selected>Unposted</option>
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_amount">Amount</label>
-												<div class="input-group">
-													<input type="text" class="form-control form-control-sm rounded-0" name="edit_amount" id="edit_amount"  step="any" placeholder="Amount" required>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_payee">Payee</label>
-												<div class="input-group">
-													<input type="text" class="form-control form-control-sm rounded-0" name="edit_payee" id="edit_payee"  placeholder="Payee" required >
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6 col-xs-12">
-										<div class="box">
-											<div class="form-group">
-												<label class="label-normal" for="edit_remarks">Remarks (<font style="color:red;">Separate with double colon (::) for the next remarks</font>)</label>
-												<div class="input-group">
-													<input type="text" class="form-control form-control-sm rounded-0" name="edit_remarks" id="edit_remarks"  placeholder="Remarks" required>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<button id="edit_btn_submit" style="display:none;" > UPDATE</button>
-						</form>
-					</div>
-					<div class="co-md-12" style="height:10px;"></div>
-					<div class="col-md-12">
-						<div class="col-md-12 text-right">
-							<button class="btn btn-flat btn-sm bg-gradient-success" id="edit_add_item"><i class="fa fa-plus"></i> Add Details </button>
-						</div>
-						<div class="co-md-12" style="height:10px;"></div>
-						<div class="row">
-							<div class="col-md-12">
-								<table class="table table-bordered table-sm text-center" id="tbl-edit-journal" style="table-layout: fixed;">
-									<thead>
-										<tr class="text-center">
-											<th style="width: 10%;">Account #</th>
-											<th style="width: 30%;">Account Name</th>
-											<th style="width: 15%;">Debit</th>
-											<th style="width: 15%;">Credit</th>
-											<th style="width: 30%;">S/L</th>
-											<th style="width: 5%;">Action</th>
-										</tr>
-									</thead>
-									<tbody id="tbl-create-edit-container">
 
-									</tbody>
-									<tfoot>
-	                                    <tr class="text-center">
-	                                        <th></th>
-	                                        <th>TOTAL</th>
-	                                        <th width="150" class="text-left">₱<span id="edit_total_debit">0</span></th>
-	                                        <th width="150" class="text-left">₱<span id="edit_total_credit">0</span></th>
-	                                        <th></th>
-	                                        <th class="text-right" width="50"></th>
-	                                    </tr>
-	                                    <tr class="text-center">
-	                                        <th></th>
-	                                        <th>BALANCE</th>
-	                                        <th class="text-left">₱<span id="edit_balance_debit">0</span></th>
-	                                        <th></th>
-	                                        <th></th>
-	                                        <th class="text-right" width="50"></th>
-	                                    </tr>
-	                                </tfoot>								
-								</table>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-12 text-right">
-							<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#edit_btn_submit').click()" > UPDATE JOURNAL</button>
-						</div>
-						<!-- Button trigger modal -->
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- Modal -->
-<div class="modal fade" id="journalDetailsVoucher" tabindex="2" role="dialog" aria-labelledby="journalDetailsVoucherLabel" aria-hidden="true">
-	<div class="modal-dialog modal-xl" role="document">
-		<div class="modal-content">
-			<div class="modal-body"  >
+                                </div>
+                            </div>
+                            <!-- Button trigger modal -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container-fluid ">
+                            <div class="col-md-12">
+                                <form id="journalEntryFormEdit" method="POST">
+                                    @csrf
+                                    <input type="hidden" class="form-control form-control-sm rounded-0"
+                                        name="edit_journal_id" id="edit_journal_id" placeholder="">
+                                    <div class="row">
+                                        <div class="col-md-8 frm-header">
+                                            <h4><b>Journal Entry (Edit)</b></h4>
+                                        </div>
+                                        <div class="col-md-4 frm-header">
+                                            <label class="label-normal" for="date">Journal Date</label>
+                                            <div class="input-group">
+                                                <input type="date" class="form-control form-control-sm rounded-0"
+                                                    name="edit_journal_date" id="edit_journal_date"
+                                                    placeholder="Journal Date" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_branch_id">Branch</label>
+                                                    <div class="input-group">
+                                                        <select name="edit_branch_id" class="form-control form-control-sm"
+                                                            id="edit_branch_id" required>
+                                                            <option value="" disabled selected>-Select Branch-
+                                                            </option>
+                                                            <option value="1">Butuan CIty Branch</option>
+                                                            <option value="2">Nasipit Branch</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="">Book Reference</label>
+                                                    <div class="input-group">
+                                                        <select name="edit_book_id" class="form-control form-control-sm"
+                                                            id="edit_book_id" required>
+                                                            <option value="" disabled selected>-Select Book
+                                                                References-</option>
+                                                            @foreach ($journalBooks as $journalBook)
+                                                                <option value="{{ $journalBook->book_id }}"
+                                                                    _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
+                                                                    book-src="{{ $journalBook->book_src }}">
+                                                                    {{ $journalBook->book_code }} -
+                                                                    {{ $journalBook->book_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="">Reference No.</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal" id="edit_LrefNo"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_source">Source</label>
+                                                    <div class="input-group">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_source" id="edit_source" placeholder="Source"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_cheque_no">Cheque No</label>
+                                                    <div class="input-group">
+                                                        <input type="Number"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_cheque_no" id="edit_cheque_no"
+                                                            placeholder="Cheque No">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_cheque_date">Cheque Date</label>
+                                                    <div class="input-group">
+                                                        <input type="date"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_cheque_date" id="edit_cheque_date"
+                                                            placeholder="Cheque Date">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_status">Status</label>
+                                                    <div class="input-group">
+                                                        <select name="edit_status" class="form-control form-control-sm"
+                                                            id="edit_status" required>
+                                                            <option value="unposted" selected>Unposted</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_amount">Amount</label>
+                                                    <div class="input-group">
+                                                        <input type="number"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_amount" id="edit_amount" step="any"
+                                                            placeholder="Amount" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_payee">Payee</label>
+                                                    <div class="input-group">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_payee" id="edit_payee" placeholder="Payee"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_remarks">Remarks (<font
+                                                            style="color:red;">Separate with double colon (::) for the next
+                                                            remarks</font>)</label>
+                                                    <div class="input-group">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_remarks" id="edit_remarks" placeholder="Remarks"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button id="edit_btn_submit" style="display:none;"> UPDATE</button>
+                                </form>
+                            </div>
+                            <div class="co-md-12" style="height:10px;"></div>
+                            <div class="col-md-12">
+                                <div class="col-md-12 text-right">
+                                    <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i
+                                            class="fa fa-plus"></i> Add Details </button>
+                                </div>
+                                <div class="co-md-12" style="height:10px;"></div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered table-sm" id="tbl-create-journal-container">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th>Account #</th>
+                                                    <th width="200">Account Name</th>
+                                                    <th width="150">Debit</th>
+                                                    <th width="150">Credit</th>
+                                                    <th width="200">S/L</th>
+                                                    <th class="text-right" width="50">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbl-create-edit-container">
+
+                                            </tbody>
+
+                                            <tfoot>
+                                                <tr class="text-center">
+                                                    <th></th>
+                                                    <th width="200">TOTAL</th>
+                                                    <th width="150" id="edit_total_debit">0</th>
+                                                    <th width="150" id="edit_total_credit">0</th>
+                                                    <th width="200"></th>
+                                                    <th class="text-right" width="50"></th>
+                                                </tr>
+                                                <tr class="text-center">
+                                                    <th></th>
+                                                    <th width="200">BALANCE</th>
+                                                    <th width="150" id="edit_balance_debit">0</th>
+                                                    <th width="150"></th>
+                                                    <th width="200"></th>
+                                                    <th class="text-right" width="50"></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-right">
+                                <button class="btn btn-flat btn-sm bg-gradient-success"
+                                    onclick="$('#edit_btn_submit').click()"> UPDATE JOURNAL</button>
+                            </div>
+                            <!-- Button trigger modal -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="journalDetailsVoucher" tabindex="2" role="dialog"
+            aria-labelledby="journalDetailsVoucherLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+
                         <div class="container-fluid ">
                             <div id="ui-view">
                                 <div class="card">
@@ -654,27 +693,30 @@
                                                     <h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong
                                                             id="voucher_source"></strong></h6>
 
-	                                                </div>
-	                                            </div>
-	                                            <div class="col-md-12">
-	                                                <div class="col-md-12">
-	                                                    <h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong
-	                                                            id="voucher_particular"></strong></h6>
-											</div>
-										</div>
-										<div class="col-md-12">
-											<div class="col-md-12">
-												<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; <strong id="voucher_amount"></strong></h6>
-	                                                </div>
-	                                            </div>
-	                                            <div class="col-md-12">
-	                                                <div class="col-md-12">
-	                                                    <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
-	                                                            id="voucher_amount_in_words"
-	                                                            style="text-transform:capitalize;"></strong></h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_particular"></strong></h6>
 
-	                                                </div>
-	                                            </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Amount : &nbsp;&nbsp;&nbsp; ₱ <strong
+                                                            id="voucher_amount"></strong></h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_amount_in_words"
+                                                            style="text-transform:capitalize;"></strong></h6>
+
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="table-responsive-sm" style="padding-top:5px;">
                                             <table class="table table-striped"
