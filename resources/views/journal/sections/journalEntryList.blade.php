@@ -43,6 +43,14 @@
             padding: 50px;
             display: none;
         }
+        .editable-container.editable-inline,
+        .editable-container.editable-inline .control-group.form-group,
+        .editable-container.editable-inline .control-group.form-group .editable-input,
+        .editable-container.editable-inline .control-group.form-group .editable-input textarea,
+        .editable-container.editable-inline .control-group.form-group .editable-input select,
+        .editable-container.editable-inline .control-group.form-group .editable-input input:not([type=radio]):not([type=checkbox]):not([type=submit]) {
+            width: 100%;
+        }
     </style>
     <!-- Main content -->
     <section class="content">
@@ -519,7 +527,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-2 col-xs-12">
+                                        <div class="col-md-4 col-xs-12">
                                             <div class="box">
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_status">Status</label>
@@ -532,7 +540,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3 col-xs-12">
+                                        <div class="col-md-4 col-xs-12">
                                             <div class="box">
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_amount">Amount</label>
@@ -545,7 +553,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3 col-xs-12">
+                                        <div class="col-md-4 col-xs-12">
                                             <div class="box">
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_payee">Payee</label>
@@ -558,7 +566,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-xs-12">
+                                        <div class="col-md-6 col-xs-12">
                                             <div class="box">
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_remarks">Remarks (<font
@@ -586,36 +594,35 @@
                                 <div class="co-md-12" style="height:10px;"></div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered table-sm" id="tbl-create-journal-container">
+                                        <table class="table table-bordered table-sm text-center" id="tbl-create-journal-container" style="table-layout: fixed;">
                                             <thead>
                                                 <tr class="text-center">
-                                                    <th>Account #</th>
-                                                    <th width="200">Account Name</th>
-                                                    <th width="150">Debit</th>
-                                                    <th width="150">Credit</th>
-                                                    <th width="200">S/L</th>
-                                                    <th class="text-right" width="50">Action</th>
+                                                    <th style="width: 10%;">Account #</th>
+                                                    <th style="width: 30%;">Account Name</th>
+                                                    <th style="width: 15%;">Debit</th>
+                                                    <th style="width: 15%;">Credit</th>
+                                                    <th style="width: 30%;">S/L</th>
+                                                    <th style="width: 5%;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="tbl-create-edit-container">
 
                                             </tbody>
-
                                             <tfoot>
                                                 <tr class="text-center">
                                                     <th></th>
-                                                    <th width="200">TOTAL</th>
-                                                    <th width="150" id="edit_total_debit">0</th>
-                                                    <th width="150" id="edit_total_credit">0</th>
-                                                    <th width="200"></th>
+                                                    <th>TOTAL</th>
+                                                    <th width="150">₱<span id="edit_total_debit">0.00</span></th>
+                                                    <th width="150">₱<span id="edit_total_credit">0.00</span></th>
+                                                    <th></th>
                                                     <th class="text-right" width="50"></th>
                                                 </tr>
                                                 <tr class="text-center">
                                                     <th></th>
-                                                    <th width="200">BALANCE</th>
-                                                    <th width="150" id="edit_balance_debit">0</th>
-                                                    <th width="150"></th>
-                                                    <th width="200"></th>
+                                                    <th>BALANCE</th>
+                                                    <th>₱<span id="edit_balance_debit">0.00</span></th>
+                                                    <th></th>
+                                                    <th></th>
                                                     <th class="text-right" width="50"></th>
                                                 </tr>
                                             </tfoot>

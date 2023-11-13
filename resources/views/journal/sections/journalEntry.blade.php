@@ -296,15 +296,15 @@
                                     <tr class="text-center">
                                         <th></th>
                                         <th>TOTAL</th>
-                                        <th width="150">₱<span id="total_debit">0</span></th>
-                                        <th width="150">₱<span id="total_credit">0</span></th>
+                                        <th width="150">₱<span id="total_debit">0.00</span></th>
+                                        <th width="150">₱<span id="total_credit">0.00</span></th>
                                         <th></th>
                                         <th class="text-right" width="50"></th>
                                     </tr>
                                     <tr class="text-center">
                                         <th></th>
                                         <th>BALANCE</th>
-                                        <th>₱<span id="balance_debit">0</span></th>
+                                        <th>₱<span id="balance_debit">0.00</span></th>
                                         <th></th>
                                         <th></th>
                                         <th class="text-right" width="50"></th>

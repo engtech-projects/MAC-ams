@@ -1,3 +1,8 @@
+<style type="text/css">
+    .editable-buttons {
+       display: none !important;
+    }
+</style>
 <script type="text/javascript">
     (function($) {
         'use strict'
@@ -605,20 +610,8 @@
 									</select>
 								</td>
                             </td>
-                            <td class='editable-table-data journalNum' id="deb" value="">
-                                <a href="#" fieldName="journal_details_debit" id="debit"
-                                                    class="editable-row-item records">
-                                                    ${parseFloat(vv.journal_details_debit)}
-                                                </a>
-                                            </td>
-
-                                            <td class='editable-table-data journalNum' id="cre" value="">
-                                                <a href="#" fieldName="journal_details_credit" id="credit"
-                                                    class="editable-row-item records">
-                                                    ${parseFloat(vv.journal_details_credit)}
-
-                                                </a>
-                                            </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">₱${parseFloat(vv.journal_details_debit).toFixed(2)}</a> </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">₱${parseFloat(vv.journal_details_credit).toFixed(2)}</a> </td>
 
 
 								<td class='editable-table-data' value="" >
@@ -647,9 +640,9 @@
                                 balance = parseFloat(total_debit) - parseFloat(
                                     total_credit)
                             });
-                            $('#edit_total_debit').text(total_debit)
-                            $('#edit_total_credit').text(total_credit)
-                            $('#edit_balance_debit').text(balance)
+                            $('#edit_total_debit').text(Number(total_debit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            $('#edit_total_credit').text(Number(total_credit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            $('#edit_balance_debit').text(Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                         });
                     }
                 },
