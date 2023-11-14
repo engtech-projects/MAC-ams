@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 use DB;
+use Illuminate\Support\Facades\Auth;
 
 class CollectionBreakdown extends Model
 {
@@ -46,9 +47,16 @@ class CollectionBreakdown extends Model
         $collection = CollectionBreakdown::with(['accountOfficerCollection'])->where('collection_id', $id)->first();
         return $collection;
     }
-    public static function getCollectionBreakdownByBranch($branchId)
+    public static function getCollectionBreakdownByBranch($filter)
     {
-        return CollectionBreakdown::where('branch_id', $branchId)->get();
+        $branchId = Auth::user()->branch->branch_id;
+        return CollectionBreakdown::where('branch_id', $branchId)
+        ->when($filter,function($query,$filter) {
+            $query->when(isset($filter['transaction_date']),function($query) use($filter) {
+                $query->where('transaction_date',$filter['transaction_date']);
+            });
+        })->orderBy('transaction_date','desc')
+        ->get();
     }
     public function getCollectionByTransactionDate($transactionDate, $branchId)
     {

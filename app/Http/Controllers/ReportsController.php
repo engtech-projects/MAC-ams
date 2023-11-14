@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BankReconciliationReportsRequest;
 use App\Http\Requests\RevenueMinusExpenseRequest;
 use App\Models\CollectionBreakdown;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Customer;
@@ -32,6 +33,7 @@ use App\Models\TransactionDate;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -375,14 +377,14 @@ class ReportsController extends MainController
         return view('reports.sections.cashPosition', $data);
     }
 
-    public function cashTransactionBlotter()
+    public function cashTransactionBlotter(Request $request)
     {
-        $branchId = 1;
-        // return response()->json(
-        //     [
-        //         'data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)
-        //     ]
-        // );
+
+         return response()->json(
+           [
+               'data' => CollectionBreakdown::getCollectionBreakdownByBranch($request->input())
+            ]
+        );
         // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
         // return response()->json(['data' => $cashTransactionsEntries]);
@@ -637,8 +639,6 @@ class ReportsController extends MainController
         $journalEntries = $journalEntryModel->getJournalEntry($request->validated());
 
         return $journalEntries;
-
-
 
     }
 
