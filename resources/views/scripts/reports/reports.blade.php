@@ -293,7 +293,7 @@
         if( items.length ) {
             return items
         }
-		
+
         return false;
     }
     function addBranchCollection() {
@@ -857,7 +857,10 @@
         $('#cash-blotter-tbl').dataTable({
             processing: true,
             searching: true,
-            type:"GET",
+            type:"post",
+            headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
             ajax:{
                 url:"<?= config('app.url') ?>/reports/cashTransactionBlotter",
 /* 				url:"{{route('reports.cashblotter')}}", */

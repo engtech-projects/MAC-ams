@@ -318,7 +318,6 @@
 
 
 		<div class="row">
-			<div class="col-md-12 mt-5">
 				<table id="cash-blotter-tbls"  class="table table-sm table-bordered">
 					<thead>
 						<th>Branch</th>
@@ -328,6 +327,7 @@
 					</thead>
 					<tbody>
 						<tr v-for="d in data">
+
 							<td>@{{ d.branch_id }}</td>
 							<td>@{{ d.transaction_date }}</td>
 							<td>@{{ formatCurrency(d.total) }}</td>
@@ -447,7 +447,7 @@
 											<tr v-for="fb in filteredCashBlotter.rows">
 												<td v-for="f in fb" v-html="f"></td>
 											</tr>
-											
+
 											<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 												<td><strong>TOTAL</strong></td>
 												<td></td>
@@ -457,7 +457,7 @@
 												<td></td>
 												<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashin)}}</strong></td>
 												<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashout)}}</strong></td>
-											</tr> 
+											</tr>
 										</tbody>
 										</table>
 										<div class="row">
@@ -548,7 +548,7 @@
 														<td>@{{officer.representative}} ; @{{officer.note}}</td>
 														<td>@{{formatCurrency(officer.total)}}</td>
 													</tr>
-												
+
 													<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 														<td><strong>TOTAL COLLECTION</strong></td>
 														<td><strong>@{{formatCurrency(collections.total_accountofficer)}}</strong></td>
@@ -605,7 +605,7 @@
 										<div class="col-lg-4 col-sm-5">
 										</div>
 										<div class="col-lg-4 col-sm-5 ml-auto">
-										
+
 										<div>
 											<button class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
 										</div>
@@ -621,7 +621,7 @@
 				</div>
 			</div>
 
-	
+
 
 
 
@@ -794,8 +794,8 @@
 									rows.push(['<b>Cash Ending Balance</b>','','','','','',cashEndingBalance>0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':'',cashEndingBalance<=0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':''])
 								}
 							}
-							// 
-							
+							//
+
 						}
 					}
 					return {rows:rows,total:{cashin:totalCashIn,cashout:totalCashOut}};

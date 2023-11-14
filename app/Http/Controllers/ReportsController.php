@@ -380,18 +380,19 @@ class ReportsController extends MainController
     public function cashTransactionBlotter(Request $request)
     {
 
-         /* return response()->json(
+        $transactionDate = $request["transaction_date"];
+         return response()->json(
            [
-               'data' => CollectionBreakdown::getCollectionBreakdownByBranch($request->input())
+               'data' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate)
             ]
-        ); */
+        );
         // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
         // return response()->json(['data' => $cashTransactionsEntries]);
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
-            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId),
+            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate),
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
