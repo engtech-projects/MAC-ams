@@ -380,11 +380,11 @@ class ReportsController extends MainController
     public function cashTransactionBlotter(Request $request)
     {
 
-         return response()->json(
+         /* return response()->json(
            [
                'data' => CollectionBreakdown::getCollectionBreakdownByBranch($request->input())
             ]
-        );
+        ); */
         // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
         // return response()->json(['data' => $cashTransactionsEntries]);
