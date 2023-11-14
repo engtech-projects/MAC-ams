@@ -154,30 +154,6 @@ class journalEntry extends Model
                 ])->get();
 
 
-        /* foreach ($books as $bKey => $book) {
-            $entries[] = $book->load([
-                'journalEntries' => function ($query) use ($branchId, $transactionDate) {
-                    $query->select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
-                        ->whereDate('journal_date', '=', $transactionDate)
-                        ->posted()
-                        ->when($branchId, function ($query, $branchId) {
-                            $query->where('branch_id', $branchId);
-                        })->with([
-                                'branch' => function ($query) {
-                                    $query->select('branch_id', 'branch_name');
-                                },
-                                'journalDetails' => function ($query) {
-                                    $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')->whereIn('account_id', [
-                                        Accounts::CASH_IN_BANK_BDO_ACC,
-                                        Accounts::CASH_IN_BANK_MYB_ACC,
-                                        Accounts::CASH_ON_HAND_ACC
-                                    ]);
-                                }
-                            ]);
-                }
-            ]);
-        } */
-
         $collectionEntries = [
             'begining_balance' => [
                 'transaction_date' => $prevCollection ? $prevCollection["prev_transaction_date"] : null,
@@ -245,6 +221,39 @@ class journalEntry extends Model
             }
         })->filter()->values();
         return $data;
+    }
+
+
+
+    public function getJournalEntry(array $filter)
+    {
+
+        $journalEntry = Accounts::query()
+            ->when($filter, function ($query, $filter) {
+                $query->when(isset($filter['account_id']), function ($query) use ($filter) {
+                    $query->where('account_id', $filter['account_id']);
+                })->with('entries', function ($query) use ($filter) {
+                    $query->select([
+                        'journal_entry_details.journal_details_id',
+                        'journal_entry.journal_id',
+                        'journal_entry.journal_no',
+                        'journal_entry.source',
+                        'journal_entry.cheque_no',
+                        'journal_entry.journal_date',
+                        'journal_entry.status',
+                        'journal_entry_details.journal_details_debit as deposits',
+                        'journal_entry_details.journal_details_credit as withdrawals'
+                    ])
+                    ->whereBetween('journal_entry.journal_date', [$filter['date_from'], $filter['date_to']])
+                    ->orderByRaw('withdrawals,journal_entry.journal_date')
+                    ->posted();
+                });
+            })
+            ->select('account_id', 'account_number', 'account_name')
+            ->first();
+
+        return $journalEntry;
+
     }
 
 }
