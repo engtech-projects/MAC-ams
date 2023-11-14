@@ -237,6 +237,7 @@ class journalEntry extends Model
                         'journal_entry.journal_id',
                         'journal_entry.journal_no',
                         'journal_entry.source',
+                        'journal_entry.cheque_no',
                         'journal_entry.journal_date',
                         'journal_entry.status',
                         'journal_entry_details.journal_details_debit as deposits',
