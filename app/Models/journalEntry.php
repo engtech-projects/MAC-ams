@@ -234,6 +234,7 @@ class journalEntry extends Model
                     $query->where('account_id', $filter['account_id']);
                 })->with('entries', function ($query) use ($filter) {
                     $query->select([
+                        'journal_entry_details.journal_details_id',
                         'journal_entry.journal_id',
                         'journal_entry.journal_no',
                         'journal_entry.source',
