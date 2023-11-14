@@ -209,7 +209,7 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <div id="account-details">
+                                <!-- <div id="account-details">
                                     <div class="row">
                                         <div class="col-md-12">
                                             <table class="table table-bordered table-sm" id="tbl-create-journal">
@@ -249,7 +249,7 @@
                                             </table>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </section>
@@ -331,7 +331,7 @@
                                             <div class="form-group">
                                                 <label class="label-bold label-sty" for="amount">Amount</label>
                                                 <div class="input-group">
-                                                    <label class="label-normal" style="font-size:40px;">₱ <font
+                                                    <label class="label-normal" style="font-size:30px;">₱ <font
                                                             id="vjournal_amount"></font></label>
                                                 </div>
                                             </div>
@@ -374,32 +374,32 @@
                                 <div class="co-md-12" style="height:10px;"></div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered table-sm" id="tbl-create-journal">
+                                        <table class="table table-bordered table-sm text-center" id="tbl-create-journal">
                                             <thead>
                                                 <tr class="text-center">
-                                                    <th>Account #</th>
-                                                    <th>Account Name</th>
-                                                    <th>S/L</th>
-                                                    <th>Debit</th>
-                                                    <th>Credit</th>
+                                                    <th style="width: 10%;">Account #</th>
+                                                    <th style="width: 30%;">Account Name</th>
+                                                    <th style="width: 30%;">S/L</th>
+                                                    <th style="width: 15%;">Debit</th>
+                                                    <th style="width: 15%;">Credit</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="tbl-create-journalview-container">
                                             </tbody>
                                             <tfoot>
-                                                <tr class="text-center">
+                                                <tr>
                                                     <th></th>
                                                     <th></th>
                                                     <th width="200">TOTAL</th>
-                                                    <th width="150" class="text-left" id="vtotal_debit">0</th>
-                                                    <th width="150" class="text-left" id="vtotal_credit">0</th>
+                                                    <th width="150" id="vtotal_debit">0</th>
+                                                    <th width="150" id="vtotal_credit">0</th>
                                                 </tr>
-                                                <tr class="text-center">
+                                                <tr>
                                                     <th></th>
                                                     <th></th>
                                                     <th width="200">BALANCE</th>
-                                                    <th width="150" class="text-left" id="vdebit">0</th>
-                                                    <th width="150" class="text-left" id="vcredit">0</th>
+                                                    <th width="150" id="vbalance_debit">0</th>
+                                                    <th width="150" id="vcredit"></th>
                                                 </tr>
 
                                             </tfoot>

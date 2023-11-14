@@ -674,7 +674,7 @@
                         $.each(response.data, function(k, v) {
                             $('#posted-content').html('');
                             var content = '';
-                            $('#vjournal_date, #voucher_date').text(v.journal_date);
+                            $('#vjournal_date, #voucher_date').text(moment(v.journal_date).format('MM/DD/YYYY'));
                             $('#vjournal_book_reference, #voucher_ref_no').text(v
                                 .book_details.book_name);
                             $('#vjournal_source, #voucher_source').text(v.source);
@@ -682,7 +682,7 @@
                                 'NO CHEQUE');
                             $('#vjournal_status').text(v.status);
                             $('#vjournal_amount, #voucher_amount').text(parseFloat(v
-                                .amount).toLocaleString("en-US"));
+                                .amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
                             $('#voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
@@ -691,8 +691,8 @@
                                     `<li>${vv}</li>`
                                 );
                             });
-                            $('#vjournal_branch, #voucher_branch').text(v.branch_id);
-                            $('#vjournal_cheque_date').text(v.cheque_date);
+                            $('#vjournal_branch, #voucher_branch').text(v.branch.branch_name);
+                            $('#vjournal_cheque_date').text(moment(v.cheque_date).format('MM/DD/YYYY'));
                             if (v.status == 'unposted') {
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
