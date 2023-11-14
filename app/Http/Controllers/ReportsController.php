@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BankReconciliationReportsRequest;
 use App\Http\Requests\RevenueMinusExpenseRequest;
 use App\Models\CollectionBreakdown;
 use Illuminate\Http\JsonResponse;
@@ -629,8 +630,14 @@ class ReportsController extends MainController
     }
 
 
-    public function bankReconciliation(Request $request)
+    public function bankReconciliation(BankReconciliationReportsRequest $request)
     {
+        $journalEntryModel = new journalEntry();
+
+        $journalEntries = $journalEntryModel->getJournalEntry($request->validated());
+
+        return $journalEntries;
+
 
 
     }
