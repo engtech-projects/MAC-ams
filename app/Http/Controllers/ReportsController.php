@@ -381,11 +381,11 @@ class ReportsController extends MainController
     {
 
         $transactionDate = $request["transaction_date"];
-         return response()->json(
+         /* return response()->json(
            [
                'data' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate)
             ]
-        );
+        ); */
         // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
         // return response()->json(['data' => $cashTransactionsEntries]);
