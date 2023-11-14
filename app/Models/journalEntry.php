@@ -250,7 +250,7 @@ class journalEntry extends Model
                 });
             })
             ->select('account_id', 'account_number', 'account_name')
-            ->get();
+            ->first();
 
         return $journalEntry;
 
