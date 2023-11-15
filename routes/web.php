@@ -127,6 +127,12 @@ Route::get('sales/invoice', [SalesController::class, 'invoice'])->name('sales.in
 
 //reports
 Route::get('reports/subsidiaryledger', [ReportsController::class, 'subsidiaryLedger'])->name('reports.subsidiaryledger');
+
+Route::post('reports/subsidiary-ledger',[ReportsController::class, 'subsidiaryLedgerReports'])->name('reports.subsidiary.ledger');
+Route::get('reports/subsidiary-ledger-listing',[ReportsController::class, 'subsidiaryListing'])->name('reports.subsidiary.listing');
+
+
+
 Route::get('reports/subsidiaryViewInfo', [ReportsController::class, 'subsidiaryViewInfo'])->name('reports.subsidiaryViewInfo');
 Route::get('reports/subsidiaryDelete', [ReportsController::class, 'subsidiaryDelete'])->name('reports.subsidiaryDelete');
 Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');

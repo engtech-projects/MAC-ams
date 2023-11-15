@@ -132,6 +132,31 @@ class ReportsController extends MainController
 
         return view('reports.sections.subsidiaryledger', $data);
     }
+
+
+    public function subsidiaryLedgerReports(Request $request)
+    {
+        $filter = $request->input();
+        $data = [
+            'subsidiaryData' => Subsidiary::get(),
+            'sub_categories' => SubsidiaryCategory::get(),
+            'title' => 'Subsidiary Ledger',
+            'subsidiaryLedgerList' => ''
+        ];
+        switch ($filter["type"]) {
+            case 'subsidiary-ledger-listing-report':
+                $journalEntry = new journalEntry();
+                $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter);
+                return response()->json(['data' => $subsidiaryListing]);
+
+            case 'income-minus-expense':
+                //return blade template for the selected report type
+                return response()->json(['data' => "income-minus-expense-report"]);
+            default:
+                return view('reports.sections.subsidiaryledger', $data);
+        }
+
+    }
     public function subsidiarySaveorEdit(Request $request)
     {
         if ($request->sub_id == '') {
@@ -634,9 +659,9 @@ class ReportsController extends MainController
     {
         $journalEntryModel = new journalEntry();
 
-        $journalEntries = $journalEntryModel->getJournalEntry($request->validated());
+        $data = $journalEntryModel->getBankReconciliationReport($request->validated());
 
-        return $journalEntries;
+        return $data;
 
 
 
