@@ -152,7 +152,7 @@ class ReportsController extends MainController
             case 'income-minus-expense':
                 //return blade template for the selected report type
                 return response()->json(['data' => "income-minus-expense-report"]);
-            default:
+            case 'subsidiary-ledger':
                 return view('reports.sections.subsidiaryledger', $data);
         }
 
