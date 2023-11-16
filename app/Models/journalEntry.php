@@ -277,16 +277,20 @@ class journalEntry extends Model
             ];
             $data["entries"] = collect($data["entries"])->map(function($item) {
 
-                $newArr = [];
+                $newJournalEntryCollection = [];
                 $balance = 0;
-                $item = collect($item)->sortBy("journal_date");
-                $item->each(function($item) use(&$newArr, &$balance) {
+                $item = collect($item)->sortByDesc("journal_date");
+                $item->each(function($item) use(&$newJournalEntryCollection, &$balance) {
                     $balance-=$item["credit"];
                     $balance+=$item["debit"];
-                    $newArr[] = [
+                    $newJournalEntryCollection[] = [
                         "journal_date" => $item["journal_date"],
                         "account_id" => $item["account_id"],
                         "branch_id" => $item["branch_id"],
+                        "journal_no" => $item["journal_no"],
+                        "cheque_no" => $item["cheque_no"],
+                        "cheque_date" => $item["cheque_date"],
+                        "source" => $item["source"],
                         "credit" => $item["credit"],
                         "debit" => $item["debit"],
                         "balance" => $balance
@@ -295,7 +299,7 @@ class journalEntry extends Model
 
                 });
 
-                return $newArr;
+                return $newJournalEntryCollection;
             });
             return $data;
         })->values()->all();
