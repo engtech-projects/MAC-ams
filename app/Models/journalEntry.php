@@ -252,12 +252,13 @@ class journalEntry extends Model
                         $query->whereBetween('journal_entry.journal_date', [$filter['date_from'], $filter['date_to']]);
                     })
                     ->posted()
-                    ->withAggregate('branch','branch_name');
+                    ->with('branch:branch_id,branch_code,branch_name');
                 });
             })
             ->select('account_id', 'account_number', 'account_name')
             ->get();
         return $journalEntry;
+
     }
 
 
@@ -266,7 +267,7 @@ class journalEntry extends Model
         $collections = collect($this->getJournalEntry($filter));
         $subsidiaryListing = $collections->map(function($item,$key) {
             $item["entries"] = collect($item["entries"])->groupBy(function($item) {
-                return $item["branch_branch_name"] == null ? "NO BRANCH" : $item["branch_branch_name"];
+                return $item["branch"] == null ? "NO BRANCH" : $item["branch"]["branch_code"] .' '. $item["branch"]["branch_name"];
             });
 
             $data = [
