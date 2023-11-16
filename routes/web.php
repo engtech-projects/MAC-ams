@@ -147,6 +147,9 @@ Route::post('reports/cashTransactionBlotter/{id}', [ReportsController::class, 's
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
 
+
+Route::post('reports/bank-reconciliation', [ReportsController::class,'bankReconciliation'])->name('reports.bank.reconciliation');
+
 Route::post('collections',[CollectionController::class, 'store'])->name('create.collection.breakdown');
 
 

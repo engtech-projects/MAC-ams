@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BankReconciliationReportsRequest;
 use App\Http\Requests\RevenueMinusExpenseRequest;
 use App\Models\CollectionBreakdown;
 use Illuminate\Http\JsonResponse;
@@ -392,7 +393,7 @@ class ReportsController extends MainController
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
-		// dd($data);
+        // dd($data);
         return view('reports.sections.cashTransactionBlotter', $data);
     }
 
@@ -454,9 +455,9 @@ class ReportsController extends MainController
 
     public function showCashBlotter($id, Request $request)
     {
-		$journalEntries = new journalEntry();
-        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id,$request->branch_id);
-		return response()->json([
+        $journalEntries = new journalEntry();
+        $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
+        return response()->json([
             'entries' => $cashTransactionsEntries
         ], 200);
     }
@@ -625,7 +626,20 @@ class ReportsController extends MainController
     {
         $accounts = new Accounts();
         $data = $accounts->getRevenueAndExpense($request->validated());
-        return new JsonResponse(["data" => $data],200);
+        return new JsonResponse(["data" => $data], 200);
+    }
+
+
+    public function bankReconciliation(BankReconciliationReportsRequest $request)
+    {
+        $journalEntryModel = new journalEntry();
+
+        $journalEntries = $journalEntryModel->getJournalEntry($request->validated());
+
+        return $journalEntries;
+
+
+
     }
 
 

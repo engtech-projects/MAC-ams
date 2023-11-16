@@ -100,12 +100,10 @@
 										<option value="1">Butuan City Branch</option>
 										<option value="2">Nasipit Branch</option>
 									</select>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -141,6 +139,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -239,10 +238,8 @@
 												<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_number}}<span> - </span> {{$account->account_name}}</span></option>
 											@endforeach
 										</select>
-
-
-                                            </td>
-                                            <td class='editable-table-data journalNum text-center' id="deb" value="">
+									</td>
+									<td class='editable-table-data journalNum text-center' id="deb" value="">
                                                 <a href="#" fieldName="journal_details_debit" id="debit"
                                                     class="editable-row-item records">
                                                 </a>
@@ -253,44 +250,42 @@
                                                     class="editable-row-item records">
                                                 </a>
                                             </td>
-
-                                            <td class='editable-table-data' value="">
-                                                <?php
-                                                // echo '<pre>';
-                                                // var_export($data['subsidiaries']);
-                                                // echo '</pre>';
-                                                ?>
-                                                <select fieldName="subsidiary_id"
-                                                    class="select-account form-control form-control-sm editable-row-item">
-                                                    <option disabled value="" selected>-Select S/L-</option>
-                                                    <?php
-                                                    $temp = '';
-                                                    foreach ($subsidiaries as $subsidiary) {
-                                                        if (is_array($subsidiary->toArray()['subsidiary_category']) && $subsidiary->toArray()['subsidiary_category'] > 0) {
-                                                            if ($temp == '') {
-                                                                $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-                                                                echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-                                                            } elseif ($temp != $subsidiary->toArray()['subsidiary_category']['sub_cat_name']) {
-                                                                echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-                                                                $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-                                                            }
-                                                            echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <button
-                                                    class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
-                                                    <span>
-                                                        <i class="fas fa-trash" aria-hidden="true"></i>
-                                                    </span>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endfor
-
+									<td class='editable-table-data' value="" >
+										<?php
+										// echo '<pre>';
+										// var_export($data['subsidiaries']);
+										// echo '</pre>';
+														?>
+										<select  fieldName="subsidiary_id" class="select-account form-control form-control-sm editable-row-item">
+											<option disabled value="" selected>-Select S/L-</option>
+											<?php
+												$temp = '';
+												foreach($subsidiaries as $subsidiary) {
+													if( is_array($subsidiary->toArray()["subsidiary_category"]) && ( $subsidiary->toArray()["subsidiary_category"] > 0) ){
+														if($temp == '')
+														{
+															$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+															echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+														}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
+														{
+															echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
+															$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
+														}
+														echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
+													}
+												}
+											?>
+										</select>
+									</td>
+									<td>
+										<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
+											<span>
+												<i class="fas fa-trash" aria-hidden="true"></i>
+											</span>
+										</button>
+									</td>
+								</tr>
+							@endfor
                                 </tbody>
                                 <tfoot>
                                     <tr class="text-center">
@@ -310,95 +305,79 @@
                                         <th class="text-right" width="50"></th>
                                     </tr>
                                 </tfoot>
-                            </table>
-                    </div>
-                </div>
-                </div>
-                <div class="col-md-12 text-right">
-                    <button class="btn btn-flat btn-sm bg-gradient-info" id="open_voucher">VOUCHER</button>
-                    <button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#btn_submit').click()"> SAVE
-                        JOURNAL</button>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="JDetailsVoucher" tabindex="2" role="dialog"
-            aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <div class="container-fluid ">
-                            <div id="ui-view">
-                                <div class="card">
-                                    <div class="card-body" id="journal_toPrintVouch">
-                                        <link rel="stylesheet"
-                                            href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
-                                        <link rel="stylesheet"
-                                            href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
-                                        <link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
-                                        <div class="col-md-12">
-                                            <img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"
-                                                class="img img-fluid">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <h3 style="text-align:center">Journal Voucher</h3>
-                                        </div>
-                                        <div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
-                                            <div class="col-md-6">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_pay"></strong></h6>
+					</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 text-right">
+				<button class="btn btn-flat btn-sm bg-gradient-info" id="open_voucher" >VOUCHER</button>
+				<button class="btn btn-flat btn-sm bg-gradient-success" onclick="$('#btn_submit').click()" > SAVE JOURNAL</button>
+			</div>
+		</div>
+  </div>
+  <div class="modal fade" id="JDetailsVoucher" tabindex="2" role="dialog" aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-body" id="printContent">
+				<div class="container-fluid ">
+					<div id="ui-view">
+						<div class="card">
+							<div class="card-body" id="journal_toPrintVouch">
+								<link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
+								<link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+								<link rel="stylesheet" href="{{ asset('css/adminlte/adminlte.min.css') }}">
+								<div class="col-md-12">
+									<img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"  class="img img-fluid">
+								</div>
+								<div class="col-md-12">
+									<h3 style="text-align:center">Journal Voucher</h3>
+								</div>
+								<div class="row" style="padding-top:10px; border-bottom:10px solid gray;">
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_pay"></strong></h6>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_branch"></strong></h6>
 
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_branch"></strong></h6>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp;<strong id="journal_voucher_date"></strong></h6>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="col-md-12">
+											<h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_ref_no"></strong></h6>
 
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_date"></strong></h6>
+										</div>
+									</div>
+								</div>
+								<div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_source"></strong></h6>
 
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_ref_no"></strong></h6>
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_particular"></strong></h6>
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
-                                            <div class="col-md-12">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_source"></strong></h6>
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; ₱ <strong id="journal_voucher_amount"></strong></h6>
 
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_particular"></strong></h6>
-
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Amount : &nbsp;&nbsp;&nbsp; ₱ <strong
-                                                            id="journal_voucher_amount"></strong></h6>
-
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="col-md-12">
-                                                    <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_amount_in_words"
-                                                            style="text-transform:capitalize;"></strong></h6>
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_amount_in_words" style="text-transform:capitalize;"></strong></h6>
 
 										</div>
 									</div>
@@ -415,7 +394,7 @@
 										</tr>
 									</thead>
 									<tbody id="journal_VoucherContent">
-
+									
 									</tbody>
 									</table>
 								</div>
@@ -444,11 +423,11 @@
 				</div>
 			</div>
 
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- /.content -->
+		</div>
+	</div>
+</div>
+</section>
+<!-- /.content -->
 
 <script>
 	new Vue({
@@ -476,5 +455,5 @@
 </script>
 @endsection
 @section('footer-scripts')
-    @include('scripts.journal.journal')
+  @include('scripts.journal.journal')
 @endsection

@@ -982,9 +982,9 @@
             $('#journal_voucher_pay').text($('#payee').val())
             $('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
             $('#journal_voucher_date').text($('#journal_date').val())
-            $('#journal_voucher_ref_no').text($('#JDetailsVoucher').val())
+			$('#journal_voucher_ref_no').text($('#LrefNo').html())
             $('#journal_voucher_source').text($('#source').val())
-            $('#journal_voucher_particular').text($('#JDetailsVoucher').val())
+            $('#journal_voucher_particular').text($('#remarks').val())
             $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
             /*         $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US")) */
 
@@ -1002,12 +1002,24 @@
 				<tr>
 					<td class="center">${$(field[0]).find('.editable-row-item').text()}</td>
 					<td class="left">${$(field[1]).find('.editable-row-item').find(":selected").text()}</td>
+					<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
 					<td class="left">${$(field[2]).find('.editable-row-item').text()}</td>
 					<td class="center">${$(field[3]).find('.editable-row-item').text()}</td>
-					<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
-				</tr>`);
+				</tr>`
+				);
 
             });
+			$('#journal_VoucherContent').append(`
+				<tr style="border-top:4px dashed black;">
+					<td></td>
+					<td></td>
+					<td><b>TOTAL</b></td>
+					<td>₱ <strong id="journal_total_debit_voucher"></strong></td>
+					<td>₱ <strong id="journal_total_credit_voucher"></strong></td>
+				</tr>
+			`)
+			$('#journal_total_debit_voucher').text($('#total_debit').text())
+			$('#journal_total_credit_voucher').text($('#total_credit').text())
             $('#JDetailsVoucher').modal('show');
         }
 
