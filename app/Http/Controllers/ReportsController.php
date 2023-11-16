@@ -63,7 +63,7 @@ class ReportsController extends MainController
 
             $entries = [];
 
-            foreach ($entry->journalDetails as $details) {
+            foreach ($entry->details as $details) {
                 $subsidiary = '';
 
                 if ($details->subsidiary_id) {
@@ -110,6 +110,8 @@ class ReportsController extends MainController
             'paginated' => $paginated,
             'paginationLinks' => $journal_entry
         ];
+
+        /* return response()->json($data); */
 
 
         return view('reports.sections.journalledger', $data);
