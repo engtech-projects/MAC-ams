@@ -177,8 +177,15 @@
 						</a>
 					</li>
 					@if(checkUserHasAccessModule('sub-module','reports/subsidiary-ledger'))
+                    <form id="subsidiary-ledger" action="{{ route('reports.subsidiary-ledger') }}" method="POST" style="display: none;">
+                        <input type="hidden" name="type" value="subsidiary-ledger">
+                        @csrf
+                    </form>
 					<li class="nav-item">
-						<a href="{{ route('reports.subsidiary-ledger',['type' => 'subsidiary-ledger'])}}" class="nav-link {{ (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
+						<a
+                        onclick="event.preventDefault(); document.getElementById('subsidiary-ledger').submit();"
+                        href="{{ route('reports.subsidiary-ledger') }}"
+                        class="nav-link {{ (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
 							<p>Subsidiary Ledger</p>
 						</a>
