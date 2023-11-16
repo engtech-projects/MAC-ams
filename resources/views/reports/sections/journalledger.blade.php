@@ -69,7 +69,7 @@
 							<div class="input-group" style="flex:3">
 								<select v-model="filter.branch_id" name="branch_id" class="select-jl-branch form-control form-control-sm" id="jlBranch">
 									<option value="" disabled selected>-Select Branch-</option>
-									<option value="1">Butuan CIty Branch</option>
+									<option value="1">Butuan City Branch</option>
 									<option value="2">Nasipit Branch</option>
 								</select>
 							</div>

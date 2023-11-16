@@ -97,15 +97,13 @@
 									<div class="input-group">
 									<select name="branch_id" class="select2 form-control form-control-sm" id="branch_id" required>
 										<option value="" disabled selected>-Select Branch-</option>
-										<option value="1">Butuan CIty Branch</option>
+										<option value="1">Butuan City Branch</option>
 										<option value="2">Nasipit Branch</option>
 									</select>
-
 									</div>
 								</div>
 							</div>
 						</div>
-
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -293,15 +291,15 @@
                                     <tr class="text-center">
                                         <th></th>
                                         <th>TOTAL</th>
-                                        <th width="150">₱<span id="total_debit">0</span></th>
-                                        <th width="150">₱<span id="total_credit">0</span></th>
+                                        <th width="150">₱<span id="total_debit">0.00</span></th>
+                                        <th width="150">₱<span id="total_credit">0.00</span></th>
                                         <th></th>
                                         <th class="text-right" width="50"></th>
                                     </tr>
                                     <tr class="text-center">
                                         <th></th>
                                         <th>BALANCE</th>
-                                        <th>₱<span id="balance_debit">0</span></th>
+                                        <th>₱<span id="balance_debit">0.00</span></th>
                                         <th></th>
                                         <th></th>
                                         <th class="text-right" width="50"></th>
@@ -338,7 +336,6 @@
 									<div class="col-md-6">
 										<div class="col-md-12">
 											<h6 class="mb-4">Pay to: &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_pay"></strong></h6>
-
 										</div>
 									</div>
 									<div class="col-md-6">

@@ -1,3 +1,8 @@
+<style type="text/css">
+    .editable-buttons {
+       display: none !important;
+    }
+</style>
 <script type="text/javascript">
     (function($) {
         'use strict'
@@ -135,7 +140,6 @@
                             $('#vbalance_debit').text(amountConverter((parseFloat(
                                 total_debit) - parseFloat(total_credit))))
                         });
-                        console.log
                     }
 
                 },
@@ -202,15 +206,15 @@
 										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
                             }
                             $('#posted-content').html(content);
-                            $.each(v.journal_details, function(kk, vv) {
+                            $.each(v.journal_entry_details, function(kk, vv) {
                                 total_debit += parseFloat(vv
                                     .journal_details_debit);
                                 total_credit += parseFloat(vv
                                     .journal_details_credit);
                                 $('#tbl-preview-container').append(`
 								<tr class='editable-table-row'>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_number}</label></td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_name}</label> </td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
                                     <td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_debit}</label> </td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_credit}</label> </td>
 
@@ -223,8 +227,8 @@
 							`);
                                 $('#journalVoucherContent').append(`
 								<tr>
-									<td class="center">${vv.chart_of_account.account_number}</td>
-									<td class="left">${vv.chart_of_account.account_name}</td>
+									<td class="center">${vv.account.account_number}</td>
+									<td class="left">${vv.account.account_name}</td>
 									<td class="left">${vv.subsidiary.sub_name}</td>
 									<td class="center">${vv.journal_details_debit}</td>
 									<td class="right">${vv.journal_details_credit}</td>
@@ -489,14 +493,22 @@
             });
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
-            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
-            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
             getBalance()
             checkTotalAndAmount()
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
-            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
-            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", { minimumFractionDigits: 2 }));
+            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
             getBalance()
             checkTotalAndAmount()
         })
@@ -568,7 +580,6 @@
                 dataType: "json",
                 success: function(response) {
                     if (response.message == 'fetch') {
-                        console.log(response.data);
                         $.each(response.data, function(k, v) {
                             var total_debit = 0;
                             var total_credit = 0;
@@ -585,10 +596,10 @@
                             $('#edit_amount').val(v.amount);
                             $('#edit_payee').val(v.payee);
                             $('#edit_remarks').val(v.remarks);
-                            $.each(v.journal_details, function(kk, vv) {
+                            $.each(v.journal_entry_details, function(kk, vv) {
                                 $('#tbl-create-edit-container').append(`<tr class='editable-table-row'>
 								<td class="acctnu" value="" >
-									<a href="#" class="editable-row-item journal_details_account_no">${vv.chart_of_account.account_number}</a>
+									<a href="#" class="editable-row-item journal_details_account_no">${vv.account.account_number}</a>
 								</td>
 								<td class='editable-table-data' value="" >
 									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item COASelect">
@@ -598,8 +609,11 @@
 										@endforeach
 									</select>
 								</td>
-								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
-								<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
+                            </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
+
+
 								<td class='editable-table-data' value="" >
 									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
 										@foreach ($subsidiaries as $subsidiary)
@@ -626,9 +640,9 @@
                                 balance = parseFloat(total_debit) - parseFloat(
                                     total_credit)
                             });
-                            $('#edit_total_debit').text(total_debit)
-                            $('#edit_total_credit').text(total_credit)
-                            $('#edit_balance_debit').text(balance)
+                            $('#edit_total_debit').text(Number(total_debit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            $('#edit_total_credit').text(Number(total_credit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            $('#edit_balance_debit').text(Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                         });
                     }
                 },
@@ -660,7 +674,7 @@
                         $.each(response.data, function(k, v) {
                             $('#posted-content').html('');
                             var content = '';
-                            $('#vjournal_date, #voucher_date').text(v.journal_date);
+                            $('#vjournal_date, #voucher_date').text(moment(v.journal_date).format('MM/DD/YYYY'));
                             $('#vjournal_book_reference, #voucher_ref_no').text(v
                                 .book_details.book_name);
                             $('#vjournal_source, #voucher_source').text(v.source);
@@ -668,7 +682,7 @@
                                 'NO CHEQUE');
                             $('#vjournal_status').text(v.status);
                             $('#vjournal_amount, #voucher_amount').text(parseFloat(v
-                                .amount).toLocaleString("en-US"));
+                                .amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
                             $('#voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
@@ -677,8 +691,8 @@
                                     `<li>${vv}</li>`
                                 );
                             });
-                            $('#vjournal_branch, #voucher_branch').text(v.branch_id);
-                            $('#vjournal_cheque_date').text(v.cheque_date);
+                            $('#vjournal_branch, #voucher_branch').text(v.branch.branch_name);
+                            $('#vjournal_cheque_date').text(moment(v.cheque_date).format('MM/DD/YYYY'));
                             if (v.status == 'unposted') {
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
@@ -690,7 +704,7 @@
 										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
                             }
                             $('#posted-content').html(content);
-                            $.each(v.journal_details, function(kk, vv) {
+                            $.each(v.journal_entry_details, function(kk, vv) {
                                 total_debit += parseFloat(vv
                                     .journal_details_debit);
                                 total_credit += parseFloat(vv
@@ -698,8 +712,8 @@
                                 console.log(v.journal_details)
                                 $('#tbl-create-journalview-container').append(`
 								<tr class='editable-table-row'>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_number}</label></td>
-									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_name}</label> </td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
 
 									<td class='editable-table-data' value="" >
 										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
@@ -710,8 +724,8 @@
 							`);
                                 $('#journalVoucherContent').append(`
 								<tr>
-									<td class="center">${vv.chart_of_account.account_number}</td>
-									<td class="left">${vv.chart_of_account.account_name}</td>
+									<td class="center">${vv.account.account_number}</td>
+									<td class="left">${vv.account.account_name}</td>
 									<td class="left">${vv.subsidiary.sub_name}</td>
 									<td class="center">${amountConverter(vv.journal_details_debit)}</td>
 									<td class="right">${amountConverter(vv.journal_details_credit)}</td>
@@ -829,10 +843,8 @@
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
-
-
             var content = `<tr class='editable-table-row'>
-			<td class="acctnu" value="" >
+			<td class="acctnu" value="">
 				<a href="#" class="editable-row-item journal_details_account_no"></a>
 			</td>
 			<td class='editable-table-data' value="" >
@@ -843,8 +855,17 @@
 					@endforeach
 				</select>
 			</td>
-            <td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_debit"class="records editable-row-item"></a> </td>
-			<td class='editable-table-data' value="" ><a href="#" fieldName="journal_details_credit" class="records editable-row-item"></a> </td>
+            <td class='editable-table-data journalNum text-center' id="deb" value="">
+                                                <a href="#" fieldName="journal_details_debit" id="debit"
+                                                    class="editable-row-item records">
+                                                </a>
+                                            </td>
+
+                                            <td class='editable-table-data journalNum text-center' id="cre" value="">
+                                                <a href="#" fieldName="journal_details_credit" id="credit"
+                                                    class="editable-row-item records">
+                                                </a>
+                                            </td>
 			<td class='editable-table-data' width="250">
 				<select  fieldName="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
@@ -1031,11 +1052,15 @@
         function getBalance() {
             $('#balance_debit').text(
                 (parseFloat($('#total_debit').text().replace(",", "")) - parseFloat($('#total_credit').text()
-                    .replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
+                    .replace(",", ""))).toLocaleString("en-US", {
+                    minimumFractionDigits: 2
+                })
             );
             $('#edit_balance_debit').text(
                 (parseFloat($('#edit_total_debit').text().replace(",", "")) - parseFloat($('#edit_total_credit')
-                    .text().replace(",", ""))).toLocaleString("en-US", { minimumFractionDigits: 2 })
+                    .text().replace(",", ""))).toLocaleString("en-US", {
+                    minimumFractionDigits: 2
+                })
             );
         }
 
