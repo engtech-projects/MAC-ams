@@ -610,8 +610,8 @@
 									</select>
 								</td>
                             </td>
-                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">₱${parseFloat(vv.journal_details_debit).toFixed(2)}</a> </td>
-                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">₱${parseFloat(vv.journal_details_credit).toFixed(2)}</a> </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
 
 
 								<td class='editable-table-data' value="" >
