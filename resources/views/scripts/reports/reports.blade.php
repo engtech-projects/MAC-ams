@@ -110,7 +110,7 @@
         e.preventDefault();
         alert("delete cash blotter")
 
-        aja
+
 
 
 
@@ -293,7 +293,7 @@
         if( items.length ) {
             return items
         }
-		
+
         return false;
     }
     function addBranchCollection() {
