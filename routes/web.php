@@ -144,14 +144,13 @@ Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedChequ
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
 Route::post('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashTransactionBlotter'])->name('reports.showCashTransactionBlotter');
+
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
-
-
 Route::post('reports/bank-reconciliation', [ReportsController::class,'bankReconciliation'])->name('reports.bank.reconciliation');
 
 Route::post('collections',[CollectionController::class, 'store'])->name('create.collection.breakdown');
-
+Route::delete('collections/{collection}',[CollectionController::class, 'destroy'])->name('delete.collection');
 
 Route::get('reports/cashTransactionBlotter/cashblotter', [ReportsController::class, 'cashBlotterIndex'])->name('reports.cashblotter');
 Route::post('reports/cashTransactionBlotter/storecashblotter', [ReportsController::class, 'storeCashBlotter'])->name('reports.storeCashBlotter');
