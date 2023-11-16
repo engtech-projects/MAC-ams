@@ -371,7 +371,7 @@
 									</div>
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; ₱ <strong id="journal_voucher_amount"></strong></h6>
+											<h6 class="mb-4">Amount :  &nbsp;&nbsp;&nbsp; <strong id="journal_voucher_amount"></strong></h6>
 
 										</div>
 									</div>

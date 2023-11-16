@@ -674,7 +674,7 @@
                         $.each(response.data, function(k, v) {
                             $('#posted-content').html('');
                             var content = '';
-                            $('#vjournal_date, #voucher_date').text(moment(v.journal_date).format('MM/DD/YYYY'));
+                            $('#vjournal_date, #voucher_date').text(moment(v.journal_date).format('MMMM D, YYYY'));
                             $('#vjournal_book_reference, #voucher_ref_no').text(v
                                 .book_details.book_name);
                             $('#vjournal_source, #voucher_source').text(v.source);
@@ -692,7 +692,9 @@
                                 );
                             });
                             $('#vjournal_branch, #voucher_branch').text(v.branch.branch_name);
-                            $('#vjournal_cheque_date').text(moment(v.cheque_date).format('MM/DD/YYYY'));
+                            $('#vjournal_cheque_date').text((v.cheque_date)?
+                                moment(v.cheque_date).format('MM/DD/YYYY')
+                                : 'NO CHEQUE');
                             if (v.status == 'unposted') {
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
@@ -981,12 +983,13 @@
             $('#journal_VoucherContent').html('')
             $('#journal_voucher_pay').text($('#payee').val())
             $('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
-            $('#journal_voucher_date').text($('#journal_date').val())
+            // $('#journal_voucher_date').text($('#journal_date').val())
+            $('#journal_voucher_date').text(moment($('#journal_date')).format('MMMM D, YYYY'));
 			$('#journal_voucher_ref_no').text($('#LrefNo').html())
             $('#journal_voucher_source').text($('#source').val())
             $('#journal_voucher_particular').text($('#remarks').val())
-            $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
-            /*         $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US")) */
+            // $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
+            $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
 
             $('#journal_voucher_amount_in_words').text(numberToWords(parseFloat(Number($('#amount').val().replace(
                 /[^0-9\.-]+/g, "")))))
@@ -1014,8 +1017,8 @@
 					<td></td>
 					<td></td>
 					<td><b>TOTAL</b></td>
-					<td>₱ <strong id="journal_total_debit_voucher"></strong></td>
-					<td>₱ <strong id="journal_total_credit_voucher"></strong></td>
+					<td>₱<strong id="journal_total_debit_voucher"></strong></td>
+					<td>₱<strong id="journal_total_credit_voucher"></strong></td>
 				</tr>
 			`)
 			$('#journal_total_debit_voucher').text($('#total_debit').text())
