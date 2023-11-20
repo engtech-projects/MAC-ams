@@ -292,10 +292,11 @@
 												@foreach ($jl['details'] as $jld)
 												<?php $totalDebit += $jld['debit']; $totalCredit += $jld['credit']; ?>
 												<tr>
+
 													<td></td>
 													<td>{{$jld['account']}}</td>
 													<td>{{$jld['title']}}</td>
-													<td>{{$jld['subsidiary']}}</td>
+													<td>{{$jld["subsidiary"]}}</td>
 													<td>{{$jld['debit']==0?'':number_format($jld['debit'], 2, '.', ',')}}</td>
 													<td>{{$jld['credit']==0?'':number_format($jld['credit'], 2, '.', ',')}}</td>
 												</tr>

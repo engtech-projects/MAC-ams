@@ -64,16 +64,16 @@ class ReportsController extends MainController
             $entries = [];
 
             foreach ($entry->details as $details) {
-                $subsidiary = '';
+                $subsidiary = null;
 
                 if ($details->subsidiary_id) {
-                    $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
+                    $subsidiary = Subsidiary::select('sub_name')->where(['sub_id' => $details->subsidiary_id])->first();
                 }
 
                 $entries[] = [
                     'account' => $details->journal_details_account_no,
                     'title' => $details->journal_details_title,
-                    'subsidiary' => $subsidiary,
+                    'subsidiary' => $subsidiary ? $subsidiary->sub_name : null,
                     'debit' => $details->journal_details_debit,
                     'credit' => $details->journal_details_credit
                 ];
@@ -96,6 +96,7 @@ class ReportsController extends MainController
                 'details' => $entries
             ];
         }
+
 
 
 
