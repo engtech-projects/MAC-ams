@@ -48,7 +48,7 @@ class CollectionBreakdown extends Model
     }
     public static function getCollectionBreakdownByBranch($branchId)
     {
-        return CollectionBreakdown::where('branch_id', $branchId)->get();
+        return CollectionBreakdown::where('branch_id', $branchId)->orderBy('transaction_date','DESC')->get();
     }
     public function getCollectionByTransactionDate($transactionDate, $branchId)
     {

@@ -413,7 +413,7 @@ class ReportsController extends MainController
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
-        // dd($data);
+        return response()->json(['data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)]);
         return view('reports.sections.cashTransactionBlotter', $data);
     }
 
