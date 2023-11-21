@@ -405,15 +405,7 @@ class ReportsController extends MainController
 
     public function cashTransactionBlotter()
     {
-        $branchId = 1;
-        // return response()->json(
-        //     [
-        //         'data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)
-        //     ]
-        // );
-        // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
-
-        // return response()->json(['data' => $cashTransactionsEntries]);
+        $branchId = auth()->user()->branch_id;
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',

@@ -47,19 +47,6 @@
 						</div>
 					</div>
 					<div class="row">
-
-						<div class="col-md-3">
-							<label for="branch">Branch</label>
-							<div class="input-group">
-
-								<select class="select-branch form-control form-control-sm" name="branch_id">
-									<option value="" disabled selected>-Select Branch-</option>
-									@foreach ($branches as $branch)
-										<option value="{{$branch->branch_id}}">{{$branch->branch_name}}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
 						<div class="col-md-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
@@ -100,18 +87,6 @@
 				<div class="row">
 					<div class="col-md-12">
 					<div class="row">
-						<div class="col-sm-3">
-							<label for="branch">Branch</label>
-							<div class="input-group" width="100%">
-
-								<select id="select_branch" name="branch_id" class="select-branch form-control-sm form-control" name="" required>
-								<option value="" disabled selected>-Select Branch-</option>
-								@foreach ($branches as $branch)
-									<option value="{{$branch->branch_id}}">{{$branch->branch_name}}</option>
-								@endforeach
-								</select>
-							</div>
-						</div>
 						<div class="col-sm-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
@@ -447,7 +422,7 @@
 											<tr v-for="fb in filteredCashBlotter.rows">
 												<td v-for="f in fb" v-html="f"></td>
 											</tr>
-											
+
 											<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 												<td><strong>TOTAL</strong></td>
 												<td></td>
@@ -457,7 +432,7 @@
 												<td></td>
 												<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashin)}}</strong></td>
 												<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashout)}}</strong></td>
-											</tr> 
+											</tr>
 										</tbody>
 										</table>
 										<div class="row">
@@ -548,7 +523,7 @@
 														<td>@{{officer.representative}} ; @{{officer.note}}</td>
 														<td>@{{formatCurrency(officer.total)}}</td>
 													</tr>
-												
+
 													<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 														<td><strong>TOTAL COLLECTION</strong></td>
 														<td><strong>@{{formatCurrency(collections.total_accountofficer)}}</strong></td>
@@ -605,7 +580,7 @@
 										<div class="col-lg-4 col-sm-5">
 										</div>
 										<div class="col-lg-4 col-sm-5 ml-auto">
-										
+
 										<div>
 											<button class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
 										</div>
@@ -621,7 +596,7 @@
 				</div>
 			</div>
 
-	
+
 
 
 
@@ -794,8 +769,8 @@
 									rows.push(['<b>Cash Ending Balance</b>','','','','','',cashEndingBalance>0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':'',cashEndingBalance<=0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':''])
 								}
 							}
-							// 
-							
+							//
+
 						}
 					}
 					return {rows:rows,total:{cashin:totalCashIn,cashout:totalCashOut}};
