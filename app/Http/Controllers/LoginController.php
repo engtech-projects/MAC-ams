@@ -68,18 +68,10 @@ class LoginController extends MainController
         return $request->user();
     } */
 
-    public function userLogout() {
+    public function userLogout(Request $request) {
 
-        /* Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/');
-
-        auth()->user()->tokens()->delete();
-
-        return [
-            'message'       => 'Logged out'
-        ]; */
+        Auth::logout();
+        return redirect("login")->withSuccess('Successfully Logged out. ');
     }
 
 }
