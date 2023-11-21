@@ -65,17 +65,17 @@ class ReportsController extends MainController
 
             $entries = [];
 
-            foreach ($entry->journalDetails as $details) {
-                $subsidiary = '';
+            foreach ($entry->details as $details) {
+                $subsidiary = null;
 
                 if ($details->subsidiary_id) {
-                    $subsidiary = Subsidiary::where(['sub_id' => $details->subsidiary_id])->get()->first()->sub_name;
+                    $subsidiary = Subsidiary::select('sub_name')->where(['sub_id' => $details->subsidiary_id])->first();
                 }
 
                 $entries[] = [
                     'account' => $details->journal_details_account_no,
                     'title' => $details->journal_details_title,
-                    'subsidiary' => $subsidiary,
+                    'subsidiary' => $subsidiary ? $subsidiary->sub_name : null,
                     'debit' => $details->journal_details_debit,
                     'credit' => $details->journal_details_credit
                 ];
@@ -101,6 +101,7 @@ class ReportsController extends MainController
 
 
 
+
         $currentPage = $request->page ? $request->page : 1;
 
         /* ----- end journal ledger ----- */
@@ -112,6 +113,8 @@ class ReportsController extends MainController
             'paginated' => $paginated,
             'paginationLinks' => $journal_entry
         ];
+
+        /* return response()->json($data); */
 
 
         return view('reports.sections.journalledger', $data);
@@ -133,6 +136,31 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.subsidiaryledger', $data);
+    }
+
+
+    public function subsidiaryLedgerReports(Request $request)
+    {
+        $filter = $request->input();
+        $data = [
+            'subsidiaryData' => Subsidiary::get(),
+            'sub_categories' => SubsidiaryCategory::get(),
+            'title' => 'Subsidiary Ledger',
+            'subsidiaryLedgerList' => ''
+        ];
+        switch ($filter["type"]) {
+            case 'subsidiary-ledger-listing-report':
+                $journalEntry = new journalEntry();
+                $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter);
+                return response()->json(['data' => $subsidiaryListing]);
+
+            case 'income-minus-expense':
+                //return blade template for the selected report type
+                return response()->json(['data' => "income-minus-expense-report"]);
+            case 'subsidiary-ledger':
+                return view('reports.sections.subsidiaryledger', $data);
+        }
+
     }
     public function subsidiarySaveorEdit(Request $request)
     {
@@ -637,9 +665,9 @@ class ReportsController extends MainController
     {
         $journalEntryModel = new journalEntry();
 
-        $journalEntries = $journalEntryModel->getJournalEntry($request->validated());
+        $data = $journalEntryModel->getBankReconciliationReport($request->validated());
 
-        return $journalEntries;
+        return $data;
 
     }
 

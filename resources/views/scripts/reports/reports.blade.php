@@ -110,7 +110,7 @@
         e.preventDefault();
         alert("delete cash blotter")
 
-        aja
+
 
 
 
