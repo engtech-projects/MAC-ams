@@ -156,7 +156,6 @@
 					@endif
 				</ul>
 			</li>
-
 			@endif
 
 			@if(checkUserHasAccessModule('module','reports'))
@@ -234,7 +233,7 @@
 					@endif
 					@if(checkUserHasAccessModule('sub-module','reports/cashTransactionBlotter'))
 					<li class="nav-item">
-						<a href="{{ route('reports.cashTransactionBlotter') }}" class="nav-link {{ (request()->is('reports/cashTransactionBlotter')) ? 'active' : '' }}">
+						<a href="{{ route('reports.cashTransactionBlotter') }}"  class="nav-link {{ (request()->is('reports/cashTransactionBlotter')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
 							<p>Cash Transaction Blotter</p>
 						</a>
@@ -299,3 +298,4 @@
 	</div>
 
 </aside>
+

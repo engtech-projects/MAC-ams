@@ -1,5 +1,13 @@
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 <script type="text/javascript">
+
+$(document).ready(function(){
+  $("form").submit(function(){
+    alert("Submitted");
+  });
+});
+
+
 	(function ($) {
 
         var cashblotter_tbl
@@ -202,6 +210,31 @@
             }
         });
 
+    })
+
+    /* $(document).on('click','#get-cash-blotter',function(){
+        var transactionDate = $('#transaction_date').val()
+        var data = {
+            transaction_date: $('#transaction_date').val()
+        }
+        $.ajaxSetup({
+            headers: {
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+         });
+        $.ajax({
+            type:"POST",
+            url:"<?= config('app.url') ?>/reports/cashTransactionBlotter",
+            data:data,
+        }).done(function(data) {
+            console.log(data);
+        })
+    }) */
+
+
+    $(document).on('submit','#filter-cash-blotter',function(e){
+        event.preventDefault();
+        return alert("asd");
     })
 
 

@@ -381,15 +381,6 @@ class ReportsController extends MainController
     {
 
         $transactionDate = $request["transaction_date"];
-         /* return response()->json(
-           [
-               'data' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate)
-            ]
-        ); */
-        // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
-
-        // return response()->json(['data' => $cashTransactionsEntries]);
-        $branchId = auth()->user()->branch_id;
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
@@ -397,8 +388,16 @@ class ReportsController extends MainController
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
-        /* return response()->json(['data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)]); */
+        /* return response()->json(['data' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate)]); */
         return view('reports.sections.cashTransactionBlotter', $data);
+    }
+
+    public function searchCashTransactionBlotter(Request $request)
+    {
+        $transactionDate = $request["transaction_date"];
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate);
+        $message = $collections->count() > 0 ? "Collections fetched." : "No data found.";
+        return response()->json(['message' => $message,'data' => $collections]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)
