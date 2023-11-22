@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 use DB;
+use Illuminate\Support\Facades\Auth;
 
 class CollectionBreakdown extends Model
 {
@@ -46,17 +47,23 @@ class CollectionBreakdown extends Model
         $collection = CollectionBreakdown::with(['accountOfficerCollection'])->where('collection_id', $id)->first();
         return $collection;
     }
-    public static function getCollectionBreakdownByBranch($branchId)
+    public static function getCollectionBreakdownByBranch($transactionDate)
     {
-        return CollectionBreakdown::where('branch_id', $branchId)->get();
+        $branchId = Auth::user()->branch->branch_id;
+        return CollectionBreakdown::where('branch_id', $branchId)
+        ->when($transactionDate,function($query,$transactionDate) {
+            $query->where('transaction_date',$transactionDate);
+
+        })->orderBy('transaction_date','desc')
+        ->get();
     }
     public function getCollectionByTransactionDate($transactionDate, $branchId)
     {
 
-        $collection = CollectionBreakdown::whereDate('transaction_date', '<', $transactionDate)
-            ->where('branch_id', $branchId)
-            ->orderBy('collection_id', 'DESC')
-            ->first();
+        $collection = CollectionBreakdown::whereDate('transaction_date','<', $transactionDate)
+        ->where('branch_id',$branchId)
+        ->orderBy('collection_id','DESC')
+        ->first();
         return $collection;
     }
 
@@ -70,7 +77,7 @@ class CollectionBreakdown extends Model
         })->values();
 
         return DB::transaction(function () use ($attributes, $collection_ao) {
-            self::create($attributes)->accountOfficerCollection()->createMany($collection_ao);
+           self::create($attributes)->accountOfficerCollection()->createMany($collection_ao);
         });
 
     }
@@ -82,9 +89,9 @@ class CollectionBreakdown extends Model
 
         $previousCollection = $this->getCollectionByTransactionDate($transactionDate, $collection->branch_id);
         return [
-            'prev_transaction_date' => isset($previousCollection->transaction_date) ? $previousCollection->transaction_date : '',
+            'prev_transaction_date' => isset($previousCollection->transaction_date)?$previousCollection->transaction_date:'',
             'transaction_date' => $collection->transaction_date,
-            'total' => isset($previousCollection->total) ? $previousCollection->total : 0
+            'total' => isset($previousCollection->total) ? $previousCollection->total:0
         ];
     }
 
@@ -92,11 +99,6 @@ class CollectionBreakdown extends Model
     {
         $collections = $this->getCollectionById($id);
         return $collections;
-    }
-
-    public function deleteCollection($collection)
-    {
-
     }
 
 }
