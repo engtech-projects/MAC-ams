@@ -48,7 +48,7 @@
 					</div>
 					<div class="row">
 
-						<!-- <div class="col-md-3">
+						<div class="col-md-3">
 							<label for="branch">Branch</label>
 							<div class="input-group">
 
@@ -59,21 +59,21 @@
 									@endforeach
 								</select>
 							</div>
-						</div> -->
-						<div class="col-md-4">
+						</div>
+						<div class="col-md-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
 								<input type="date" name="transaction_date" class="form-control form-control-sm">
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-3">
 							<div class="mt-4 text-left">
 								<button class="btn btn-success">Search</button>
 							</div>
 
 						</div>
 
-						<div class="col-md-4">
+						<div class="col-md-3">
 							<div class="mt-4 text-right">
 								<button type="button" class="btn btn-primary" data-type="create" id="create-cashblotter">New Transaction</button>
 							</div>
@@ -81,7 +81,6 @@
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12" style="height:10px;"></div>
 
 		</div>
 
@@ -319,6 +318,7 @@
 
 
 		<div class="row">
+			<div class="col-md-12 mt-5">
 				<table id="cash-blotter-tbls"  class="table table-sm table-bordered">
 					<thead>
 						<th>Branch</th>
@@ -328,7 +328,6 @@
 					</thead>
 					<tbody>
 						<tr v-for="d in data">
-
 							<td>@{{ d.branch_id }}</td>
 							<td>@{{ d.transaction_date }}</td>
 							<td>@{{ formatCurrency(d.total) }}</td>
