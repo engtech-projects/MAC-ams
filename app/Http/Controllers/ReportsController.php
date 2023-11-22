@@ -387,6 +387,7 @@ class ReportsController extends MainController
     public function bankReconcillation()
     {
         $data = [
+			'chartOfAccount' => \App\Models\Accounts::where(['type' => 'L'])->get(),
             'title' => 'Subsidiary Ledger',
             'trialbalanceList' => ''
         ];
