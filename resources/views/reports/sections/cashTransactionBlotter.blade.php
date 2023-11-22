@@ -47,19 +47,6 @@
 						</div>
 					</div>
 					<div class="row">
-
-						<div class="col-md-3">
-							<label for="branch">Branch</label>
-							<div class="input-group">
-
-								<select class="select-branch form-control form-control-sm" name="branch_id">
-									<option value="" disabled selected>-Select Branch-</option>
-									@foreach ($branches as $branch)
-										<option value="{{$branch->branch_id}}">{{$branch->branch_name}}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
 						<div class="col-md-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
@@ -100,18 +87,6 @@
 				<div class="row">
 					<div class="col-md-12">
 					<div class="row">
-						<div class="col-sm-3">
-							<label for="branch">Branch</label>
-							<div class="input-group" width="100%">
-
-								<select id="select_branch" name="branch_id" class="select-branch form-control-sm form-control" name="" required>
-								<option value="" disabled selected>-Select Branch-</option>
-								@foreach ($branches as $branch)
-									<option value="{{$branch->branch_id}}">{{$branch->branch_name}}</option>
-								@endforeach
-								</select>
-							</div>
-						</div>
 						<div class="col-sm-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">

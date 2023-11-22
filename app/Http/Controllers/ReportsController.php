@@ -389,6 +389,7 @@ class ReportsController extends MainController
         // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
         // return response()->json(['data' => $cashTransactionsEntries]);
+        $branchId = auth()->user()->branch_id;
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
@@ -396,7 +397,7 @@ class ReportsController extends MainController
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
-        // dd($data);
+        /* return response()->json(['data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)]); */
         return view('reports.sections.cashTransactionBlotter', $data);
     }
 
