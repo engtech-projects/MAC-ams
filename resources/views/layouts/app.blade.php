@@ -8,6 +8,9 @@
   <script src="https://cdn.jsdelivr.net/npm/axios@0.24.0/dist/axios.min.js"></script>
   <title> {{ $title }} </title>
   <style type="text/css">
+		.flex {
+			display:flex;
+		}
 		.dataTables_filter {
 			float: left !important;
 		}
