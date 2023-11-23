@@ -39,7 +39,6 @@
 	<section class="content" id="app">
 	<div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 		<div class="row">
-
 			<div class="col-md-12">
 					<div class="row">
 						<div class="col-md-12 frm-header">
@@ -47,28 +46,16 @@
 						</div>
 					</div>
 					<div class="row">
-
-						<div class="col-md-3">
-							<label for="branch">Branch</label>
-							<div class="input-group">
-
-								<select class="select-branch form-control form-control-sm" name="branch_id">
-									<option value="" disabled selected>-Select Branch-</option>
-									@foreach ($branches as $branch)
-										<option value="{{$branch->branch_id}}">{{$branch->branch_name}}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
 						<div class="col-md-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
-								<input type="date" name="transaction_date" class="form-control form-control-sm">
+								<input type="date" v-model="filter.transaction_date" id="transaction_date" name="transaction_date" class="form-control form-control-sm">
 							</div>
+
 						</div>
 						<div class="col-md-3">
 							<div class="mt-4 text-left">
-								<button class="btn btn-success">Search</button>
+								<button  @click="filterCollections()" class="btn btn-success">Search</button>
 							</div>
 
 						</div>
@@ -100,18 +87,6 @@
 				<div class="row">
 					<div class="col-md-12">
 					<div class="row">
-						<div class="col-sm-3">
-							<label for="branch">Branch</label>
-							<div class="input-group" width="100%">
-
-								<select id="select_branch" name="branch_id" class="select-branch form-control-sm form-control" name="" required>
-								<option value="" disabled selected>-Select Branch-</option>
-								@foreach ($branches as $branch)
-									<option value="{{$branch->branch_id}}">{{$branch->branch_name}}</option>
-								@endforeach
-								</select>
-							</div>
-						</div>
 						<div class="col-sm-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
@@ -327,7 +302,7 @@
 						<th>Action</th>
 					</thead>
 					<tbody>
-						<tr v-for="d in data">
+						<tr v-for="d in collectionsBreakdown">
 							<td>@{{ d.branch_id }}</td>
 							<td>@{{ d.transaction_date }}</td>
 							<td>@{{ formatCurrency(d.total) }}</td>
@@ -447,7 +422,7 @@
 											<tr v-for="fb in filteredCashBlotter.rows">
 												<td v-for="f in fb" v-html="f"></td>
 											</tr>
-											
+
 											<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 												<td><strong>TOTAL</strong></td>
 												<td></td>
@@ -457,7 +432,7 @@
 												<td></td>
 												<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashin)}}</strong></td>
 												<td><strong>@{{formatCurrency(filteredCashBlotter.total.cashout)}}</strong></td>
-											</tr> 
+											</tr>
 										</tbody>
 										</table>
 										<div class="row">
@@ -548,7 +523,7 @@
 														<td>@{{officer.representative}} ; @{{officer.note}}</td>
 														<td>@{{formatCurrency(officer.total)}}</td>
 													</tr>
-												
+
 													<tr style="border-top:4px dashed black;border-bottom:4px dashed black;">
 														<td><strong>TOTAL COLLECTION</strong></td>
 														<td><strong>@{{formatCurrency(collections.total_accountofficer)}}</strong></td>
@@ -605,7 +580,7 @@
 										<div class="col-lg-4 col-sm-5">
 										</div>
 										<div class="col-lg-4 col-sm-5 ml-auto">
-										
+
 										<div>
 											<button class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
 										</div>
@@ -621,7 +596,7 @@
 				</div>
 			</div>
 
-	
+
 
 
 
@@ -649,6 +624,10 @@
 			data: {
 				data: @json($cash_blotter),
 				accountOfficers:@json($account_officers),
+                filter:{
+                    transaction_date:null
+                },
+                result:{},
 				entries:{
 							begining_balance:{},
 							cash_received:[],
@@ -668,6 +647,21 @@
 				greet:function(data){
 					alert(data);
 				},
+                filterCollections:function() {
+                    var data = {
+                        transaction_date:this.filter.transaction_date
+                    }
+                    var url = "{{ route('reports.cashTransactionBlotter') }}"
+                    axios.post(url,data)
+                    .then(response => {
+                        this.data = response.data.data
+                        toastr.success(response.data.message);
+                    }).catch(error => {
+                        console.error(error);
+                    })
+
+
+                },
 				showCashBlotter:function(id,branch){
 					var url = "{{route('reports.showCashBlotter',['id'=>'cid'])}}".replace('cid', id);
 					axios.get(url,{params:{branch_id:branch}}) // Replace with your API endpoint
@@ -752,6 +746,9 @@
 				}
 			},
 			computed:{
+                collectionsBreakdown:function(){
+                    return this.data
+                },
 				filteredCashBlotter:function(){
 					var rows = [];
 					var cashEndingBalance = 0;
@@ -794,14 +791,15 @@
 									rows.push(['<b>Cash Ending Balance</b>','','','','','',cashEndingBalance>0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':'',cashEndingBalance<=0?'<b>'+this.formatCurrency(cashEndingBalance)+'</b>':''])
 								}
 							}
-							// 
-							
+							//
+
 						}
 					}
 					return {rows:rows,total:{cashin:totalCashIn,cashout:totalCashOut}};
 				}
 			},
 			mounted(){
+                this.data =  @json($cash_blotter);
 				// console.log(this.data);
 			}
 		});

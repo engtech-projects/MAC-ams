@@ -23,10 +23,4 @@ class CollectionController extends Controller
         return new JsonResponse(["message" => "Collection successfully saved."]);
     }
 
-    public function destroy(CollectionBreakdown $collection)
-    {
-        $collection->delete();
-        return response()->json(["message"=> "Collection successfully deleted.","data" => $collection]);
-    }
-
 }

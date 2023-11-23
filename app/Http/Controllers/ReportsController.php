@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BankReconciliationReportsRequest;
 use App\Http\Requests\RevenueMinusExpenseRequest;
 use App\Models\CollectionBreakdown;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Customer;
@@ -32,6 +33,7 @@ use App\Models\TransactionDate;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -63,7 +65,7 @@ class ReportsController extends MainController
 
             $entries = [];
 
-            foreach ($entry->details as $details) {
+            foreach ($entry->journalDetails as $details) {
                 $subsidiary = '';
 
                 if ($details->subsidiary_id) {
@@ -111,8 +113,6 @@ class ReportsController extends MainController
             'paginationLinks' => $journal_entry
         ];
 
-        /* return response()->json($data); */
-
 
         return view('reports.sections.journalledger', $data);
     }
@@ -133,31 +133,6 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.subsidiaryledger', $data);
-    }
-
-
-    public function subsidiaryLedgerReports(Request $request)
-    {
-        $filter = $request->input();
-        $data = [
-            'subsidiaryData' => Subsidiary::get(),
-            'sub_categories' => SubsidiaryCategory::get(),
-            'title' => 'Subsidiary Ledger',
-            'subsidiaryLedgerList' => ''
-        ];
-        switch ($filter["type"]) {
-            case 'subsidiary-ledger-listing-report':
-                $journalEntry = new journalEntry();
-                $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter);
-                return response()->json(['data' => $subsidiaryListing]);
-
-            case 'income-minus-expense':
-                //return blade template for the selected report type
-                return response()->json(['data' => "income-minus-expense-report"]);
-            case 'subsidiary-ledger':
-                return view('reports.sections.subsidiaryledger', $data);
-        }
-
     }
     public function subsidiarySaveorEdit(Request $request)
     {
@@ -402,26 +377,27 @@ class ReportsController extends MainController
         return view('reports.sections.cashPosition', $data);
     }
 
-    public function cashTransactionBlotter()
+    public function cashTransactionBlotter(Request $request)
     {
-        $branchId = 1;
-        // return response()->json(
-        //     [
-        //         'data' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId)
-        //     ]
-        // );
-        // $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($request);
 
-        // return response()->json(['data' => $cashTransactionsEntries]);
+        $transactionDate = $request["transaction_date"];
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
-            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($branchId),
+            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate),
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
-        // dd($data);
+        /* return response()->json(['data' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate)]); */
         return view('reports.sections.cashTransactionBlotter', $data);
+    }
+
+    public function searchCashTransactionBlotter(Request $request)
+    {
+        $transactionDate = $request["transaction_date"];
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate);
+        $message = $collections->count() > 0 ? "Collections fetched." : "No data found.";
+        return response()->json(['message' => $message,'data' => $collections]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)
@@ -661,11 +637,9 @@ class ReportsController extends MainController
     {
         $journalEntryModel = new journalEntry();
 
-        $data = $journalEntryModel->getBankReconciliationReport($request->validated());
+        $journalEntries = $journalEntryModel->getJournalEntry($request->validated());
 
-        return $data;
-
-
+        return $journalEntries;
 
     }
 
