@@ -235,7 +235,9 @@
 				})
 				.then(response => {
 					console.log('Response:', response.data);
-					this.reconData = response.data;
+					var arr = [];
+					arr.push(response.data);
+					this.reconData = arr;
 				})
 				.catch(error => {
 					console.error('Error:', error);
