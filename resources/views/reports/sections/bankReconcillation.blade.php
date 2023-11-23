@@ -57,9 +57,10 @@
 								<div class="input-group">
 									<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="" value="{{request('account_id')}}" required>
 										<option value="all" selected>-All-</option>
-										@foreach($chartOfAccount as $data)
+										<option v-for="acc,a in filteredAccounts" :key="a" :value="acc.account_id">@{{acc.account_number}} - @{{acc.account_name}}</option>
+										<!-- @foreach($chartOfAccount as $data)
 											<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
-										@endforeach
+										@endforeach -->
 									</select>
 								</div>
 							</div>
@@ -70,7 +71,7 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">Bank Balance</label>
 								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="0.00" required>
+									<input v-model="bankBalance" type="number" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="0.00" required>
 								</div>
 							</div>
 						</div>
@@ -189,7 +190,7 @@
 										<td></td>
 										<td class="text-right"><b>Bank Statement Balance: </b></td>
 										<td></td>
-										<td>0.00</td>
+										<td>@{{formatCurrency(bankBalance)}}</td>
 									</tr>
 									<tr>
 										<td></td>
@@ -220,6 +221,8 @@
 				date_from:'',
 				date_to:''
 			},
+			accounts:@json($chartOfAccount),
+			bankBalance:'0.00',
 			reconData:[],
 			url:"{{route('reports.bank.reconciliation')}}",
 		},
@@ -267,6 +270,20 @@
 					return this.reconData[0];
 				}
 				return {entries:[]}
+			},
+			filteredAccounts:function(){
+				var valid = ['1025','1026','1045','1060','1050','1055','1260'];
+				var result = [];
+				for(var i in valid){
+					var vd = valid[i];
+					for(var m in this.accounts){
+						var acc = this.accounts[m];
+						if(vd == acc.account_number){
+							result.push(acc);
+						}
+					}
+				}
+				return result;
 			}
 		},
 		mounted(){
