@@ -677,8 +677,11 @@
                                     `<li>${vv}</li>`
                                 );
                             });
-                            $('#vjournal_branch, #voucher_branch').text(v.branch_id);
-                            $('#vjournal_cheque_date').text(v.cheque_date);
+                            $('#voucher_particular').text(v.remarks);
+                            $('#vjournal_branch, #voucher_branch').text(v.branch.branch_name);
+                            $('#vjournal_cheque_date').text((v.cheque_date)?
+                                moment(v.cheque_date).format('MM/DD/YYYY')
+                                : 'NO CHEQUE');
                             if (v.status == 'unposted') {
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
@@ -717,6 +720,15 @@
 									<td class="right">${amountConverter(vv.journal_details_credit)}</td>
 								</tr>`);
                             })
+                            $('#journalVoucherContent').append(`
+                                <tr style="border-top:4px dashed black; border-bottom:none">
+                                    <td></td>
+                                    <td></td>
+                                    <td><b>TOTAL</b></td>
+                                    <td><strong id="total_debit_voucher"></strong></td>
+                                    <td><strong id="total_credit_voucher"></strong></td>
+                                </tr>
+                            `)
                             $('#vtotal_debit, #total_debit_voucher').text(
                                 amountConverter(total_debit))
                             $('#vtotal_credit, #total_credit_voucher').text(
