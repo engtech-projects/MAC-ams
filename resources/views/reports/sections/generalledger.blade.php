@@ -36,7 +36,7 @@
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div class="row">
-					<div class="col-md-8 frm-header">
+					<div class="col-md-12 frm-header">
 						<h4 ><b>General Ledger</b></h4>
                         {{-- <table style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
                             <thead>
