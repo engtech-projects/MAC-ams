@@ -46,21 +46,21 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-3">
+						<div class="col-md-4">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
 								<input type="date" v-model="filter.transaction_date" id="transaction_date" name="transaction_date" class="form-control form-control-sm">
 							</div>
 
 						</div>
-						<div class="col-md-3">
+						<div class="col-md-4">
 							<div class="mt-4 text-left">
 								<button  @click="filterCollections()" class="btn btn-success">Search</button>
 							</div>
 
 						</div>
 
-						<div class="col-md-3">
+						<div class="col-md-4">
 							<div class="mt-4 text-right">
 								<button type="button" class="btn btn-primary" data-type="create" id="create-cashblotter">New Transaction</button>
 							</div>
@@ -79,7 +79,7 @@
 				@csrf
 			<div class="container">
 				<div class="row">
-					<div class="col-md-12 frm-header">
+					<div class="col-md-12 frm-header" style="padding:10px;">
 						<h4 id="title"><b></b></h4>
 					</div>
 				</div>
@@ -87,7 +87,7 @@
 				<div class="row">
 					<div class="col-md-12">
 					<div class="row">
-						<div class="col-sm-3">
+						<div class="col-sm-3" style="margin-left:10px;">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
 								<input type="date" name="transaction_date" class="form-control form-control-sm" required>
@@ -111,47 +111,47 @@
 									</thead>
 									<tbody>
 										<tr class="cash-breakdown">
-										<td>₱1000</td>
+										<td>₱1000.00</td>
 										<td><input type="number" name="p_1000" id="onethousand" class="form-control form-control-sm pcs" required></td>
 										<td id="onethousandtotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱500</td>
+											<td>₱500.00</td>
 											<td><input type="number" name="p_500" id="fivehundred" class="form-control form-control-sm pcs" required></td>
 											<td id="fivehundredtotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱200</td>
+											<td>₱200.00</td>
 											<td><input type="number" name="p_200" id="twohundred" class="form-control form-control-sm" required></td>
 											<td id="twohundredtotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱100</td>
+											<td>₱100.00</td>
 											<td><input type="number" name="p_100" id="onehundred" class="form-control form-control-sm" required></td>
 											<td id="onehundredtotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱50</td>
+											<td>₱50.00</td>
 											<td><input type="number" name="p_50" id="fifty" class="form-control form-control-sm" required></td>
 											<td id="fiftytotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱20</td>
+											<td>₱20.00</td>
 											<td><input type="number" name="p_20" id="twenty" class="form-control form-control-sm" required></td>
 											<td id="twentytotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱10</td>
+											<td>₱10.00</td>
 											<td><input type="number" name="p_10" id="ten" class="form-control form-control-sm" required></td>
 											<td id="tentotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱5</td>
+											<td>₱5.00</td>
 											<td><input type="number" name="p_5" id="five" class="form-control form-control-sm" required></td>
 											<td id="fivetotalamount" class="total">0</td>
 										</tr>
 										<tr class="cash-breakdown">
-											<td>₱1</td>
+											<td>₱1.00</td>
 											<td><input type="number" name="p_1" id="one" class="form-control form-control-sm" required></td>
 											<td id="onetotalamount" class="total">0</td>
 										</tr>
@@ -296,14 +296,14 @@
 			<div class="col-md-12 mt-5">
 				<table id="cash-blotter-tbls"  class="table table-sm table-bordered">
 					<thead>
-						<th>Branch</th>
+						<!-- <th>Branch</th> -->
 						<th>Transaction Date</th>
 						<th>Total Branch Collection</th>
 						<th>Action</th>
 					</thead>
 					<tbody>
 						<tr v-for="d in collectionsBreakdown">
-							<td>@{{ d.branch_id }}</td>
+							<!-- <td>@{{ d.branch_id }}</td> -->
 							<td>@{{ d.transaction_date }}</td>
 							<td>@{{ formatCurrency(d.total) }}</td>
 							<td>
@@ -445,47 +445,47 @@
 													</thead>
 													<tbody>
 														<tr>
-															<td>1,000</td>
+															<td>1,000.00</td>
 															<td>@{{collections.p_1000}}</td>
 															<td>@{{formatCurrency(1000 * parseFloat(collections.p_1000))}}</td>
 														</tr>
 														<tr>
-															<td>500</td>
+															<td>500.00</td>
 															<td>@{{collections.p_500}}</td>
 															<td>@{{formatCurrency(500 * parseFloat(collections.p_500))}}</td>
 														</tr>
 														<tr>
-															<td>200</td>
+															<td>200.00</td>
 															<td>@{{collections.p_200}}</td>
 															<td>@{{formatCurrency(200 * parseFloat(collections.p_200))}}</td>
 														</tr>
 														<tr>
-															<td>100</td>
+															<td>100.00</td>
 															<td>@{{collections.p_100}}</td>
 															<td>@{{formatCurrency(100 * parseFloat(collections.p_100))}}</td>
 														</tr>
 														<tr>
-															<td>50</td>
+															<td>50.00</td>
 															<td>@{{collections.p_50}}</td>
 															<td>@{{formatCurrency(50 * parseFloat(collections.p_50))}}</td>
 														</tr>
 														<tr>
-															<td>20</td>
+															<td>20.00</td>
 															<td>@{{collections.p_20}}</td>
 															<td>@{{formatCurrency(20 * parseFloat(collections.p_20))}}</td>
 														</tr>
 														<tr>
-															<td>10</td>
+															<td>10.00</td>
 															<td>@{{collections.p_10}}</td>
 															<td>@{{formatCurrency(10 * parseFloat(collections.p_10))}}</td>
 														</tr>
 														<tr>
-															<td>5</td>
+															<td>5.00</td>
 															<td>@{{collections.p_5}}</td>
 															<td>@{{formatCurrency(5 * parseFloat(collections.p_5))}}</td>
 														</tr>
 														<tr>
-															<td>1</td>
+															<td>1.00</td>
 															<td>@{{collections.p_1}}</td>
 															<td>@{{formatCurrency(1 * parseFloat(collections.p_1))}}</td>
 														</tr>
