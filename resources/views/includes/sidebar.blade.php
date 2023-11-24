@@ -159,9 +159,9 @@
 			@endif
 
 			@if(checkUserHasAccessModule('module','reports'))
-			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/journalledger') || request()->is('reports/subsidiaryledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
+			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/journalledger') || request()->is('reports/subsidiary-ledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
 					|| request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition') || request()->is('reports/cheque') || request()->is('reports/postDatedCheque')|| request()->is('reports/chartOfAccounts')) ? 'menu-open' : '' }}">
-			<a href="{{ route('sales') }}" class="nav-link {{  (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">
+			<a href="{{ route('sales') }}" class="nav-link {{  (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-clipboard-list"></i>
 				<p>
 				Reports
@@ -175,9 +175,16 @@
 							<p>Journal Ledger</p>
 						</a>
 					</li>
-					@if(checkUserHasAccessModule('sub-module','reports/subsidiaryledger'))
+					@if(checkUserHasAccessModule('sub-module','reports/subsidiary-ledger'))
+                    <form id="subsidiary-ledger" action="{{ route('reports.subsidiary-ledger') }}" method="POST" style="display: none;">
+                        <input type="hidden" name="type" value="subsidiary-ledger">
+                        @csrf
+                    </form>
 					<li class="nav-item">
-						<a href="{{ route('reports.subsidiaryledger') }}" class="nav-link {{ (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">
+						<a
+                        onclick="event.preventDefault(); document.getElementById('subsidiary-ledger').submit();"
+                        href="{{ route('reports.subsidiary-ledger') }}"
+                        class="nav-link {{ (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
 							<p>Subsidiary Ledger</p>
 						</a>
