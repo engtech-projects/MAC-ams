@@ -127,6 +127,12 @@ Route::get('sales/invoice', [SalesController::class, 'invoice'])->name('sales.in
 
 //reports
 Route::get('reports/subsidiaryledger', [ReportsController::class, 'subsidiaryLedger'])->name('reports.subsidiaryledger');
+
+Route::post('reports/subsidiary-ledger',[ReportsController::class, 'subsidiaryLedgerReports'])->name('reports.subsidiary-ledger');
+Route::get('reports/subsidiary-ledger-listing',[ReportsController::class, 'subsidiaryListing'])->name('reports.subsidiary.listing');
+
+
+
 Route::get('reports/subsidiaryViewInfo', [ReportsController::class, 'subsidiaryViewInfo'])->name('reports.subsidiaryViewInfo');
 Route::get('reports/subsidiaryDelete', [ReportsController::class, 'subsidiaryDelete'])->name('reports.subsidiaryDelete');
 Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');
@@ -145,14 +151,13 @@ Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
 Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'searchCashTransactionBlotter'])->name('reports.searchTransactionBlotter');
 Route::post('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashTransactionBlotter'])->name('reports.showCashTransactionBlotter');
+
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
-
-
 Route::post('reports/bank-reconciliation', [ReportsController::class,'bankReconciliation'])->name('reports.bank.reconciliation');
 
 Route::post('collections',[CollectionController::class, 'store'])->name('create.collection.breakdown');
-
+Route::delete('collections/{collection}',[CollectionController::class, 'destroy'])->name('delete.collection');
 
 Route::get('reports/cashTransactionBlotter/cashblotter', [ReportsController::class, 'cashBlotterIndex'])->name('reports.cashblotter');
 Route::post('reports/cashTransactionBlotter/storecashblotter', [ReportsController::class, 'storeCashBlotter'])->name('reports.storeCashBlotter');

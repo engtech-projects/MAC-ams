@@ -118,7 +118,7 @@ $(document).ready(function(){
         e.preventDefault();
         alert("delete cash blotter")
 
-        aja
+
 
 
 

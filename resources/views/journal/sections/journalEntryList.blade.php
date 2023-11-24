@@ -726,8 +726,7 @@
                                             </div>
                                         </div>
                                         <div class="table-responsive-sm" style="padding-top:5px;">
-                                            <table class="table table-striped"
-                                                style="border-top:4px dashed black;">
+                                            <table class="table table-striped" style="border-top:4px dashed black;">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Account</th>
@@ -745,6 +744,7 @@
                                         <div class="row">
                                             <div class="col-lg-4 col-sm-5"></div>
                                             <div class="col-lg-4 col-sm-5 ml-auto">
+
                                                 <!-- <table class="table table-clear">
                                                     <tbody>
                                                         <tr>
@@ -756,6 +756,7 @@
                                                             <td class="left"><strong id="total_credit_voucher"></strong>
                                                             </td>
                                                         </tr>
+
                                                     </tbody>
                                                 </table> -->
                                                 <div>
@@ -780,3 +781,4 @@
     @section('footer-scripts')
         @include('scripts.journal.journal')
     @endsection
+
