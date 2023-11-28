@@ -25,7 +25,7 @@ class SystemSetupController extends MainController
 {
     public function index() {
 		return view('systemSetup.systemSetup')->with([
-			'title' 	=> 'Settings Setup'.' - '.config('app.name'),
+			'title' 	=> 'MAC-AMS | System Setup',
 			'nav' 		=> ['settings', 'general'],
 			'company' 	=> Company::with('address')->first(),
 			'accessLists' => AccessList::with('subModuleList')->get(),
