@@ -1,6 +1,6 @@
 <style type="text/css">
     .editable-buttons {
-       display: none !important;
+        display: none !important;
     }
 </style>
 <script type="text/javascript">
@@ -90,11 +90,14 @@
                         $.each(response.data, function(k, v) {
                             $('#posted-content').html('');
                             var content = '';
+
+                            console.log(v.remarks)
                             $.each(v.remarks.split('::'), function(k, vv) {
                                 $('#vjournal_remarks').append(
                                     `<li>${vv}</li>`
                                 );
                             });
+
                             if (v.status == 'unposted') {
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
@@ -190,11 +193,13 @@
                         $.each(response.data, function(k, v) {
                             $('#posted-content').html('');
                             var content = '';
-                            $.each(v.remarks.split('::'), function(k, vv) {
-                                $('#vjournal_remarks').append(
-                                    `<li>${vv}</li>`
-                                );
-                            });
+                            if (v.remarks) {
+                                $.each(v.remarks.split('::'), function(k, vv) {
+                                    $('#vjournal_remarks').append(
+                                        `<li>${vv}</li>`
+                                    );
+                                });
+                            }
                             if (v.status == 'unposted') {
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
@@ -640,9 +645,21 @@
                                 balance = parseFloat(total_debit) - parseFloat(
                                     total_credit)
                             });
-                            $('#edit_total_debit').text(Number(total_debit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                            $('#edit_total_credit').text(Number(total_credit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                            $('#edit_balance_debit').text(Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                            $('#edit_total_debit').text(Number(total_debit)
+                                .toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }));
+                            $('#edit_total_credit').text(Number(total_credit)
+                                .toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }));
+                            $('#edit_balance_debit').text(Number(balance)
+                                .toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }));
                         });
                     }
                 },
@@ -674,7 +691,8 @@
                         $.each(response.data, function(k, v) {
                             $('#posted-content').html('');
                             var content = '';
-                            $('#vjournal_date, #voucher_date').text(moment(v.journal_date).format('MMMM D, YYYY'));
+                            $('#vjournal_date, #voucher_date').text(moment(v
+                                .journal_date).format('MMMM D, YYYY'));
                             $('#vjournal_book_reference, #voucher_ref_no').text(v
                                 .book_details.book_name);
                             $('#vjournal_source, #voucher_source').text(v.source);
@@ -682,20 +700,26 @@
                                 'NO CHEQUE');
                             $('#vjournal_status').text(v.status);
                             $('#vjournal_amount, #voucher_amount').text(parseFloat(v
-                                .amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                                .amount).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }));
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
                             $('#voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
-                            $.each(v.remarks.split('::'), function(k, vv) {
-                                $('#vjournal_remarks').append(
-                                    `<li>${vv}</li>`
-                                );
-                            });
+                            if(v.remarks) {
+                                $.each(v.remarks.split('::'), function(k, vv) {
+                                    $('#vjournal_remarks').append(
+                                        `<li>${vv}</li>`
+                                    );
+                                });
+                            }
                             $('#voucher_particular').text(v.remarks);
-                            $('#vjournal_branch, #voucher_branch').text(v.branch.branch_name);
-                            $('#vjournal_cheque_date').text((v.cheque_date)?
-                                moment(v.cheque_date).format('MM/DD/YYYY')
-                                : 'NO CHEQUE');
+                            $('#vjournal_branch, #voucher_branch').text(v.branch
+                                .branch_name);
+                            $('#vjournal_cheque_date').text((v.cheque_date) ?
+                                moment(v.cheque_date).format('MM/DD/YYYY') :
+                                'NO CHEQUE');
                             if (v.status == 'unposted') {
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
@@ -995,7 +1019,7 @@
             $('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
             // $('#journal_voucher_date').text($('#journal_date').val())
             $('#journal_voucher_date').text(moment($('#journal_date')).format('MMMM D, YYYY'));
-			$('#journal_voucher_ref_no').text($('#LrefNo').html())
+            $('#journal_voucher_ref_no').text($('#LrefNo').html())
             $('#journal_voucher_source').text($('#source').val())
             $('#journal_voucher_particular').text($('#remarks').val())
             // $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
@@ -1018,11 +1042,10 @@
 					<td class="right">${$(field[4]).find('.editable-row-item').find(":selected").text()}</td>
 					<td class="left">${$(field[2]).find('.editable-row-item').text()}</td>
 					<td class="center">${$(field[3]).find('.editable-row-item').text()}</td>
-				</tr>`
-				);
+				</tr>`);
 
             });
-			$('#journal_VoucherContent').append(`
+            $('#journal_VoucherContent').append(`
 				<tr style="border-top:4px dashed black;">
 					<td></td>
 					<td></td>
@@ -1031,8 +1054,8 @@
 					<td>₱<strong id="journal_total_credit_voucher"></strong></td>
 				</tr>
 			`)
-			$('#journal_total_debit_voucher').text($('#total_debit').text())
-			$('#journal_total_credit_voucher').text($('#total_credit').text())
+            $('#journal_total_debit_voucher').text($('#total_debit').text())
+            $('#journal_total_credit_voucher').text($('#total_credit').text())
             $('#JDetailsVoucher').modal('show');
         }
 
