@@ -242,7 +242,7 @@
 					<li class="nav-item">
 						<a href="{{ route('reports.cashTransactionBlotter') }}"  class="nav-link {{ (request()->is('reports/cashTransactionBlotter')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
-							<p>Cash Transaction Blotter</p>
+							<p>Cashier's Transaction Blotter</p>
 						</a>
 					</li>
 					@endif
@@ -280,7 +280,7 @@
 			<a href="{{url('accounts')}}" class="nav-link {{ (request()->is('accounts')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa fa-book"></i>
 				<p>
-					Chart of accounts
+					Chart of Accounts
 				</p>
 			</a>
 

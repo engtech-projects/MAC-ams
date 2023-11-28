@@ -42,7 +42,7 @@
 			<div class="col-md-12">
 					<div class="row">
 						<div class="col-md-12 frm-header">
-							<h4 ><b>{{$title}}</b></h4>
+							<h4 ><b>Cashier's Transaction Blotter</b></h4>
 						</div>
 					</div>
 					<div class="row">
