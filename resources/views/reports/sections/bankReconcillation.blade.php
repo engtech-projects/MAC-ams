@@ -129,10 +129,10 @@
 									<th>Status</th>
 								</thead>
 								<tbody>
-									<tr v-if="!processedData.entries.length">
+									<tr v-if="!processedData.length">
 										<td colspan="7"><center>No data available in table.</b></td>
 									</tr>
-									<tr v-for="rd,i in processedData.entries" :key="i">
+									<tr v-for="rd,i in processedData[0]?.entries" :key="i">
 										<td>@{{rd.journal_date}}</td>
 										<td>@{{rd.source}}</td>
 										<td>@{{rd.journal_date}}</td>
@@ -234,7 +234,6 @@
 					}
 				})
 				.then(response => {
-					console.log('Response:', response.data);
 					var arr = [];
 					arr.push(response.data);
 					this.reconData = arr;
@@ -256,11 +255,12 @@
 		computed:{
 			processedData:function(){
 				if(this.reconData.length){
+
 					this.reconData[0].totalDepositsCleared = 0;
 					this.reconData[0].totalDepositsUncleared = 0;
 					this.reconData[0].totalWithdrawalsCleared = 0;
 					this.reconData[0].totalWithdrawalsUncleared = 0;
-					this.reconData[0].entries.forEach(data => {
+					this.reconData[0][0].entries.forEach(data => {
 						if(data.status.toLowerCase() == 'cleared'){
 							this.reconData[0].totalDepositsCleared += parseFloat(data.deposits);
 							this.reconData[0].totalWithdrawalsCleared += parseFloat(data.withdrawals);
