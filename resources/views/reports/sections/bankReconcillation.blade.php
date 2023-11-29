@@ -154,7 +154,7 @@
 									<span>1:58 PM</span>
 								</div>
 							</div> -->
-							<table v-if="processedData.entries.length" class="table" style="margin-top:45px;border-top:4px dashed #000">
+							<table v-if="processedData.length" class="table" style="margin-top:45px;border-top:4px dashed #000">
 								<thead>
 									<th></th>
 									<th>CLEARED</th>
