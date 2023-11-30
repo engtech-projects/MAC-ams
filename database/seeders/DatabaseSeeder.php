@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
+
         DB::table('users')->insert([
             'username' => 'admin',
             'password' => Hash::make('admin'),
@@ -27,7 +28,10 @@ class DatabaseSeeder extends Seeder
 
         ]);
 
-		$currency =	['PHP' => 'Philippine Peso', 
+        $this->call(AccessListSeeder::class);
+        $this->call(SubModuleSeeder::class);
+
+		$currency =	['PHP' => 'Philippine Peso',
 					'USD' => 'US Dollars'];
 
 		foreach ($currency as $key => $value) {
