@@ -146,7 +146,8 @@ class ReportsController extends MainController
             'subsidiaryData' => Subsidiary::get(),
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'Subsidiary Ledger',
-            'subsidiaryLedgerList' => ''
+            'subsidiaryLedgerList' => '',
+			'accounts' => Accounts::all(),
         ];
         switch ($filter["type"]) {
             case 'subsidiary-ledger-listing-report':
@@ -157,6 +158,17 @@ class ReportsController extends MainController
             case 'income-minus-expense':
                 //return blade template for the selected report type
                 return response()->json(['data' => "income-minus-expense-report"]);
+
+			case 'subsidiary_all_account':
+
+				$transactions = Accounts::subsidiaryLedger($request->from, $request->to, '', $request->subsidiary_id);
+				return response()->json(['data' => $transactions]);
+
+			case 'subsidiary_per_account':
+
+				$transactions = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id, $request->subsidiary_id);
+				return response()->json(['data' => $transactions]);
+
             case 'subsidiary-ledger':
                 return view('reports.sections.subsidiaryledger', $data);
         }
