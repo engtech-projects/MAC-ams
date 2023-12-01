@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateUserTableSetUsernameUnique extends Migration
+class CreateTableUserBranch extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class UpdateUserTableSetUsernameUnique extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unique('username')->change();
+        Schema::create('table_user_branch', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
         });
     }
 
@@ -25,8 +26,6 @@ class UpdateUserTableSetUsernameUnique extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            /* $table->dropUnique('username'); */
-        });
+        Schema::dropIfExists('table_user_branch');
     }
 }

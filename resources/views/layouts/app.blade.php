@@ -42,17 +42,21 @@
 </head>
 <body class="hold-transition sidebar-mini text-sm">
 <!-- Site wrapper -->
+@auth
 <div class="wrapper">
 
-  @include('includes.topbar')
+@include('includes.topbar')
 
-  @include('includes.sidebar')
+@include('includes.sidebar')
+@endauth
+
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     @yield('content')
   </div>
   <!-- /.content-wrapper -->
+
 </div>
 <!-- ./wrapper -->
 

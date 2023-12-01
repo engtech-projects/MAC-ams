@@ -17,6 +17,7 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\GeneralSettingsController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\BranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,9 +39,12 @@ Route::get('get-token', function () {
 Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user');
 Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::get('logout', [LoginController::class, 'userLogout'])->name('logout');
+
 /* Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user'); */
 // DashboardController
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::get('branch',[BranchController::class, 'getBranchList'])->name('branch.list');
 
 // AccountsController
 Route::resource('accounts', AccountsController::class);

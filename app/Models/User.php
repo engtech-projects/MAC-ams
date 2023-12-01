@@ -70,11 +70,13 @@ class User extends Authenticatable
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
-    public function getUserByUsername(array $attribules)
+    public function getUserBranch(array $attributes)
     {
-        $user = User::where('username','=', $attribules["username"])->with('userBranch',function($query) use($attribules){
-            $query->where('user_branch.branch_id',$attribules["branch_id"]);
+
+        $user = User::where('username', '=', $attributes["username"])->with('userBranch', function ($query) use ($attributes) {
+            $query->where('user_branch.branch_id', $attributes["branch_id"])->first();
         })->first();
+
         return $user;
     }
 
