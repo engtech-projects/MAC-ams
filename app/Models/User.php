@@ -15,7 +15,7 @@ use App\Models\Accessibilities;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    public $with = ['personal_info', 'accessibilities.subModuleList', 'branch'];
+    public $with = ['personal_info', 'accessibilities.subModuleList', 'userBranch'];
 
     /**
      * The attributes that are mass assignable.
@@ -56,13 +56,26 @@ class User extends Authenticatable
         return $this->hasOne(PersonalInfo::class, 'personal_info_id');
     }
 
+    public function userBranch()
+    {
+        return $this->belongsToMany(Branch::class, 'user_branch', 'user_id', 'branch_id');
+    }
+
     public function accessibilities()
     {
         return $this->hasMany(Accessibilities::class, 'user_id');
     }
     public function branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id');
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    public function getUserByUsername(array $attribules)
+    {
+        $user = User::where('username','=', $attribules["username"])->with('userBranch',function($query) use($attribules){
+            $query->where('user_branch.branch_id',$attribules["branch_id"]);
+        })->first();
+        return $user;
     }
 
 }

@@ -11,33 +11,44 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends MainController
 {
 
-    public function __construct() {
-       if(Auth::user()){
+    public function __construct()
+    {
+        if (Auth::user()) {
             return redirect()->intended('dashboard');
-       }else{
-             $this->middleware('guest')->except('userLogout');
-       }
-
-    }
-
-    public function index() {
-    	return view('auth.login');
-    }
-
-    public function authenticate(Request $request) {
-
-    	$request->validate([
-    		'username' => 'required',
-    		'password' => 'required'
-    	]);
-
-    	$credentials = $request->only('username', 'password');
-    	if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard')
-                        ->withSuccess('Signed in');
+        } else {
+            $this->middleware('guest')->except('userLogout');
         }
 
-    	return redirect("login")->withSuccess('Invalid Username or Password');
+    }
+
+    public function index()
+    {
+        return view('auth.login');
+    }
+
+    public function authenticate(Request $request)
+    {
+
+        $userModel = new User();
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+            'branch_id' => 'required'
+        ]);
+        $branchId = $request->branch_id;
+        $credentials = $request->only('username', 'password');
+
+        $user = $userModel->getUserByUsername(['username' => $credentials['username'],'branch_id' => $branchId]);
+        if ($user && count($user->userBranch) > 0) {
+            if (Auth::attempt($credentials)) {
+                return response()->json(['message' => 'Successfully logged in.'],200);
+                /* return redirect()->intended('dashboard')
+                    ->withSuccess('Signed in'); */
+            }
+        }
+        return response()->json(['message' => 'Credentials not found.'],401);
+        /* return redirect("login")->withSuccess('Credentials not found.'); */
+        //return redirect("login")->withSuccess('Invalid Username or Password');
 
 
 
@@ -61,15 +72,18 @@ class LoginController extends MainController
             'token'         => $token
         ]; */
 
-        return response($response, 201);
+        //return response($response, 201);
     }
 
     /* public function user(Request $request) {
         return $request->user();
     } */
 
-    public function userLogout(Request $request) {
+    public function userLogout(Request $request)
+    {
 
+        /* $user = Auth::user()->userBranch;
+        return response()->json(['data' => $user]); */
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

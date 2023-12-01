@@ -12,7 +12,13 @@ class Branch extends Model
     protected $table = 'branch';
     protected $primaryKey = 'branch_id';
 
-    public static function fetchBranch() {
+    public function userBranch()
+    {
+        return $this->belongsToMany(User::class,'user_branch','user_id','branch_id');
+    }
+
+    public static function fetchBranch()
+    {
         return Branch::all();
     }
 
