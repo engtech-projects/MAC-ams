@@ -51,7 +51,7 @@ class JournalController extends MainController
     public function journalEntry(Request $request)
     {
         $data = [
-            'title' => 'Journal Entry',
+            'title' => 'MAC-AMS | Journal Entry',
             'journalBooks' => JournalBook::getBookWithJournalCount(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
             'chartOfAccount' => Accounts::get()
@@ -129,7 +129,7 @@ class JournalController extends MainController
     public function journalEntryList(Request $request)
     {
         $data = [
-            'title' => 'Journal Entry',
+            'title' => 'MAC-AMS | Journal Entry List',
             'journalBooks' => JournalBook::get(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
             'journalEntryList' => JournalEntry::fetch(),

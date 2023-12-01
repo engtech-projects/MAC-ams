@@ -107,7 +107,7 @@ class ReportsController extends MainController
         /* ----- end journal ledger ----- */
         $paginated = $this->paginate($journal_ledger, $currentPage);
         $data = [
-            'title' => 'Journal Ledger',
+            'title' => 'MAC-AMS | Journal Ledger',
             'journalBooks' => JournalBook::getBookWithJournalCount(),
             'jLedger' => $journal_ledger,
             'paginated' => $paginated,
@@ -145,7 +145,7 @@ class ReportsController extends MainController
         $data = [
             'subsidiaryData' => Subsidiary::get(),
             'sub_categories' => SubsidiaryCategory::get(),
-            'title' => 'Subsidiary Ledger',
+            'title' => 'MAC-AMS | Subsidiary Ledger',
             'subsidiaryLedgerList' => ''
         ];
         switch ($filter["type"]) {
@@ -339,7 +339,7 @@ class ReportsController extends MainController
         // var_export($journalItems);
         // echo '</pre>';
         $data = [
-            'title' => 'General Ledger',
+            'title' => 'MAC-AMS | General Ledger',
             'chartOfAccount' => Accounts::where(['type' => 'L'])->get(),
             'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
             'transactions' => $transactions,
@@ -380,7 +380,7 @@ class ReportsController extends MainController
     public function incomeStatement()
     {
         $data = [
-            'title' => 'Subsidiary Ledger',
+            'title' => 'MAC-AMS | Income Statement',
             'trialbalanceList' => ''
         ];
         return view('reports.sections.incomeStatement', $data);
@@ -390,7 +390,7 @@ class ReportsController extends MainController
     {
         $data = [
 			'chartOfAccount' => \App\Models\Accounts::where(['type' => 'L'])->get(),
-            'title' => 'Subsidiary Ledger',
+            'title' => 'MAC-AMS | Bank Reconciliation',
             'trialbalanceList' => ''
         ];
         return view('reports.sections.bankReconcillation', $data);
@@ -399,7 +399,7 @@ class ReportsController extends MainController
     public function cashPosition()
     {
         $data = [
-            'title' => 'Subsidiary Ledger',
+            'title' => 'MAC-AMS | Cash Position',
             'trialbalanceList' => ''
         ];
 
@@ -411,7 +411,7 @@ class ReportsController extends MainController
 
         $transactionDate = $request["transaction_date"];
         $data = [
-            'title' => 'Cashier Transaction Blotter',
+            'title' => 'MAC-AMS | Cashiers Transaction Blotter',
             'trialbalanceList' => '',
             'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate),
             'branches' => Branch::fetchBranch(),
@@ -481,7 +481,7 @@ class ReportsController extends MainController
 
         return response()->json([
             'success' => true,
-            'message' => 'Cash Transaction Blotter created'
+            'message' => 'Cashiers Transaction Blotter created'
         ], 201);
     }
 
