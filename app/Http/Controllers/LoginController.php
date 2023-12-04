@@ -41,11 +41,13 @@ class LoginController extends MainController
         $user = $userModel->getUserBranch(['username' => $credentials['username'],'branch_id' => $branchId]);
         if ($user && count($user->userBranch) > 0) {
             if (Auth::attempt($credentials)) {
-                return redirect()->intended('dashboard')
-                    ->withSuccess('Signed in');
+                return response()->json(['message' => "successfully logged in."],200);
+/*                 return redirect()->intended('dashboard')
+                    ->withSuccess('Signed in'); */
             }
         }else {
-            return redirect("login")->withSuccess('Credentials not found.');
+            return response()->json(['message' => "Invalid credentials."],401);
+/*             return redirect("login")->withSuccess('Credentials not found.'); */
         }
 
 
