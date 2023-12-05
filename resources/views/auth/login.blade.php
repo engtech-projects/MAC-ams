@@ -37,10 +37,11 @@
                             @endif
                         </div>
                         <div class="form-group">
-                            @{{ selected }}
-                            <select class="form-control" :v-text="selected" :v-model="credentials.branch_id">
-                                <option value="" selected disabled>@{{ selected }}</option>
-                                <option v-for="(item,i) in branches" :value="item.branch_id" v-text="item.branch_name"></option>
+                            <select required class="form-control" @change="selectBranch" :v-model="credentials.branch_id">
+                                <option value="" disabled selected>Select-Branch</option>
+                                <option v-for="item in branches" v-bind:value="item.branch_id">
+                                    @{{ item.branch_name }}
+                                </option>
                             </select>
 
                         </div>
@@ -68,11 +69,11 @@
             el: '#app',
             data: {
                 branches: null,
-                selected:"Select Branch",
+                defaultSelect: "Select Branch",
                 credentials: {
-                    username: null,
-                    password: null,
-                    branch_id: null,
+                    username: "",
+                    password: "",
+                    branch_id: "",
                 },
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams"
 
@@ -85,6 +86,28 @@
                         console.error(err);
                     });
                 },
+                clearForm() {
+                    this.credentials = {
+                        username: "",
+                        password: "",
+                    }
+                },
+                selectBranch(e) {
+                    this.credentials.branch_id = e.target.value
+                },
+                isBranchEmpty(toast) {
+
+                    if (this.credentials.branch_id == "") {
+                        toast.fire({
+                            icon: 'error',
+                            title: "Select branch."
+                        })
+                        this.clearForm()
+                        return true
+                    }
+                    return false
+
+                },
                 async login() {
                     var Toast = Swal.mixin({
                         toast: true,
@@ -93,34 +116,37 @@
                         timer: 3000
                     });
                     var result = null;
-                    axios.post(this.baseUrl + '/authenticate', this.credentials, {
-                        headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                .content
-                        }
-                    }).then((response) => {
-                        result = response
-                        Toast.fire({
-                            icon: 'success',
-                            title: response.data.message
-                        });
-                    }).catch((err) => {
-                        result = err.response
-                    }).finally(() => {
-                        if (result.status === 200) {
-                            location.assign(this.baseUrl + '/dashboard');
-                        } else if (result.status >= 401) {
+
+                    if (!this.isBranchEmpty(Toast)) {
+
+
+                        axios.post(this.baseUrl + '/authenticate', this.credentials, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then((response) => {
+                            result = response
                             Toast.fire({
-                                icon: 'error',
-                                title: result.data.message
+                                icon: 'success',
+                                title: response.data.message
                             });
-                        }
-                        this.credentials = {
-                            username:null,
-                            password:null,
-                            branch_id:null
-                        }
-                    })
+                        }).catch((err) => {
+                            result = err.response
+                        }).finally(() => {
+                            if (result.status === 200) {
+                                location.assign(this.baseUrl + '/dashboard');
+                            } else if (result.status >= 401) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: result.data.message
+                                });
+                            }
+                            this.clearForm()
+
+                        })
+                    }
+
                 }
             },
             mounted() {

@@ -39,16 +39,17 @@ class LoginController extends MainController
         $branchId = $request->branch_id;
         $credentials = $request->only('username', 'password');
         $user = $userModel->getUserBranch(['username' => $credentials['username'],'branch_id' => $branchId]);
+
         if ($user && count($user->userBranch) > 0) {
             if (Auth::attempt($credentials)) {
+                $branchId = $user->userBranch[0]->branch_id;
+                session()->put('auth_user_branch', $branchId);
                 return response()->json(['message' => "successfully logged in."],200);
-/*                 return redirect()->intended('dashboard')
-                    ->withSuccess('Signed in'); */
+
             }
-        }else {
-            return response()->json(['message' => "Invalid credentials."],401);
-/*             return redirect("login")->withSuccess('Credentials not found.'); */
         }
+        return response()->json(['message' => "Invalid credentials."],401);
+
 
 
 
@@ -58,6 +59,7 @@ class LoginController extends MainController
     public function userLogout(Request $request)
     {
         Auth::logout();
+        session()->forget('auth_user_branch');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect("login")->withSuccess('Successfully Logged out. ');
