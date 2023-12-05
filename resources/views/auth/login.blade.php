@@ -11,7 +11,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @{{ defaultSelected }}
                         @if (Session::has('success'))
                             <div class="alert alert-success alert-dismissable">
                                 <button type="button" class="close" data-dismiss="alert"
@@ -117,7 +116,6 @@
                 },
 
                 async login() {
-                    console.log(this.credentials.branch_id)
                     var Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
