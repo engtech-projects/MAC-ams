@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <section class="content" id="app">
-        <div class="hold-transition login-page">
+        <div class="hold-transition">
             <div class="login-box">
                 <!-- /.login-logo -->
                 <div class="card card-outline">
@@ -11,30 +11,29 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <p class="login-box-msg" style="font-size: 1.5rem;"><b>Login</b></p>
-                        @csrf
-                        @if (Session::has('success'))
-                            <div class="callout callout-danger">
-                                <h5>Something Went Wrong!</h5>
-                                <p>{{ Session::get('success') }}</p>
+                        <div v-if="responseMessage">
+                            <div class="alert alert-danger alert-dismissable">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <h6><i class="icon fas fa-ban"></i>@{{ responseMessage.message }}</h6>
+
+                                <ul v-if="responseMessage?.errors">
+                                    <li v-for="item in responseMessage.errors">@{{ item[0] }}</li>
+                                </ul>
+
                             </div>
-                        @endif
+                        </div>
+                        @csrf
 
                         <div class="form-group">
                             <label for="username" style="font-weight: normal;">Username</label>
                             <input type="text" id="username" v-model="credentials.username" class="form-control"
                                 id="username" name="username" required autofocus>
-                            @if ($errors->has('username'))
-                                <span class="text-danger">{{ $errors->first('username') }}</span>
-                            @endif
+
                         </div>
                         <div class="form-group">
                             <label for="password" style="font-weight: normal;">Password</label>
                             <input type="password" id="password" v-model="credentials.password" class="form-control"
                                 id="password" name="password" required>
-                            @if ($errors->has('password'))
-                                <span class="text-danger">{{ $errors->first('password') }}</span>
-                            @endif
                         </div>
                         <div class="form-group">
                             <select required class="form-control" @change="selectBranch" :v-model="credentials.branch_id">
@@ -75,6 +74,7 @@
                     password: "",
                     branch_id: "",
                 },
+                responseMessage:null,
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams"
 
             },
@@ -90,6 +90,7 @@
                     this.credentials = {
                         username: "",
                         password: "",
+                        branch_id:this.credentials.branch_id
                     }
                 },
                 selectBranch(e) {
@@ -116,11 +117,7 @@
                         timer: 3000
                     });
                     var result = null;
-
-                    if (!this.isBranchEmpty(Toast)) {
-
-
-                        axios.post(this.baseUrl + '/authenticate', this.credentials, {
+                       axios.post(this.baseUrl + '/authenticate', this.credentials, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
@@ -137,15 +134,16 @@
                             if (result.status === 200) {
                                 location.assign(this.baseUrl + '/dashboard');
                             } else if (result.status >= 401) {
+                                this.responseMessage = result.data
                                 Toast.fire({
                                     icon: 'error',
-                                    title: result.data.message
+                                    title: "Something went wrong."
                                 });
                             }
                             this.clearForm()
 
                         })
-                    }
+
 
                 }
             },

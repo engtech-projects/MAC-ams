@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use Hash;
 use Session;
@@ -28,15 +29,11 @@ class LoginController extends MainController
         return view('auth.login')->with(compact('title'));
     }
 
-    public function authenticate(Request $request)
+    public function authenticate(LoginRequest $request )
     {
         $userModel = new User();
-        $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-            'branch_id' => 'required'
-        ]);
-        $branchId = $request->branch_id;
+        $credentials = $request->validated();
+        $branchId = $credentials["branch_id"];
         $credentials = $request->only('username', 'password');
         $user = $userModel->getUserBranch(['username' => $credentials['username'],'branch_id' => $branchId]);
 
