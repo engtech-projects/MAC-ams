@@ -11,6 +11,12 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        @if (Session::has('success'))
+                        <div class="alert alert-success alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                          <h6><i class="icon fas fa-check-circle"></i>{{ Session::get('success') }}</h6>
+                        </div>
+                        @endif
                         <div v-if="responseMessage">
                             <div class="alert alert-danger alert-dismissable">
                                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -23,34 +29,35 @@
                             </div>
                         </div>
                         @csrf
+                        <form @submit.prevent="login">
+                            <div class="form-group">
+                                <label for="username" style="font-weight: normal;">Username</label>
+                                <input type="text" id="username" v-model="credentials.username" class="form-control"
+                                    id="username" name="username" required autofocus>
 
-                        <div class="form-group">
-                            <label for="username" style="font-weight: normal;">Username</label>
-                            <input type="text" id="username" v-model="credentials.username" class="form-control"
-                                id="username" name="username" required autofocus>
-
-                        </div>
-                        <div class="form-group">
-                            <label for="password" style="font-weight: normal;">Password</label>
-                            <input type="password" id="password" v-model="credentials.password" class="form-control"
-                                id="password" name="password" required>
-                        </div>
-                        <div class="form-group">
-                            <select required class="form-control" @change="selectBranch" :v-model="credentials.branch_id">
-                                <option value="" disabled selected>Select-Branch</option>
-                                <option v-for="item in branches" v-bind:value="item.branch_id">
-                                    @{{ item.branch_name }}
-                                </option>
-                            </select>
-
-                        </div>
-                        <div class="row">
-
-                            <div class="col-4">
-                                <button @click="login()" class="btn bg-gradient-primary btn-flat btn-block">Sign
-                                    In</button>
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <label for="password" style="font-weight: normal;">Password</label>
+                                <input type="password" id="password" v-model="credentials.password" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <select required class="form-control" @change="selectBranch" :v-model="credentials.branch_id">
+                                    <option value="" disabled selected>Select-Branch</option>
+                                    <option v-for="item in branches" v-bind:value="item.branch_id">
+                                        @{{ item.branch_name }}
+                                    </option>
+                                </select>
+
+                            </div>
+                            <div class="row">
+
+                                <div class="col-4">
+                                    <button type="submit" class="btn bg-gradient-primary btn-flat btn-block">Sign
+                                        In</button>
+                                </div>
+                            </div>
+                        </form>
+
 
 
                     </div>
