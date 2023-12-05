@@ -11,15 +11,18 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        @{{ defaultSelected }}
                         @if (Session::has('success'))
-                        <div class="alert alert-success alert-dismissable">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                          <h6><i class="icon fas fa-check-circle"></i>{{ Session::get('success') }}</h6>
-                        </div>
+                            <div class="alert alert-success alert-dismissable">
+                                <button type="button" class="close" data-dismiss="alert"
+                                    aria-hidden="true">&times;</button>
+                                <h6><i class="icon fas fa-check-circle"></i>{{ Session::get('success') }}</h6>
+                            </div>
                         @endif
                         <div v-if="responseMessage">
                             <div class="alert alert-danger alert-dismissable">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                <button type="button" class="close" data-dismiss="alert"
+                                    aria-hidden="true">&times;</button>
                                 <h6><i class="icon fas fa-ban"></i>@{{ responseMessage.message }}</h6>
 
                                 <ul v-if="responseMessage?.errors">
@@ -38,11 +41,14 @@
                             </div>
                             <div class="form-group">
                                 <label for="password" style="font-weight: normal;">Password</label>
-                                <input type="password" id="password" v-model="credentials.password" class="form-control" required>
+                                <input type="password" id="password" v-model="credentials.password" class="form-control"
+                                    required>
                             </div>
                             <div class="form-group">
-                                <select required class="form-control" @change="selectBranch" :v-model="credentials.branch_id">
-                                    <option value="" disabled selected>Select-Branch</option>
+                                <select required class="form-control" :change="credentials.branch_id"
+                                    v-model="credentials.branch_id">
+                                    <option value="" disabled selected>@{{ defaultSelected }}
+                                    </option>
                                     <option v-for="item in branches" v-bind:value="item.branch_id">
                                         @{{ item.branch_name }}
                                     </option>
@@ -76,14 +82,20 @@
             data: {
                 branches: null,
                 defaultSelect: "Select Branch",
+                setDefaultSelect: true,
                 credentials: {
                     username: "",
                     password: "",
                     branch_id: "",
                 },
-                responseMessage:null,
+                responseMessage: null,
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams"
 
+            },
+            computed: {
+                defaultSelected: function() {
+                    return this.defaultSelect
+                }
             },
             methods: {
                 async getBranchList() {
@@ -97,26 +109,15 @@
                     this.credentials = {
                         username: "",
                         password: "",
-                        branch_id:this.credentials.branch_id
+                        branch_id: ""
                     }
                 },
                 selectBranch(e) {
                     this.credentials.branch_id = e.target.value
                 },
-                isBranchEmpty(toast) {
 
-                    if (this.credentials.branch_id == "") {
-                        toast.fire({
-                            icon: 'error',
-                            title: "Select branch."
-                        })
-                        this.clearForm()
-                        return true
-                    }
-                    return false
-
-                },
                 async login() {
+                    console.log(this.credentials.branch_id)
                     var Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
@@ -124,32 +125,33 @@
                         timer: 3000
                     });
                     var result = null;
-                       axios.post(this.baseUrl + '/authenticate', this.credentials, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        }).then((response) => {
-                            result = response
+                    axios.post(this.baseUrl + '/authenticate', this.credentials, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then((response) => {
+                        result = response
+                        Toast.fire({
+                            icon: 'success',
+                            title: response.data.message
+                        });
+                    }).catch((err) => {
+                        this.credentials.branch_id = ""
+                        result = err.response
+                    }).finally(() => {
+                        if (result.status === 200) {
+                            location.assign(this.baseUrl + '/dashboard');
+                        } else if (result.status >= 401) {
+                            this.responseMessage = result.data
                             Toast.fire({
-                                icon: 'success',
-                                title: response.data.message
+                                icon: 'error',
+                                title: "Something went wrong."
                             });
-                        }).catch((err) => {
-                            result = err.response
-                        }).finally(() => {
-                            if (result.status === 200) {
-                                location.assign(this.baseUrl + '/dashboard');
-                            } else if (result.status >= 401) {
-                                this.responseMessage = result.data
-                                Toast.fire({
-                                    icon: 'error',
-                                    title: "Something went wrong."
-                                });
-                            }
+                            this.credentials.branch_id = this.defaultSelect
                             this.clearForm()
-
-                        })
+                        }
+                    })
 
 
                 }
