@@ -11,14 +11,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @if (Session::has('success'))
-                            <div class="alert alert-success alert-dismissable">
-                                <button type="button" class="close" data-dismiss="alert"
-                                    aria-hidden="true">&times;</button>
-                                <h6><i class="icon fas fa-check-circle"></i>{{ Session::get('success') }}</h6>
-                            </div>
-                        @endif
-                        <div v-if="responseMessage">
+                        <div v-if="responseMessage?.errors">
                             <div class="alert alert-danger alert-dismissable">
                                 <button type="button" class="close" data-dismiss="alert"
                                     aria-hidden="true">&times;</button>
@@ -30,8 +23,8 @@
 
                             </div>
                         </div>
-                        @csrf
                         <form @submit.prevent="login">
+                            @csrf
                             <div class="form-group">
                                 <label for="username" style="font-weight: normal;">Username</label>
                                 <input type="text" id="username" v-model="credentials.username" class="form-control"
@@ -142,9 +135,10 @@
                             location.assign(this.baseUrl + '/dashboard');
                         } else if (result.status >= 401) {
                             this.responseMessage = result.data
+                            console.log(result.data.message)
                             Toast.fire({
                                 icon: 'error',
-                                title: "Something went wrong."
+                                title:  result.data.message
                             });
                             this.credentials.branch_id = this.defaultSelect
                             this.clearForm()

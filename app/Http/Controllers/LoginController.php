@@ -15,7 +15,7 @@ class LoginController extends MainController
     public function __construct()
     {
         if (Auth::user()) {
-            return redirect()->intended('dashboard');
+            redirect()->intended('dashboard');
         } else {
             $this->middleware('guest')->except('userLogout');
         }
