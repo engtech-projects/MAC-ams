@@ -150,13 +150,16 @@ class ReportsController extends MainController
         ];
         switch ($filter["type"]) {
             case 'subsidiary-ledger-listing-report':
+
                 $journalEntry = new journalEntry();
                 $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter);
                 return response()->json(['data' => $subsidiaryListing]);
 
             case 'income-minus-expense':
-                //return blade template for the selected report type
-                return response()->json(['data' => "income-minus-expense-report"]);
+
+                $revenueMinusExpenseReport = $this->revenueMinusExpense($filter);
+                return response()->json(['data' => $revenueMinusExpenseReport]);
+
             case 'subsidiary-ledger':
                 return view('reports.sections.subsidiaryledger', $data);
         }
@@ -654,11 +657,11 @@ class ReportsController extends MainController
         }
     }
 
-    public function revenueMinusExpense(RevenueMinusExpenseRequest $request)
+    public function revenueMinusExpense(array $filter)
     {
         $accounts = new Accounts();
-        $data = $accounts->getRevenueAndExpense($request->validated());
-        return new JsonResponse(["data" => $data], 200);
+        $data = $accounts->getRevenueAndExpense($filter);
+        return $data;
     }
 
 
