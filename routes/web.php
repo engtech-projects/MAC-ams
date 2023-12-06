@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
@@ -39,12 +40,13 @@ Route::get('get-token', function () {
 Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user');
 Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::get('logout', [LoginController::class, 'userLogout'])->name('logout');
+Route::get('/me',[AuthController::class, 'getAuthUser'])->name('auth.user');
 
 /* Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user'); */
 // DashboardController
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('branch',[BranchController::class, 'getBranchList'])->name('branch.list');
+Route::get('branch',[BranchController::class, 'index'])->name('branch.list');
 
 // AccountsController
 Route::resource('accounts', AccountsController::class);

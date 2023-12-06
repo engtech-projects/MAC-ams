@@ -15,13 +15,8 @@ use App\Models\Accessibilities;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    public $with = ['personal_info', 'accessibilities.subModuleList', 'userBranch'];
+    public $with = ['personal_info', 'accessibilities.subModuleList', 'userBranch','userRole'];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
     protected $fillable = [
         'username',
         'password',
@@ -31,22 +26,13 @@ class User extends Authenticatable
 
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
         'salt',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
+
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
@@ -54,6 +40,11 @@ class User extends Authenticatable
     public function personal_info()
     {
         return $this->hasOne(PersonalInfo::class, 'personal_info_id');
+    }
+
+    public function userRole()
+    {
+        return $this->belongsTo(UserRole::class,'role_id','role_id');
     }
 
     public function userBranch()
