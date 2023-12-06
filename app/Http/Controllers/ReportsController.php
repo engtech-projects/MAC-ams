@@ -158,8 +158,7 @@ class ReportsController extends MainController
                 $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter);
                 return response()->json(['data' => $subsidiaryListing]);
 
-            case 'income-minus-expense':
-
+            case 'income_minus_expense':
                 $revenueMinusExpenseReport = $this->revenueMinusExpense($filter);
                 return response()->json(['data' => $revenueMinusExpenseReport]);
 

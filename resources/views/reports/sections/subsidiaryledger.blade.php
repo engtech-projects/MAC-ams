@@ -204,8 +204,8 @@
 				</div>
 				
 			</form>
-			<form @submit.prevent="fetchSubAll" action="">
-			<div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'" class="row col-md-12 no-print">
+			<form @submit.prevent="submitForm" action="">
+			<div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'" class="row col-md-12 no-print">
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -348,6 +348,71 @@
 											</tr>
 										</tbody>
 									</table>
+
+
+									<table v-if="reportType=='income_minus_expense'" style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
+										<thead>
+											<th width="15%">Date</th>
+											<th>Reference</th>
+											<th width="26%">Particular</th>
+											<th>Source</th>
+											<th>Cheque Date</th>
+											<th>Cheque No.</th>
+											<th class="text-right">Amount</th>
+											<th class="text-right">Commulative</th>
+										</thead>
+										<tbody id="generalLedgerTblContainer">
+											<tr v-if="!processedIncomeExpense.income.length&&!processedIncomeExpense.expense.length">
+												<td colspan="7"><center>No data available in table.</b></td>
+											</tr>
+											<tr>
+												<td><b>REVENUE</b></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr :Class="rowStylesIncomeExpense(i)" v-for="i in processedIncomeExpense.income">
+												<td v-for="j in i">@{{j}}</td>
+											</tr>
+											<tr>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td>0.00</td>
+												<td></td>
+											</tr>
+											<tr>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td>0.00</td>
+											</tr>
+											<tr>
+												<td><b>EXPENSE</b></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr :Class="rowStylesIncomeExpense(l)" v-for="l in processedIncomeExpense.expense">
+												<td v-for="m in l">@{{m}}</td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
 						</div>
 					</section>
@@ -370,10 +435,19 @@
 				account_id:'all',
 				type:''
 			},
+			incomeExpense:{income:[],expense:[]},
 			subsidiaryAll:[],
 			url:"{{route('reports.subsidiary-ledger')}}",
 		},
 		methods: {
+			submitForm:function(){
+				if(this.reportType=='subsidiary_all_account'||this.reportType=='subsidiary_per_account'){
+					fetchSubAll();
+				}else if(this.reportType=='income_minus_expense'){
+					this.fetchIncomeExpense();
+				}
+				
+			},
 			fetchSubAll:function(){
 				this.filter.type = this.reportType;
 				axios.post(this.url, this.filter, {
@@ -382,9 +456,25 @@
 					}
 				})
 				.then(response => {
-					if(response.data){
-						this.subsidiaryAll = response.data.data;
+					this.subsidiaryAll = response.data.data;
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			},
+			fetchIncomeExpense:function(){
+				var data = {subsidiary_id:this.filter.subsidiary_id,
+							date_from:this.filter.from,
+							date_to:this.filter.to,
+							type:this.reportType};
+				axios.post(this.url, data, {
+					headers: {
+						'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
 					}
+				})
+				.then(response => {
+					this.incomeExpense = response.data.data;
+					// console.log(response.data.data);
 				})
 				.catch(error => {
 					console.error('Error:', error);
@@ -399,6 +489,15 @@
 					style += ' text-bold';
 				}
 				return style;
+			},
+			rowStylesIncomeExpense:function(row){
+				if(row[0].length&&!row[1].length){
+					return 'text-bold';
+				}
+				if(!row[0].length&&(row[6].length||row[7].length)){
+					return 'text-bold';
+				}
+				return '';
 			},
 			formatCurrency:function(number) {
 				const formatter = new Intl.NumberFormat('en-US', {
@@ -448,6 +547,55 @@
 					rows.push(['','','Net Movement','','','','','','0.00'])
 				}
 				return rows;
+			},
+			processedIncomeExpense:function(){
+				var result = {income:[],expense:[]}
+				this.incomeExpense.income.forEach(income => {
+					result.income.push([income.account_name,'','','','','','',''])
+					var totalAmount = 0;
+					income.entries.forEach(entry => {
+						var row = [];
+						var amount = entry.credit==0?entry.debit:entry.credit;
+						totalAmount += parseFloat(amount);
+						row.push(entry.journal_date);
+						row.push(entry.journal_no);
+						row.push(entry.subsidiary_name);
+						row.push(entry.source);
+						row.push(entry.cheque_date);
+						row.push(entry.cheque_no);
+						row.push(this.formatCurrency(amount));
+						row.push('0.00');
+						result.income.push(row);
+					});
+					if(income.entries.length){
+						result.income.push(['','','','','','',this.formatCurrency(totalAmount),''])
+						result.income.push(['','','','','','','','0.00'])
+					}
+				});
+				this.incomeExpense.expense.forEach(expense => {
+					result.expense.push([expense.account_name,'','','','','','',''])
+					var totalAmount = 0;
+					expense.entries.forEach(entry => {
+						var row = [];
+						var amount = entry.credit==0?entry.debit:entry.credit;
+						totalAmount += parseFloat(amount);
+						row.push(entry.journal_date);
+						row.push(entry.journal_no);
+						row.push(entry.subsidiary_name);
+						row.push(entry.source);
+						row.push(entry.cheque_date);
+						row.push(entry.cheque_no);
+						row.push(this.formatCurrency(amount));
+						row.push('0.00');
+						result.expense.push(row);
+					});
+					if(expense.entries.length){
+						result.expense.push(['','','','','','',this.formatCurrency(totalAmount),''])
+						result.expense.push(['','','','','','','','0.00'])
+					}
+					
+				});
+				return result;
 			}
 		},
 		mounted(){
