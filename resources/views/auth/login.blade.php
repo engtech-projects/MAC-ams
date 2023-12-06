@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign In - {{ config('app.name') }}</title>
+  <title>MAC-AMS | Login</title>
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -38,8 +38,8 @@
       <form method="POST" id="handlelogin" action="{{route('login.user')}}" >
         @csrf
         @if (Session::has('success'))
-        <div class="callout callout-danger">
-          <h5>Something Went Wrong!</h5>
+        <div class="callout callout-success">
+          <!-- <h5>Something Went Wrong!</h5> -->
 
           <p>{{ Session::get('success') }}</p>
         </div>

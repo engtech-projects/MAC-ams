@@ -33,7 +33,7 @@
         <div class="card">
           <div class="card-header">
             {{-- {{dd($account_by_type)}} --}}
-            <h3 class="card-title"> Chart of Accounts </h3>
+            <h4 class="card-title" style="font-size:22px"><b> Chart of Accounts </b></h4>
 				<div class="col-md-12 text-right">
                     <a href="#"  onclick="$('#modal-create-class').modal('show')"class="btn btn-flat btn-sm bg-gradient-success">New Class</a>
 					<a href="#"  onclick="$('#modal-create-type').modal('show')" class="btn btn-flat btn-sm bg-gradient-success">New Type</a>
@@ -65,11 +65,11 @@
 
                             @foreach ($accounts[$key] as $account )
                                 <div class="row">
-                                    <div class="col-md-2 col-xs-1 col-sm-1 text-left"></div>
-                                    <div class="col-md-4 col-xs-2 col-sm-2 text-left ">{{ ucwords($account['account_number']) }}</div>
+                                    <!-- <div class="col-md-2 col-xs-1 col-sm-1 text-left"></div> -->
+                                    <div class="col-md-4 col-xs-2 col-sm-2 text-center ">{{ ucwords($account['account_number']) }}</div>
                                     <div class="col-md-4 col-xs-5 col-sm-5 text-left ">{{ ucwords($account['account_name']) }}</div>
-                                    <div class="col-md-1 col-xs-3 col-sm-3 text-cgenter">{{ ucwords($account['bank_reconcillation']) }}</div>
-                                    <div class="col-md-1 col-xs-1 col-sm-1 text-center ">
+                                    <div class="col-md-2 col-xs-3 col-sm-3 text-center">{{ ucwords($account['bank_reconcillation']) }}</div>
+                                    <div class="col-md-2 col-xs-1 col-sm-1 text-center ">
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-xs btn-default btn-flat coa-action">Report</button>
                                             <a type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action" data-toggle="dropdown" aria-expanded="false">
