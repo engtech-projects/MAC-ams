@@ -196,6 +196,7 @@ class ReportsController extends MainController
             $sub->sub_no_amort = $request->sub_no_amort;
             $sub->sub_salvage = $request->sub_salvage;
             $sub->sub_date_post = $request->sub_date_post;
+			$sub->sub_code = $request->sub_acct_no;
             if ($sub->save()) {
                 return json_encode(['message' => 'save', 'sub_id' => $sub->sub_id]);
             }

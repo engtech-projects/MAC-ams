@@ -522,7 +522,7 @@
 					var entry = entries[i];
 					var totalCredit = 0;
 					var totalDebit = 0;
-					rows.push([entry.account_number + ' - ' + entry.account_name.toUpperCase() + ':','','','','','','','',entry.opening_balance?this.formatCurrency(entry.opening_balance):'0.00']);
+					rows.push([entry.account_number + ' - ' + entry.account_name?entry.account_name.toUpperCase():'' + ':','','','','','','','',entry.opening_balance?this.formatCurrency(entry.opening_balance):'0.00']);
 					for(var d in entry.data){
 						var data = entry.data[d];
 						totalCredit += parseFloat(data.credit);
@@ -539,7 +539,7 @@
 						rows.push(row);
 						if(this.reportType=='subsidiary_per_account'){
 							rows.push(['','PAYEE: '+data.payee,'','','','','','',''])
-							rows.push(['',data.remarks.toUpperCase(),'','','','','','',''])
+							rows.push(['',data.remarks?data.remarks.toUpperCase():'','','','','','','',''])
 						}
 					}
 					rows.push(['','','Total','','','',totalDebit!=0?this.formatCurrency(totalDebit):'',
