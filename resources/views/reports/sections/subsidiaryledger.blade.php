@@ -442,7 +442,7 @@
 		methods: {
 			submitForm:function(){
 				if(this.reportType=='subsidiary_all_account'||this.reportType=='subsidiary_per_account'){
-					fetchSubAll();
+					this.fetchSubAll();
 				}else if(this.reportType=='income_minus_expense'){
 					this.fetchIncomeExpense();
 				}
@@ -457,6 +457,7 @@
 				})
 				.then(response => {
 					this.subsidiaryAll = response.data.data;
+					console.log(response.data.data);
 				})
 				.catch(error => {
 					console.error('Error:', error);
