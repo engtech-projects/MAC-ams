@@ -46,6 +46,12 @@
 						</div>
 					</div>
 					<div class="row">
+                        <div class="col-md-3">
+							<label for="branch">Select Branch</label>
+							<div class="input-group">
+                                <branches/>
+							</div>
+						</div>
 						<div class="col-md-3">
 							<label for="branch">Transaction Date</label>
 							<div class="input-group">
@@ -85,7 +91,7 @@
 				</div>
 
 				<div class="row">
-					<div class="col-md-12">
+					<div class="col-md-6">
 					<div class="row">
 						<div class="col-sm-3">
 							<label for="branch">Transaction Date</label>
@@ -93,6 +99,7 @@
 								<input type="date" name="transaction_date" class="form-control form-control-sm" required>
 							</div>
 						</div>
+
 					</div>
 					</div>
 				</div>
@@ -602,28 +609,15 @@
 
 
 	</section>
+    @include('includes.branches')
 	<script>
-		Vue.component('account-officers', {
-			template: '<div><h1>@{{greet}}</h1></div>',
-			props:['data'],
-			data(){
-				return {
-					greet:'Hello there!',
-				}
-			},
-			methods:{
-
-			},
-			mounted(){
-				alert('hey!');
-				this.$emit('sayhi', 'Hi there!');
-			}
-		});
 		new Vue({
 			el: '#app',
 			data: {
 				data: @json($cash_blotter),
 				accountOfficers:@json($account_officers),
+                baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
+                branches:null,
                 filter:{
                     transaction_date:null
                 },
@@ -644,6 +638,14 @@
 				collections:{transaction_date:''},
 			},
 			methods: {
+/*                 async getBranchList() {
+                    axios.get(this.baseUrl + '/branch').then((response) => {
+                        this.branches = response.data.data
+                        console.log(this.branches)
+                    }).catch((err) => {
+                        console.error(err);
+                    });
+                }, */
 				greet:function(data){
 					alert(data);
 				},
@@ -749,6 +751,7 @@
                 collectionsBreakdown:function(){
                     return this.data
                 },
+
 				filteredCashBlotter:function(){
 					var rows = [];
 					var cashEndingBalance = 0;
@@ -799,6 +802,7 @@
 				}
 			},
 			mounted(){
+/*                 this.getBranchList(); */
                 this.data =  @json($cash_blotter);
 				// console.log(this.data);
 			}

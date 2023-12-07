@@ -41,7 +41,7 @@ class LoginController extends MainController
             if (Auth::attempt($credentials)) {
                 $branchId = $user->userBranch[0]->branch_id;
                 session()->put('auth_user_branch', $branchId);
-                return response()->json(['message' => "successfully logged in."],200);
+                return response()->json(['message' => "successfully logged in.",'user' => auth()->user()],200);
 
             }
         }

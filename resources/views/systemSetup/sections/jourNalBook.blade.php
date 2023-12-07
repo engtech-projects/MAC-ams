@@ -10,7 +10,7 @@
 				<div class="form-group">
 					<label class="label-normal" for="book_code">Book Code</label>
 					<div class="input-group">
-						<input type="text" class="form-control form-control-sm rounded-0" name="book_code" id="book_code"  placeholder="Book Code" required>
+						<branches></branches>
 					</div>
 				</div>
 			</div>
@@ -37,7 +37,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="col-md-4 col-xs-12">
 			<div class="box">
 				<div class="form-group">
@@ -113,7 +113,7 @@
 											</td>
 										</tr>
 									@endforeach
-									
+
 								</tbody>
 							</table>
 						</div>
@@ -122,6 +122,6 @@
 			</section>
 			<!-- /.Table -->
 		</div>
-		
+
 	</div>
 </form>

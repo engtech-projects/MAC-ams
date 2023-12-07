@@ -43,8 +43,6 @@ use App\Models\OpeningBalance;
 class ReportsController extends MainController
 {
 
-
-
     public function journalLedger(Request $request)
     {
         /* ----- start journal ledger ----- */
@@ -408,12 +406,12 @@ class ReportsController extends MainController
 
     public function cashTransactionBlotter(Request $request)
     {
-
         $transactionDate = $request["transaction_date"];
+        $branchId = session()->get("auth_user_branch");
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
-            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate),
+            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate,$branchId),
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
@@ -424,7 +422,8 @@ class ReportsController extends MainController
     public function searchCashTransactionBlotter(Request $request)
     {
         $transactionDate = $request["transaction_date"];
-        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate);
+        $branchId = session()->get("auth_user_branch");
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate,$branchId);
         $message = $collections->count() > 0 ? "Collections fetched." : "No data found.";
         return response()->json(['message' => $message,'data' => $collections]);
     }

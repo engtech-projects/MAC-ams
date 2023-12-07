@@ -81,7 +81,6 @@
                     branch_id: "",
                 },
                 responseMessage: null,
-                baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams"
 
             },
             computed: {
@@ -91,7 +90,7 @@
             },
             methods: {
                 async getBranchList() {
-                    axios.get(this.baseUrl + '/branch').then((response) => {
+                    axios.get('/MAC-ams/branch').then((response) => {
                         this.branches = response.data.data
                     }).catch((err) => {
                         console.error(err);
@@ -116,7 +115,7 @@
                         timer: 3000
                     });
                     var result = null;
-                    axios.post(this.baseUrl + '/authenticate', this.credentials, {
+                    axios.post('/MAC-ams/authenticate', this.credentials, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -132,7 +131,7 @@
                         result = err.response
                     }).finally(() => {
                         if (result.status === 200) {
-                            location.assign(this.baseUrl + '/dashboard');
+                            location.assign('/MAC-ams/dashboard');
                         } else if (result.status >= 401) {
                             this.responseMessage = result.data
                             console.log(result.data.message)
