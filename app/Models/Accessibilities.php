@@ -13,11 +13,13 @@ class Accessibilities extends Model
 
     protected $table = 'accessibilities';
     protected $primaryKey = 'access_id';
-    protected $fillable = ['user_id', 'sml_id','date_created'];
+    protected $fillable = ['user_id', 'sml_id', 'date_created'];
 
 
-	public function subModuleList(){
-		return $this->belongsTo(subModuleList::class, 'sml_id');
+    public function subModuleList()
+    {
+        return $this->belongsTo(subModuleList::class, 'sml_id');
     }
+
 
 }

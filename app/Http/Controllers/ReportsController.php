@@ -387,7 +387,7 @@ class ReportsController extends MainController
     public function bankReconcillation()
     {
         $data = [
-			'chartOfAccount' => \App\Models\Accounts::where(['type' => 'L'])->get(),
+            'chartOfAccount' => \App\Models\Accounts::where(['type' => 'L'])->get(),
             'title' => 'Subsidiary Ledger',
             'trialbalanceList' => ''
         ];
@@ -411,7 +411,7 @@ class ReportsController extends MainController
         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
-            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate,$branchId),
+            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId),
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
@@ -423,9 +423,12 @@ class ReportsController extends MainController
     {
         $transactionDate = $request["transaction_date"];
         $branchId = session()->get("auth_user_branch");
-        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate,$branchId);
+        if (isset($request->branch_id)) {
+            $branchId = $request->branch_id;
+        }
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
         $message = $collections->count() > 0 ? "Collections fetched." : "No data found.";
-        return response()->json(['message' => $message,'data' => $collections]);
+        return response()->json(['message' => $message, 'data' => $collections]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)
