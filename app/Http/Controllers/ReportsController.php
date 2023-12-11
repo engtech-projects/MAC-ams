@@ -440,7 +440,8 @@ class ReportsController extends MainController
 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
-        $data = [
+        return response()->json(['data' => $cashTransactionsEntries]);
+/*         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
             'cashTransactions' => $cashTransactionsEntries,
@@ -449,7 +450,7 @@ class ReportsController extends MainController
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
 
-        return view('reports.sections.cashTransactionBlotter', $data);
+        return view('reports.sections.cashTransactionBlotter', $data); */
     }
     public function cashBlotterIndex()
     {

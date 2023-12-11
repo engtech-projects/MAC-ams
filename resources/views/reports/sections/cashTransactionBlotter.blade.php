@@ -710,7 +710,6 @@
                         branch_id:this.filter.branch_id
                     }
                     var url = "{{ route('reports.cashTransactionBlotter') }}"
-                    console.log(data);
                     axios.post(url, data)
                         .then(response => {
                             this.data = response.data.data
