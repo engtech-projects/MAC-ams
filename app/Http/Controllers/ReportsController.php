@@ -431,7 +431,7 @@ class ReportsController extends MainController
             $branchId = $request->branch_id;
         }
         $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
-        $message = $collections->count() > 0 ? "Collections fetched." : "No data found.";
+        $message = $collections->count() > 0 ? "Collections fetched." : "No record found.";
         return response()->json(['message' => $message, 'data' => $collections]);
     }
 
@@ -440,7 +440,7 @@ class ReportsController extends MainController
 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
-        return response()->json(['data' => $cashTransactionsEntries]);
+        return response()->json($cashTransactionsEntries);
 /*         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',

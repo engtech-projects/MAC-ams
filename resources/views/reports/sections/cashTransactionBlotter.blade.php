@@ -833,12 +833,12 @@
                                 rows.push(row);
                                 for (var k in entry) {
                                     var journal = entry[k];
-                                    totalCashIn += parseFloat(journal.journal_details[0].cash_in);
-                                    totalCashOut += parseFloat(journal.journal_details[0].cash_out);
+                                    totalCashIn += parseFloat(journal.details.cash_in);
+                                    totalCashOut += parseFloat(journal.details.cash_out);
                                     if (i == 'cash_received') {
-                                        cashEndingBalance += parseFloat(journal.journal_details[0].cash_in);
+                                        cashEndingBalance += parseFloat(journal.details[0].cash_in);
                                     } else if (i == 'cash_paid') {
-                                        cashEndingBalance -= parseFloat(journal.journal_details[0].cash_out);
+                                        cashEndingBalance -= parseFloat(journal.details[0].cash_out);
                                     }
                                     var mrow = ['', '', '', '', '', '', '', ''];
                                     mrow[0] = journal.journal_date;
@@ -847,9 +847,9 @@
                                     mrow[3] = journal.source;
                                     mrow[4] = journal.cheque_date;
                                     mrow[5] = journal.cheque_no;
-                                    mrow[6] = journal.journal_details ? this.noZero(journal.journal_details[0]
+                                    mrow[6] = journal.details ? this.noZero(journal.details[0]
                                         .cash_in) : '';
-                                    mrow[7] = journal.journal_details ? this.noZero(journal.journal_details[0]
+                                    mrow[7] = journal.details ? this.noZero(journal.details[0]
                                         .cash_out) : '';
                                     rows.push(mrow);
                                 }

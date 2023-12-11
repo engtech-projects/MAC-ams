@@ -157,7 +157,7 @@ Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedChequ
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
 Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'searchCashTransactionBlotter'])->name('reports.searchTransactionBlotter');
-Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashTransactionBlotter'])->name('reports.showCashBlotter');
+Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
 
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
