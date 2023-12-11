@@ -16,7 +16,7 @@ class AccountsController extends MainController
     public function index() {
 		$accountData = Accounts::fetch();
         $data = [
-            'title' => 'Chart of Accounts',
+            'title' => 'MAC-AMS | Chart of Accounts',
             'accounts' => Accounts::fetch(),
             'account_by_type' => $this->groupByAccountType($accountData),
 			'organizedAccount'=> $this->groupByType($accountData),

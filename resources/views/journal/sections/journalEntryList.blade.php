@@ -759,9 +759,6 @@
 
                                                     </tbody>
                                                 </table> -->
-                                                <div>
-                                                    <button @click="print" class="btn btn-success float-right no-print" data-dismiss="modal" style="padding:5px 32px">Print</button>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>

@@ -25,7 +25,7 @@ $(document).ready(function(){
         $('#create-cashblotter').click(function(){
             $('#Mymodal').modal('show')
             reset()
-            $('#title').text("Cash Transaction Blotter (New)")
+            $('#title').text("Cashier's Transaction Blotter (New)")
         });
 
      /*
@@ -36,7 +36,7 @@ $(document).ready(function(){
         e.preventDefault();
         $('#Mymodal').modal('show')
         reset()
-        $('#title').text("Cash Transaction Blotter (Edit)")
+        $('#title').text("Cashier's Transaction Blotter (Edit)")
 
         var cashblotter_id = $(this).attr('data-id')
         $.ajax({
