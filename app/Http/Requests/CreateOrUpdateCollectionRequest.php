@@ -37,10 +37,11 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "transaction_date" => 'required|date',
             "branch_id" => 'required|numeric',
             "total" => 'required|numeric',
-            "collection_ao" => "array",
-            "collection_ao.*" => 'required',
-            'collection_ao.total' => 'numeric',
-
+            "collection_ao" => "required",
         ];
+    }
+
+    protected function prepareForValidation() {
+        $this->merge(['branch_id' => auth()->user()->branch_id]);
     }
 }

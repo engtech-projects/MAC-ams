@@ -35,12 +35,18 @@ class journalEntryDetails extends Model
     }
     public function journalEntry()
     {
-        return $this->belongsTo(journalEntry::class, 'journal_id');
+        return $this->belongsTo(journalEntry::class, 'journal_id', 'journal_id');
     }
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
+
+    public function branches()
+    {
+        return $this->hasOneThrough(Branch::class, journalEntry::class, 'journal_id', 'branch_id');
+    }
+
 
     public function scopeDebit($query)
     {
@@ -63,7 +69,6 @@ class journalEntryDetails extends Model
     {
         return $this->belongsTo(Accounts::class, 'account_id');
     }
-
 
     public function createJournalDetails()
     {

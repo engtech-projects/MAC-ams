@@ -51,7 +51,7 @@ class JournalController extends MainController
     public function journalEntry(Request $request)
     {
         $data = [
-            'title' => 'Journal Entry',
+            'title' => 'MAC-AMS | Journal Entry',
             'journalBooks' => JournalBook::getBookWithJournalCount(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
             'chartOfAccount' => Accounts::get()
@@ -74,7 +74,10 @@ class JournalController extends MainController
     }
     public function JournalEntryFetch(Request $request)
     {
-        return json_encode(['message' => 'fetch', 'data' => JournalEntry::with(['journalDetails.chartOfAccount', 'bookDetails', 'journalDetails.subsidiary'])->where('journal_id', $request->journal_id)->get()]);
+        $journalEntry = JournalEntry::with(['bookDetails',  'journalEntryDetails','journalEntryDetails.account','branch','journalEntryDetails.subsidiary'])->where('journal_id', $request->journal_id)->get();
+        return response()->json(['message' => 'fetch', 'data' => $journalEntry]);
+
+        //return json_encode(['message' => 'fetch', 'data' => JournalEntry::with(['bookDetails', 'journalEntryDetails'])->where('journal_id', $request->journal_id)->get()]);
     }
     public function JournalEntryDelete(Request $request)
     {
@@ -126,7 +129,7 @@ class JournalController extends MainController
     public function journalEntryList(Request $request)
     {
         $data = [
-            'title' => 'Journal Entry',
+            'title' => 'MAC-AMS | Journal Entry List',
             'journalBooks' => JournalBook::get(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
             'journalEntryList' => JournalEntry::fetch(),
