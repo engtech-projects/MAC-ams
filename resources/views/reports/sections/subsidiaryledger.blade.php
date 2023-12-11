@@ -344,7 +344,7 @@
 												<td colspan="7"><center>No data available in table.</b></td>
 											</tr>
 											<tr v-for="ps in processedSubsidiary" :class="ps[2]=='Total'||ps[2]=='Net Movement'?'text-bold':''">
-												<td v-for="p,i in ps" :class="rowStyles(p,i,ps)">@{{p}}</td>
+												<td v-for="p,i in ps" :class="rowStyles(p,i,ps)" :colspan="ps.length==2&&i==1?8:''">@{{p}}</td>
 											</tr>
 										</tbody>
 									</table>
@@ -365,7 +365,7 @@
 											<tr v-if="!processedIncomeExpense.income.length&&!processedIncomeExpense.expense.length">
 												<td colspan="7"><center>No data available in table.</b></td>
 											</tr>
-											<tr>
+											<tr v-if="processedIncomeExpense.income.length">
 												<td><b>REVENUE</b></td>
 												<td></td>
 												<td></td>
@@ -378,7 +378,7 @@
 											<tr :Class="rowStylesIncomeExpense(i)" v-for="i in processedIncomeExpense.income">
 												<td v-for="j in i">@{{j}}</td>
 											</tr>
-											<tr>
+											<tr v-if="processedIncomeExpense.income.length">
 												<td></td>
 												<td></td>
 												<td></td>
@@ -388,7 +388,7 @@
 												<td>0.00</td>
 												<td></td>
 											</tr>
-											<tr>
+											<tr v-if="processedIncomeExpense.income.length">
 												<td></td>
 												<td></td>
 												<td></td>
@@ -398,7 +398,7 @@
 												<td></td>
 												<td>0.00</td>
 											</tr>
-											<tr>
+											<tr v-if="processedIncomeExpense.expense.length">
 												<td><b>EXPENSE</b></td>
 												<td></td>
 												<td></td>
@@ -538,8 +538,8 @@
 									data.balance?this.formatCurrency(data.balance):'0.00'];
 						rows.push(row);
 						if(this.reportType=='subsidiary_per_account'){
-							rows.push(['','PAYEE: '+data.payee,'','','','','','',''])
-							rows.push(['',data.remarks?data.remarks.toUpperCase():'','','','','','','',''])
+							rows.push(['','PAYEE: '+data.payee])
+							rows.push(['',data.remarks?data.remarks.toUpperCase():''])
 						}
 					}
 					rows.push(['','','Total','','','',totalDebit!=0?this.formatCurrency(totalDebit):'',
