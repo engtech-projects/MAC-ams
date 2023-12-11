@@ -896,7 +896,6 @@ $(document).ready(function(){
 				},
             ajax:{
                 url:"<?= config('app.url') ?>/reports/cashTransactionBlotter",
-/* 				url:"{{route('reports.cashblotter')}}", */
             },
             columns:[
                 {data:"branch_code"},

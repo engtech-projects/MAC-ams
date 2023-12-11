@@ -14,7 +14,7 @@
 	  <li class="nav-item">
 	    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
 	  </li>
-	
+
 	</ul>
 
 	<!-- Right navbar links -->
@@ -23,7 +23,7 @@
 			<div class="d-inline p-4 "><font id="currentDate"></font></div>
 			<div class="d-inline p-4" >Time : <font id="currentTime"></font> </div>
 	  	</li>
-		  
+
 		<li class="nav-item dropdown">
 			<a class="nav-link" data-toggle="dropdown" href="#">
 				<i class="fa fa-bell"></i>
@@ -61,3 +61,17 @@
 	  </li>
 	</ul>
 </nav>
+
+<script>
+    new Vue({
+        el:"#App",
+        data:{
+            message:null,
+        },
+        methods: {
+            async logout() {
+                axios.get()
+            }
+        },
+    })
+</script>

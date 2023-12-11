@@ -21,19 +21,21 @@ class CashBlotter extends Model
     ];
 
 
-    public static function fetchCashBlotter() {
-        $cashblotter =CashBlotter::leftjoin("branch", 'branch.branch_id','=','cash_blotter.branch_id')
-        ->select("cash_blotter.*","branch.*")
-        ->get();
+    public static function fetchCashBlotter()
+    {
+        $cashblotter = CashBlotter::leftjoin("branch", 'branch.branch_id', '=', 'cash_blotter.branch_id')
+            ->select("cash_blotter.*", "branch.*")
+            ->get();
         return $cashblotter;
     }
-    public static function fetchCashBlotterById($cashblotter_id) {
-        $cashblotter = $branch = CashBlotter::leftjoin("branch", 'branch.branch_id','=','cash_blotter.branch_id')
-        ->select("branch.*","cash_blotter.*")
-        ->where('cash_blotter.cashblotter_id','=',$cashblotter_id)
-        ->first();
+    public static function fetchCashBlotterById($cashblotter_id)
+    {
+        $branch = CashBlotter::leftjoin("branch", 'branch.branch_id', '=', 'cash_blotter.branch_id')
+            ->select("branch.*", "cash_blotter.*")
+            ->where('cash_blotter.cashblotter_id', '=', $cashblotter_id)
+            ->first();
         return $branch;
-        return $cashblotter;
+
     }
 
 
