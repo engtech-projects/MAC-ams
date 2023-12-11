@@ -30,7 +30,7 @@ class AuthServiceProvider extends ServiceProvider
 
     protected function checkGate()
     {
-        Gate::define('branch-manager', function (User $user) {
+        Gate::define('manager', function (User $user) {
             return $user->userRole->role_name === UserRole::BRANCH_MANAGER_ROLE ? true : false;
         });
     }

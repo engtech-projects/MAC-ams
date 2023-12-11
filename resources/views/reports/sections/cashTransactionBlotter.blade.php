@@ -49,7 +49,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        @if (Gate::allows('branch-manager'))
+                        @if (Gate::allows('manager'))
                             <div class="col-md-3">
                                 <label for="branch">Select Branch</label>
                                 <select-branch @setselectedbranch="getSelectedBranch" />
