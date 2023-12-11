@@ -50,12 +50,12 @@
                     </div>
                     <div class="row">
                         @if (Gate::allows('manager'))
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label for="branch">Select Branch</label>
                                 <select-branch @setselectedbranch="getSelectedBranch" />
                             </div>
                         @endif
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label for="branch">Transaction Date</label>
                             <div class="input-group">
                                 <input type="date" v-model="filter.transaction_date" id="transaction_date"
@@ -63,20 +63,21 @@
                             </div>
 
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="mt-4 text-left">
                                 <button @click="filterCollections()" class="btn btn-success">Search</button>
                             </div>
-
                         </div>
 
-                        <div class="col-md-3">
+                        @if(Gate::allows(['accounting-staff']))
+                        <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6':'2' }}">
                             <div class="mt-4 text-right">
                                 <button type="button" class="btn btn-primary" data-type="create"
                                     id="create-cashblotter">New Transaction</button>
                             </div>
 
                         </div>
+                        @endif
                     </div>
                 </div>
 
@@ -358,13 +359,9 @@
                                 <td>@{{ d.transaction_date }}</td>
                                 <td>@{{ formatCurrency(d.total) }}</td>
                                 <td>
-                                    <button @click="showCashBlotter(d.collection_id,d.branch_id)"
+                                    <button @click="showCashBlotter(d.collection_id,d.branch_name)"
                                         class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye"
                                             data-toggle="modal" data-target="#cashBlotterPreviewModal"></i></button>
-                                    <button class="mr-1 btn btn-xs btn-warning" id="update-cashblotter"><i
-                                            class="fas fa-xs fa-edit"></i></button>
-                                    <button class="mr-1 btn btn-xs btn-danger"><i
-                                            class="fas fa-xs fa-trash delete-cashblotter"></i></button>
                                     <button class="mr-1 btn btn-xs btn-primary"><i
                                             class="fas fa-xs fa-download download-cashblotter"></i></button>
                                     <button class="mr-1 btn btn-xs btn-default"><i
