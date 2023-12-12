@@ -834,6 +834,7 @@
 							<td>${v.amount}</td>
 							<td>${v.remarks}</td>
 							<td>${v.journal_date}</td>
+                            <td>${v.branch_id}</td>
 							<td class="nav-link ${status}"><b>${v.status}</b></td>
 							<td>
                                 <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>

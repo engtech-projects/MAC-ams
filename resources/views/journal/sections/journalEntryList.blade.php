@@ -167,12 +167,14 @@
                             <div class="col-md-12">
                                 <table id="journalEntryDetails" class="table table-bordered">
                                     <thead>
+
                                         <th>Book Code</th>
                                         <th>Journal #</th>
                                         <th>Source</th>
                                         <th>Amount</th>
                                         <th>Remarks</th>
                                         <th>Journal Date</th>
+                                        <th>Branch</th>
                                         <th>Status</th>
                                         <th width="150">Action</th>
                                     </thead>
@@ -190,6 +192,7 @@
                                                     @endforeach
                                                 </td>
                                                 <td>{{ $journal->journal_date }}</td>
+                                                <td class="font-weight-bold">{{ $journal->branch_id }}</td>
                                                 <td
                                                     class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
                                                     <b>{{ ucfirst($journal->status) }}</b></td>

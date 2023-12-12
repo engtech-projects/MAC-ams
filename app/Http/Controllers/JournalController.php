@@ -135,6 +135,7 @@ class JournalController extends MainController
             'journalEntryList' => JournalEntry::fetch(),
             'chartOfAccount' => Accounts::get()
         ];
+/*         return response()->json(['data' => $data]); */
 
         // echo '<pre>';
         // var_export($data['journalEntryList']->toArray());

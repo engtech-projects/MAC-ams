@@ -51,6 +51,7 @@ class journalEntry extends Model
 
 
 
+
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id='', $order = 'DESC', $journal_no = '')
     {
         if(!$branch_id) {
