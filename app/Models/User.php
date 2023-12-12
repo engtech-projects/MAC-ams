@@ -15,13 +15,8 @@ use App\Models\Accessibilities;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    public $with = ['personal_info', 'accessibilities.subModuleList', 'branch'];
+    public $with = ['personal_info', 'accessibilities.subModuleList', 'userBranch','userRole'];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
     protected $fillable = [
         'username',
         'password',
@@ -31,22 +26,13 @@ class User extends Authenticatable
 
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
         'salt',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
+
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
@@ -56,13 +42,33 @@ class User extends Authenticatable
         return $this->hasOne(PersonalInfo::class, 'personal_info_id');
     }
 
+    public function userRole()
+    {
+        return $this->belongsTo(UserRole::class,'role_id','role_id');
+    }
+
+    public function userBranch()
+    {
+        return $this->belongsToMany(Branch::class, 'user_branch', 'user_id', 'branch_id');
+    }
+
     public function accessibilities()
     {
         return $this->hasMany(Accessibilities::class, 'user_id');
     }
     public function branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id');
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    public function getUserBranch(array $attributes)
+    {
+
+        $user = User::where('username', '=', $attributes["username"])->with('userBranch', function ($query) use ($attributes) {
+            $query->where('user_branch.branch_id', $attributes["branch_id"])->first();
+        })->first();
+
+        return $user;
     }
 
 }

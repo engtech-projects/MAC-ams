@@ -47,9 +47,8 @@ class CollectionBreakdown extends Model
         $collection = CollectionBreakdown::with(['accountOfficerCollection'])->where('collection_id', $id)->first();
         return $collection;
     }
-    public static function getCollectionBreakdownByBranch($transactionDate)
+    public static function getCollectionBreakdownByBranch($transactionDate,$branchId)
     {
-        $branchId = Auth::user()->branch->branch_id;
         return CollectionBreakdown::where('branch_id', $branchId)
         ->when($transactionDate,function($query,$transactionDate) {
             $query->where('transaction_date',$transactionDate);
@@ -86,7 +85,6 @@ class CollectionBreakdown extends Model
     {
         $collection = $this->getCollectionById($id);
         $transactionDate = Carbon::createFromFormat('Y-m-d', $collection->transaction_date);
-
         $previousCollection = $this->getCollectionByTransactionDate($transactionDate, $collection->branch_id);
         return [
             'prev_transaction_date' => isset($previousCollection->transaction_date) ? $previousCollection->transaction_date : '',
