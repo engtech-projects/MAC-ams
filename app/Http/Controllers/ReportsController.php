@@ -43,8 +43,6 @@ use App\Models\OpeningBalance;
 class ReportsController extends MainController
 {
 
-
-
     public function journalLedger(Request $request)
     {
         /* ----- start journal ledger ----- */
@@ -392,6 +390,7 @@ class ReportsController extends MainController
     public function bankReconcillation()
     {
         $data = [
+
 			'chartOfAccount' => \App\Models\Accounts::where(['type' => 'L'])->get(),
             'title' => 'MAC-AMS | Bank Reconciliation',
             'trialbalanceList' => ''
@@ -411,12 +410,12 @@ class ReportsController extends MainController
 
     public function cashTransactionBlotter(Request $request)
     {
-
         $transactionDate = $request["transaction_date"];
+        $branchId = session()->get("auth_user_branch");
         $data = [
             'title' => 'MAC-AMS | Cashiers Transaction Blotter',
             'trialbalanceList' => '',
-            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate),
+            'cash_blotter' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId),
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
@@ -427,9 +426,13 @@ class ReportsController extends MainController
     public function searchCashTransactionBlotter(Request $request)
     {
         $transactionDate = $request["transaction_date"];
-        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate);
-        $message = $collections->count() > 0 ? "Collections fetched." : "No data found.";
-        return response()->json(['message' => $message,'data' => $collections]);
+        $branchId = session()->get("auth_user_branch");
+        if (isset($request->branch_id)) {
+            $branchId = $request->branch_id;
+        }
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
+        $message = $collections->count() > 0 ? "Collections fetched." : "No record found.";
+        return response()->json(['message' => $message, 'data' => $collections]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)
@@ -437,7 +440,8 @@ class ReportsController extends MainController
 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
-        $data = [
+        return response()->json($cashTransactionsEntries);
+/*         $data = [
             'title' => 'Cashier Transaction Blotter',
             'trialbalanceList' => '',
             'cashTransactions' => $cashTransactionsEntries,
@@ -446,7 +450,7 @@ class ReportsController extends MainController
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
 
-        return view('reports.sections.cashTransactionBlotter', $data);
+        return view('reports.sections.cashTransactionBlotter', $data); */
     }
     public function cashBlotterIndex()
     {

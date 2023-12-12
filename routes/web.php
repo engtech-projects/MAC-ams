@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\GeneralSettingsController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\BranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,9 +40,14 @@ Route::get('get-token', function () {
 Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user');
 Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::get('logout', [LoginController::class, 'userLogout'])->name('logout');
+Route::get('/me',[AuthController::class, 'getAuthUser'])->name('auth.user');
+Route::get('branch',[BranchController::class, 'index'])->name('branch.list');
+
 /* Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user'); */
 // DashboardController
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
 
 // AccountsController
 Route::resource('accounts', AccountsController::class);
@@ -150,7 +157,7 @@ Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedChequ
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
 Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'searchCashTransactionBlotter'])->name('reports.searchTransactionBlotter');
-Route::post('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashTransactionBlotter'])->name('reports.showCashTransactionBlotter');
+Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
 
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
@@ -161,7 +168,7 @@ Route::delete('collections/{collection}',[CollectionController::class, 'destroy'
 
 Route::get('reports/cashTransactionBlotter/cashblotter', [ReportsController::class, 'cashBlotterIndex'])->name('reports.cashblotter');
 Route::post('reports/cashTransactionBlotter/storecashblotter', [ReportsController::class, 'storeCashBlotter'])->name('reports.storeCashBlotter');
-Route::get('reports/cashTransactionBlotter/showcashblotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
+Route::get('reports/cashTransactionBlotter/showcashblotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.getCashBlotter');
 Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsController::class, 'editCashBlotter'])->name('reports.editCashBlotter');
 Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter');
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
