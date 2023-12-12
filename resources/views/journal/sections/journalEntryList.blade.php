@@ -64,6 +64,8 @@
                                 <h4><b>Journal Entry List</b></h4>
                             </div>
                             <div class="col-md-12" style="height:20px;"></div>
+
+                            @if(Gate::allows('manager'))
                             <div class="col-md-4 col-xs-12">
                                 <div class="box">
                                     <div class="form-group">
@@ -76,9 +78,10 @@
                                                 <option value="2">Nasipit Branch</option>
                                             </select>
                                         </div>
-                                    </div>
+
                                 </div>
                             </div>
+                            @endif
                             <div class="col-md-4 col-xs-12">
                                 <div class="box">
                                     <div class="form-group">
@@ -112,6 +115,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-md-5 col-xs-12">
                                 <div class="box">
                                     <div class="form-group">
@@ -137,7 +141,8 @@
                             <div class="col-md-2 col-xs-12">
                                 <div class="box">
                                     <div class="form-group">
-                                        <label class="label-normal" for="book_ref">To</label>
+                                        <label class="label-normal" for="book_ref" style="margin"></label>
+                                        <br>
                                         <div class="input-group">
                                             <button class="btn btn-flat btn-sm bg-gradient-success"
                                                 id="searchJournal">SEARCH</button>

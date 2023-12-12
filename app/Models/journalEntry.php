@@ -51,8 +51,11 @@ class journalEntry extends Model
 
 
 
-    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'DESC', $journal_no = '')
+    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id='', $order = 'DESC', $journal_no = '')
     {
+        if(!$branch_id) {
+            $branch_id = session()->get('auth_user_branch');
+        }
         $query = journalEntry::with(['journalDetails', 'bookDetails']);
         // $query = journalEntry::with(['bookDetails']);
         if ($status != '') {

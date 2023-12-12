@@ -182,20 +182,30 @@ Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'
 // Route::get('payment/bill', [PaymentController::class, ''])->name('');
 Route::post('payment/store', [PaymentController::class, 'store'])->name('payment.store');
 
-// journal
-Route::get('journal', [JournalController::class, 'create'])->name('journal.create');
-Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
-Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
-Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
-Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalEntry'])->name('journal.saveJournalEntry');
+
+
+/** USERS */
+// USERS BLAD TEMPLATES
+Route::get('user/profile', [UserProfileController::class, 'index'])->name('user.profile');
+
+// USERS REQUESTS
+Route::post('user/profile/username/update', [UserProfileController::class, 'updateUsername'])->name('username.update');
+Route::post('user/profile/password/update', [UserProfileController::class, 'updatePassword'])->name('password.update');
+
+
+
+/** JOURNAL ENTRY */
+// JOURNAL ENTRY REQUESTS
 Route::post('journal/saveJournalEntryDetails', [JournalController::class, 'saveJournalEntryDetails'])->name('journal.saveJournalEntryDetails');
 Route::post('journal/JournalEntryFetch', [JournalController::class, 'JournalEntryFetch'])->name('journal.JournalEntryFetch');
 Route::post('journal/JournalEntryDelete', [JournalController::class, 'JournalEntryDelete'])->name('journal.JournalEntryDelete');
 Route::post('journal/JournalEntryEdit', [JournalController::class, 'JournalEntryEdit'])->name('journal.JournalEntryEdit');
 Route::post('journal/JournalEntryPostUnpost', [JournalController::class, 'JournalEntryPostUnpost'])->name('journal.JournalEntryPostUnpost');
 Route::get('journal/searchJournalEntry', [JournalController::class, 'searchJournalEntry'])->name('journal.searchJournalEntry');
+Route::get('journal', [JournalController::class, 'create'])->name('journal.create');
+Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
+Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
 
-// User Profile
-Route::get('user/profile', [UserProfileController::class, 'index'])->name('user.profile');
-Route::post('user/profile/username/update', [UserProfileController::class, 'updateUsername'])->name('username.update');
-Route::post('user/profile/password/update', [UserProfileController::class, 'updatePassword'])->name('password.update');
+// JOURNAL ENTRY BLADES TEMPLATES
+Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
+Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalEntry'])->name('journal.saveJournalEntry');

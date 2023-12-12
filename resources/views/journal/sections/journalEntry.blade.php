@@ -92,6 +92,7 @@
 						</div>
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
+                                @if (Gate::allows('manager'))
 								<div class="form-group">
 									<label class="label-normal" for="branch_id">Branch</label>
 									<div class="input-group">
@@ -102,6 +103,7 @@
 									</select>
 									</div>
 								</div>
+                                @endif
 							</div>
 						</div>
 						<div class="col-md-2 col-xs-12">
@@ -394,7 +396,7 @@
 										</tr>
 									</thead>
 									<tbody id="journal_VoucherContent">
-									
+
 									</tbody>
 									</table>
 								</div>
