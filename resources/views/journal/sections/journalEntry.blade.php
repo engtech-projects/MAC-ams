@@ -90,6 +90,7 @@
 							<input type="date" class="form-control form-control-sm rounded-0" name="journal_date" id="journal_date"  placeholder="Journal Date" required >
 							</div>
 						</div>
+                        @if (Gate::allows('manager'))
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -102,8 +103,10 @@
 									</select>
 									</div>
 								</div>
+
 							</div>
 						</div>
+                        @endif
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
@@ -160,7 +163,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4 col-xs-12">
+						<div class="col-md-{{ Gate::allows('manager') ? '4':'2' }} col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="status">Status</label>
@@ -394,7 +397,7 @@
 										</tr>
 									</thead>
 									<tbody id="journal_VoucherContent">
-									
+
 									</tbody>
 									</table>
 								</div>

@@ -43,6 +43,7 @@
             padding: 50px;
             display: none;
         }
+
         .editable-container.editable-inline,
         .editable-container.editable-inline .control-group.form-group,
         .editable-container.editable-inline .control-group.form-group .editable-input,
@@ -59,88 +60,90 @@
                 <div class="col-md-12">
                     <form id="SearchJournalForm" method="post">
                         @csrf
+
                         <div class="row">
                             <div class="col-md-12 frm-header">
                                 <h4><b>Journal Entry List</b></h4>
                             </div>
                             <div class="col-md-12" style="height:20px;"></div>
-                            <div class="col-md-4 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="branch_id">Branch</label>
-                                        <div class="input-group">
-                                            <select name="s_branch_id" class="form-control form-control-sm select2"
-                                                id="s_branch_id">
-                                                <option value="" disabled selected>-All-</option>
-                                                <option value="1">Butuan City Branch</option>
-                                                <option value="2">Nasipit Branch</option>
-                                            </select>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    @if(Gate::allows('manager'))
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="branch_id">Branch</label>
+                                            <div class="input-group">
+                                                <select name="s_branch_id" class="form-control form-control-sm select2"
+                                                    id="s_branch_id">
+                                                    <option value="" disabled selected>-All-</option>
+                                                    <option value="1">Butuan City Branch</option>
+                                                    <option value="2">Nasipit Branch</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    @endif
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="branch_id">Book Reference</label>
+                                            <div class="input-group">
+                                                <select name="s_book_id" class="select2 form-control form-control-sm"
+                                                    id="s_book_id">
+                                                    <option value="" disabled selected>-All-</option>
+                                                    @foreach ($journalBooks as $journalBook)
+                                                        <option value="{{ $journalBook->book_id }}">
+                                                            {{ $journalBook->book_code }} - {{ $journalBook->book_name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="s_status">Status</label>
+                                            <div class="input-group">
+                                                <select name="s_status" class="select2 form-control form-control-sm"
+                                                    id="s_status">
+                                                    <option value="" selected>-All-</option>
+                                                    <option value="unposted">Unposted</option>
+                                                    <option value="posted">Posted</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="branch_id">Book Reference</label>
-                                        <div class="input-group">
-                                            <select name="s_book_id" class="select2 form-control form-control-sm"
-                                                id="s_book_id">
-                                                <option value="" disabled selected>-All-</option>
-                                                @foreach ($journalBooks as $journalBook)
-                                                    <option value="{{ $journalBook->book_id }}">
-                                                        {{ $journalBook->book_code }} - {{ $journalBook->book_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="s_from">From</label>
+                                            <div class="input-group">
+                                                <input type="date" class="form-control form-control-sm rounded-0"
+                                                    name="s_from" id="s_from" placeholder="Book Reference" required>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="s_status">Status</label>
-                                        <div class="input-group">
-                                            <select name="s_status" class="select2 form-control form-control-sm"
-                                                id="s_status">
-                                                <option value="" selected>-All-</option>
-                                                <option value="unposted">Unposted</option>
-                                                <option value="posted">Posted</option>
-                                            </select>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="s_to">To</label>
+                                            <div class="input-group">
+                                                <input disabled type="date" class="form-control form-control-sm rounded-0"
+                                                    name="s_to" id="s_to" placeholder="Book Reference" required>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-md-5 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="s_from">From</label>
-                                        <div class="input-group">
-                                            <input type="date" class="form-control form-control-sm rounded-0"
-                                                name="s_from" id="s_from" placeholder="Book Reference" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-5 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="s_to">To</label>
-                                        <div class="input-group">
-                                            <input disabled type="date" class="form-control form-control-sm rounded-0"
-                                                name="s_to" id="s_to" placeholder="Book Reference" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="book_ref">To</label>
-                                        <div class="input-group">
-                                            <button class="btn btn-flat btn-sm bg-gradient-success"
-                                                id="searchJournal">SEARCH</button>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group mt-2">
+                                            <label class="label-normal" for="book_ref" style="margin"></label>
+                                            <br>
+                                            <div class="input-group">
+                                                <button class="btn btn-flat btn-sm bg-gradient-success"
+                                                    id="searchJournal">SEARCH</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -162,12 +165,14 @@
                             <div class="col-md-12">
                                 <table id="journalEntryDetails" class="table table-bordered">
                                     <thead>
+
                                         <th>Book Code</th>
                                         <th>Journal #</th>
                                         <th>Source</th>
                                         <th>Amount</th>
                                         <th>Remarks</th>
                                         <th>Journal Date</th>
+                                        <th>Branch</th>
                                         <th>Status</th>
                                         <th width="150">Action</th>
                                     </thead>
@@ -185,9 +190,11 @@
                                                     @endforeach
                                                 </td>
                                                 <td>{{ $journal->journal_date }}</td>
+                                                <td class="font-weight-bold">{{ $journal->branch_id }}</td>
                                                 <td
                                                     class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
-                                                    <b>{{ ucfirst($journal->status) }}</b></td>
+                                                    <b>{{ ucfirst($journal->status) }}</b>
+                                                </td>
                                                 <td>
                                                     <button value="{{ $journal->journal_id }}"
                                                         {{ $journal->status == 'posted' ? 'disabled' : '' }}
@@ -210,46 +217,46 @@
                                     </tbody>
                                 </table>
                                 <!-- <div id="account-details">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <table class="table table-bordered table-sm" id="tbl-create-journal">
-                                                <thead>
-                                                    <tr class="text-center">
-                                                        <th>Account #</th>
-                                                        <th>Account Name</th>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table class="table table-bordered table-sm" id="tbl-create-journal">
+                                                    <thead>
+                                                        <tr class="text-center">
+                                                            <th>Account #</th>
+                                                            <th>Account Name</th>
 
-                                                        <th>S/L</th>
-                                                        <th width="150">Debit</th>
-                                                        <th width="150">Credit</th>
+                                                            <th>S/L</th>
+                                                            <th width="150">Debit</th>
+                                                            <th width="150">Credit</th>
 
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tbl-preview-container">
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr class="text-center">
-                                                        <th></th>
-                                                        <th width="200"></th>
-                                                        <th width="200">TOTAL</th>
-                                                        <th width="150" id="vtotal_debit">0</th>
-                                                        <th width="150" id="vtotal_credit">0</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tbl-preview-container">
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr class="text-center">
+                                                            <th></th>
+                                                            <th width="200"></th>
+                                                            <th width="200">TOTAL</th>
+                                                            <th width="150" id="vtotal_debit">0</th>
+                                                            <th width="150" id="vtotal_credit">0</th>
 
-                                                    </tr>
-                                                    <tr class="text-center">
-                                                        <th></th>
-                                                        <th width="200"></th>
-                                                        <th width="200">BALANCE</th>
-                                                        <th width="150" id="vbalance_debit">0</th>
-                                                        <th width="150" id="vbalance_credit">0</th>
+                                                        </tr>
+                                                        <tr class="text-center">
+                                                            <th></th>
+                                                            <th width="200"></th>
+                                                            <th width="200">BALANCE</th>
+                                                            <th width="150" id="vbalance_debit">0</th>
+                                                            <th width="150" id="vbalance_credit">0</th>
 
 
-                                                    </tr>
+                                                        </tr>
 
-                                                </tfoot>
-                                            </table>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div> -->
+                                    </div> -->
                             </div>
                         </div>
                     </section>
@@ -594,7 +601,8 @@
                                 <div class="co-md-12" style="height:10px;"></div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered table-sm text-center" id="tbl-create-journal-container" style="table-layout: fixed;">
+                                        <table class="table table-bordered table-sm text-center"
+                                            id="tbl-create-journal-container" style="table-layout: fixed;">
                                             <thead>
                                                 <tr class="text-center">
                                                     <th style="width: 10%;">Account #</th>
@@ -746,19 +754,19 @@
                                             <div class="col-lg-4 col-sm-5 ml-auto">
 
                                                 <!-- <table class="table table-clear">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="left">
-                                                                <strong>TOTAL</strong>
-                                                            </td>
-                                                            <td class="left"><strong id="total_debit_voucher"></strong>
-                                                            </td>
-                                                            <td class="left"><strong id="total_credit_voucher"></strong>
-                                                            </td>
-                                                        </tr>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="left">
+                                                                    <strong>TOTAL</strong>
+                                                                </td>
+                                                                <td class="left"><strong id="total_debit_voucher"></strong>
+                                                                </td>
+                                                                <td class="left"><strong id="total_credit_voucher"></strong>
+                                                                </td>
+                                                            </tr>
 
-                                                    </tbody>
-                                                </table> -->
+                                                        </tbody>
+                                                    </table> -->
                                             </div>
                                         </div>
                                     </div>
@@ -778,4 +786,3 @@
     @section('footer-scripts')
         @include('scripts.journal.journal')
     @endsection
-

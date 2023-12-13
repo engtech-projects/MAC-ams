@@ -13,6 +13,7 @@ class UserRole extends Model
     protected $primary_key = "role_id";
 
     const BRANCH_MANAGER_ROLE = "Manager";
+    const BRANCH_ACCOUNTING_STAFF_ROLE = "Accounting Staff";
 
     public function users() {
         return $this->hasMany(User::class);

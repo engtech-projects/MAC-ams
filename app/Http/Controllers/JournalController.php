@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Hash;
 use Session;
@@ -64,8 +65,8 @@ class JournalController extends MainController
     {
         try {
             $journalEntry = $journalEntry->createJournalEntry($request->input());
-        } catch (\Throwable $th) {
-            throw $th;
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()]);
         }
 
         return response()->json([
@@ -135,6 +136,7 @@ class JournalController extends MainController
             'journalEntryList' => JournalEntry::fetch(),
             'chartOfAccount' => Accounts::get()
         ];
+/*         return response()->json(['data' => $data]); */
 
         // echo '<pre>';
         // var_export($data['journalEntryList']->toArray());

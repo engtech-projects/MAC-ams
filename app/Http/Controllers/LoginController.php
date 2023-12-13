@@ -24,7 +24,7 @@ class LoginController extends MainController
 
     public function index()
     {
-        $title = 'Login'.' - '.config('app.name');
+        $title = 'MAC-AMS | Login';
 
         return view('auth.login')->with(compact('title'));
     }
