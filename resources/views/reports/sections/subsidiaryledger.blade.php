@@ -28,7 +28,7 @@
 </style>
 
 <!-- Main content -->
-<section class="content">
+<section class="content" id="app">
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
@@ -42,7 +42,7 @@
 					<div class="col-md-4 frm-header">
 						<label class="label-normal" for="gender">Select Report</label>
 						<div class="input-group">
-							<select name="gender" class="form-control form-control-sm" id="gender">
+							<select v-model="reportType" name="gender" class="form-control form-control-sm" id="gender">
 								<option value="" disabled selected>-Select Report-</option>
 								<option value="income_minus_expense">Income Minus Expense</option>
 								<option value="income_minus_expense_summary">Income Minus Expense (Summary)</option>
@@ -59,146 +59,219 @@
 							</select>
 						</div>
 					</div>
-					<div class="col-md-2 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_acct_no">Code</label>
-								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="sub_acct_no" id="sub_acct_no"  placeholder="Subsidiary Account No." required>
+					<div v-if="reportType==''" class="row col-md-12">
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_acct_no">Code</label>
+									<div class="input-group">
+										<input type="number" class="form-control form-control-sm rounded-0" name="sub_acct_no" id="sub_acct_no"  placeholder="Subsidiary Account No." required>
+									</div>
 								</div>
 							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_name">Account Name</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="sub_name" id="sub_name"  placeholder="Subsidiary Name" required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-4 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_address">Address</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="sub_address" id="sub_address"  placeholder="Address" required>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_life_used">Life Used</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="sub_life_used" id="sub_life_used"  placeholder="Life Used" required>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_tel">Phone Number</label>
+									<div class="input-group">
+										<input type="Number" class="form-control form-control-sm rounded-0" name="sub_tel" id="sub_tel"  placeholder="Subsidiary Telephone Number" required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
+									<div class="input-group">
+									<select name="sub_cat_id" class="form-control form-control-sm" id="sub_cat_id">
+										<option value="" disabled selected>-Select Category-</option>
+										@foreach ($sub_categories as $sub_category)
+											<option value="{{$sub_category->sub_cat_id}}">{{$sub_category->sub_cat_code}} - {{$sub_category->sub_cat_name}}</option>
+										@endforeach
+									</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-5 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_per_branch">Branch</label>
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm rounded-0" name="sub_per_branch" id="sub_per_branch"  placeholder="Branch" required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_date">Date</label>
+									<div class="input-group">
+										<input type="date" class="form-control form-control-sm rounded-0" name="sub_date" id="sub_date"  required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_amount">Amount</label>
+									<div class="input-group">
+										<input type="number" class="form-control form-control-sm rounded-0" name="sub_amount" id="sub_amount"  placeholder="Amount" required>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_no_amort">Amort</label>
+									<div class="input-group">
+										<input type="number" class="form-control form-control-sm rounded-0" name="sub_no_amort" id="sub_no_amort" required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_salvage">Salvage</label>
+									<div class="input-group">
+										<input type="number" class="form-control form-control-sm rounded-0" name="sub_salvage" id="sub_salvage"  placeholder="Salvage" required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_date_post">Date Post</label>
+									<div class="input-group">
+										<input type="date" class="form-control form-control-sm rounded-0" name="sub_date_post" id="sub_date_post"  placeholder="Date Posted" required>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12 text-right" style="padding-bottom:20px">
+							<button class="btn btn-flat btn-sm bg-gradient-success " type="submit">Save/Update</button>
 						</div>
 					</div>
 
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_name">Account Name</label>
-								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="sub_name" id="sub_name"  placeholder="Subsidiary Name" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-4 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_address">Address</label>
-								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="sub_address" id="sub_address"  placeholder="Address" required>
-								</div>
-							</div>
-						</div>
-					</div>
 					
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_life_used">Life Used</label>
-								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="sub_life_used" id="sub_life_used"  placeholder="Life Used" required>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					<div class="col-md-2 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_tel">Phone Number</label>
-								<div class="input-group">
-									<input type="Number" class="form-control form-control-sm rounded-0" name="sub_tel" id="sub_tel"  placeholder="Subsidiary Telephone Number" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
-								<div class="input-group">
-								<select name="sub_cat_id" class="form-control form-control-sm" id="sub_cat_id">
-									<option value="" disabled selected>-Select Category-</option>
-									@foreach ($sub_categories as $sub_category)
-										<option value="{{$sub_category->sub_cat_id}}">{{$sub_category->sub_cat_code}} - {{$sub_category->sub_cat_name}}</option>
-									@endforeach
-								</select>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-5 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_per_branch">Branch</label>
-								<div class="input-group">
-									<input type="text" class="form-control form-control-sm rounded-0" name="sub_per_branch" id="sub_per_branch"  placeholder="Branch" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-2 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_date">Date</label>
-								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="sub_date" id="sub_date"  required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_amount">Amount</label>
-								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="sub_amount" id="sub_amount"  placeholder="Amount" required>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_no_amort">Amort</label>
-								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="sub_no_amort" id="sub_no_amort" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_salvage">Salvage</label>
-								<div class="input-group">
-									<input type="number" class="form-control form-control-sm rounded-0" name="sub_salvage" id="sub_salvage"  placeholder="Salvage" required>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-3 col-xs-12">
-						<div class="box">
-							<div class="form-group">
-								<label class="label-normal" for="sub_date_post">Date Post</label>
-								<div class="input-group">
-									<input type="date" class="form-control form-control-sm rounded-0" name="sub_date_post" id="sub_date_post"  placeholder="Date Posted" required>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-12 text-right" style="padding-bottom:20px">
-						<button class="btn btn-flat btn-sm bg-gradient-success " type="submit">Save/Update</button>
-					</div>
 				</div>
 				
+			</form>
+			<form @submit.prevent="submitForm" action="">
+			<div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'" class="row col-md-12 no-print">
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_acct_no">Subsidiary</label>
+									<div class="input-group">
+										<select v-model="filter.subsidiary_id" name="subsidiary_id" class="select2 form-control form-control-sm" style="width:100%" id="subsidiaryDD" required>
+											<option value="" disabled selected>-Select Category-</option>
+											@foreach ($subsidiaryData as $subdata)
+												<option value="{{$subdata->sub_id}}">{{$subdata->sub_name}}</option>
+											@endforeach
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div v-show="reportType=='subsidiary_per_account'" class="col-md-3 col-xs-12" style="margin-right:64px;">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_name">Account Title</label>
+									<div class="input-group">
+										<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="gender" required>
+										<option value="" disabled selected>-Select Account-</option>
+										<option value="all">All Accounts</option>
+											@foreach ($accounts as $account)
+												<option value="{{$account->account_id}}">{{$account->account_number}} - {{$account->account_name}}</option>
+											@endforeach
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+							
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_date">From</label>
+									<div class="input-group">
+										<input v-model="filter.from" type="date" class="form-control form-control-sm rounded-0" name="from" id="sub_date"  required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_date">To</label>
+									<div class="input-group">
+										<input v-model="filter.to" type="date" class="form-control form-control-sm rounded-0" name="to" id="sub_date"  required>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-2 col-xs-12">
+							<div class="box">
+								<div class="form-group">
+									<label class="label-normal" for="sub_date"></label>
+									<div class="input-group">
+										<button class="btn btn-flat btn-sm bg-gradient-success " type="submit" style="margin-top:8px;width:100px;">Search</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 			</form>
 		</div>
 		<div class="co-md-12" style="height:10px;"></div>
@@ -212,7 +285,7 @@
 						<div class="container-fluid">
 							<div class="row" >
 								<div class="col-md-12 table-responsive">
-									<table id="subsidiaryledgerTbl"  class="table ">
+									<table v-if="reportType==''" id="subsidiaryledgerTbl"  class="table ">
 										<thead>
 											<th>Account Name</th>
 											<th>Address</th>
@@ -251,6 +324,95 @@
 											@endforeach
 										</tbody>
 									</table>
+
+
+
+									<table v-if="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'" style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
+										<thead>
+											<th width="15%">Date</th>
+											<th>Reference</th>
+											<th width="26%">Preference Name</th>
+											<th>Source</th>
+											<th>Cheque Date</th>
+											<th>Cheque No.</th>
+											<th class="text-right">Debit</th>
+											<th class="text-right">Credit</th>
+											<th class="text-right">Balance</th>
+										</thead>
+										<tbody id="generalLedgerTblContainer">
+											<tr v-if="!subsidiaryAll.length">
+												<td colspan="7"><center>No data available in table.</b></td>
+											</tr>
+											<tr v-for="ps in processedSubsidiary" :class="ps[2]=='Total'||ps[2]=='Net Movement'?'text-bold':''">
+												<td v-for="p,i in ps" :class="rowStyles(p,i,ps)" :colspan="ps.length==2&&i==1?8:''">@{{p}}</td>
+											</tr>
+										</tbody>
+									</table>
+
+
+									<table v-if="reportType=='income_minus_expense'" style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
+										<thead>
+											<th width="15%">Date</th>
+											<th>Reference</th>
+											<th width="26%">Particular</th>
+											<th>Source</th>
+											<th>Cheque Date</th>
+											<th>Cheque No.</th>
+											<th class="text-right">Amount</th>
+											<th class="text-right">Commulative</th>
+										</thead>
+										<tbody id="generalLedgerTblContainer">
+											<tr v-if="!processedIncomeExpense.income.length&&!processedIncomeExpense.expense.length">
+												<td colspan="7"><center>No data available in table.</b></td>
+											</tr>
+											<tr v-if="processedIncomeExpense.income.length">
+												<td><b>REVENUE</b></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr :Class="rowStylesIncomeExpense(i)" v-for="i in processedIncomeExpense.income">
+												<td v-for="j in i">@{{j}}</td>
+											</tr>
+											<tr v-if="processedIncomeExpense.income.length">
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td>0.00</td>
+												<td></td>
+											</tr>
+											<tr v-if="processedIncomeExpense.income.length">
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td>0.00</td>
+											</tr>
+											<tr v-if="processedIncomeExpense.expense.length">
+												<td><b>EXPENSE</b></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr :Class="rowStylesIncomeExpense(l)" v-for="l in processedIncomeExpense.expense">
+												<td v-for="m in l">@{{m}}</td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
 						</div>
 					</section>
@@ -261,7 +423,191 @@
   </div>
 </section>	
 <!-- /.content -->
+<script>
+	new Vue({
+		el: '#app',
+		data: {
+			reportType:'',
+			filter:{
+				subsidiary_id:'',
+				from:'',
+				to:'',
+				account_id:'all',
+				type:''
+			},
+			incomeExpense:{income:[],expense:[]},
+			subsidiaryAll:[],
+			url:"{{route('reports.subsidiary-ledger')}}",
+		},
+		methods: {
+			submitForm:function(){
+				if(this.reportType=='subsidiary_all_account'||this.reportType=='subsidiary_per_account'){
+					this.fetchSubAll();
+				}else if(this.reportType=='income_minus_expense'){
+					this.fetchIncomeExpense();
+				}
+				
+			},
+			fetchSubAll:function(){
+				this.filter.type = this.reportType;
+				axios.post(this.url, this.filter, {
+					headers: {
+						'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+					}
+				})
+				.then(response => {
+					this.subsidiaryAll = response.data.data;
+					console.log(response.data.data);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			},
+			fetchIncomeExpense:function(){
+				var data = {subsidiary_id:this.filter.subsidiary_id,
+							date_from:this.filter.from,
+							date_to:this.filter.to,
+							type:this.reportType};
+				axios.post(this.url, data, {
+					headers: {
+						'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+					}
+				})
+				.then(response => {
+					this.incomeExpense = response.data.data;
+					// console.log(response.data.data);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			},
+			rowStyles:function(p,i,r){
+				var style = '';
+				if(i>=6){
+					style += 'text-right';
+				}
+				if(i==0 && !r[1].length){
+					style += ' text-bold';
+				}
+				return style;
+			},
+			rowStylesIncomeExpense:function(row){
+				if(row[0].length&&!row[1].length){
+					return 'text-bold';
+				}
+				if(!row[0].length&&(row[6].length||row[7].length)){
+					return 'text-bold';
+				}
+				return '';
+			},
+			formatCurrency:function(number) {
+				const formatter = new Intl.NumberFormat('en-US', {
+					style: 'decimal',
+					minimumFractionDigits: 2,
+				});
 
+				return formatter.format(number);
+			}
+		},
+		computed:{
+			processedSubsidiary:function(){
+				var entries = {};
+				var rows = [];
+				if(this.subsidiaryAll){
+					if(this.subsidiaryAll[0]){
+						entries = this.subsidiaryAll[0].entries;
+					}
+				}
+				for(var i in entries){
+					var entry = entries[i];
+					var totalCredit = 0;
+					var totalDebit = 0;
+					rows.push([entry.account_number + ' - ' + entry.account_name?entry.account_name.toUpperCase():'' + ':','','','','','','','',entry.opening_balance?this.formatCurrency(entry.opening_balance):'0.00']);
+					for(var d in entry.data){
+						var data = entry.data[d];
+						totalCredit += parseFloat(data.credit);
+						totalDebit += parseFloat(data.debit);
+						var row = [data.journal_date,
+									data.journal_no,
+									data.sub_name,
+									data.source,
+									data.cheque_date,
+									data.cheque_no,
+									data.debit!=0?this.formatCurrency(data.debit):'',
+									data.credit!=0?this.formatCurrency(data.credit):'',
+									data.balance?this.formatCurrency(data.balance):'0.00'];
+						rows.push(row);
+						if(this.reportType=='subsidiary_per_account'){
+							rows.push(['','PAYEE: '+data.payee])
+							rows.push(['',data.remarks?data.remarks.toUpperCase():''])
+						}
+					}
+					rows.push(['','','Total','','','',totalDebit!=0?this.formatCurrency(totalDebit):'',
+								totalCredit!=0?this.formatCurrency(totalCredit):'',
+								'']);
+					rows.push(['','','Net Movement','','','','','','0.00'])
+				}
+				return rows;
+			},
+			processedIncomeExpense:function(){
+				var result = {income:[],expense:[]}
+				this.incomeExpense.income.forEach(income => {
+					result.income.push([income.account_name,'','','','','','',''])
+					var totalAmount = 0;
+					income.entries.forEach(entry => {
+						var row = [];
+						var amount = entry.credit==0?entry.debit:entry.credit;
+						totalAmount += parseFloat(amount);
+						row.push(entry.journal_date);
+						row.push(entry.journal_no);
+						row.push(entry.subsidiary_name);
+						row.push(entry.source);
+						row.push(entry.cheque_date);
+						row.push(entry.cheque_no);
+						row.push(this.formatCurrency(amount));
+						row.push('0.00');
+						result.income.push(row);
+					});
+					if(income.entries.length){
+						result.income.push(['','','','','','',this.formatCurrency(totalAmount),''])
+						result.income.push(['','','','','','','','0.00'])
+					}
+				});
+				this.incomeExpense.expense.forEach(expense => {
+					result.expense.push([expense.account_name,'','','','','','',''])
+					var totalAmount = 0;
+					expense.entries.forEach(entry => {
+						var row = [];
+						var amount = entry.credit==0?entry.debit:entry.credit;
+						totalAmount += parseFloat(amount);
+						row.push(entry.journal_date);
+						row.push(entry.journal_no);
+						row.push(entry.subsidiary_name);
+						row.push(entry.source);
+						row.push(entry.cheque_date);
+						row.push(entry.cheque_no);
+						row.push(this.formatCurrency(amount));
+						row.push('0.00');
+						result.expense.push(row);
+					});
+					if(expense.entries.length){
+						result.expense.push(['','','','','','',this.formatCurrency(totalAmount),''])
+						result.expense.push(['','','','','','','','0.00'])
+					}
+					
+				});
+				return result;
+			}
+		},
+		mounted(){
+			// for(var i in this.data){
+			// 	if(this.data[i]){
+			// 		console.log(this.data[i]);
+			// 	}
+			// }
+		}
+	});
+</script>
 
 @endsection
 
