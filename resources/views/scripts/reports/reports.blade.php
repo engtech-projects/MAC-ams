@@ -39,13 +39,9 @@ $(document).ready(function(){
         $('#title').text("Cashier's Transaction Blotter (Edit)")
 
         var cashblotter_id = $(this).attr('data-id')
-        console.log(e)
         $.ajax({
-            type: "POST",
-            url: "cashTransactionBlotter/"+cashblotter_id,
-            headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
+            type: "GET",
+            url: "cashTransactionBlotter/editcashblotter/"+cashblotter_id,
             dataType: "json",
             success: function (response) {
                     $('#onethousand').val(response.data.cash_breakdown.onethousand_pesos)
@@ -913,7 +909,7 @@ $(document).ready(function(){
                 {data:null,
                     render:function(data,row,type){
                         var cashblotter_id = data.cashblotter_id
-                        var editCashBlotterUrl = "{{ route('reports.showCashBlotter',':id') }}";
+                        var editCashBlotterUrl = "{{ route('reports.editCashBlotter',':id') }}";
                         editCashBlotterUrl = editCashBlotterUrl.replace(':id', cashblotter_id);
                         var showCashBlotterUrl = "{{ route('reports.showCashBlotter',':id') }}";
                         showCashBlotterUrl = showCashBlotterUrl.replace(':id', cashblotter_id);

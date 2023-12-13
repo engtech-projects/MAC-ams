@@ -157,7 +157,7 @@ Route::get('reports/postDatedCheque', [ReportsController::class, 'postDatedChequ
 Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->name('reports.cashPosition');
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
 Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'searchCashTransactionBlotter'])->name('reports.searchTransactionBlotter');
-Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
+Route::post('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashTransactionBlotter'])->name('reports.showCashBlotter');
 
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
@@ -166,11 +166,10 @@ Route::post('reports/bank-reconciliation', [ReportsController::class,'bankReconc
 Route::post('collections',[CollectionController::class, 'store'])->name('create.collection.breakdown');
 Route::delete('collections/{collection}',[CollectionController::class, 'destroy'])->name('delete.collection');
 
-Route::get('reports/cashTransactionBlotter/cashblotter', [ReportsController::class, 'cashBlotterIndex'])->name('reports.cashblotter');
-Route::post('reports/cashTransactionBlotter/storecashblotter', [ReportsController::class, 'storeCashBlotter'])->name('reports.storeCashBlotter');
-Route::get('reports/cashTransactionBlotter/showcashblotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.getCashBlotter');
+/* Route::post('reports/cashTransactionBlotter/storecashblotter', [ReportsController::class, 'storeCashBlotter'])->name('reports.storeCashBlotter');
+Route::get('reports/cashTransactionBlotter/showcashblotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
 Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsController::class, 'editCashBlotter'])->name('reports.editCashBlotter');
-Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter');
+Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter'); */
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
 /* Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses'); */
 
@@ -182,30 +181,20 @@ Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'
 // Route::get('payment/bill', [PaymentController::class, ''])->name('');
 Route::post('payment/store', [PaymentController::class, 'store'])->name('payment.store');
 
-
-
-/** USERS */
-// USERS BLAD TEMPLATES
-Route::get('user/profile', [UserProfileController::class, 'index'])->name('user.profile');
-
-// USERS REQUESTS
-Route::post('user/profile/username/update', [UserProfileController::class, 'updateUsername'])->name('username.update');
-Route::post('user/profile/password/update', [UserProfileController::class, 'updatePassword'])->name('password.update');
-
-
-
-/** JOURNAL ENTRY */
-// JOURNAL ENTRY REQUESTS
+// journal
+Route::get('journal', [JournalController::class, 'create'])->name('journal.create');
+Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
+Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
+Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
+Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalEntry'])->name('journal.saveJournalEntry');
 Route::post('journal/saveJournalEntryDetails', [JournalController::class, 'saveJournalEntryDetails'])->name('journal.saveJournalEntryDetails');
 Route::post('journal/JournalEntryFetch', [JournalController::class, 'JournalEntryFetch'])->name('journal.JournalEntryFetch');
 Route::post('journal/JournalEntryDelete', [JournalController::class, 'JournalEntryDelete'])->name('journal.JournalEntryDelete');
 Route::post('journal/JournalEntryEdit', [JournalController::class, 'JournalEntryEdit'])->name('journal.JournalEntryEdit');
 Route::post('journal/JournalEntryPostUnpost', [JournalController::class, 'JournalEntryPostUnpost'])->name('journal.JournalEntryPostUnpost');
 Route::get('journal/searchJournalEntry', [JournalController::class, 'searchJournalEntry'])->name('journal.searchJournalEntry');
-Route::get('journal', [JournalController::class, 'create'])->name('journal.create');
-Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
-Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
 
-// JOURNAL ENTRY BLADES TEMPLATES
-Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
-Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalEntry'])->name('journal.saveJournalEntry');
+// User Profile
+Route::get('user/profile', [UserProfileController::class, 'index'])->name('user.profile');
+Route::post('user/profile/username/update', [UserProfileController::class, 'updateUsername'])->name('username.update');
+Route::post('user/profile/password/update', [UserProfileController::class, 'updatePassword'])->name('password.update');

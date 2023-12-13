@@ -30,10 +30,54 @@
 				</p>
 			</a>
 			</li>
-
+			<!-- @if(checkUserHasAccessModule('module','sales'))
+			<li class="nav-item {{ (isset($nav) && $nav[0] == 'sales') ? 'menu-open' : '' }} {{ (request()->is('sales') || request()->is('sales/invoice') ) ? 'menu-open' : '' }}">
+			<a href="{{ route('sales') }}" class="nav-link {{ (request()->is('sales') || (request()->is('sales/invoice')) || (request()->is('sales/customers')) || (request()->is('products_and_services'))) ? 'active' : '' }}">
+				<i class="nav-icon fas fa-newspaper"></i>
+				<p>
+				Sales
+				<i class="right fas fa-angle-left"></i>
+				</p>
+			</a>
+			<ul class="nav nav-treeview">
+				@if(checkUserHasAccessModule('sub-module','sales'))
+				<li class="nav-item">
+					<a href="{{ route('sales') }}" class="nav-link {{ (request()->is('sales')) ? 'active' : '' }}">
+						<i class="far fa-circle nav-icon"></i>
+						<p>Sales</p>
+					</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','sales/invoice'))
+				<li class="nav-item">
+				<a href="{{ route('sales.invoice') }}" class="nav-link {{ (request()->is('sales/invoice')) ? 'active' : '' }}">
+					<i class="far fa-circle nav-icon"></i>
+					<p>Invoices</p>
+				</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','sales/customers'))
+				<li class="nav-item">
+					<a href="{{route('sales.customers')}}" class="nav-link {{ (isset($nav) && $nav[1] == 'customers') ? 'active' : '' }}">
+						<i class="far fa-circle nav-icon"></i>
+						<p>Customers</p>
+					</a>
+				</li>
+				@endif
+				@if(checkUserHasAccessModule('sub-module','products_and_services'))
+				<li class="nav-item">
+					<a href="{{route('products_services')}}" class="nav-link {{ (isset($nav) && $nav[1] == 'products and services') ? 'active' : '' }}" class="nav-link">
+						<i class="far fa-circle nav-icon"></i>
+						<p>Product and Services</p>
+					</a>
+				</li>
+				@endif
+			</ul>
+			</li> -->
+			@endif
 			@if(checkUserHasAccessModule('module','journal'))
 			<li class="nav-item {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? 'menu-open' : '' }}">
-				<a class="nav-link {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? '' : '' }}">
+				<a href="{{ route('sales') }}" class="nav-link {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? '' : '' }}">
 					<i class="nav-icon fas fa-address-book"></i>
 					<p>
 					Journal
@@ -117,7 +161,7 @@
 			@if(checkUserHasAccessModule('module','reports'))
 			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/journalledger') || request()->is('reports/subsidiary-ledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
 					|| request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition') || request()->is('reports/cheque') || request()->is('reports/postDatedCheque')|| request()->is('reports/chartOfAccounts')) ? 'menu-open' : '' }}">
-			<a class="nav-link {{  (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
+			<a href="{{ route('sales') }}" class="nav-link {{  (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-clipboard-list"></i>
 				<p>
 				Reports

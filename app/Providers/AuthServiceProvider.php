@@ -33,8 +33,5 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manager', function (User $user) {
             return $user->userRole->role_name === UserRole::BRANCH_MANAGER_ROLE ? true : false;
         });
-        Gate::define('accounting-staff', function (User $user) {
-            return $user->userRole->role_name === UserRole::BRANCH_ACCOUNTING_STAFF_ROLE ? true : false;
-        });
     }
 }

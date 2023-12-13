@@ -85,6 +85,7 @@ class CollectionBreakdown extends Model
     {
         $collection = $this->getCollectionById($id);
         $transactionDate = Carbon::createFromFormat('Y-m-d', $collection->transaction_date);
+
         $previousCollection = $this->getCollectionByTransactionDate($transactionDate, $collection->branch_id);
         return [
             'prev_transaction_date' => isset($previousCollection->transaction_date) ? $previousCollection->transaction_date : '',

@@ -406,6 +406,8 @@
             if (parseFloat($('#debit_balance').text().float()) != 0) {
                 if (_st) {
                     var serialized = $(this).serializeArray();
+
+
                     var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
                     serialized.push({
                         name: 'amount',
@@ -432,7 +434,6 @@
                         data: data,
                         dataType: "json",
                         success: function(data) {
-                            console.log(data)
                             toastr.success(data.message);
                             reload();
                         },
@@ -440,6 +441,8 @@
                             toastr.error('Error');
                         }
                     });
+                } else {
+                    alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
             } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                 alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
@@ -831,7 +834,6 @@
 							<td>${v.amount}</td>
 							<td>${v.remarks}</td>
 							<td>${v.journal_date}</td>
-                            <td>${v.branch_id}</td>
 							<td class="nav-link ${status}"><b>${v.status}</b></td>
 							<td>
                                 <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>

@@ -40,10 +40,8 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "collection_ao" => "required",
         ];
     }
-    protected function prepareForValidation()
-    {
-        $this->merge(['branch_id' => session()->get('auth_user_branch')]);
+
+    protected function prepareForValidation() {
+        $this->merge(['branch_id' => auth()->user()->branch_id]);
     }
-
-
 }
