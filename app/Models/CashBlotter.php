@@ -28,6 +28,7 @@ class CashBlotter extends Model
             ->get();
         return $cashblotter;
     }
+
     public static function fetchCashBlotterById($cashblotter_id)
     {
         $branch = CashBlotter::leftjoin("branch", 'branch.branch_id', '=', 'cash_blotter.branch_id')
