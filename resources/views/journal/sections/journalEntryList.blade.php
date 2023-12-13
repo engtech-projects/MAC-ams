@@ -84,7 +84,7 @@
                                         </div>
                                     </div>
                                     @endif
-                                    <div class="col-md-4">
+                                    <div class="col-md-{{ Gate::allows('manager') ? '4':'6' }}">
                                         <div class="form-group">
                                             <label class="label-normal" for="branch_id">Book Reference</label>
                                             <div class="input-group">
@@ -101,7 +101,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-{{ Gate::allows('manager') ? '4':'6' }}">
                                         <div class="form-group">
                                             <label class="label-normal" for="s_status">Status</label>
                                             <div class="input-group">
@@ -117,7 +117,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="form-group">
                                             <label class="label-normal" for="s_from">From</label>
                                             <div class="input-group">
@@ -126,7 +126,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="form-group">
                                             <label class="label-normal" for="s_to">To</label>
                                             <div class="input-group">
@@ -136,7 +136,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <div class="form-group mt-2">
                                             <label class="label-normal" for="book_ref" style="margin"></label>
                                             <br>

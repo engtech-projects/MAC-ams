@@ -41,11 +41,11 @@ class LoginController extends MainController
             if (Auth::attempt($credentials)) {
                 $branchId = $user->userBranch[0]->branch_id;
                 session()->put('auth_user_branch', $branchId);
-                return response()->json(['message' => "successfully logged in.",'user' => auth()->user()],200);
+                return response()->json(['message' => "&nbsp; Login Successful",'user' => auth()->user()],200);
 
             }
         }
-        return response()->json(['message' => "Invalid credentials."],401);
+        return response()->json(['message' => "&nbsp; Invalid credentials"],401);
 
 
 
@@ -59,7 +59,7 @@ class LoginController extends MainController
         session()->forget('auth_user_branch');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect("login")->withSuccess('Successfully Logged out. ');
+        return redirect("login")->withSuccess('Logout Successful');
     }
 
 }
