@@ -33,7 +33,7 @@
 
 			@if(checkUserHasAccessModule('module','journal'))
 			<li class="nav-item {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? 'menu-open' : '' }}">
-				<a href="{{ route('sales') }}" class="nav-link {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? '' : '' }}">
+				<a class="nav-link {{ (request()->is('journal') || request()->is('journal/journalEntry') || request()->is('journal/journalEntryList')) ? '' : '' }}">
 					<i class="nav-icon fas fa-address-book"></i>
 					<p>
 					Journal
@@ -117,7 +117,7 @@
 			@if(checkUserHasAccessModule('module','reports'))
 			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/journalledger') || request()->is('reports/subsidiary-ledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
 					|| request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition') || request()->is('reports/cheque') || request()->is('reports/postDatedCheque')|| request()->is('reports/chartOfAccounts')) ? 'menu-open' : '' }}">
-			<a href="{{ route('sales') }}" class="nav-link {{  (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
+			<a class="nav-link {{  (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-clipboard-list"></i>
 				<p>
 				Reports
