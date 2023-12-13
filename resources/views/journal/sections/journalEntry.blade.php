@@ -163,7 +163,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-{{ Gate::allows('manager') ? '2':'4' }} col-xs-12">
+						<div class="col-md-{{ Gate::allows('manager') ? '4':'2' }} col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="status">Status</label>
