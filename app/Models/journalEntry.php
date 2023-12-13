@@ -104,10 +104,11 @@ class journalEntry extends Model
     {
         $requestEntry = $request["journal_entry"];
         $requestDetails = $request["details"];
+        $branchId = isset($request['branch_id']) ? $request["branch_id"] : session()->get('auth_user_branch');
         $journalEntry = self::create([
             'journal_no' => $requestEntry["journal_no"],
             'journal_date' => $requestEntry["journal_date"],
-            'branch_id' => $requestEntry["branch_id"],
+            'branch_id' => $branchId,
             'book_id' => $requestEntry["book_id"],
             'source' => $requestEntry["source"],
             'cheque_date' => $requestEntry["cheque_date"],

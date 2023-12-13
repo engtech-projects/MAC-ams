@@ -406,8 +406,6 @@
             if (parseFloat($('#debit_balance').text().float()) != 0) {
                 if (_st) {
                     var serialized = $(this).serializeArray();
-
-
                     var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
                     serialized.push({
                         name: 'amount',
@@ -434,6 +432,7 @@
                         data: data,
                         dataType: "json",
                         success: function(data) {
+                            console.log(data)
                             toastr.success(data.message);
                             reload();
                         },
@@ -441,8 +440,6 @@
                             toastr.error('Error');
                         }
                     });
-                } else {
-                    alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
             } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                 alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');

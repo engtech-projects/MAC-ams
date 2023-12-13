@@ -90,9 +90,9 @@
 							<input type="date" class="form-control form-control-sm rounded-0" name="journal_date" id="journal_date"  placeholder="Journal Date" required >
 							</div>
 						</div>
+                        @if (Gate::allows('manager'))
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
-                                @if (Gate::allows('manager'))
 								<div class="form-group">
 									<label class="label-normal" for="branch_id">Branch</label>
 									<div class="input-group">
@@ -103,9 +103,10 @@
 									</select>
 									</div>
 								</div>
-                                @endif
+
 							</div>
 						</div>
+                        @endif
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
