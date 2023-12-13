@@ -129,11 +129,12 @@ class ReportsController extends MainController
         $data = [
             'subsidiaryData' => Subsidiary::get(),
             'sub_categories' => SubsidiaryCategory::get(),
-            'title' => 'Subsidiary Ledger',
-            'subsidiaryLedgerList' => ''
+            'title' => 'MAC-AMS | Subsidiary Ledger',
+            'subsidiaryLedgerList' => '',
+			'accounts' => Accounts::all()
         ];
 
-        return view('reports.sections.subsidiaryledger', $data);
+		return view('reports.sections.subsidiaryledger', $data);
     }
 
 
@@ -144,8 +145,6 @@ class ReportsController extends MainController
             'subsidiaryData' => Subsidiary::get(),
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'MAC-AMS | Subsidiary Ledger',
-            'subsidiaryLedgerList' => '',
-            'title' => 'Subsidiary Ledger',
             'subsidiaryLedgerList' => '',
 			'accounts' => Accounts::all(),
         ];

@@ -457,7 +457,7 @@
 				})
 				.then(response => {
 					this.subsidiaryAll = response.data.data;
-					console.log(response.data.data);
+					// console.log(response.data.data);
 				})
 				.catch(error => {
 					console.error('Error:', error);
@@ -538,7 +538,7 @@
 									data.balance?this.formatCurrency(data.balance):'0.00'];
 						rows.push(row);
 						if(this.reportType=='subsidiary_per_account'){
-							rows.push(['','PAYEE: '+data.payee])
+							data.payee!=null?rows.push(['','PAYEE: '+data.payee]):rows.push(['','','','','','','','',''])
 							rows.push(['',data.remarks?data.remarks.toUpperCase():''])
 						}
 					}

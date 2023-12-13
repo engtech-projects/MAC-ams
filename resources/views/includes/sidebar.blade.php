@@ -180,11 +180,19 @@
                         <input type="hidden" name="type" value="subsidiary-ledger">
                         @csrf
                     </form>
-					<li class="nav-item">
+					<!-- <li class="nav-item">
 						<a
                         onclick="event.preventDefault(); document.getElementById('subsidiary-ledger').submit();"
                         href="{{ route('reports.subsidiary-ledger') }}"
                         class="nav-link {{ (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
+							<i class="far fa-circle nav-icon"></i>
+							<p>Subsidiary Ledger</p>
+						</a>
+					</li> -->
+					<li class="nav-item">
+						<a
+                        href="{{ route('reports.subsidiaryledger') }}"
+                        class="nav-link {{ (request()->is('reports/subsidiaryledger')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
 							<p>Subsidiary Ledger</p>
 						</a>
