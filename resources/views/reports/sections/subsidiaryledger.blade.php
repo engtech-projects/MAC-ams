@@ -48,6 +48,7 @@
 								<option value="income_minus_expense_summary">Income Minus Expense (Summary)</option>
 								<option value="subsidiary_all_account">Subsidiary (All Account)</option>
 								<option value="subsidiary_per_account">Subsidiary (Per Account)</option>
+								<option value="subsidiary_listing_account">Subsidiary Listing Account</option>
 								<option value="schedule_of_account">Schedule of Account</option>
 								<option value="subsidiary_aging_account">Subsidiary Aging / Account</option>
 								<option value="aging_of_payables">Aging  of Payables</option>
@@ -205,13 +206,52 @@
 				
 			</form>
 			<form @submit.prevent="submitForm" action="">
-			<div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'" class="row col-md-12 no-print">
+				<div v-show="reportType=='subsidiary_listing_account'" class="row">
+					<div  class="col-md-3 col-xs-12" style="margin-right:16px;">
+						<div class="box">
+							<div class="form-group">
+								<label class="label-normal" for="sub_name">Account Title</label>
+								<div class="input-group">
+									<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="gender" required>
+									<option value="" disabled selected>-Select Account-</option>
+									<option value="all">All Accounts</option>
+										@foreach ($accounts as $account)
+											<option value="{{$account->account_id}}">{{$account->account_number}} - {{$account->account_name}}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3 col-xs-12" style="margin-right:16px;">
+						<div class="box">
+							<div class="form-group">
+								<label class="label-normal" for="sub_date">As of</label>
+								<div class="input-group">
+									<input v-model="asof" type="date" class="form-control form-control-sm rounded-0" name="from" id="sub_date"  required>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-2 col-xs-12">
+						<div class="box">
+							<div class="form-group">
+								<label class="label-normal" for="sub_date"></label>
+								<div class="input-group">
+									<button class="btn btn-flat btn-sm bg-gradient-success " type="submit" style="margin-top:8px;width:100px;">Search</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'" class="row col-md-12 no-print">
 						<div class="col-md-2 col-xs-12">
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="sub_acct_no">Subsidiary</label>
 									<div class="input-group">
-										<select v-model="filter.subsidiary_id" name="subsidiary_id" class="select2 form-control form-control-sm" style="width:100%" id="subsidiaryDD" required>
+										<select v-model="filter.subsidiary_id" name="subsidiary_id" class="select2 form-control form-control-sm" style="width:100%" id="subsidiaryDD" :required="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'">
 											<option value="" disabled selected>-Select Category-</option>
 											@foreach ($subsidiaryData as $subdata)
 												<option value="{{$subdata->sub_id}}">{{$subdata->sub_name}}</option>
@@ -227,7 +267,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="sub_name">Account Title</label>
 									<div class="input-group">
-										<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="gender" required>
+										<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="gender" :required="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'">
 										<option value="" disabled selected>-Select Account-</option>
 										<option value="all">All Accounts</option>
 											@foreach ($accounts as $account)
@@ -244,7 +284,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="sub_date">From</label>
 									<div class="input-group">
-										<input v-model="filter.from" type="date" class="form-control form-control-sm rounded-0" name="from" id="sub_date"  required>
+										<input v-model="filter.from" type="date" class="form-control form-control-sm rounded-0" name="from" id="sub_date"  :required="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'">
 									</div>
 								</div>
 							</div>
@@ -255,7 +295,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="sub_date">To</label>
 									<div class="input-group">
-										<input v-model="filter.to" type="date" class="form-control form-control-sm rounded-0" name="to" id="sub_date"  required>
+										<input v-model="filter.to" type="date" class="form-control form-control-sm rounded-0" name="to" id="sub_date"  :required="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'">
 									</div>
 								</div>
 							</div>
@@ -413,6 +453,29 @@
 											</tr>
 										</tbody>
 									</table>
+
+
+									<table v-if="reportType=='subsidiary_listing_account'" style="table-layout: fixed;" id="generalLedgerTbl"  class="table">
+										<thead>
+											<th width="15%">Date</th>
+											<th>Reference</th>
+											<th width="26%">Preference Name</th>
+											<th>Source</th>
+											<th>Cheque Date</th>
+											<th>Cheque No.</th>
+											<th class="text-right">Debit</th>
+											<th class="text-right">Credit</th>
+											<th class="text-right">Balance</th>
+										</thead>
+										<tbody id="generalLedgerTblContainer">
+											<tr v-if="!processedListing.length">
+												<td colspan="7"><center>No data available in table.</b></td>
+											</tr>
+											<tr v-for="i in processedListing">
+												<td :colspan="listingColSpan(i,j,k)" :class="listingStyles(i,j,k)" v-for="j,k in i">@{{j}}</td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
 						</div>
 					</section>
@@ -428,6 +491,7 @@
 		el: '#app',
 		data: {
 			reportType:'',
+			asof:'',
 			filter:{
 				subsidiary_id:'',
 				from:'',
@@ -435,16 +499,37 @@
 				account_id:'all',
 				type:''
 			},
+			accountListings:{entries:[]},
 			incomeExpense:{income:[],expense:[]},
 			subsidiaryAll:[],
 			url:"{{route('reports.subsidiary-ledger')}}",
 		},
 		methods: {
+			listingStyles:function(row, item, i){
+				console.log(i);
+				if(row.length == 1){
+					return 'text-bold';
+				}
+				else if(row.length == 4 && i > 0){
+					return 'border-top-dash text-bold';
+				}
+				return '';
+			},
+			listingColSpan:function(row, item){
+				if(row.length == 4 && item == 0){
+					return 6;
+				}else if(row.length == 1){
+					return 9;
+				}
+				return '';
+			},
 			submitForm:function(){
 				if(this.reportType=='subsidiary_all_account'||this.reportType=='subsidiary_per_account'){
 					this.fetchSubAll();
 				}else if(this.reportType=='income_minus_expense'){
 					this.fetchIncomeExpense();
+				}else if(this.reportType=='subsidiary_listing_account'){
+					this.fetchSubListing();
 				}
 				
 			},
@@ -476,6 +561,21 @@
 				.then(response => {
 					this.incomeExpense = response.data.data;
 					// console.log(response.data.data);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			},
+			fetchSubListing:function(){
+				var filter = {account_id:this.filter.account_id, as_of:this.as_of,type:'subsidiary-ledger-listing-report'};
+				axios.post(this.url, filter, {
+					headers: {
+						'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+					}
+				})
+				.then(response => {
+					this.accountListings = response.data.data.length?response.data.data[0]:[];
+					// console.log(this.accountListings);
 				})
 				.catch(error => {
 					console.error('Error:', error);
@@ -597,6 +697,35 @@
 					
 				});
 				return result;
+			},
+			processedListing:function(){
+				var rows = [];
+				for(var m in this.accountListings.entries){
+					var entry = this.accountListings.entries[m]
+					var totalDebit = 0;
+					var totalCredit = 0;
+					var totalBalance = 0;
+					rows.push([m.toUpperCase()])
+					for(var j in entry){
+						var item = entry[j];
+						var row = [];
+						totalDebit += parseFloat(item.debit);
+						totalCredit += parseFloat(item.credit);
+						totalBalance += parseFloat(item.balance);
+						row.push(item.journal_date);
+						row.push(item.journal_no);
+						row.push(m);
+						row.push(item.source);
+						row.push(item.cheque_date);
+						row.push(item.cheque_no);
+						row.push(item.debit!=0?this.formatCurrency(item.debit):'');
+						row.push(item.credit!=0?this.formatCurrency(item.credit):'');
+						row.push(this.formatCurrency(item.balance));
+						rows.push(row);
+					}
+					rows.push(['',this.formatCurrency(totalDebit),this.formatCurrency(totalCredit),this.formatCurrency(totalBalance)])
+				}
+				return rows;
 			}
 		},
 		mounted(){
