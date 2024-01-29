@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Accounts;
 use App\Models\journalEntryDetails;
 use App\Models\AccountType;
+use Carbon\Carbon;
 
 
 class Accounts extends Model
@@ -631,4 +632,136 @@ class Accounts extends Model
 
         return $accountsJournalEntries;
     }
+
+    public function getAccountBalance($from, $to, $account_id) {
+
+        $cycle = Accounting::getFiscalYear(1);
+        $startDate = Carbon::parse($cycle->start_date);
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+        $diff = $startDate->diffInDays($fromDate);
+        $endDate = Carbon::parse($fromDate->toDateString())->subDay(1);
+
+        $balance = $this->getOpeningBalance($account_id);
+
+        if( $diff > 0 ) {
+
+            $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
+                        ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
+                        ->select(
+                            'coa.account_id',
+                            'coa.account_number',
+                            'coa.account_name',
+                            DB::raw('COALESCE(SUM(jed.journal_details_debit)) AS total_debit'),
+                            DB::raw('COALESCE(SUM(jed.journal_details_credit)) AS total_credit')
+                        )
+                        ->from('chart_of_accounts as coa')
+                        ->where(['coa.type' => 'L', 'coa.account_id' => $account_id ])
+                        ->whereBetween("je.journal_date", [$startDate->toDateString(), $endDate->toDateString()])
+                        ->groupBy('coa.account_id','coa.account_number','coa.account_name')
+                        ->first();
+
+
+            if( $account ){
+                return $balance + $account->total_debit - $account->total_credit;    
+            }
+        }
+
+        return $balance;
+    }
+
+    public function getOpeningBalance($account_id) {
+
+        $obj = OpeningBalance::where(['account_id' => $account_id])->first('opening_balance');
+
+        if( $obj && isset($obj->opening_balance) ) {
+            return $obj->opening_balance;
+        }
+
+        return 0;
+    }
+
+    public function ledger($range = [], $account_id = '') {
+
+        $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
+                        ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
+                        ->join('subsidiary as sub', 'jed.subsidiary_id', '=', 'sub.sub_id')
+                        ->join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
+                        ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+                        ->select(
+                            'ac.account_category','ac.to_increase',
+                            'at.account_type',
+                            'coa.account_id', 'coa.account_number', 'coa.account_name',
+                            'je.journal_date','je.journal_no','je.source', 'je.cheque_no','je.cheque_date', 'je.payee', 'je.remarks',
+                            'jed.journal_details_debit','jed.journal_details_credit',
+                            'sub.sub_name',
+                            'ac.account_category','ac.to_increase'
+                        )
+                        ->from('chart_of_accounts as coa')
+                        ->where(['je.status' => 'posted', 'coa.type' => 'L', 'coa.status' => 'active'])
+                        ->whereBetween("je.journal_date", $range);
+
+        if( $account_id ) {
+            $account->where(['coa.account_id' => $account_id]);
+        }
+
+        $data = $account->orderBy('je.journal_date', 'ASC')
+                        ->orderBy('jed.journal_id', 'ASC')
+                        ->get();
+
+        $ledger = [];
+
+        $current_balance = 0;
+        $total_debit = 0;
+        $total_credit = 0;
+
+        foreach ($data as $key => $value) {
+            
+            if( !isset($ledger[$value->account_id]) ) {
+
+                $balance = $this->getAccountBalance($range[0], $range[1], $value->account_id);
+                $current_balance = $balance;
+                $total_debit = 0;
+                $total_credit = 0;
+
+                $ledger[$value->account_id] = [
+                    'account_category' => $value->account_category,
+                    'account_type' => $value->account_type,
+                    'account_number' => $value->account_number,
+                    'account_name' => $value->account_name,
+                    'balance' => number_format($balance, 2),
+                    'current_balance' => 0,
+                    'total_debit' => 0,
+                    'total_credit' => 0,
+                    'to_increase' => $value->to_increase,
+                    'entries' => []
+                ];
+            }
+
+            $current_balance += ($value->journal_details_debit - $value->journal_details_credit);
+            $total_debit += $value->journal_details_debit;
+            $total_credit += $value->journal_details_credit;
+
+            $ledger[$value->account_id]['current_balance'] = number_format($current_balance, 2);
+            $ledger[$value->account_id]['total_debit'] = number_format($total_debit, 2);
+            $ledger[$value->account_id]['total_credit'] = number_format($total_credit, 2);
+
+            $ledger[$value->account_id]['entries'][] = [
+                'sub_name' => $value->sub_name,
+                'journal_date' => Carbon::parse($value->journal_date)->format('m/d/y'),
+                'journal_no' => $value->journal_no,
+                'source' => $value->source,
+                'cheque_no' => $value->cheque_no ,
+                'cheque_date' => ($value->cheque_date) ? Carbon::parse($value->cheque_date)->format('m/d/y') : NULL,
+                'debit' => number_format($value->journal_details_debit, 2),
+                'credit' => number_format($value->journal_details_credit, 2),
+                'current_balance' => number_format($current_balance, 2),
+                'payee' => $value->payee,
+                'remarks' => $value->remarks
+            ];
+        }
+
+        return $ledger;
+    }
+
 }

@@ -1,11 +1,11 @@
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 <script type="text/javascript">
 
-$(document).ready(function(){
-  $("form").submit(function(){
-    alert("Submitted");
-  });
-});
+// $(document).ready(function(){
+  // $("form").submit(function(){
+  //   alert("Submitted");
+  // });
+// });
 
 
 	(function ($) {
@@ -764,117 +764,117 @@ $(document).ready(function(){
         }
 
 
-		$(document).on('change', '#genLedgerAccountName', function(e){
-            e.preventDefault()
-			var id = $(this).val();
-			var from = $('#genLedgerFrom').val();
-			var to = $('#genLedgerTo').val();
-			$.ajax({
-				headers: {
-					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-				},
-				type: "POST",
-				url: "{{route('reports.generalLedgerFetchAccount')}}",
-				data:{id:id,from:from,to:to},
-				dataType: "json",
-				success: function(data) {
-                    console.log(data)
-					generalLedger.fnClearTable();
-					generalLedger.fnDestroy();
+		// $(document).on('change', '#genLedgerAccountName', function(e){
+  //           e.preventDefault()
+		// 	var id = $(this).val();
+		// 	var from = $('#genLedgerFrom').val();
+		// 	var to = $('#genLedgerTo').val();
+		// 	$.ajax({
+		// 		headers: {
+		// 			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		// 		},
+		// 		type: "POST",
+		// 		url: "{{route('reports.generalLedgerFetchAccount')}}",
+		// 		data:{id:id,from:from,to:to},
+		// 		dataType: "json",
+		// 		success: function(data) {
+  //                   console.log(data)
+		// 			generalLedger.fnClearTable();
+		// 			generalLedger.fnDestroy();
 
-					if(data)
-					{
-						var vvid = '';
-						var tempContainer = '';
-						var container = '';
-                        let balance = 0
-                        let total_debits = 0,total_credits = 0
-						$.each(data, function(k,v){
+		// 			if(data)
+		// 			{
+		// 				var vvid = '';
+		// 				var tempContainer = '';
+		// 				var container = '';
+  //                       let balance = 0
+  //                       let total_debits = 0,total_credits = 0
+		// 				$.each(data, function(k,v){
 
-							if(vvid == ''){
+		// 					if(vvid == ''){
 
-                                balance = v.opening_balance
+  //                               balance = v.opening_balance
 
-								container += `<tr>
-                                        <td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td class="balance">${formatAmount(v.opening_balance)}</td>
+		// 						container += `<tr>
+  //                                       <td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td class="balance">${formatAmount(v.opening_balance)}</td>
 
-									</tr>`;
-								vvid = v.account_id;
-							}else if(vvid != v.account_id){
+		// 							</tr>`;
+		// 						vvid = v.account_id;
+		// 					}else if(vvid != v.account_id){
 
-									container += `
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>${formatAmount(total_debits)}</td>
-                                        <td>${formatAmount(total_credits)}</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td class="balance">${formatAmount(v.opening_balance)}</td>
-									</tr>
-                                   `;
-                                   total_credits =0
-                                   total_debits = 0
-								vvid = v.account_id;
-								}
-                                balance+=Number(v.journal_details_debit)
-                                balance-=Number(v.journal_details_credit)
-                                total_debits+=Number(v.journal_details_debit)
-                                total_credits+=Number(v.journal_details_credit)
+		// 							container += `
+  //                                   <tr>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td>${formatAmount(total_debits)}</td>
+  //                                       <td>${formatAmount(total_credits)}</td>
+  //                                       <td></td>
+  //                                   </tr>
+  //                                   <tr>
+  //                                       <td  class="font-weight-bold">${v.account_number} - ${v.account_name}</td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td></td>
+		// 								<td class="balance">${formatAmount(v.opening_balance)}</td>
+		// 							</tr>
+  //                                  `;
+  //                                  total_credits =0
+  //                                  total_debits = 0
+		// 						vvid = v.account_id;
+		// 						}
+  //                               balance+=Number(v.journal_details_debit)
+  //                               balance-=Number(v.journal_details_credit)
+  //                               total_debits+=Number(v.journal_details_debit)
+  //                               total_credits+=Number(v.journal_details_credit)
 
-							container +=
-								`<tr>
-									<td>${v.journal_date}</td>
-									<td>${v.sub_name}</td>
-									<td>${v.source}</td>
-									<td>${(v.cheque_date == '') ? '/' : v.cheque_date}</td>
-									<td>${(v.cheque_no == '') ? '/' : v.cheque_no}</td>
-									<td>${formatAmount(v.journal_details_debit)}</td>
-									<td>${formatAmount(v.journal_details_credit)}</td>
-									<td class="journal_balance">${formatAmount(balance)}</td>
-								</tr>`
-
-
-						});
-                        container += `<tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>${formatAmount(total_debits)}</td>
-                                        <td>${formatAmount(total_credits)}</td>
-                                        <td></td>
-                                    </tr>`
+		// 					container +=
+		// 						`<tr>
+		// 							<td>${v.journal_date}</td>
+		// 							<td>${v.sub_name}</td>
+		// 							<td>${v.source}</td>
+		// 							<td>${(v.cheque_date == '') ? '/' : v.cheque_date}</td>
+		// 							<td>${(v.cheque_no == '') ? '/' : v.cheque_no}</td>
+		// 							<td>${formatAmount(v.journal_details_debit)}</td>
+		// 							<td>${formatAmount(v.journal_details_credit)}</td>
+		// 							<td class="journal_balance">${formatAmount(balance)}</td>
+		// 						</tr>`
 
 
-						$('#generalLedgerTblContainer').html(container)
-					}
-					generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
-				},
-				error: function() {
-					console.log("Error");
-				}
-			});
-		});
+		// 				});
+  //                       container += `<tr>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td></td>
+  //                                       <td>${formatAmount(total_debits)}</td>
+  //                                       <td>${formatAmount(total_credits)}</td>
+  //                                       <td></td>
+  //                                   </tr>`
+
+
+		// 				$('#generalLedgerTblContainer').html(container)
+		// 			}
+		// 			generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
+		// 		},
+		// 		error: function() {
+		// 			console.log("Error");
+		// 		}
+		// 	});
+		// });
 	})(jQuery);
 
 
