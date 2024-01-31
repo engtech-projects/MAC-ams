@@ -10,10 +10,21 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\AccountType;
 use App\Models\Accounts;
 use App\Models\AccountCategory;
+use App\Models\Accounting;
+use Carbon\Carbon;
 
 class AccountsController extends MainController
 {
     public function index() {
+
+    	 // $accounts = new Accounts();
+    	 // $from = '2023-02-01';
+    	 // $to = '2023-02-28';
+    	 // $account_id = 3;
+    	 //  echo '<pre>';
+    	 // var_export($accounts->ledger([$from, $to], $account_id));
+    	 // echo '</pre>';
+    	 
 		$accountData = Accounts::fetch();
         $data = [
             'title' => 'MAC-AMS | Chart of Accounts',
@@ -24,6 +35,7 @@ class AccountsController extends MainController
 			'accountTypes' => AccountType::orderBy('account_category_id')->get(),
             'cashFlows'    => ['investing', 'financing', 'operating']
         ];
+
     	return view('chartofaccounts.accounts', $data);
     }
 
