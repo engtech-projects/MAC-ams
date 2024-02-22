@@ -27,9 +27,9 @@ concurrency:
 
 jobs:
 
-  build-staging:
+  build-dev:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/staging'
+    if: github.ref == 'refs/heads/dev'
     steps:
       - uses: shivammathur/setup-php@v2
         with:
