@@ -291,12 +291,10 @@ class ReportsController extends MainController
 
         $from = $request->from ? $request->from : $accounting->default_start;
         $to = $request->to ? $request->to : $accounting->default_end;
-        $account_id = !$request->account_id ? 4 : $request->account_id;
+        $account_id = !$request->account_id ? 3 : $request->account_id;
 
         $transactions = $glAccounts->ledger([$from, $to], $account_id);
         $accounts = Accounts::where(['type' => 'L', 'status' => 'active'])->get();
-        
-        // echo 'test';
 
         $data = [
             'title' => 'MAC-AMS | General Ledger',
