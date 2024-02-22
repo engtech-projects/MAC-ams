@@ -296,6 +296,10 @@ class ReportsController extends MainController
         $transactions = $glAccounts->ledger([$from, $to], $account_id);
         $accounts = Accounts::where(['type' => 'L', 'status' => 'active'])->get();
         
+        // echo '<pre>';
+        // var_export($transactions);
+        // echo '</pre>';
+
         $data = [
             'title' => 'MAC-AMS | General Ledger',
             'chartOfAccount' => $accounts,

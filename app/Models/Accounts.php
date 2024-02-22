@@ -738,7 +738,12 @@ class Accounts extends Model
                 ];
             }
 
-            $current_balance += ($value->journal_details_debit - $value->journal_details_credit);
+            if( isset($value->to_increase) && strtolower($value->to_increase) == 'debit' ) {
+                $current_balance += ($value->journal_details_debit - $value->journal_details_credit);
+            }else{
+                $current_balance += ($value->journal_details_credit - $value->journal_details_debit);
+            }
+
             $total_debit += $value->journal_details_debit;
             $total_credit += $value->journal_details_credit;
 
