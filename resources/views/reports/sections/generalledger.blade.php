@@ -47,10 +47,18 @@
 							<div class="form-group">
 								<label class="label-normal" for="book_ref">Account Name</label>
 								<div class="input-group">
-									<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="" value="{{request('account_id')}}" required>
+									
+									<select name="account_id" class="form-control form-control-sm" id="select-account" value="" required>
 										<!-- <option value="all" selected>-All-</option> -->
 										@foreach($chartOfAccount as $data)
-											<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
+
+											@if( request('account_id') == $data->account_id ) 
+												<option value="{{$data->account_id}}" Selected>{{$data->account_number}} - {{$data->account_name}}</option>
+											@else
+												<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
+											@endif
+
+											
 										@endforeach
 									</select>
 								</div>

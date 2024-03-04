@@ -21,6 +21,8 @@ use App\Models\Subsidiary;
 use App\Models\JournalBook;
 use App\Models\journalEntry;
 use App\Models\journalEntryDetails;
+use App\Models\Accounting;
+use Carbon\Carbon;
 
 class JournalController extends MainController
 {
@@ -128,18 +130,22 @@ class JournalController extends MainController
         );
     }
     public function journalEntryList(Request $request)
-    {
+    {   
+        $accounting = Accounting::getFiscalYear();
+        $current_date = Carbon::now();
+
         $data = [
             'title' => 'MAC-AMS | Journal Entry List',
             'journalBooks' => JournalBook::get(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
-            'journalEntryList' => JournalEntry::fetch(),
-            'chartOfAccount' => Accounts::get()
+            'journalEntryList' => JournalEntry::fetch('posted', $current_date->toDateString(), $current_date->toDateString()),
+            'chartOfAccount' => Accounts::get(),
+            'default_date_start' => $current_date->toDateString()
         ];
-/*         return response()->json(['data' => $data]); */
+        // return response()->json(['data' => $data]); 
 
         // echo '<pre>';
-        // var_export($data['journalEntryList']->toArray());
+        // var_export($current_date->toDateString());
         // echo '</pre>';
         return view('journal.sections.journalEntryList', $data);
     }

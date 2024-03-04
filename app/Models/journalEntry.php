@@ -48,11 +48,7 @@ class journalEntry extends Model
         return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id');
     }
 
-
-
-
-
-    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id='', $order = 'DESC', $journal_no = '')
+    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id='', $order = 'ASC', $journal_no = '')
     {
         if(!$branch_id) {
             $branch_id = session()->get('auth_user_branch');
@@ -78,7 +74,7 @@ class journalEntry extends Model
             $query->orderBy('journal_date', $order);
         }
 
-        return $query->limit(1000)->get();
+        return $query->get();
     }
 
     public function details()
