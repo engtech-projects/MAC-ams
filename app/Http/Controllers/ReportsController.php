@@ -97,9 +97,6 @@ class ReportsController extends MainController
             ];
         }
 
-
-
-
         $currentPage = $request->page ? $request->page : 1;
 
         /* ----- end journal ledger ----- */
@@ -294,7 +291,7 @@ class ReportsController extends MainController
         $account_id = !$request->account_id ? 3 : $request->account_id;
 
         $transactions = $glAccounts->ledger([$from, $to], $account_id);
-        $accounts = Accounts::where(['type' => 'L', 'status' => 'active'])->get();
+        $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
 
         $data = [
             'title' => 'MAC-AMS | General Ledger',

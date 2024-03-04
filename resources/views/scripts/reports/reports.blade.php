@@ -623,6 +623,11 @@
 		var generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
 		// var journalLedgerTbl = $('#journalLedgerTbl').dataTable(dtbleOption);
 
+        $('#select-account').select2({
+            placeholder: 'Account',
+            allowClear: true,
+        });
+
 		$('form').attr('autocomplete','off');
 
 		$(document).on('click','#printGeneralLedgerExcel',function(e){

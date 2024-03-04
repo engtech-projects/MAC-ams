@@ -122,7 +122,7 @@
                                             <label class="label-normal" for="s_from">From</label>
                                             <div class="input-group">
                                                 <input type="date" class="form-control form-control-sm rounded-0"
-                                                    name="s_from" id="s_from" placeholder="Book Reference" required>
+                                                    name="s_from" id="s_from" value="{{ $default_date_start }}" required>
                                             </div>
                                         </div>
                                     </div>
@@ -131,7 +131,7 @@
                                             <label class="label-normal" for="s_to">To</label>
                                             <div class="input-group">
                                                 <input disabled type="date" class="form-control form-control-sm rounded-0"
-                                                    name="s_to" id="s_to" placeholder="Book Reference" required>
+                                                    name="s_to" value="{{ $default_date_start }}" id="s_to" required>
                                             </div>
                                         </div>
                                     </div>
@@ -165,21 +165,21 @@
                             <div class="col-md-12">
                                 <table id="journalEntryDetails" class="table table-bordered">
                                     <thead>
-
-                                        <th>Book Code</th>
+                                        <th>Journal Date</th>
+                                        <!-- <th>Book Code</th> -->
                                         <th>Journal #</th>
                                         <th>Source</th>
                                         <th>Amount</th>
                                         <th>Remarks</th>
-                                        <th>Journal Date</th>
-                                        <th>Branch</th>
+                                        <!-- <th>Branch</th> -->
                                         <th>Status</th>
                                         <th width="150">Action</th>
                                     </thead>
                                     <tbody id="journalEntryDetailsContent">
                                         @foreach ($journalEntryList as $journal)
                                             <tr class="tbl-row" data-id="{{ $journal->journal_id }}">
-                                                <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('M d, Y') }}</td>
+                                                <!-- <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td> -->
                                                 <td class="font-weight-bold">{{ $journal->journal_no }}</td>
                                                 <td>{{ $journal->source }}</td>
                                                 <td class="journal-amount">{{ $journal->amount }}</td>
@@ -189,8 +189,7 @@
                                                         <li> {{ $remark }}</li>
                                                     @endforeach
                                                 </td>
-                                                <td>{{ $journal->journal_date }}</td>
-                                                <td class="font-weight-bold">{{ $journal->branch_id }}</td>
+                                                <!-- <td class="font-weight-bold">{{ $journal->branch_id }}</td> -->
                                                 <td
                                                     class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
                                                     <b>{{ ucfirst($journal->status) }}</b>
