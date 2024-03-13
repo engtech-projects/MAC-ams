@@ -698,7 +698,7 @@ class Accounts extends Model
                             'ac.account_category','ac.to_increase'
                         )
                         ->from('chart_of_accounts as coa')
-                        ->where(['je.status' => 'posted', 'coa.type' => 'L', 'coa.status' => 'active'])
+                        ->where(['je.status' => 'posted', 'coa.status' => 'active'])
                         ->whereBetween("je.journal_date", $range);
 
         if( $account_id ) {
