@@ -56,7 +56,7 @@ class ReportsController extends MainController
         $journal_no = $request->journal_no ? $request->journal_no : '';
 
         // $branch = Branch::find($branch_id);
-        $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'DESC', $journal_no);
+        $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no);
         $journal_ledger = [];
 
         foreach ($journal_entry as $entry) {
