@@ -115,7 +115,7 @@
 			@endif
 
 			@if(checkUserHasAccessModule('module','reports'))
-			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/journalledger') || request()->is('reports/subsidiary-ledger') || request()->is('reports/generalLedger') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
+			<li class="nav-item {{ (isset($nav) && $nav[0] == 'reports') ? 'menu-open' : '' }} {{ (request()->is('reports') || request()->is('reports/journalledger') || request()->is('reports/subsidiary-ledger') || request()->is('reports/generalLedger') || request()->is('reports/balance-sheet') || request()->is('reports/trialBalance') || request()->is('reports/incomeStatement') || request()->is('reports/cashTransactionBlotter')
 					|| request()->is('reports/bankReconcillation') || request()->is('reports/cashPosition') || request()->is('reports/cheque') || request()->is('reports/postDatedCheque')|| request()->is('reports/chartOfAccounts')) ? 'menu-open' : '' }}">
 			<a class="nav-link {{  (request()->is('reports/subsidiary-ledger')) ? 'active' : '' }}">
 				<i class="nav-icon fas fa-clipboard-list"></i>
@@ -159,6 +159,14 @@
 						<a href="{{ route('reports.generalLedger') }}" class="nav-link {{ (request()->is('reports/generalLedger')) ? 'active' : '' }}">
 							<i class="far fa-circle nav-icon"></i>
 							<p>General Ledger</p>
+						</a>
+					</li>
+					@endif
+					@if(checkUserHasAccessModule('sub-module','reports/balance-sheet'))
+					<li class="nav-item">
+						<a href="{{ route('reports.balancesheet') }}" class="nav-link {{ (request()->is('reports/balance-sheet')) ? 'active' : '' }}">
+							<i class="far fa-circle nav-icon"></i>
+							<p>Balance Sheet</p>
 						</a>
 					</li>
 					@endif

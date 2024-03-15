@@ -619,9 +619,19 @@
 			"filter": false,
 
 		}
+
+        // var dtbleOptionJL = {
+        //     dom: 'Bftrip',
+        //     "info": true,
+        //     "paging": true,
+        //     "ordering": false,
+        //     "filter": true,
+        //     "pageLength" : 60
+        // }
+
 		var subsidiaryTbl = $('#subsidiaryledgerTbl').dataTable(dtbleOption);
 		var generalLedger = $('#generalLedgerTbl').dataTable(dtbleOption);
-		// var journalLedgerTbl = $('#journalLedgerTbl').dataTable(dtbleOption);
+		// var journalLedgerTbl = $('#journalLedgerTbl').dataTable(dtbleOptionJL);
 
         $('#select-account').select2({
             placeholder: 'Account',
