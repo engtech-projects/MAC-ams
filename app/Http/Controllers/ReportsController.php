@@ -48,8 +48,10 @@ class ReportsController extends MainController
         /* ----- start journal ledger ----- */
 
         $accounting = Accounting::getFiscalYear();
-        $from = $request->from ? $request->from : $accounting->start_date;
-        $to = $request->to ? $request->to : $accounting->end_date;
+        $from = $request->from ? $request->from : $accounting->default_start;
+        $to = $request->to ? $request->to : $accounting->default_end;
+        // $from = $request->from ? $request->from : $accounting->start_date;
+        // $to = $request->to ? $request->to : $accounting->end_date;
         $branch_id = $request->branch_id ? $request->branch_id : '';
         $status = $request->status ? $request->status : null;
         $book_id = $request->book_id ? $request->book_id : '';
@@ -59,6 +61,7 @@ class ReportsController extends MainController
         $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no);
         $journal_ledger = [];
 
+        $page = [];
         foreach ($journal_entry as $entry) {
 
             $entries = [];
@@ -86,8 +89,17 @@ class ReportsController extends MainController
                 $entry->reference_name = $branch->branch_name;
             }
 
+            $entryDate = null;
+            $entryDate = Carbon::parse($entry->journal_date)->format('m/d/Y'); 
+
+            if( !in_array($entry->journal_date, $page) ) {
+                $page[] = $entry->journal_date; 
+            }
+            
+
             $journal_ledger[] = [
-                'date' => Carbon::parse($entry->journal_date)->format('m/d/Y'),
+                'date' => $entryDate,
+                'page' => (array_search($entry->journal_date, $page) + 1),
                 'reference' => $entry->journal_no,
                 'source' => $entry->source,
                 'reference_name' => $entry->reference_name,
@@ -97,20 +109,23 @@ class ReportsController extends MainController
             ];
         }
 
-        $currentPage = $request->page ? $request->page : 1;
+        // $currentPage = $request->page ? $request->page : 1;
 
         /* ----- end journal ledger ----- */
-        $paginated = $this->paginate($journal_ledger, $currentPage);
+        // $paginated = $this->paginate($journal_ledger, $currentPage);
+
+        // echo '<pre>';
+        // var_export($journal_ledger);
+        // echo '</pre>';
+
         $data = [
             'title' => 'MAC-AMS | Journal Ledger',
             'journalBooks' => JournalBook::getBookWithJournalCount(),
             'jLedger' => $journal_ledger,
-            'paginated' => $paginated,
+            // 'paginated' => $paginated,
+            'requests' => ['from' => $from, 'to' => $to],
             'paginationLinks' => $journal_entry
         ];
-
-        /* return response()->json($data); */
-
 
         return view('reports.sections.journalledger', $data);
     }
@@ -646,6 +661,33 @@ class ReportsController extends MainController
 
 
         return 'journal entry';
+
+    }
+
+    public function balanceSheet() {
+
+        $coa = new Accounts();
+        $accounting = Accounting::getFiscalYear();
+
+        $from = $accounting->start_date;
+        $to = $accounting->end_date;
+
+        // $transactions = $glAccounts->ledger([$from, $to], $account_id);
+        $balanceSheet = $coa->balanceSheet([$from, $to]);
+
+        // echo '<pre>';
+        // var_export($balanceSheet);
+        // echo '</pre>';
+
+        $data = [
+            'title' => 'MAC-AMS | Balance Sheet',
+            // 'chartOfAccount' => $accounts,
+            'requests' => ['from' => $from, 'to' => $to ],
+            'fiscalYear' => $accounting,
+            'balanceSheet' => $balanceSheet,
+        ];
+        
+        return view('reports.sections.balanceSheet', $data);
 
     }
 }
