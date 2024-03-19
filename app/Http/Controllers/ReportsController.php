@@ -672,19 +672,15 @@ class ReportsController extends MainController
         $from = $accounting->start_date;
         $to = $accounting->end_date;
 
-        // $transactions = $glAccounts->ledger([$from, $to], $account_id);
+        $now = Carbon::now();
         $balanceSheet = $coa->balanceSheet([$from, $to]);
-
-        // echo '<pre>';
-        // var_export($balanceSheet);
-        // echo '</pre>';
 
         $data = [
             'title' => 'MAC-AMS | Balance Sheet',
-            // 'chartOfAccount' => $accounts,
             'requests' => ['from' => $from, 'to' => $to ],
             'fiscalYear' => $accounting,
             'balanceSheet' => $balanceSheet,
+            'current_date' => $now->toDateString()
         ];
         
         return view('reports.sections.balanceSheet', $data);
