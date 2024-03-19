@@ -771,52 +771,90 @@ class Accounts extends Model
 
     public function balanceSheet($range = []) {
 
-        $accounts = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
-                        ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
-                        // ->join('subsidiary as sub', 'jed.subsidiary_id', '=', 'sub.sub_id')
-                        ->join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
-                        ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
-                        ->select(
-                            'ac.account_category', 'ac.account_category_id','ac.to_increase',
-                            'at.account_type', 'at.account_type_id',
-                            'coa.account_id', 'coa.account_number', 'coa.account_name', 'coa.type',
-                            DB::raw('SUM(jed.journal_details_debit) as debit'),
-                            DB::raw('SUM(jed.journal_details_credit) as credit'),
-                            DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
-                            // 'je.journal_date','je.journal_no',
-                            // 'jed.journal_details_debit','jed.journal_details_credit',
-                            // 'sub.sub_name',
-                            // 'ac.account_category','ac.to_increase'
-                        )
-                        ->from('chart_of_accounts as coa')
-                        ->where(['je.status' => 'posted', 'coa.status' => 'active'])
-                        ->whereIn('coa.type', ['L', 'R'])
-                        ->whereBetween("je.journal_date", $range)
-                        // ->orderBy('je.journal_date', 'ASC')
-                        // ->orderBy('ac.account_category', 'ASC')
-                        ->orderBy('coa.account_number', 'ASC')
-                        ->groupBy('coa.account_id')
-                        ->get();
+        $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
+        ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+        ->select(
+            'ac.account_category', 'ac.account_category_id','ac.to_increase',
+            'at.account_type', 'at.account_type_id',
+            'coa.account_id', 'coa.account_number', 'coa.account_name',
+        )
+        ->from('chart_of_accounts as coa')
+        ->where(['coa.status' => 'active'])
+        ->whereIn('coa.type', ['L', 'R'])
+        ->whereIn('at.account_category_id', [1,2,3])
+        ->orderBy('coa.account_number', 'ASC')
+        ->groupBy('coa.account_id')
+        ->get();
 
-        $sheet = [];
-
+        $sheet = [
+            'accounts' => [],
+            'total_asset' => []
+        ];
         foreach ($accounts as $account) {
+            
+            $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
+            ->select(
+                DB::raw('SUM(jed.journal_details_debit) as debit'),
+                DB::raw('SUM(jed.journal_details_credit) as credit'),
+                DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
+            )
+            ->from('journal_entry as je')
+            ->whereBetween("je.journal_date", $range)
+            ->where(['jed.account_id' => $account->account_id])
+            ->groupBy('jed.account_id')
+            ->limit(1)
+            ->first();
 
-            if ( !isset($sheet[$account->account_category]) ) {
-                   $sheet[$account->account_category] = [
-                    $account->account_type => []
+
+            if( $data ) {
+                $account->debit = $data['debit'];
+                $account->credit = $data['credit'];
+                $account->total = $data['total'];
+            }else{
+                $account->debit = 0;
+                $account->credit = 0;
+                $account->total = 0;
+            }
+
+            // ------------------------------------------------------------------------
+            if ( !isset($sheet['accounts'][$account->account_category]) ) {
+             
+                $sheet['accounts'][$account->account_category] = [
+                    'header' => [
+                        $account->account_type => [
+                            'total' => 0,
+                            'data' => []
+                        ]
+                    ],
+                    'total' => 0
                 ];
             }
 
-            $sheet[$account->account_category][$account->account_type][] = [
+            $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
+
+            $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][] = [
                 'account_number' => $account->account_number,
                 'account_name' => $account->account_name,
                 'debit' =>  $account->debit,
                 'credit' => $account->credit,
-                'total' => $account->total,
-                'type' => $account->type
+                'total' => ($account->total + $opening_balance),
             ];
+
+            if( isset($sheet['accounts'][$account->account_category]['header'][$account->account_type]['total']) ) {
+                $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] += ($account->total + $opening_balance);
+            }else{
+                $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] = 0;
+            }
+
+
+            $sheet['accounts'][$account->account_category]['total'] += ($account->total + $opening_balance);
+
         }
+
+        $sheet['total_asset'] = [
+            'title' => 'TOTAL LIABILITIES AND EQUITY',
+            'value' => ($sheet['accounts']['liabilities']['total'] + $sheet['accounts']['equity']['total'])
+        ];
 
         return $sheet;
     }
