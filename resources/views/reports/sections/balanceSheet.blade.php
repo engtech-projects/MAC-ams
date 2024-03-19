@@ -84,10 +84,7 @@
 						</tr>
 					@endforeach
 					<tr>
-						<td colspan="3">&nbsp;</td>
-					</tr>
-					<tr>
-						<td class="indent-2 text-right text-bold">Total {{ Str::title($category) }}</td>
+						<td class="text-bold">Total {{ Str::title($category) }}</td>
 						<td></td>
 						<td class="text-bold text-right">{{ number_format($type['total'], 2) }}</td>
 					</tr>
@@ -98,7 +95,7 @@
 				@endforeach
 				<thead>
 				<tr>
-					<th width="50%" class="text-right">{{ $balanceSheet['total_asset']['title'] }}</th>
+					<th width="50%">{{ $balanceSheet['total_asset']['title'] }}</th>
 					<th width="25%"></th>
 					<th width="25%" class="text-right">{{ number_format($balanceSheet['total_asset']['value'], 2) }}</th>
 				</tr>
