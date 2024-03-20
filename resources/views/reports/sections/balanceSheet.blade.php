@@ -58,30 +58,30 @@
 				</thead>
 				<tbody>
 					
-					@foreach($type['header'] as $group => $data)
+					@foreach($type['types'] as $group => $data)
 					<tr>
-						<td class="indent-1">{{ Str::title($group) }}</td>
+						<td class="indent-1">{{ Str::title($data['name']) }}</td>
 						<td></td>
 						<td></td>
 					</tr>
-						@foreach($data['data'] as $key => $value)
+						@foreach($data['accounts'] as $key => $value)
 						<tr>
 							<td class="indent-2">{{ Str::title($value['account_name']) }}</td>
 							<td class="text-right">{{ number_format($value['total'], 2) }}</td>
 							<td></td>
 						</tr>
 						@endforeach
-						<tr>
-							<td colspan="3">&nbsp;</td>
-						</tr>
-						<tr>
-							<td class="indent-1">Total {{ Str::title($group) }}</td>
-							<td></td>
-							<td class="text-bold text-right">{{ number_format($data['total'], 2) }}</td>
-						</tr>
-						<tr>
-							<td colspan="3">&nbsp;</td>
-						</tr>
+					<tr>
+						<td colspan="3">&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="indent-1">Total {{ Str::title($data['name']) }}</td>
+						<td></td>
+						<td class="text-bold text-right">{{ number_format($data['total'], 2) }}</td>
+					</tr>
+					<tr>
+						<td colspan="3">&nbsp;</td>
+					</tr>
 					@endforeach
 					<tr>
 						<td class="text-bold">Total {{ Str::title($category) }}</td>

@@ -788,7 +788,7 @@ class Accounts extends Model
 
         $sheet = [
             'accounts' => [],
-            'total_asset' => []
+            'total_asset' => 0
         ];
         foreach ($accounts as $account) {
             
@@ -817,43 +817,88 @@ class Accounts extends Model
             }
 
             // ------------------------------------------------------------------------
-            if ( !isset($sheet['accounts'][$account->account_category]) ) {
-             
+
+            if( !isset($sheet['accounts'][$account->account_category]) ) {
                 $sheet['accounts'][$account->account_category] = [
-                    'header' => [
-                        $account->account_type => [
-                            'total' => 0,
-                            'data' => []
-                        ]
-                    ],
-                    'total' => 0
+                    'total' => 0,
+                    'types' => []
                 ];
             }
 
-            $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
+            if ( !isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]) ) {
+                $sheet['accounts'][$account->account_category]['types'][$account->account_type_id] = [
+                    'total' => 0,
+                    'name' => $account->account_type,
+                    'accounts' => []
 
-            $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][] = [
+                ];
+                //  $sheet['accounts'][$account->account_category]['header'][$account->account_type] = [
+                //     'total' => 0,
+                //     'data' => []
+                // ];
+                // $sheet['accounts'][$account->account_category]['header'][$account->account_type] = [
+                //     'total' => 0,
+                //     'data' => []
+                // ];
+            }else{
+              // $sheet['accounts'][$account->account_category]['total'][] = $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'];
+            }          
+
+            $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
+            // $subtotal = 0;
+            $subtotal = ($account->total + $opening_balance);
+
+            // if( !isset($sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id]) ){
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
                 'account_number' => $account->account_number,
                 'account_name' => $account->account_name,
                 'debit' =>  $account->debit,
                 'credit' => $account->credit,
-                'total' => ($account->total + $opening_balance),
+                'opening_balance' => $opening_balance,
+                'total' => $subtotal,
+                'computed' => $subtotal
             ];
 
-            if( isset($sheet['accounts'][$account->account_category]['header'][$account->account_type]['total']) ) {
-                $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] += ($account->total + $opening_balance);
-            }else{
-                $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] = 0;
-            }
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
+
+            $sheet['accounts'][$account->account_category]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
+
+                // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id] = [
+                //     // 'account_number' => $account->account_number,
+                //     // 'account_name' => $account->account_name,
+                //     // 'debit' =>  $account->debit,
+                //     // 'credit' => $account->credit,
+                //     'total' => []
+                // ];
+            // }
+
+            // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id]['total'][]= $subtotal;
+            // [
+            //     // 'account_number' => $account->account_number,
+            //     // 'account_name' => $account->account_name,
+            //     // 'debit' =>  $account->debit,
+            //     // 'credit' => $account->credit,
+            //     'total' => $subtotal,  
+            // ];
+
+            // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] += $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id]['total'];
+             // return $sheet['accounts'][$account->account_category]['header'][$account->account_type];
+
+            // if( isset($sheet['accounts'][$account->account_category]['header'][$account->account_type]['total']) ) {
+            // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] += $subtotal;
+            // }else{
+                // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] = 0;
+            // }
 
 
-            $sheet['accounts'][$account->account_category]['total'] += ($account->total + $opening_balance);
+            // $sheet['accounts'][$account->account_category]['total'] += $subtotal;
 
         }
 
         $sheet['total_asset'] = [
             'title' => 'TOTAL LIABILITIES AND EQUITY',
             'value' => ($sheet['accounts']['liabilities']['total'] + $sheet['accounts']['equity']['total'])
+            // 'value' => 0
         ];
 
         return $sheet;
