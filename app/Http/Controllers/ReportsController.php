@@ -675,6 +675,10 @@ class ReportsController extends MainController
         $now = Carbon::now();
         $balanceSheet = $coa->balanceSheet([$from, $to]);
 
+        // echo '<pre>';
+        // var_export($balanceSheet);
+        // echo '</pre>';
+
         $data = [
             'title' => 'MAC-AMS | Balance Sheet',
             'requests' => ['from' => $from, 'to' => $to ],
