@@ -846,7 +846,13 @@ class Accounts extends Model
 
             $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
             // $subtotal = 0;
-            $subtotal = ($account->total + $opening_balance);
+
+            if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
+                $subtotal = ($account->total + $opening_balance);
+            }else{
+
+               $subtotal = abs($account->total + ($opening_balance) * -1); 
+            }
 
             // if( !isset($sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id]) ){
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
@@ -858,6 +864,8 @@ class Accounts extends Model
                 'total' => $subtotal,
                 'computed' => $subtotal
             ];
+
+
 
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
 
