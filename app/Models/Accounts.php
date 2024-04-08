@@ -656,7 +656,7 @@ class Accounts extends Model
                             DB::raw('COALESCE(SUM(jed.journal_details_credit)) AS total_credit')
                         )
                         ->from('chart_of_accounts as coa')
-                        ->where(['coa.type' => 'L', 'coa.account_id' => $account_id ])
+                        ->where(['coa.type' => 'L', 'coa.account_id' => $account_id, 'je.status' => 'posted' ])
                         ->whereBetween("je.journal_date", [$startDate->toDateString(), $endDate->toDateString()])
                         ->groupBy('coa.account_id','coa.account_number','coa.account_name')
                         ->first();
@@ -800,7 +800,7 @@ class Accounts extends Model
             )
             ->from('journal_entry as je')
             ->whereBetween("je.journal_date", $range)
-            ->where(['jed.account_id' => $account->account_id])
+            ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
             ->groupBy('jed.account_id')
             ->limit(1)
             ->first();
