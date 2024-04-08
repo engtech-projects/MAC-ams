@@ -78,6 +78,8 @@
                                                     <option value="" disabled selected>-All-</option>
                                                     <option value="1">Butuan City Branch</option>
                                                     <option value="2">Nasipit Branch</option>
+                                                    <option value="3">Gingoog Branch</option>
+                                                    <option value="4">Head Office</option>
                                                 </select>
                                             </div>
 
