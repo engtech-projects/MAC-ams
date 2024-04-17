@@ -85,10 +85,11 @@ class JournalController extends MainController
     public function JournalEntryDelete(Request $request)
     {
         $journal = JournalEntry::find($request->id);
-        if ($journal->delete()) {
-            return json_encode(['message' => 'delete']);
+        $journal->status = 'void';
+        if ($journal->save()) {
+            return response()->json(['message' => $journal->status]);
         }
-        return json_encode(['message' => 'error']);
+        return response()->json(['message' => 'error']);
     }
     public function JournalEntryEdit(Request $request)
     {

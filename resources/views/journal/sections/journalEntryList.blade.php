@@ -199,7 +199,7 @@
                                                 <td>
                                                     <button value="{{ $journal->journal_id }}"
                                                         {{ $journal->status == 'posted' ? 'disabled' : '' }}
-                                                        class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i
+                                                        class="btn btn-flat btn-xs bg-gradient-danger jnalVoid"><i
                                                             class="fa fa-trash"></i></button>
                                                     <button value="{{ $journal->journal_id }}"
                                                         class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i

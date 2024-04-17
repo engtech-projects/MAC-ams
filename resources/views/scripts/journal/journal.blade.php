@@ -459,32 +459,6 @@
                 alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
             }
         });
-        $(document).on('click', '.jnalDelete', function(e) {
-            e.preventDefault();
-            var id = $(this).attr('value');
-            if (confirm("Are You Sure want to delete this Journal Entry ?")) {
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    type: "POST",
-                    url: "{{ route('journal.JournalEntryDelete') }}",
-                    data: {
-                        id: id
-                    },
-                    dataType: "json",
-                    success: function(data) {
-                        if (data.message == 'delete') {
-                            toastr.success('Successfully Delete');
-                            reload();
-                        }
-                    },
-                    error: function() {
-                        toastr.error('Error');
-                    }
-                });
-            }
-        })
         $(document).on('click', '.JnalFetch', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
@@ -530,11 +504,47 @@
             var accnu = $(this).parent().siblings('.acctnu').first().find('.journal_details_account_no')
                 .text($('option:selected', this).attr('acct-num'));
         });
+        $(document).on('click', '.jnalVoid', function(e) {
+            e.preventDefault();
+            var id = $(this).attr('value');
+            var statusElement = $(this).closest('tr').find('b');
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var stStatusButton = $(this).closest('tr').find('.stStatus');
+
+            if (confirm("Are you sure you want to void this Journal Entry?")) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: "POST",
+                    url: "{{ route('journal.JournalEntryDelete') }}",
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.message == 'void') {
+                            toastr.success('Journal entry has been voided.');
+                            statusElement.html('<b>Void</b>');
+                            statusElement.removeClass('text-success').addClass('text-danger');
+                            voidButton.prop('disabled', true); // Disable the void button
+                            editButton.prop('disabled', false); // Disable the edit button
+                            stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success');
+                            stStatusButton.text('Post');
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Error');
+                    }
+                });
+            }
+        })
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
-            var statusElement = $(this).closest('tr').find('.nav-link');
-            var editButton = $('#editButton'); // Assuming the edit button has an ID of editButton
-            var deleteButton = $('#deleteButton'); // Assuming the delete button has an ID of deleteButton
+            var statusElement = $(this).closest('tr').find('b');
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
             var stStatusButton = $(this); // Store reference to the clicked button
 
             $.ajax({
@@ -551,20 +561,20 @@
                     console.log(data);
                     if (data.message == 'posted') {
                         toastr.success('Journal entry has been posted');
-                        statusElement.html('<b>posted</b>');
+                        statusElement.html('<b>Posted</b>');
                         statusElement.removeClass('text-danger').addClass('text-success');
                         stStatusButton.text('Unpost'); // Change the text content of the clicked button
                         stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
                         editButton.prop('disabled', true); // Disable the edit button
-                        deleteButton.prop('disabled', true); // Disable the delete button
+                        voidButton.prop('disabled', false); // Enable the delete button
                     } else if (data.message == 'unposted') {
                         toastr.success('Journal entry has been unposted');
-                        statusElement.html('<b>unposted</b>');
+                        statusElement.html('<b>Unposted</b>');
                         statusElement.removeClass('text-success').addClass('text-danger');
                         stStatusButton.text('Post'); // Change the text content of the clicked button
                         stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
                         editButton.prop('disabled', false); // Enable the edit button
-                        deleteButton.prop('disabled', false); // Enable the delete button
+                        voidButton.prop('disabled', false); // Enable the delete button
                     }
                 },
                 error: function(data) {
@@ -852,6 +862,7 @@
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
                         var disabled = (v.status == 'posted') ? 'disabled' : '';
+                        var voided = (v.status == 'void') ? 'disabled' : '';
                         var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' : 'bg-gradient-success';
                         var ifpost = (v.status == 'posted') ? 'Unpost' : 'Post';
 
@@ -864,11 +875,11 @@
 							<td>${v.source}</td>
 							<td>${v.amount}</td>
 							<td>${v.remarks}</td>
-							<td class="nav-link ${status}"><b>${v.status}</b></td>
+							<td class="${status}"><b>${v.status.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</b></td>
 							<td>
-                                <button id="deleteButton" value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete action-buttons">Delete</button>
+                                <button value="${v.journal_id}" ${voided} class="btn btn-flat btn-xs bg-gradient-danger jnalVoid action-buttons">Void</button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary action-buttons">View</button>
-                                <button id="editButton" value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
+                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>
 							</td>
 						</tr>`
