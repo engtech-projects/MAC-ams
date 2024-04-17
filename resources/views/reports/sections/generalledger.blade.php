@@ -129,7 +129,7 @@
                         		<tr id="journal">
                                  	<td>{{ $entry['journal_date'] }}</td>
                                     <td>{{ $entry['journal_no'] }}</td>
-                                    <td>{{ $entry['sub_name'] }}</td>
+                                    <td>{{ $entry['branch_name'] }}</td>
                                     <td>{{ $entry['source'] }}</td>
                                     <td>{{ $entry['cheque_date'] }}</td>
                                     <td>{{ $entry['cheque_no'] }}</td>
