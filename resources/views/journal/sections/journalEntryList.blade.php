@@ -168,7 +168,7 @@
                                 <table id="journalEntryDetails" class="table table-bordered">
                                     <thead>
                                         <th>Journal Date</th>
-                                        <!-- <th>Book Code</th> -->
+                                        <th>Book Code</th>
                                         <th>Journal #</th>
                                         <th>Source</th>
                                         <th>Amount</th>
@@ -181,7 +181,7 @@
                                         @foreach ($journalEntryList as $journal)
                                             <tr class="tbl-row" data-id="{{ $journal->journal_id }}">
                                                 <td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('M d, Y') }}</td>
-                                                <!-- <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td> -->
+                                                <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td>
                                                 <td class="font-weight-bold">{{ $journal->journal_no }}</td>
                                                 <td>{{ $journal->source }}</td>
                                                 <td class="journal-amount">{{ $journal->amount }}</td>

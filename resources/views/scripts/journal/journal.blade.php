@@ -2,6 +2,18 @@
     .editable-buttons {
         display: none !important;
     }
+    .action-buttons {
+        width: calc(50% - 10px); /* Adjust width and margins as needed */
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 8px;
+        margin: 4px 2px;
+    }
 </style>
 <script type="text/javascript">
     (function($) {
@@ -520,6 +532,11 @@
         });
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
+            var statusElement = $(this).closest('tr').find('.nav-link');
+            var editButton = $('#editButton'); // Assuming the edit button has an ID of editButton
+            var deleteButton = $('#deleteButton'); // Assuming the delete button has an ID of deleteButton
+            var stStatusButton = $(this); // Store reference to the clicked button
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -531,14 +548,27 @@
                 },
                 dataType: "json",
                 success: function(data) {
-                    console.log(data)
+                    console.log(data);
                     if (data.message == 'posted') {
-                        toastr.success('Successfully Update');
-                        reload();
+                        toastr.success('Journal entry has been posted');
+                        statusElement.html('<b>posted</b>');
+                        statusElement.removeClass('text-danger').addClass('text-success');
+                        stStatusButton.text('Unpost'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
+                        editButton.prop('disabled', true); // Disable the edit button
+                        deleteButton.prop('disabled', true); // Disable the delete button
+                    } else if (data.message == 'unposted') {
+                        toastr.success('Journal entry has been unposted');
+                        statusElement.html('<b>unposted</b>');
+                        statusElement.removeClass('text-success').addClass('text-danger');
+                        stStatusButton.text('Post'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
+                        editButton.prop('disabled', false); // Enable the edit button
+                        deleteButton.prop('disabled', false); // Enable the delete button
                     }
                 },
                 error: function(data) {
-                    toastr.error('Error');
+                    toastr.error('Error occurred');
                 }
             });
         });
@@ -822,22 +852,24 @@
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
                         var disabled = (v.status == 'posted') ? 'disabled' : '';
+                        var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' : 'bg-gradient-success';
+                        var ifpost = (v.status == 'posted') ? 'Unpost' : 'Post';
+
 
                         $('#journalEntryDetailsContent').append(
                             `<tr>
-							<td class="font-weight-bold">${v.book_details.book_code}</td>
+							<td class="font-weight-bold">${v.journal_date}</td>
+                            <td>${v.book_details.book_code}</td>
                             <td>${v.journal_no}</td>
 							<td>${v.source}</td>
 							<td>${v.amount}</td>
 							<td>${v.remarks}</td>
-							<td>${v.journal_date}</td>
-                            <td>${v.branch_id}</td>
 							<td class="nav-link ${status}"><b>${v.status}</b></td>
 							<td>
-                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
-                                <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
-                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i class="fa fa-edit"></i></button>
-                                <button value="${v.journal_id}" class="btn btn-flat btn-xs bg-gradient-success stStatus"><i class="fa fa-check"></i></button>
+                                <button id="deleteButton" value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete action-buttons">Delete</button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary action-buttons">View</button>
+                                <button id="editButton" value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>
 							</td>
 						</tr>`
                         );

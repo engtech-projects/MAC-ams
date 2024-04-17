@@ -111,11 +111,15 @@ class JournalController extends MainController
     public function JournalEntryPostUnpost(Request $request)
     {
         $journal = JournalEntry::find($request->journal_id);
-        $journal->status = 'posted';
+
+        // Toggle the status between 'posted' and 'unposted'
+        $journal->status = ($journal->status === 'posted') ? 'unposted' : 'posted';
+
         if ($journal->save()) {
-            return json_encode(['message' => $journal->status]);
+            return response()->json(['message' => $journal->status]);
         }
-        return json_encode(['message' => 'error']);
+        
+        return response()->json(['message' => 'error']);
     }
     public function searchJournalEntry(Request $request)
     {
