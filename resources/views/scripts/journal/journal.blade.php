@@ -768,7 +768,8 @@
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
                                     <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
-
+                            } else if (v.status == 'void') {
+                                content = ``
                             } else {
                                 content =
                                     `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
