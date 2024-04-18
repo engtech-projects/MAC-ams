@@ -57,7 +57,7 @@ class JournalController extends MainController
             'title' => 'MAC-AMS | Journal Entry',
             'journalBooks' => JournalBook::getBookWithJournalCount(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
-            'chartOfAccount' => Accounts::get()
+            'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get()
         ];
 
         return view('journal.sections.journalEntry', $data);
@@ -144,7 +144,7 @@ class JournalController extends MainController
             'journalBooks' => JournalBook::get(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
             'journalEntryList' => JournalEntry::fetch('posted', $current_date->toDateString(), $current_date->toDateString()),
-            'chartOfAccount' => Accounts::get(),
+            'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get(),
             'default_date_start' => $current_date->toDateString()
         ];
         // return response()->json(['data' => $data]); 

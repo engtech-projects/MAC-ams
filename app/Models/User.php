@@ -39,7 +39,7 @@ class User extends Authenticatable
 
     public function personal_info()
     {
-        return $this->hasOne(PersonalInfo::class, 'personal_info_id');
+        return $this->hasOne(PersonalInfo::class, 'personal_info_id', 'personal_info_id');
     }
 
     public function userRole()

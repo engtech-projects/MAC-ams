@@ -11,6 +11,7 @@ class DashboardController extends MainController
 
     public function index() {
     	
+    	
     	$title = 'MAC-AMS | Dashboard';
 
     	return view('dashboard.dashboard')->with(compact('title'));

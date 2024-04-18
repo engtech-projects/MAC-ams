@@ -100,7 +100,8 @@ class journalEntry extends Model
     {
         $requestEntry = $request["journal_entry"];
         $requestDetails = $request["details"];
-        $branchId = isset($request['branch_id']) ? $request["branch_id"] : session()->get('auth_user_branch');
+        $branchId = isset($requestEntry['branch_id']) ? $requestEntry["branch_id"] : session()->get('auth_user_branch');
+
         $journalEntry = self::create([
             'journal_no' => $requestEntry["journal_no"],
             'journal_date' => $requestEntry["journal_date"],
@@ -162,16 +163,17 @@ class journalEntry extends Model
             'pos_payment' => $this->mapCashBlotterEntries($entries, JournalBook::LOAN_PAYMENTS_BOOK, Accounts::CASH_IN_BANK_BDO_ACC, journalBook::BOOK_DEBIT, 'pos_payment'),
             'check_payment' => $this->mapCashBlotterEntries($entries, JournalBook::POS_PAYMENT_BOOK, Accounts::PAYABLE_CHECK_ACC, journalBook::BOOK_DEBIT, 'check_payment'),
             'pdc_deposit' => $this->mapCashBlotterEntries($entries, JournalBook::COLLECTION_DEPOSITS_BOOK, Accounts::PAYABLE_CHECK_ACC, journalBook::BOOK_CREDIT, 'pdc_deposit'),
-            'interbranch' => $this->getInterBranchEntries($transactionDate),
+            'interbranch' => $this->getInterBranchEntries($transactionDate, $branchId),
             'collections' => $collections
         ];
         return collect($collectionEntries);
     }
 
-    public function getInterBranchEntries($transactionDate)
+    public function getInterBranchEntries($transactionDate, $branchId)
     {
         $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
             ->whereDate('journal_date', '=', $transactionDate)
+            ->where(['branch_id' => $branchId])
             ->with('branch:branch_id,branch_name')
             ->whereIn('book_id', JournalBook::INTER_BRANCH_BOOKS)
             ->posted()

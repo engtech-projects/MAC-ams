@@ -397,6 +397,7 @@
         })
         $(document).on('submit', '#journalEntryForm', function(e) {
             e.preventDefault();
+
             var serialized = $(this).serializeArray();
             var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
             serialized.push({
@@ -435,6 +436,9 @@
                         "journal_entry": entry,
                         "details": details
                     });
+
+                    // console.log(data);
+
                     $.ajax({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -444,7 +448,7 @@
                         data: data,
                         dataType: "json",
                         success: function(data) {
-                            console.log(data)
+                            // console.log(data)
                             toastr.success(data.message);
                             reload();
                         },
@@ -1231,7 +1235,7 @@
             var form = $(this);
             var formData = form.serializeArray();
             var url = form.prop('action');
-
+            // console.log(formData);
             var posting = $.post(url, formData);
             posting.done(function(response) {
                 console.log(response);
