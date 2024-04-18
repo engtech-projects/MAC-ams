@@ -741,7 +741,7 @@
                                             </div>
                                         </div>
                                         <div class="table-responsive-sm" style="padding-top:5px;">
-                                            <table class="table table-striped" style="border-top:4px dashed black;">
+                                            <table class="table table-striped" style="margin-bottom:0; border-top:4px dashed black;">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Account</th>
@@ -755,6 +755,12 @@
 
                                                 </tbody>
                                             </table>
+                                        </div>
+                                        <div class="row" style="border-top: 10px solid gray;">
+                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Prepared By:</h6>
+                                            <p>______________________________________________________</p></div>
+                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Certified Correct By:</h6><p>______________________________________________________</p></div>
+                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Approved By:</h6><p>______________________________________________________</p></div>
                                         </div>
                                         <div class="row">
                                             <div class="col-lg-4 col-sm-5"></div>
@@ -774,6 +780,10 @@
 
                                                         </tbody>
                                                     </table> -->
+
+                                            </div>
+                                            <div class="col-lg-4 col-sm-5" style="text-align:right;">
+                                                <button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
                                             </div>
                                         </div>
                                     </div>
@@ -787,9 +797,23 @@
         </div>
 
         <!-- /.content -->
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '#printVoucher', function(e) {
+                var winPrint = window.open('', '',
+                    'left=0,top=0,width=800,height=600,toolbar=0,scrollbars=0,status=0');
+                winPrint.document.write($('#toPrintVouch').html());
+                winPrint.document.close();
+                winPrint.focus();
+                window.setTimeout(() => {
+                    winPrint.print();
+                    winPrint.close();
+                }, 500);
+            });
+        });
+    </script>
     @endsection
-
-
     @section('footer-scripts')
         @include('scripts.journal.journal')
     @endsection

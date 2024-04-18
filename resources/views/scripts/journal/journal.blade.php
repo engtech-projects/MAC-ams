@@ -110,13 +110,12 @@
 
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>`;
 
                             } else {
                                 content =
                                     `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
+										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
                             }
                             $('#posted-content').html(content);
                             $.each(v.journal_details, function(kk, vv) {
@@ -212,13 +211,12 @@
                             }
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>`;
 
                             } else {
                                 content =
                                     `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
+										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
                             }
                             $('#posted-content').html(content);
                             $.each(v.journal_entry_details, function(kk, vv) {
@@ -761,13 +759,12 @@
                                 'NO CHEQUE');
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>`;
 
                             } else {
                                 content =
                                     `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
+										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
                             }
                             $('#posted-content').html(content);
                             $.each(v.journal_entry_details, function(kk, vv) {
