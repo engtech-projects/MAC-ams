@@ -471,6 +471,7 @@ class ReportsController extends MainController
 
     public function showCashBlotter($id, Request $request)
     {
+ 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
         return response()->json([
