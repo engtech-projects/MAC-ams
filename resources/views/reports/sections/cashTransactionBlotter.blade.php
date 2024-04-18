@@ -359,7 +359,7 @@
                                 <td>@{{ d.transaction_date }}</td>
                                 <td>@{{ formatCurrency(d.total) }}</td>
                                 <td>
-                                    <button @click="showCashBlotter(d.collection_id,d.branch_name)"
+                                    <button @click="showCashBlotter(d.collection_id, d.branch_id)"
                                         class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye"
                                             data-toggle="modal" data-target="#cashBlotterPreviewModal"></i></button>
                                     <button class="mr-1 btn btn-xs btn-primary"><i
@@ -721,16 +721,17 @@
 
 
                 },
-                showCashBlotter: function(id, branch) {
+                showCashBlotter: function(id, branch_id) {
                     var url = "{{ route('reports.showCashBlotter', ['id' => 'cid']) }}".replace('cid', id);
                     axios.get(url, {
                             params: {
-                                branch_id: branch
+                                branch_id: branch_id
                             }
                         }) // Replace with your API endpoint
                         .then(response => {
-                            // this.responseData = response.data;
-                            // this.entries = response.data['entries'];
+                            // console.log(response);
+                            this.responseData = response.data;
+                            this.entries = response.data['entries'];
                             this.collections = response.data['entries']['collections'];
                             this.arrangeData(response.data['entries']);
                             this.collections.total_accountofficer = 0;
@@ -834,8 +835,8 @@
                                 rows.push(row);
                                 for (var k in entry) {
                                     var journal = entry[k];
-                                    totalCashIn += parseFloat(journal.details.cash_in);
-                                    totalCashOut += parseFloat(journal.details.cash_out);
+                                    totalCashIn += parseFloat(journal.details[0].cash_in);
+                                    totalCashOut += parseFloat(journal.details[0].cash_out);
                                     if (i == 'cash_received') {
                                         cashEndingBalance += parseFloat(journal.details[0].cash_in);
                                     } else if (i == 'cash_paid') {
@@ -864,8 +865,10 @@
                             }
                             //
 
+
                         }
                     }
+
                     return {
                         rows: rows,
                         total: {
