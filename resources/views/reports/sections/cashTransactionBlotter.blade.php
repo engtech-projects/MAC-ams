@@ -713,6 +713,7 @@
                     axios.post(url, data)
                         .then(response => {
                             this.data = response.data.data
+                            // console.log(this.data);
                             toastr.success(response.data.message);
                         }).catch(error => {
                             console.error(error);
@@ -877,7 +878,7 @@
             mounted() {
                 /*                 this.getBranchList(); */
                 this.data = @json($cash_blotter);
-                // console.log(this.data);
+                // console.log(this.data); 
             }
         });
     </script>
