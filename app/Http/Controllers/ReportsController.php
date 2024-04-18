@@ -379,7 +379,16 @@ class ReportsController extends MainController
 
     public function cashTransactionBlotter(Request $request)
     {
-        $transactionDate = $request["transaction_date"];
+
+        $now = Carbon::now();
+        // $accounting = Accounting::getFiscalYear();
+
+        // var_export($accounting);
+        // $from = $request->from ? $request->from : $accounting->default_start;
+        // $to = $request->to ? $request->to : $accounting->default_end;
+
+        $transactionDate = $request["transaction_date"] ? $request["transaction_date"] : $now->toDateString();
+        // var_export($transactionDate);
         $branchId = session()->get("auth_user_branch");
         $data = [
             'title' => 'MAC-AMS | Cashiers Transaction Blotter',
@@ -388,7 +397,6 @@ class ReportsController extends MainController
             'branches' => Branch::fetchBranch(),
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
-        /* return response()->json(['data' => CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate)]); */
         return view('reports.sections.cashTransactionBlotter', $data);
     }
 
