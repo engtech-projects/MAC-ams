@@ -110,7 +110,8 @@
 
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                        <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
 
                             } else {
                                 content =
@@ -211,7 +212,8 @@
                             }
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                    <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
 
                             } else {
                                 content =
@@ -708,6 +710,11 @@
         $(document).on('click', '.JnalView', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
+            var statusElement = $(this).closest('tr').find('b'); // Get reference to status element
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var stStatusButton = $(this).closest('tr').find('.stStatus');
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -759,7 +766,8 @@
                                 'NO CHEQUE');
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                    <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
 
                             } else {
                                 content =
@@ -815,6 +823,38 @@
                 },
                 error: function() {
                     console.log("Error");
+                }
+            });
+            $('#journalModalView').on('hidden.bs.modal', function (e) {
+                // Update status immediately after closing modal
+                if (statusElement) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: "POST",
+                        data: {
+                            journal_id: id
+                        },
+                        url: "{{ route('journal.JournalEntryFetch') }}",
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.message == 'fetch') {
+                                // Update status element in the main table
+                                if (response.data[0].status === 'posted') {
+                                    statusElement.html('<b>Posted</b>');
+                                    statusElement.removeClass('text-danger').addClass('text-success');
+                                    stStatusButton.text('Unpost'); // Change the text content of the clicked button
+                                    stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
+                                    editButton.prop('disabled', true); // Disable the edit button
+                                    voidButton.prop('disabled', false); // Enable the delete button
+                                }
+                            }
+                        },
+                        error: function() {
+                            console.log("Error");
+                        }
+                    });
                 }
             });
         })
