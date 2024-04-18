@@ -132,7 +132,7 @@
                                         <div class="form-group">
                                             <label class="label-normal" for="s_to">To</label>
                                             <div class="input-group">
-                                                <input disabled type="date" class="form-control form-control-sm rounded-0"
+                                                <input type="date" class="form-control form-control-sm rounded-0"
                                                     name="s_to" value="{{ $default_date_start }}" id="s_to" required>
                                             </div>
                                         </div>
@@ -168,12 +168,12 @@
                                 <table id="journalEntryDetails" class="table table-bordered">
                                     <thead>
                                         <th>Journal Date</th>
-                                        <!-- <th>Book Code</th> -->
+                                        <th>Book Code</th>
                                         <th>Journal #</th>
                                         <th>Source</th>
                                         <th>Amount</th>
                                         <th>Remarks</th>
-                                        <!-- <th>Branch</th> -->
+                                        <th>Branch</th>
                                         <th>Status</th>
                                         <th width="150">Action</th>
                                     </thead>

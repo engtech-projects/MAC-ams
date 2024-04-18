@@ -825,14 +825,14 @@
 
                         $('#journalEntryDetailsContent').append(
                             `<tr>
+                            <td>${v.journal_date}</td>
 							<td class="font-weight-bold">${v.book_details.book_code}</td>
                             <td>${v.journal_no}</td>
 							<td>${v.source}</td>
 							<td>${v.amount}</td>
 							<td>${v.remarks}</td>
-							<td>${v.journal_date}</td>
                             <td>${v.branch_id}</td>
-							<td class="nav-link ${status}"><b>${v.status}</b></td>
+							<td class="text-danger"><b>${v.status}</b></td>
 							<td>
                                 <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
@@ -1164,35 +1164,35 @@
             e.preventDefault();
             var form = $(this);
             var formData = form.serializeArray();
-            var accountName = $('select[name=account_id] option:selected').text();
-            var accountId = formData[0].value;
-            var debit = formData[1].value;
-            var credit = formData[2].value;
-            // var personId = formData[4].value;
-            var personName = $('select[name=person] option:selected').text();
-            var personType = $('select[name=person] option:selected').data('type');
-            var markup = `
-			<tr class="transaction-items">
-				<td></td>
-				<td>${accountName}</td>
-				<td class="text-right">${debit}</td>
-				<td class="text-right">${credit}</td>
-				<td>${personName}</td>
-				<td class="text-center"><i class="fa fa-trash-alt fa-xs text-muted remove-items" aria-hidden="true"></i></td>
-			</tr>
-			`;
-            $('#footer-row').before(markup);
+   //          var accountName = $('select[name=account_id] option:selected').text();
+   //          var accountId = formData[0].value;
+   //          var debit = formData[1].value;
+   //          var credit = formData[2].value;
+   //          // var personId = formData[4].value;
+   //          var personName = $('select[name=person] option:selected').text();
+   //          var personType = $('select[name=person] option:selected').data('type');
+   //          var markup = `
+			// <tr class="transaction-items">
+			// 	<td></td>
+			// 	<td>${accountName}</td>
+			// 	<td class="text-right">${debit}</td>
+			// 	<td class="text-right">${credit}</td>
+			// 	<td>${personName}</td>
+			// 	<td class="text-center"><i class="fa fa-trash-alt fa-xs text-muted remove-items" aria-hidden="true"></i></td>
+			// </tr>
+			// `;
+   //          $('#footer-row').before(markup);
         });
         $(document).on('submit', '#frm-create-journal', function(e) {
             e.preventDefault();
             var form = $(this);
             var formData = form.serializeArray();
             var url = form.prop('action');
-
-            var posting = $.post(url, formData);
-            posting.done(function(response) {
-                console.log(response);
-            });
+            console.log(formData);
+            // var posting = $.post(url, formData);
+            // posting.done(function(response) {
+            //     console.log(response);
+            // });
         });
         $(document).on('change', '#book_id', function() {
             $('#journal_no').val($(this).find(':selected').attr('_count'));
