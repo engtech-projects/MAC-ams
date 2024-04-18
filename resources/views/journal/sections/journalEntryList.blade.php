@@ -172,8 +172,10 @@
                                         <th>Journal #</th>
                                         <th>Source</th>
                                         <th>Amount</th>
-                                        <th>Remarks</th>
+                                        <th width="150">Remarks</th>
+                                        @if(Gate::allows('manager'))
                                         <th>Branch</th>
+                                        @endif
                                         <th>Status</th>
                                         <th width="150">Action</th>
                                     </thead>
@@ -191,7 +193,9 @@
                                                         <li> {{ $remark }}</li>
                                                     @endforeach
                                                 </td>
-                                                <!-- <td class="font-weight-bold">{{ $journal->branch_id }}</td> -->
+                                                @if(Gate::allows('manager'))
+                                                <td class="font-weight-bold">{{ $journal->branch_id }}</td>
+                                                @endif
                                                 <td
                                                     class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
                                                     <b>{{ ucfirst($journal->status) }}</b>

@@ -4,8 +4,6 @@
     }
     .action-buttons {
         width: calc(50% - 10px); /* Adjust width and margins as needed */
-        padding: 10px;
-        border: none;
         border-radius: 5px;
         color: white;
         text-align: center;
@@ -870,7 +868,11 @@
                         var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' : 'bg-gradient-success';
                         var ifpost = (v.status == 'posted') ? 'Unpost' : 'Post';
 
-
+                        var branchColumn = '';
+                        @if(Gate::allows('manager'))
+                            branchColumn = `<td>${v.branch_id}</td>`;
+                        @endif
+                
                         $('#journalEntryDetailsContent').append(
                             `<tr>
 							<td class="font-weight-bold">${v.journal_date}</td>
@@ -879,6 +881,7 @@
 							<td>${v.source}</td>
 							<td>${v.amount}</td>
 							<td>${v.remarks}</td>
+                            ${branchColumn}
 							<td class="${status}"><b>${v.status.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</b></td>
 							<td>
                                 <button value="${v.journal_id}" ${voided} class="btn btn-flat btn-xs bg-gradient-danger jnalVoid action-buttons">Void</button>
