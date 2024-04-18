@@ -878,7 +878,7 @@
             mounted() {
                 /*                 this.getBranchList(); */
                 this.data = @json($cash_blotter);
-                // console.log(this.data);
+                // console.log(this.data); 
             }
         });
     </script>
