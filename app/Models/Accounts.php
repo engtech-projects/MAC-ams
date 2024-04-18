@@ -688,6 +688,7 @@ class Accounts extends Model
                         ->join('subsidiary as sub', 'jed.subsidiary_id', '=', 'sub.sub_id')
                         ->join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
                         ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+                        ->join('branch as br', 'br.branch_id', '=', 'je.branch_id')
                         ->select(
                             'ac.account_category','ac.to_increase',
                             'at.account_type',
@@ -695,7 +696,8 @@ class Accounts extends Model
                             'je.journal_date','je.journal_no','je.source', 'je.cheque_no','je.cheque_date', 'je.payee', 'je.remarks',
                             'jed.journal_details_debit','jed.journal_details_credit',
                             'sub.sub_name',
-                            'ac.account_category','ac.to_increase'
+                            'ac.account_category','ac.to_increase',
+                            'br.branch_name'
                         )
                         ->from('chart_of_accounts as coa')
                         ->where(['je.status' => 'posted', 'coa.status' => 'active'])
@@ -729,6 +731,7 @@ class Accounts extends Model
                     'account_type' => $value->account_type,
                     'account_number' => $value->account_number,
                     'account_name' => $value->account_name,
+                    'branch_name' => $value->branch_name,
                     'balance' => number_format($balance, 2),
                     'current_balance' => 0,
                     'total_debit' => 0,
@@ -752,6 +755,7 @@ class Accounts extends Model
             $ledger[$value->account_id]['total_credit'] = number_format($total_credit, 2);
 
             $ledger[$value->account_id]['entries'][] = [
+                'branch_name' => $value->branch_name,
                 'sub_name' => $value->sub_name,
                 'journal_date' => Carbon::parse($value->journal_date)->format('m/d/y'),
                 'journal_no' => $value->journal_no,
