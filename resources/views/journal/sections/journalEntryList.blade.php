@@ -112,6 +112,7 @@
                                                     <option value="" selected>-All-</option>
                                                     <option value="unposted">Unposted</option>
                                                     <option value="posted">Posted</option>
+                                                    <option value="void">Void</option>
                                                 </select>
                                             </div>
                                         </div>

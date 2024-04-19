@@ -908,7 +908,7 @@
 
                         var branchColumn = '';
                         @if(Gate::allows('manager'))
-                            branchColumn = `<td>${v.branch_id}</td>`;
+                            branchColumn = `<td>${v.branch_name}</td>`;
                         @endif
                 
                         $('#journalEntryDetailsContent').append(

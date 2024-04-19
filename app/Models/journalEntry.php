@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 
 class journalEntry extends Model
 {
@@ -49,10 +50,11 @@ class journalEntry extends Model
     }
 
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id='', $order = 'ASC', $journal_no = '')
-    {
-        if(!$branch_id) {
+    {   
+        if (!$branch_id && !Gate::allows('manager')) {
             $branch_id = session()->get('auth_user_branch');
-        }
+        } 
+
         $query = journalEntry::with(['journalDetails', 'bookDetails']);
         // $query = journalEntry::with(['bookDetails']);
         if ($status != '') {
