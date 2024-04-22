@@ -2,6 +2,16 @@
     .editable-buttons {
         display: none !important;
     }
+    .action-buttons {
+        width: calc(50% - 10px); /* Adjust width and margins as needed */
+        border-radius: 5px;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 8px;
+        margin: 4px 2px;
+    }
 </style>
 <script type="text/javascript">
     (function($) {
@@ -100,13 +110,13 @@
 
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                        <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
 
                             } else {
                                 content =
                                     `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
+										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
                             }
                             $('#posted-content').html(content);
                             $.each(v.journal_details, function(kk, vv) {
@@ -202,13 +212,13 @@
                             }
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                    <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
 
                             } else {
                                 content =
                                     `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
+										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
                             }
                             $('#posted-content').html(content);
                             $.each(v.journal_entry_details, function(kk, vv) {
@@ -451,32 +461,6 @@
                 alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
             }
         });
-        $(document).on('click', '.jnalDelete', function(e) {
-            e.preventDefault();
-            var id = $(this).attr('value');
-            if (confirm("Are You Sure want to delete this Journal Entry ?")) {
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    type: "POST",
-                    url: "{{ route('journal.JournalEntryDelete') }}",
-                    data: {
-                        id: id
-                    },
-                    dataType: "json",
-                    success: function(data) {
-                        if (data.message == 'delete') {
-                            toastr.success('Successfully Delete');
-                            reload();
-                        }
-                    },
-                    error: function() {
-                        toastr.error('Error');
-                    }
-                });
-            }
-        })
         $(document).on('click', '.JnalFetch', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
@@ -522,8 +506,49 @@
             var accnu = $(this).parent().siblings('.acctnu').first().find('.journal_details_account_no')
                 .text($('option:selected', this).attr('acct-num'));
         });
+        $(document).on('click', '.jnalVoid', function(e) {
+            e.preventDefault();
+            var id = $(this).attr('value');
+            var statusElement = $(this).closest('tr').find('b');
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var stStatusButton = $(this).closest('tr').find('.stStatus');
+
+            if (confirm("Are you sure you want to void this Journal Entry?")) {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: "POST",
+                    url: "{{ route('journal.JournalEntryDelete') }}",
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.message == 'void') {
+                            toastr.success('Journal entry has been voided.');
+                            statusElement.html('<b>Void</b>');
+                            statusElement.removeClass('text-success').addClass('text-danger');
+                            voidButton.prop('disabled', true); // Disable the void button
+                            editButton.prop('disabled', false); // Disable the edit button
+                            stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success');
+                            stStatusButton.text('Post');
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Error');
+                    }
+                });
+            }
+        })
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
+            var statusElement = $(this).closest('tr').find('b');
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var stStatusButton = $(this); // Store reference to the clicked button
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -535,14 +560,27 @@
                 },
                 dataType: "json",
                 success: function(data) {
-                    console.log(data)
+                    console.log(data);
                     if (data.message == 'posted') {
-                        toastr.success('Successfully Update');
-                        reload();
+                        toastr.success('Journal entry has been posted');
+                        statusElement.html('<b>Posted</b>');
+                        statusElement.removeClass('text-danger').addClass('text-success');
+                        stStatusButton.text('Unpost'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
+                        editButton.prop('disabled', true); // Disable the edit button
+                        voidButton.prop('disabled', false); // Enable the delete button
+                    } else if (data.message == 'unposted') {
+                        toastr.success('Journal entry has been unposted');
+                        statusElement.html('<b>Unposted</b>');
+                        statusElement.removeClass('text-success').addClass('text-danger');
+                        stStatusButton.text('Post'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
+                        editButton.prop('disabled', false); // Enable the edit button
+                        voidButton.prop('disabled', false); // Enable the delete button
                     }
                 },
                 error: function(data) {
-                    toastr.error('Error');
+                    toastr.error('Error occurred');
                 }
             });
         });
@@ -672,6 +710,11 @@
         $(document).on('click', '.JnalView', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
+            var statusElement = $(this).closest('tr').find('b'); // Get reference to status element
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var stStatusButton = $(this).closest('tr').find('.stStatus');
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -723,13 +766,14 @@
                                 'NO CHEQUE');
                             if (v.status == 'unposted') {
                                 content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Posted</button>`;
-
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                    <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
+                            } else if (v.status == 'void') {
+                                content = ``
                             } else {
                                 content =
                                     `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
+										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
                             }
                             $('#posted-content').html(content);
                             $.each(v.journal_entry_details, function(kk, vv) {
@@ -782,6 +826,38 @@
                     console.log("Error");
                 }
             });
+            $('#journalModalView').on('hidden.bs.modal', function (e) {
+                // Update status immediately after closing modal
+                if (statusElement) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: "POST",
+                        data: {
+                            journal_id: id
+                        },
+                        url: "{{ route('journal.JournalEntryFetch') }}",
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.message == 'fetch') {
+                                // Update status element in the main table
+                                if (response.data[0].status === 'posted') {
+                                    statusElement.html('<b>Posted</b>');
+                                    statusElement.removeClass('text-danger').addClass('text-success');
+                                    stStatusButton.text('Unpost'); // Change the text content of the clicked button
+                                    stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
+                                    editButton.prop('disabled', true); // Disable the edit button
+                                    voidButton.prop('disabled', false); // Enable the delete button
+                                }
+                            }
+                        },
+                        error: function() {
+                            console.log("Error");
+                        }
+                    });
+                }
+            });
         })
         $(document).on('click', '.JnalView', function(e) {
             e.preventDefault();
@@ -826,22 +902,30 @@
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
                         var disabled = (v.status == 'posted') ? 'disabled' : '';
+                        var voided = (v.status == 'void') ? 'disabled' : '';
+                        var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' : 'bg-gradient-success';
+                        var ifpost = (v.status == 'posted') ? 'Unpost' : 'Post';
 
+                        var branchColumn = '';
+                        @if(Gate::allows('manager'))
+                            branchColumn = `<td>${v.branch_name}</td>`;
+                        @endif
+                
                         $('#journalEntryDetailsContent').append(
                             `<tr>
-                            <td>${v.journal_date}</td>
-							<td class="font-weight-bold">${v.book_details.book_code}</td>
+							<td class="font-weight-bold">${v.journal_date}</td>
+                            <td>${v.book_details.book_code}</td>
                             <td>${v.journal_no}</td>
 							<td>${v.source}</td>
 							<td>${v.amount}</td>
 							<td>${v.remarks}</td>
-                            <td>${v.branch_id}</td>
-							<td class="text-danger"><b>${v.status}</b></td>
+                            ${branchColumn}
+							<td class="${status}"><b>${v.status.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</b></td>
 							<td>
-                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
-                                <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
-                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i class="fa fa-edit"></i></button>
-                                <button value="${v.journal_id}" class="btn btn-flat btn-xs bg-gradient-success stStatus"><i class="fa fa-check"></i></button>
+                                <button value="${v.journal_id}" ${voided} class="btn btn-flat btn-xs bg-gradient-danger jnalVoid action-buttons">Void</button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary action-buttons">View</button>
+                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
+                                <button value="${v.journal_id}" class="btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>
 							</td>
 						</tr>`
                         );

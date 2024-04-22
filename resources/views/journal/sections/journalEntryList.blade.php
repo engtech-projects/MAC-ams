@@ -112,6 +112,7 @@
                                                     <option value="" selected>-All-</option>
                                                     <option value="unposted">Unposted</option>
                                                     <option value="posted">Posted</option>
+                                                    <option value="void">Void</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -172,8 +173,10 @@
                                         <th>Journal #</th>
                                         <th>Source</th>
                                         <th>Amount</th>
-                                        <th>Remarks</th>
+                                        <th width="150">Remarks</th>
+                                        @if(Gate::allows('manager'))
                                         <th>Branch</th>
+                                        @endif
                                         <th>Status</th>
                                         <th width="150">Action</th>
                                     </thead>
@@ -181,7 +184,7 @@
                                         @foreach ($journalEntryList as $journal)
                                             <tr class="tbl-row" data-id="{{ $journal->journal_id }}">
                                                 <td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('M d, Y') }}</td>
-                                                <!-- <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td> -->
+                                                <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td>
                                                 <td class="font-weight-bold">{{ $journal->journal_no }}</td>
                                                 <td>{{ $journal->source }}</td>
                                                 <td class="journal-amount">{{ $journal->amount }}</td>
@@ -191,7 +194,9 @@
                                                         <li> {{ $remark }}</li>
                                                     @endforeach
                                                 </td>
-                                                <!-- <td class="font-weight-bold">{{ $journal->branch_id }}</td> -->
+                                                @if(Gate::allows('manager'))
+                                                <td class="font-weight-bold">{{ $journal->branch_id }}</td>
+                                                @endif
                                                 <td
                                                     class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
                                                     <b>{{ ucfirst($journal->status) }}</b>
@@ -199,7 +204,7 @@
                                                 <td>
                                                     <button value="{{ $journal->journal_id }}"
                                                         {{ $journal->status == 'posted' ? 'disabled' : '' }}
-                                                        class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i
+                                                        class="btn btn-flat btn-xs bg-gradient-danger jnalVoid"><i
                                                             class="fa fa-trash"></i></button>
                                                     <button value="{{ $journal->journal_id }}"
                                                         class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i
@@ -737,7 +742,7 @@
                                             </div>
                                         </div>
                                         <div class="table-responsive-sm" style="padding-top:5px;">
-                                            <table class="table table-striped" style="border-top:4px dashed black;">
+                                            <table class="table table-striped" style="margin-bottom:0; border-top:4px dashed black;">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Account</th>
@@ -751,6 +756,12 @@
 
                                                 </tbody>
                                             </table>
+                                        </div>
+                                        <div class="row" style="border-top: 10px solid gray;">
+                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Prepared By:</h6>
+                                            <p>______________________________________________________</p></div>
+                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Certified Correct By:</h6><p>______________________________________________________</p></div>
+                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Approved By:</h6><p>______________________________________________________</p></div>
                                         </div>
                                         <div class="row">
                                             <div class="col-lg-4 col-sm-5"></div>
@@ -770,6 +781,10 @@
 
                                                         </tbody>
                                                     </table> -->
+
+                                            </div>
+                                            <div class="col-lg-4 col-sm-5" style="text-align:right;">
+                                                <button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
                                             </div>
                                         </div>
                                     </div>
@@ -783,9 +798,23 @@
         </div>
 
         <!-- /.content -->
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '#printVoucher', function(e) {
+                var winPrint = window.open('', '',
+                    'left=0,top=0,width=800,height=600,toolbar=0,scrollbars=0,status=0');
+                winPrint.document.write($('#toPrintVouch').html());
+                winPrint.document.close();
+                winPrint.focus();
+                window.setTimeout(() => {
+                    winPrint.print();
+                    winPrint.close();
+                }, 500);
+            });
+        });
+    </script>
     @endsection
-
-
     @section('footer-scripts')
         @include('scripts.journal.journal')
     @endsection

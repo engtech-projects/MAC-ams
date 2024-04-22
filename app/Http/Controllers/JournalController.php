@@ -85,10 +85,11 @@ class JournalController extends MainController
     public function JournalEntryDelete(Request $request)
     {
         $journal = JournalEntry::find($request->id);
-        if ($journal->delete()) {
-            return json_encode(['message' => 'delete']);
+        $journal->status = 'void';
+        if ($journal->save()) {
+            return response()->json(['message' => $journal->status]);
         }
-        return json_encode(['message' => 'error']);
+        return response()->json(['message' => 'error']);
     }
     public function JournalEntryEdit(Request $request)
     {
@@ -111,23 +112,34 @@ class JournalController extends MainController
     public function JournalEntryPostUnpost(Request $request)
     {
         $journal = JournalEntry::find($request->journal_id);
-        $journal->status = 'posted';
+
+        // Toggle the status between 'posted' and 'unposted'
+        $journal->status = ($journal->status === 'posted') ? 'unposted' : 'posted';
+
         if ($journal->save()) {
-            return json_encode(['message' => $journal->status]);
+            return response()->json(['message' => $journal->status]);
         }
-        return json_encode(['message' => 'error']);
+        
+        return response()->json(['message' => 'error']);
     }
     public function searchJournalEntry(Request $request)
-    {
-        return json_encode(
-            JournalEntry::fetch(
-                $request->s_status,
-                $request->s_from,
-                $request->s_to,
-                $request->s_book_id,
-                $request->s_branch_id
-            )
+    {   
+        // Fetch journal entries
+        $journalEntries = JournalEntry::fetch(
+            $request->s_status,
+            $request->s_from,
+            $request->s_to,
+            $request->s_book_id,
+            $request->s_branch_id
         );
+
+        // Append branch name to each journal entry
+        foreach ($journalEntries as $entry) {
+            $entry->branch_name = $entry->branch->branch_name;
+        }
+
+        // Return JSON response with journal entries including branch name
+        return response()->json($journalEntries);
     }
     public function journalEntryList(Request $request)
     {   
