@@ -485,8 +485,8 @@ class SubModuleSeeder extends Seeder
             [
                 "sml_id" => "269",
                 "al_id" => "9",
-                "route" => "journal/JournalEntryDelete",
-                "description" => "Journal Entry Delete",
+                "route" => "journal/JournalEntryCancel",
+                "description" => "Journal Entry Cancel",
             ],
             [
                 "sml_id" => "270",

@@ -104,7 +104,7 @@
                             console.log(v.remarks)
                             $.each(v.remarks.split('::'), function(k, vv) {
                                 $('#vjournal_remarks').append(
-                                    `<li>${vv}</li>`
+                                    `<p>${vv}</p>`
                                 );
                             });
 
@@ -206,7 +206,7 @@
                             if (v.remarks) {
                                 $.each(v.remarks.split('::'), function(k, vv) {
                                     $('#vjournal_remarks').append(
-                                        `<li>${vv}</li>`
+                                        `<p>${vv}</p>`
                                     );
                                 });
                             }
@@ -506,31 +506,31 @@
             var accnu = $(this).parent().siblings('.acctnu').first().find('.journal_details_account_no')
                 .text($('option:selected', this).attr('acct-num'));
         });
-        $(document).on('click', '.jnalVoid', function(e) {
+        $(document).on('click', '.jnalCancel', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
             var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
 
-            if (confirm("Are you sure you want to void this Journal Entry?")) {
+            if (confirm("Are you sure you want to cancel this Journal Entry?")) {
                 $.ajax({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     type: "POST",
-                    url: "{{ route('journal.JournalEntryDelete') }}",
+                    url: "{{ route('journal.JournalEntryCancel') }}",
                     data: {
                         id: id
                     },
                     dataType: "json",
                     success: function(data) {
-                        if (data.message == 'void') {
-                            toastr.success('Journal entry has been voided.');
-                            statusElement.html('<b>Void</b>');
+                        if (data.message == 'cancelled') {
+                            toastr.success('Journal entry has been cancelled.');
+                            statusElement.html('<b>Cancelled</b>');
                             statusElement.removeClass('text-success').addClass('text-danger');
-                            voidButton.prop('disabled', true); // Disable the void button
+                            cancelButton.prop('disabled', true); // Disable the cancel button
                             editButton.prop('disabled', false); // Disable the edit button
                             stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success');
                             stStatusButton.text('Post');
@@ -546,7 +546,7 @@
             var journal_id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
             var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this); // Store reference to the clicked button
 
             $.ajax({
@@ -568,7 +568,7 @@
                         stStatusButton.text('Unpost'); // Change the text content of the clicked button
                         stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
                         editButton.prop('disabled', true); // Disable the edit button
-                        voidButton.prop('disabled', false); // Enable the delete button
+                        cancelButton.prop('disabled', false); // Enable the cancel button
                     } else if (data.message == 'unposted') {
                         toastr.success('Journal entry has been unposted');
                         statusElement.html('<b>Unposted</b>');
@@ -576,7 +576,7 @@
                         stStatusButton.text('Post'); // Change the text content of the clicked button
                         stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
                         editButton.prop('disabled', false); // Enable the edit button
-                        voidButton.prop('disabled', false); // Enable the delete button
+                        cancelButton.prop('disabled', false); // Enable the cancel button
                     }
                 },
                 error: function(data) {
@@ -712,7 +712,7 @@
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b'); // Get reference to status element
             var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var voidButton = $(this).closest('tr').find('.jnalVoid'); // Find the void button within the same row
+            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
 
             $.ajax({
@@ -754,11 +754,11 @@
                             if(v.remarks) {
                                 $.each(v.remarks.split('::'), function(k, vv) {
                                     $('#vjournal_remarks').append(
-                                        `<li>${vv}</li>`
+                                        `<p>${vv}</p>`
                                     );
                                 });
                             }
-                            $('#voucher_particular').text(v.remarks);
+                            $('#voucher_particular').html(v.remarks ? v.remarks.replace(/::/g, '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;') : '');
                             $('#vjournal_branch, #voucher_branch').text(v.branch
                                 .branch_name);
                             $('#vjournal_cheque_date').text((v.cheque_date) ?
@@ -768,7 +768,7 @@
                                 content =
                                     `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
                                     <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
-                            } else if (v.status == 'void') {
+                            } else if (v.status == 'cancelled') {
                                 content = ``
                             } else {
                                 content =
@@ -848,7 +848,7 @@
                                     stStatusButton.text('Unpost'); // Change the text content of the clicked button
                                     stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
                                     editButton.prop('disabled', true); // Disable the edit button
-                                    voidButton.prop('disabled', false); // Enable the delete button
+                                    cancelButton.prop('disabled', false); // Enable the cancel button
                                 }
                             }
                         },
@@ -902,7 +902,7 @@
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
                         var disabled = (v.status == 'posted') ? 'disabled' : '';
-                        var voided = (v.status == 'void') ? 'disabled' : '';
+                        var cancelled = (v.status == 'cancelled') ? 'disabled' : '';
                         var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' : 'bg-gradient-success';
                         var ifpost = (v.status == 'posted') ? 'Unpost' : 'Post';
 
@@ -910,7 +910,9 @@
                         @if(Gate::allows('manager'))
                             branchColumn = `<td>${v.branch_name}</td>`;
                         @endif
-                
+                        
+                        var remarks = v.remarks.replace(/::/g, '<br>');
+
                         $('#journalEntryDetailsContent').append(
                             `<tr>
 							<td class="font-weight-bold">${v.journal_date}</td>
@@ -918,20 +920,17 @@
                             <td>${v.journal_no}</td>
 							<td>${v.source}</td>
 							<td>${v.amount}</td>
-							<td>${v.remarks}</td>
+							<td>${remarks}</td>
                             ${branchColumn}
 							<td class="${status}"><b>${v.status.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</b></td>
 							<td>
-                                <button value="${v.journal_id}" ${voided} class="btn btn-flat btn-xs bg-gradient-danger jnalVoid action-buttons">Void</button>
+                                <button value="${v.journal_id}" ${cancelled} class="btn btn-flat btn-xs bg-gradient-danger jnalCancel action-buttons">Cancel</button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary action-buttons">View</button>
                                 <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>
 							</td>
 						</tr>`
                         );
-
-
-
                     });
                     $('#journalEntryDetails').DataTable();
                 },
@@ -1107,7 +1106,7 @@
             $('#journal_voucher_date').text(moment($('#journal_date')).format('MMMM D, YYYY'));
             $('#journal_voucher_ref_no').text($('#LrefNo').html())
             $('#journal_voucher_source').text($('#source').val())
-            $('#journal_voucher_particular').text($('#remarks').val())
+            $('#journal_voucher_particular').html($('#remarks').val().replace(/::/g, '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'));
             // $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
             $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
 

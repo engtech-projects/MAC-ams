@@ -82,10 +82,10 @@ class JournalController extends MainController
 
         //return json_encode(['message' => 'fetch', 'data' => JournalEntry::with(['bookDetails', 'journalEntryDetails'])->where('journal_id', $request->journal_id)->get()]);
     }
-    public function JournalEntryDelete(Request $request)
+    public function JournalEntryCancel(Request $request)
     {
         $journal = JournalEntry::find($request->id);
-        $journal->status = 'void';
+        $journal->status = 'cancelled';
         if ($journal->save()) {
             return response()->json(['message' => $journal->status]);
         }

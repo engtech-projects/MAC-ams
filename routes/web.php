@@ -199,7 +199,7 @@ Route::post('user/profile/password/update', [UserProfileController::class, 'upda
 // JOURNAL ENTRY REQUESTS
 Route::post('journal/saveJournalEntryDetails', [JournalController::class, 'saveJournalEntryDetails'])->name('journal.saveJournalEntryDetails');
 Route::post('journal/JournalEntryFetch', [JournalController::class, 'JournalEntryFetch'])->name('journal.JournalEntryFetch');
-Route::post('journal/JournalEntryDelete', [JournalController::class, 'JournalEntryDelete'])->name('journal.JournalEntryDelete');
+Route::post('journal/JournalEntryCancel', [JournalController::class, 'JournalEntryCancel'])->name('journal.JournalEntryCancel');
 Route::post('journal/JournalEntryEdit', [JournalController::class, 'JournalEntryEdit'])->name('journal.JournalEntryEdit');
 Route::post('journal/JournalEntryPostUnpost', [JournalController::class, 'JournalEntryPostUnpost'])->name('journal.JournalEntryPostUnpost');
 Route::get('journal/searchJournalEntry', [JournalController::class, 'searchJournalEntry'])->name('journal.searchJournalEntry');
