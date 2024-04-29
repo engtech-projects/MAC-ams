@@ -235,6 +235,6 @@ class AccountsController extends MainController
     public function setStatus(Request $request) {
         $account = new Accounts();
         return $account->setStatus($request);
-    }
+    }    
 
 }

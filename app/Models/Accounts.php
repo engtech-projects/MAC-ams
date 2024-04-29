@@ -780,7 +780,7 @@ class Accounts extends Model
         )
         ->from('chart_of_accounts as coa')
         ->where(['coa.status' => 'active'])
-        ->whereIn('coa.type', ['L', 'R'])
+        ->whereIn('coa.type', ['L', 'R', 'X'])
         ->whereIn('at.account_category_id', [1,2,3])
         ->orderBy('coa.account_number', 'ASC')
         ->groupBy('coa.account_id')
@@ -790,6 +790,7 @@ class Accounts extends Model
             'accounts' => [],
             'total_asset' => 0
         ];
+
         foreach ($accounts as $account) {
             
             $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
@@ -802,18 +803,26 @@ class Accounts extends Model
             ->whereBetween("je.journal_date", $range)
             ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
             ->groupBy('jed.account_id')
+            ->groupBy('jed.journal_details_account_no')
             ->limit(1)
             ->first();
-
 
             if( $data ) {
                 $account->debit = $data['debit'];
                 $account->credit = $data['credit'];
                 $account->total = $data['total'];
             }else{
-                $account->debit = 0;
-                $account->credit = 0;
-                $account->total = 0;
+
+                // account id of Current Earnings
+                if( $account->account_id == 84 ) {
+                    $account->debit = 0;
+                    $account->credit = 0;
+                    $account->total = $this->currentEarnings($range);
+                }else{
+                    $account->debit = 0;
+                    $account->credit = 0;
+                    $account->total = 0;
+                }
             }
 
             // ------------------------------------------------------------------------
@@ -832,29 +841,26 @@ class Accounts extends Model
                     'accounts' => []
 
                 ];
-                //  $sheet['accounts'][$account->account_category]['header'][$account->account_type] = [
-                //     'total' => 0,
-                //     'data' => []
-                // ];
-                // $sheet['accounts'][$account->account_category]['header'][$account->account_type] = [
-                //     'total' => 0,
-                //     'data' => []
-                // ];
+              
             }else{
-              // $sheet['accounts'][$account->account_category]['total'][] = $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'];
-            }          
+              
+            }   
 
             $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
-            // $subtotal = 0;
-
+     
             if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
                 $subtotal = ($account->total + $opening_balance);
             }else{
 
-               $subtotal = abs($account->total + ($opening_balance) * -1); 
+                if( $account->total >= 0 ) {
+                   $subtotal = abs($account->total + $opening_balance);
+                }else{
+                    $subtotal = abs($account->total + ($opening_balance) * -1); 
+                }
+
+            
             }
 
-            // if( !isset($sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id]) ){
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
                 'account_number' => $account->account_number,
                 'account_name' => $account->account_name,
@@ -865,51 +871,51 @@ class Accounts extends Model
                 'computed' => $subtotal
             ];
 
-
-
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
 
             $sheet['accounts'][$account->account_category]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
-
-                // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id] = [
-                //     // 'account_number' => $account->account_number,
-                //     // 'account_name' => $account->account_name,
-                //     // 'debit' =>  $account->debit,
-                //     // 'credit' => $account->credit,
-                //     'total' => []
-                // ];
-            // }
-
-            // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id]['total'][]= $subtotal;
-            // [
-            //     // 'account_number' => $account->account_number,
-            //     // 'account_name' => $account->account_name,
-            //     // 'debit' =>  $account->debit,
-            //     // 'credit' => $account->credit,
-            //     'total' => $subtotal,  
-            // ];
-
-            // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] += $sheet['accounts'][$account->account_category]['header'][$account->account_type]['data'][$account->account_id]['total'];
-             // return $sheet['accounts'][$account->account_category]['header'][$account->account_type];
-
-            // if( isset($sheet['accounts'][$account->account_category]['header'][$account->account_type]['total']) ) {
-            // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] += $subtotal;
-            // }else{
-                // $sheet['accounts'][$account->account_category]['header'][$account->account_type]['total'] = 0;
-            // }
-
-
-            // $sheet['accounts'][$account->account_category]['total'] += $subtotal;
-
         }
 
         $sheet['total_asset'] = [
             'title' => 'TOTAL LIABILITIES AND EQUITY',
             'value' => ($sheet['accounts']['liabilities']['total'] + $sheet['accounts']['equity']['total'])
-            // 'value' => 0
         ];
 
         return $sheet;
+    }
+
+    public function currentEarnings($range) {
+
+            $book_id = 9;
+            $accounts = [ 87, 166];
+            $account_id = 84;
+         
+            $data = journalEntry::join('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
+            ->select(
+                'je.journal_id',
+                'je.journal_date',
+                'je.book_id',
+                'jed.journal_details_title as title',
+                'jed.journal_details_debit as debit',
+                'jed.journal_details_credit as credit',
+                DB::raw('ROUND((jed.journal_details_credit / 1.12 * 0.12), 2) as vat'),
+            )
+            ->from('journal_entry as je')
+            ->whereBetween("je.journal_date", $range)
+            ->where(['je.status' => 'posted', 'je.book_id' => $book_id])
+            ->whereIn('jed.account_id', $accounts)
+            ->get();
+         
+
+            $total = 0;
+            // $balance = $this->getOpeningBalance($account_id);
+            foreach ($data as $d) {
+                $d->net = $d->credit - $d->vat;
+                $total += $d->net;
+            }
+
+            // return ['data' => $data->toArray(), $range, 'entries' => count($data->toArray()) , 'current_earnings' => round($total, 2)];
+            return round($total, 2);
     }
 
 }

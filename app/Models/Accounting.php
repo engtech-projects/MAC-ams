@@ -27,4 +27,40 @@ class Accounting extends Model
 		return $accounting;
 	}
 
+	public function createFiscalYear($start, $end, $method = 'accrual') {
+
+		$accounting = new Accounting();
+
+		$accounting->start_date = $request->start_date;
+		$accounting->end_date = $request->end_date;
+		$accounting->method = $request->method;
+		$accounting->save();
+
+		return $accounting;
+	}
+
+	public function checkFiscalYear($start, $end) {
+
+		$accounting = Accounting::where(['start_date' => $start_date, 'end_date' => $end ])->first();
+	}
+
+
+	public function closeAccountingPeriod() {
+
+	}
+
+	public function updateOpeningBalance() {
+
+	}
+
+	public function getAccountEndingBalance() {
+
+	}
+
+	public function openAccountingPeriod() {
+
+	}
+
+
+
 }
