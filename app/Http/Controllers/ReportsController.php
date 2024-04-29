@@ -680,9 +680,12 @@ class ReportsController extends MainController
 
         $from = $accounting->start_date;
         $to = $accounting->end_date;
+        // $from = '2024-02-01';
+        // $to = '2024-02-01';
 
         $now = Carbon::now();
         $balanceSheet = $coa->balanceSheet([$from, $to]);
+        // $currentEarnings = $coa->currentEarnings([$from, $to]);
 
         // echo '<pre>';
         // var_export($balanceSheet);
@@ -693,7 +696,8 @@ class ReportsController extends MainController
             'requests' => ['from' => $from, 'to' => $to ],
             'fiscalYear' => $accounting,
             'balanceSheet' => $balanceSheet,
-            'current_date' => $now->toDateString()
+            'current_date' => $now->toDateString(),
+            // 'currentEarnings' => $currentEarnings
         ];
         
         return view('reports.sections.balanceSheet', $data);
