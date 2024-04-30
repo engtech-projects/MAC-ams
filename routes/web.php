@@ -19,6 +19,7 @@ use App\Http\Controllers\GeneralSettingsController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\AccountingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -210,3 +211,5 @@ Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->
 // JOURNAL ENTRY BLADES TEMPLATES
 Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
 Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalEntry'])->name('journal.saveJournalEntry');
+
+Route::get('accounting', [AccountingController::class, 'index'])->name('accounting');

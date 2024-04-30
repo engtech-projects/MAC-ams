@@ -25,6 +25,14 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 
+		<?php
+
+			// echo '<pre>';
+			// var_export($currentEarnings);
+			// echo '</pre>';
+
+		?>
+
 		<div class="col-md-12 title-header">
 			<h4 ><b>Balance Sheet</b></h4>
 		</div>
