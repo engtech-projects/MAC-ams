@@ -14,8 +14,16 @@
 		padding-left: 20px!important;
 	}
 
+	.indent-1-r {
+		padding-right: 20px!important;
+	}
+
 	.indent-2 {
 		padding-left: 40px!important;
+	}
+
+	.border-0, .border-0 td  {
+		border: 0;
 	}
 
 </style>
@@ -59,7 +67,7 @@
 				@foreach($balanceSheet['accounts'] as $category => $type)
 				<thead>
 				<tr>
-					<th width="50%">{{ Str::upper($category) }}</th>
+					<th class="indent-1" width="50%">{{ Str::upper($category) }}</th>
 					<th width="25%"></th>
 					<th width="25%"></th>
 				</tr>
@@ -67,34 +75,34 @@
 				<tbody>
 					
 					@foreach($type['types'] as $group => $data)
-					<tr>
+					<tr class="border-0">
 						<td class="indent-1">{{ Str::title($data['name']) }}</td>
 						<td></td>
 						<td></td>
 					</tr>
 						@foreach($data['accounts'] as $key => $value)
-						<tr>
+						<tr class="border-0">
 							<td class="indent-2">{{ Str::title($value['account_name']) }}</td>
 							<td class="text-right">{{ number_format($value['total'], 2) }}</td>
 							<td></td>
 						</tr>
 						@endforeach
-					<tr>
+					<tr class="border-0">
 						<td colspan="3">&nbsp;</td>
 					</tr>
-					<tr>
+					<tr style="border-style: double;">
 						<td class="indent-1">Total {{ Str::title($data['name']) }}</td>
 						<td></td>
-						<td class="text-bold text-right">{{ number_format($data['total'], 2) }}</td>
+						<td class="text-bold text-right indent-1-r">{{ number_format($data['total'], 2) }}</td>
 					</tr>
 					<tr>
 						<td colspan="3">&nbsp;</td>
 					</tr>
 					@endforeach
-					<tr>
-						<td class="text-bold">Total {{ Str::title($category) }}</td>
+					<tr style="border-style: double;">
+						<td class="indent-1 text-bold">Total {{ Str::title($category) }}</td>
 						<td></td>
-						<td class="text-bold text-right">{{ number_format($type['total'], 2) }}</td>
+						<td class="text-bold text-right indent-1-r">{{ number_format($type['total'], 2) }}</td>
 					</tr>
 					<tr>
 						<td colspan="3">&nbsp;</td>
@@ -103,9 +111,9 @@
 				@endforeach
 				<thead>
 				<tr>
-					<th width="50%">{{ $balanceSheet['total_asset']['title'] }}</th>
+					<th class="indent-1" width="50%">{{ $balanceSheet['total_asset']['title'] }}</th>
 					<th width="25%"></th>
-					<th width="25%" class="text-right">{{ number_format($balanceSheet['total_asset']['value'], 2) }}</th>
+					<th width="25%" class="text-right indent-1-r">{{ number_format($balanceSheet['total_asset']['value'], 2) }}</th>
 				</tr>
 				</thead>
 					
