@@ -851,12 +851,12 @@ class Accounts extends Model
             if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
                 $subtotal = ($account->total + $opening_balance);
             }else{
-
-                if( $account->total >= 0 ) {
-                   $subtotal = abs($account->total + $opening_balance);
-                }else{
-                    $subtotal = abs($account->total + ($opening_balance) * -1); 
-                }
+                  $subtotal = abs($account->total - $opening_balance); 
+                // if( $account->total >= 0 ) {
+                //    $subtotal = abs($account->total + $opening_balance);
+                // }else{
+                //     $subtotal = abs($account->total + ($opening_balance) * -1); 
+                // }
 
             
             }
