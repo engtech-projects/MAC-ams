@@ -14,7 +14,7 @@ use App\Models\Accounts;
 use App\Models\journalEntryDetails;
 use App\Models\AccountType;
 use Carbon\Carbon;
-
+use Illuminate\Database\Eloquent\Builder;
 
 class Accounts extends Model
 {
@@ -774,7 +774,6 @@ class Accounts extends Model
     }
 
     public function balanceSheet($range = []) {
-
         $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
         ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
         ->select(
@@ -785,7 +784,7 @@ class Accounts extends Model
         ->from('chart_of_accounts as coa')
         ->where(['coa.status' => 'active'])
         ->whereIn('coa.type', ['L', 'R', 'X'])
-        ->whereIn('at.account_category_id', [1,2,3])
+        ->whereIn('at.account_category_id', [1,2,3,4,5])
         ->orderBy('coa.account_number', 'ASC')
         ->groupBy('coa.account_id')
         ->get();
@@ -890,10 +889,14 @@ class Accounts extends Model
 
     public function currentEarnings($range) {
 
-            $book_id = 9;
-            $accounts = [ 87, 166];
-            $account_id = 84;
-         
+            // $book_id = 9;
+            $total = 0;
+            // $accounts = [ 87, 166];
+            // $account_id = 84;
+            $accs = Accounts::whereHas('accountType.accountCategory', function (Builder $query) {
+                $query->whereIn('account_category_id', [4, 5]);
+            })
+            ->get()->pluck("account_id");
             $data = journalEntry::join('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
             ->select(
                 'je.journal_id',
@@ -905,17 +908,19 @@ class Accounts extends Model
                 DB::raw('ROUND((jed.journal_details_credit / 1.12 * 0.12), 2) as vat'),
             )
             ->from('journal_entry as je')
+            // ->whereBetween("je.journal_date", $range)
             ->whereBetween("je.journal_date", $range)
-            ->where(['je.status' => 'posted', 'je.book_id' => $book_id])
-            ->whereIn('jed.account_id', $accounts)
+            // ->whereDate("je.journal_date", "=", $range[1])
+            ->where(['je.status' => 'posted'])
+            // ->where(['je.book_id' => $book_id])
+            ->whereIn('jed.account_id', $accs)
             ->get();
-         
 
-            $total = 0;
             // $balance = $this->getOpeningBalance($account_id);
             foreach ($data as $d) {
-                $d->net = $d->credit - $d->vat;
-                $total += $d->net;
+                // $d->net = $d->credit - $d->vat;
+                $total -= $d->credit;
+                $total += $d->debit;
             }
 
             // return ['data' => $data->toArray(), $range, 'entries' => count($data->toArray()) , 'current_earnings' => round($total, 2)];
