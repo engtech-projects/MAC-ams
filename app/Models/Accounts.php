@@ -784,7 +784,7 @@ class Accounts extends Model
         ->from('chart_of_accounts as coa')
         ->where(['coa.status' => 'active'])
         ->whereIn('coa.type', ['L', 'R', 'X'])
-        ->whereIn('at.account_category_id', [1,2,3,4,5])
+        ->whereIn('at.account_category_id', [1,2,3])
         ->orderBy('coa.account_number', 'ASC')
         ->groupBy('coa.account_id')
         ->get();
