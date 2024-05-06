@@ -911,7 +911,7 @@
                             branchColumn = `<td>${v.branch_name}</td>`;
                         @endif
                         
-                        var remarks = v.remarks.replace(/::/g, '<br>');
+                        var remarks = v.remarks ? v.remarks.replace(/::/g, '<br>') : '';
 
                         $('#journalEntryDetailsContent').append(
                             `<tr>
