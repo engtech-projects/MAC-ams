@@ -347,14 +347,6 @@ class ReportsController extends MainController
         return view('reports.sections.trialBalance', $data);
     }
 
-    public function incomeStatement()
-    {
-        $data = [
-            'title' => 'MAC-AMS | Income Statement',
-            'trialbalanceList' => ''
-        ];
-        return view('reports.sections.incomeStatement', $data);
-    }
 
     public function bankReconcillation()
     {
@@ -702,5 +694,28 @@ class ReportsController extends MainController
         
         return view('reports.sections.balanceSheet', $data);
 
+    }
+
+    public function incomeStatement(Request $request)
+    {
+
+        $coa = new Accounts();
+        $accounting = Accounting::getFiscalYear();
+
+        $from = isset($request->from) ? $request->from : $accounting->start_date;
+        $to = isset($request->to) ? $request->to : $accounting->end_date;
+
+        $incomeStatement = $coa->incomeStatement([$from, $to]);
+
+        $data = [
+            'title' => 'MAC-AMS | Income Statement',
+            'requests' => ['from' => $from, 'to' => $to ],
+            'fiscalYear' => $accounting,
+            'incomeStatement' => $incomeStatement,
+            'from' => $from,
+            'to' => $to
+        ];
+
+        return view('reports.sections.incomeStatement', $data);
     }
 }
