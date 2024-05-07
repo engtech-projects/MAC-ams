@@ -232,27 +232,6 @@ class Accounts extends Model
         return response()->json(array('success' => false, 'message' => 'Something went wrong!'), 200);
     }
 
-    // public static function getAccountsBy($accountCategories = array()) {
-
-    //     if( count($accountCategories) ) {
-
-    //         $data = DB::table('chart_of_accounts')
-    //                 ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
-    //                 ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
-    //                 ->select('chart_of_accounts.*', 'account_type.account_type', 'account_type.account_type_id', 'account_category.account_category')
-    //                 ->where('status', 'active')
-    //                 ->whereIn('account_category.account_category', 'assets')
-    //                 ->orderBy('account_category.account_category_id', 'asc')
-    //                 ->orderBy('account_type.account_type_id', 'asc')
-    //                 ->get();
-
-
-    //         return $data;
-    //     }
-
-    //     return $accountCategories;
-    // }
-
     public static function assets()
     {
         $assets = DB::table('chart_of_accounts')
@@ -305,7 +284,8 @@ class Accounts extends Model
             ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
             ->select('chart_of_accounts.*', 'account_type.account_type', 'account_type.account_type_id', 'account_category.account_category')
             ->where('status', 'active')
-            ->where('account_category.account_category', 'income')
+            ->where('account_category.account_category', 'revenue')
+            ->whereIn('chart_of_accounts.type', ['L', 'R', 'X'])
             ->orderBy('account_category.account_category_id', 'asc')
             ->orderBy('account_type.account_type_id', 'asc')
             ->get();
@@ -920,6 +900,128 @@ class Accounts extends Model
 
             // return ['data' => $data->toArray(), $range, 'entries' => count($data->toArray()) , 'current_earnings' => round($total, 2)];
             return round($total, 2);
+    }
+
+    public function incomeStatement($range) {
+
+        $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
+            ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+            ->select(
+                'ac.account_category', 'ac.account_category_id','ac.to_increase',
+                'at.account_type', 'at.account_type_id',
+                'coa.account_id', 'coa.account_number', 'coa.account_name',
+            )
+            ->from('chart_of_accounts as coa')
+            ->where(['coa.status' => 'active'])
+            ->whereIn('coa.type', ['L', 'R', 'X'])
+            ->whereIn('ac.account_category', ['revenue', 'expense'])
+            ->orderBy('coa.account_number', 'ASC')
+            ->groupBy('coa.account_id')
+            ->get();
+
+        $sheet = [
+            'accounts' => [],
+            'profit' => [],
+            'income_tax' => [],
+            'net_income' => []
+        ];
+
+        foreach ($accounts as $account) {
+            
+            $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
+            ->select(
+                DB::raw('SUM(jed.journal_details_debit) as debit'),
+                DB::raw('SUM(jed.journal_details_credit) as credit'),
+                DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
+            )
+            ->from('journal_entry as je')
+            ->whereBetween("je.journal_date", $range)
+            ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
+            ->groupBy('jed.account_id')
+            ->groupBy('jed.journal_details_account_no')
+            ->limit(1)
+            ->first();
+
+            if( $data ) {
+                $account->debit = $data['debit'];
+                $account->credit = $data['credit'];
+                $account->total = $data['total'];
+            }else{
+
+                // // account id of Current Earnings
+                // if( $account->account_id == 84 ) {
+                //     $account->debit = 0;
+                //     $account->credit = 0;
+                //     $account->total = $this->currentEarnings($range);
+                // }else{
+                    $account->debit = 0;
+                    $account->credit = 0;
+                    $account->total = 0;
+                // }
+            }
+
+            // ------------------------------------------------------------------------
+
+            if( !isset($sheet['accounts'][$account->account_category]) ) {
+                $sheet['accounts'][$account->account_category] = [
+                    'total' => 0,
+                    'types' => []
+                ];
+            }
+
+            if ( !isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]) ) {
+                $sheet['accounts'][$account->account_category]['types'][$account->account_type_id] = [
+                    'total' => 0,
+                    'name' => $account->account_type,
+                    'accounts' => []
+
+                ];
+              
+            }else{
+              
+            }   
+
+            // $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
+            $subtotal = abs($account->total);
+            // if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
+            //     $subtotal = ($account->total + $opening_balance);
+            // }else{
+            //       $subtotal = abs($account->total - $opening_balance); 
+            // }
+
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
+                'account_number' => $account->account_number,
+                'account_name' => $account->account_name,
+                'debit' =>  $account->debit,
+                'credit' => $account->credit,
+                // 'opening_balance' => $opening_balance,
+                'total' => $subtotal,
+                'computed' => $subtotal
+            ];
+
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
+
+            $sheet['accounts'][$account->account_category]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
+        }
+
+
+        $sheet['profit'] = [
+            'title' => 'Profit / (Loss) before tax',
+            'value' => ($sheet['accounts']['revenue']['total'] - $sheet['accounts']['expense']['total'])
+        ];
+
+        $sheet['income_tax'] = [
+            'title' => 'Less Provision for Income tax (0%)',
+            'value' => 0
+        ];
+
+        $sheet['net_income'] = [
+            'title' => 'Net Income / (Loss)',
+            'value' => ($sheet['profit']['value'] - $sheet['income_tax']['value'])
+        ];
+
+        return $sheet;
+
     }
 
 }
