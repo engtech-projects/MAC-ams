@@ -49,7 +49,7 @@
 			<div class="col-md-2 col-xs-12">
 				<div class="box">
 					<div class="form-group">
-						<label class="label-normal" for="genLedgerFrom">AS OF</label>
+						<label class="label-normal" for="">AS OF</label>
 						<div class="input-group">
 							<input id="balanceSheetDate" value="{{ $current_date }}" type="date" class="form-control form-control-sm rounded-0" name="from" >
 						</div>
