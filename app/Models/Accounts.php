@@ -14,7 +14,7 @@ use App\Models\Accounts;
 use App\Models\journalEntryDetails;
 use App\Models\AccountType;
 use Carbon\Carbon;
-
+use Illuminate\Database\Eloquent\Builder;
 
 class Accounts extends Model
 {
@@ -628,22 +628,30 @@ class Accounts extends Model
 
             $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
                         ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
+                        ->join('account_type as acctype', 'acctype.account_type_id', '=', 'coa.account_type_id')
+                        ->join('account_category as acccat', 'acccat.account_category_id', '=', 'acctype.account_category_id')
                         ->select(
                             'coa.account_id',
                             'coa.account_number',
                             'coa.account_name',
+                            'acccat.to_increase',
                             DB::raw('COALESCE(SUM(jed.journal_details_debit)) AS total_debit'),
                             DB::raw('COALESCE(SUM(jed.journal_details_credit)) AS total_credit')
                         )
                         ->from('chart_of_accounts as coa')
-                        ->where(['coa.type' => 'L', 'coa.account_id' => $account_id, 'je.status' => 'posted' ])
+                        ->whereIn('coa.type', ["L", "R"])
+                        ->where(['coa.account_id' => $account_id, 'je.status' => 'posted' ])
                         ->whereBetween("je.journal_date", [$startDate->toDateString(), $endDate->toDateString()])
                         ->groupBy('coa.account_id','coa.account_number','coa.account_name')
                         ->first();
 
 
             if( $account ){
-                return $balance + $account->total_debit - $account->total_credit;    
+                if($account->to_increase == "debit"){
+                    return $balance + $account->total_debit - $account->total_credit;    
+                }else{
+                    return $balance - $account->total_debit + $account->total_credit;
+                }
             }
         }
 
@@ -754,7 +762,6 @@ class Accounts extends Model
     }
 
     public function balanceSheet($range = []) {
-
         $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
         ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
         ->select(
@@ -870,10 +877,14 @@ class Accounts extends Model
 
     public function currentEarnings($range) {
 
-            $book_id = 9;
-            $accounts = [ 87, 166];
-            $account_id = 84;
-         
+            // $book_id = 9;
+            $total = 0;
+            // $accounts = [ 87, 166];
+            // $account_id = 84;
+            $accs = Accounts::whereHas('accountType.accountCategory', function (Builder $query) {
+                $query->whereIn('account_category_id', [4, 5]);
+            })
+            ->get()->pluck("account_id");
             $data = journalEntry::join('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
             ->select(
                 'je.journal_id',
@@ -885,17 +896,19 @@ class Accounts extends Model
                 DB::raw('ROUND((jed.journal_details_credit / 1.12 * 0.12), 2) as vat'),
             )
             ->from('journal_entry as je')
+            // ->whereBetween("je.journal_date", $range)
             ->whereBetween("je.journal_date", $range)
-            ->where(['je.status' => 'posted', 'je.book_id' => $book_id])
-            ->whereIn('jed.account_id', $accounts)
+            // ->whereDate("je.journal_date", "=", $range[1])
+            ->where(['je.status' => 'posted'])
+            // ->where(['je.book_id' => $book_id])
+            ->whereIn('jed.account_id', $accs)
             ->get();
-         
 
-            $total = 0;
             // $balance = $this->getOpeningBalance($account_id);
             foreach ($data as $d) {
-                $d->net = $d->credit - $d->vat;
-                $total += $d->net;
+                // $d->net = $d->credit - $d->vat;
+                $total -= $d->credit;
+                $total += $d->debit;
             }
 
             // return ['data' => $data->toArray(), $range, 'entries' => count($data->toArray()) , 'current_earnings' => round($total, 2)];

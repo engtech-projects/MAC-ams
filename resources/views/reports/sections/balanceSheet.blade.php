@@ -51,7 +51,7 @@
 					<div class="form-group">
 						<label class="label-normal" for="">AS OF</label>
 						<div class="input-group">
-							<input value="{{ $current_date }}" type="date" class="form-control form-control-sm rounded-0" name="from" >
+							<input id="balanceSheetDate" value="{{ $current_date }}" type="date" class="form-control form-control-sm rounded-0" name="from" >
 						</div>
 					</div>
 				</div>

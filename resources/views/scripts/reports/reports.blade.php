@@ -519,6 +519,16 @@
 
 
     /*
+     **********************  BALANCE SHEET  **************************
+    */
+
+    $(document).on('change','#balanceSheetDate',function(){
+        window.location=window.location.href.split('?')[0] + "?date=" + this.value
+    })
+
+
+
+    /*
      **********************  CASH BREAKDOWN  **************************
     */
 

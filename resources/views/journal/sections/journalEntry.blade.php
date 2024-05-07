@@ -7,6 +7,22 @@
 		color:black!important;
 		font-style: normal!important;
 	}
+	.textarea {
+	    border: 1px solid #ccc;
+	    font-family: inherit;
+	    font-size: inherit;
+	    padding: 1px 6px;
+	    display: block;
+	    width: 100%;
+	    overflow: hidden;
+	    resize: both;
+	    min-height: 40px;
+	    line-height: 20px;
+	    transition: border-color 0.3s ease;
+	}
+	.textarea:focus {
+	    outline: 2px solid #80BDFF;
+	}
 	.frm-header{
 		margin-bottom:10px;
 		padding-bottom:10px;
@@ -192,7 +208,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="payee">Payee</label>
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm rounded-0" name="payee" id="payee"  placeholder="Payee" required >
+										<input type="text" class="form-control form-control-sm rounded-0" name="payee" id="payee"  placeholder="Payee">
 									</div>
 								</div>
 							</div>
@@ -201,9 +217,7 @@
 							<div class="box">
 								<div class="form-group">
 									<label class="label-normal" for="remarks">Remarks (<font style="color:red;">Separate with double colon (::) for the next remarks</font>)</label>
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm rounded-0" name="remarks" id="remarks"  placeholder="Remarks" required>
-									</div>
+									<textarea class="textarea" name="remarks" id="remarks" placeholder="Remarks" required></textarea>
 								</div>
 							</div>
 						</div>
@@ -463,6 +477,18 @@
 			// console.log(this.baseUrl);
 		}
 	});
+	// Function to auto-resize textarea based on content
+	function autoResizeTextarea() {
+	    const textarea = document.getElementById('remarks');
+	    textarea.style.height = 'auto'; // Reset height to auto
+	    textarea.style.height = textarea.scrollHeight + 'px'; // Set height to scrollHeight
+	}
+
+	// Attach event listener for input events
+	document.getElementById('remarks').addEventListener('input', autoResizeTextarea);
+
+	// Initial call to set the correct height
+	autoResizeTextarea();
 </script>
 @endsection
 @section('footer-scripts')

@@ -23,6 +23,10 @@
             font-size: 14px;
         }
 
+        .no-margin p {
+            margin: 0;
+        }
+
         .dataTables_filter {
             float: right !important;
         }
@@ -112,7 +116,7 @@
                                                     <option value="" selected>-All-</option>
                                                     <option value="unposted">Unposted</option>
                                                     <option value="posted">Posted</option>
-                                                    <option value="void">Void</option>
+                                                    <option value="cancelled">Cancelled</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -364,7 +368,7 @@
                                         <div class="box">
                                             <div class="form-group">
                                                 <label class="label-bold label-sty" for="remarks">Remarks</label>
-                                                <div class="input-group">
+                                                <div class="input-group no-margin">
                                                     <label class="label-normal" id="vjournal_remarks"></label>
                                                 </div>
                                             </div>
@@ -722,7 +726,6 @@
                                                 <div class="col-md-12">
                                                     <h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong
                                                             id="voucher_particular"></strong></h6>
-
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
@@ -798,7 +801,7 @@
         </div>
 
         <!-- /.content -->
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
             $(document).on('click', '#printVoucher', function(e) {

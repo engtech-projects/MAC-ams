@@ -665,17 +665,17 @@ class ReportsController extends MainController
 
     }
 
-    public function balanceSheet() {
+    public function balanceSheet(Request $request) {
 
         $coa = new Accounts();
         $accounting = Accounting::getFiscalYear();
 
         $from = $accounting->start_date;
-        $to = $accounting->end_date;
         // $from = '2024-02-01';
         // $to = '2024-02-01';
 
         $now = Carbon::now();
+        $to =  $request->input("date") ? new Carbon($request->input("date")) : $now;
         $balanceSheet = $coa->balanceSheet([$from, $to]);
         // $currentEarnings = $coa->currentEarnings([$from, $to]);
 
@@ -688,7 +688,7 @@ class ReportsController extends MainController
             'requests' => ['from' => $from, 'to' => $to ],
             'fiscalYear' => $accounting,
             'balanceSheet' => $balanceSheet,
-            'current_date' => $now->toDateString(),
+            'current_date' => $to->toDateString(),
             // 'currentEarnings' => $currentEarnings
         ];
         
