@@ -58,9 +58,6 @@
 									<select v-model="filter.account_id" name="account_id" class="form-control form-control-sm" id="" value="{{request('account_id')}}" required>
 										<option value="all" selected>-All-</option>
 										<option v-for="acc,a in filteredAccounts" :key="a" :value="acc.account_id">@{{acc.account_number}} - @{{acc.account_name}}</option>
-										<!-- @foreach($chartOfAccount as $data)
-											<option value="{{$data->account_id}}">{{$data->account_number}} - {{$data->account_name}}</option>
-										@endforeach -->
 									</select>
 								</div>
 							</div>
@@ -228,12 +225,14 @@
 		},
 		methods: {
 			fetchReconciliation:function(){
+
 				axios.post(this.url, this.filter, {
 					headers: {
 						'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
 					}
 				})
 				.then(response => {
+					console.log(response);
 					var arr = [];
 					arr.push(response.data);
 					this.reconData = arr;
@@ -289,6 +288,7 @@
 			}
 		},
 		mounted(){
+			console.log(this.url);
 			// this.fetchReconciliation();
 		}
 	});

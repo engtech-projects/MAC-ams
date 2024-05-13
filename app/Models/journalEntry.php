@@ -312,7 +312,7 @@ class journalEntry extends Model
     }
 
     public function getBankReconciliationReport(array $filter)
-    {
+    {   
         $collections = collect($this->getJournalEntry($filter));
         $journalEntries = $collections->map(function ($item, $key) {
             $data = [
@@ -342,6 +342,7 @@ class journalEntry extends Model
         ->values();
         return $journalEntries;
 
+        // return $collections;
     }
 
 

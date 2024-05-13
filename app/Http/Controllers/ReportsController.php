@@ -348,7 +348,7 @@ class ReportsController extends MainController
     }
 
 
-    public function bankReconcillation()
+    public function bankReconcillation(Request $request)
     {
         $data = [
 
@@ -356,6 +356,8 @@ class ReportsController extends MainController
             'title' => 'MAC-AMS | Bank Reconciliation',
             'trialbalanceList' => ''
         ];
+
+
         return view('reports.sections.bankReconcillation', $data);
     }
 

@@ -1037,4 +1037,8 @@ class Accounts extends Model
 
     }
 
+    public function bankReconciliation() {
+
+    }
+
 }
