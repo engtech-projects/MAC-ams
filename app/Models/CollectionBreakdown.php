@@ -61,7 +61,7 @@ class CollectionBreakdown extends Model
 
         $collection = CollectionBreakdown::whereDate('transaction_date', '<', $transactionDate)
             ->where('branch_id', $branchId)
-            ->orderBy('collection_id', 'DESC')
+            ->orderBy('transaction_date', 'DESC')
             ->first();
         return $collection;
     }
