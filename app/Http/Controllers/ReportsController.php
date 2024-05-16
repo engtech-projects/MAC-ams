@@ -375,14 +375,8 @@ class ReportsController extends MainController
     {
 
         $now = Carbon::now();
-        // $accounting = Accounting::getFiscalYear();
-
-        // var_export($accounting);
-        // $from = $request->from ? $request->from : $accounting->default_start;
-        // $to = $request->to ? $request->to : $accounting->default_end;
-
         $transactionDate = $request["transaction_date"] ? $request["transaction_date"] : $now->toDateString();
-        // var_export($transactionDate);
+
         $branchId = session()->get("auth_user_branch");
         $data = [
             'title' => 'MAC-AMS | Cashiers Transaction Blotter',
@@ -412,16 +406,7 @@ class ReportsController extends MainController
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
         return response()->json($cashTransactionsEntries);
-/*         $data = [
-            'title' => 'Cashier Transaction Blotter',
-            'trialbalanceList' => '',
-            'cashTransactions' => $cashTransactionsEntries,
-            'cash_blotter' => CashBlotter::fetchCashBlotter(),
-            'branches' => Branch::fetchBranch(),
-            'account_officers' => AccountOfficer::fetchAccountOfficer(),
-        ];
 
-        return view('reports.sections.cashTransactionBlotter', $data); */
     }
     public function cashBlotterIndex()
     {
