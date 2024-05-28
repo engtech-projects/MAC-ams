@@ -49,7 +49,7 @@
 
 
         $('tbody .tbl-row').click(function() {
-            console.log("Clicked");
+            
 
             var id = $(this).data("id")
 
@@ -91,7 +91,7 @@
                             $('#posted-content').html('');
                             var content = '';
 
-                            console.log(v.remarks)
+                            
                             $.each(v.remarks.split('::'), function(k, vv) {
                                 $('#vjournal_remarks').append(
                                     `<li>${vv}</li>`
@@ -329,9 +329,6 @@
 
         $(document).on('change', '#amount', function() {
             if ($.isNumeric($(this).val())) {
-                console.log("Numeric")
-            } else {
-                console.log("String")
             }
         })
 
@@ -352,33 +349,14 @@
             }
         })
 
-        /*          $('.editable-row-item').editable({
-                    type: 'text',
-                    emptytext: '',
-                    showbuttons: false,
-                    unsavedclass: null,
-                    toggle: 'manual',
-                    onblur: 'cancel',
-                    inputclass: 'form-control form-control-sm block input-text',
-                    success: function(newValue) {
-                        var id = $(this).attr('id')
-                        var input = $('.input-text').val();
-                        switch (id) {
-                            case 'debit':
-                                $('a#debit').text(amountConverter(input))
-                        }
-
-                    }
-                }); */
-
 
         $(".editables").on("shown", function(e, editable) {
 
-            console.log(editable.input.$input)
+            // console.log(editable.input.$input)
         });
 
         function submitEditable() {
-            $('.editable-table-data .editableform').editable().submit();
+           $('.editable-table-data .editableform').editable().submit();
         }
         $(document).on('click', '.remove-journalDetails', function(e) {
             $(this).parents('tr').remove();
@@ -425,7 +403,6 @@
                         "details": details
                     });
 
-                    // console.log(data);
 
                     $.ajax({
                         headers: {
@@ -467,7 +444,7 @@
                     dataType: "json",
                     success: function(data) {
                         if (data.message == 'delete') {
-                            toastr.success('Successfully Delete');
+                            toastr.success('Successfully Deleted');
                             reload();
                         }
                     },
@@ -477,27 +454,27 @@
                 });
             }
         })
-        $(document).on('click', '.JnalFetch', function(e) {
-            e.preventDefault();
-            var id = $(this).attr('value');
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "POST",
-                url: "{{ route('journal.JournalEntryFetch') }}",
-                data: {
-                    items: details
-                },
-                dataType: "json",
-                success: function(data) {
-                    console.log(data)
-                },
-                error: function() {
-                    toastr.error('Error');
-                }
-            });
-        })
+        // $(document).on('click', '.JnalFetch', function(e) {
+        //     e.preventDefault();
+        //     var id = $(this).attr('value');
+        //     $.ajax({
+        //         headers: {
+        //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //         },
+        //         type: "POST",
+        //         url: "{{ route('journal.JournalEntryFetch') }}",
+        //         data: {
+        //             items: details
+        //         },
+        //         dataType: "json",
+        //         success: function(data) {
+        //             console.log(data)
+        //         },
+        //         error: function() {
+        //             toastr.error('Error');
+        //         }
+        //     });
+        // })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
             $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
                 minimumFractionDigits: 2
@@ -535,9 +512,9 @@
                 },
                 dataType: "json",
                 success: function(data) {
-                    console.log(data)
+                    
                     if (data.message == 'posted') {
-                        toastr.success('Successfully Update');
+                        toastr.success('Successfully Updated');
                         reload();
                     }
                 },
@@ -551,7 +528,9 @@
         });
         $('#journalEntryFormEdit').submit(function(e) {
             e.preventDefault();
+
             var s_data = $(this).serialize();
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -562,7 +541,8 @@
                 dataType: "json",
                 success: function(data) {
                     if (data.message == 'update') {
-                        saveJournalEntryDetails(data.id, 'update')
+                        saveJournalEntryDetails('update');
+                        toastr.success('Record has been updated');
                     }
                 },
                 error: function(data) {
@@ -571,7 +551,7 @@
             });
         });
         $(document).on('click', '.JnalEdit', function(e) {
-            $('#journalModalEdit').modal('show');
+            e.preventDefault();
             var id = $(this).attr('value');
             $('#tbl-create-edit-container').html('');
             $.ajax({
@@ -591,6 +571,7 @@
                             var total_credit = 0;
                             var balance = 0;
                             $('#edit_LrefNo').text(v.journal_no)
+                            $('#edit_journal_no').val(v.journal_no);
                             $('#edit_journal_id').val(v.journal_id);
                             $('#edit_journal_date').val(v.journal_date);
                             $('#edit_branch_id').val(v.branch_id);
@@ -602,6 +583,7 @@
                             $('#edit_amount').val(v.amount);
                             $('#edit_payee').val(v.payee);
                             $('#edit_remarks').val(v.remarks);
+
                             $.each(v.journal_entry_details, function(kk, vv) {
                                 $('#tbl-create-edit-container').append(`<tr class='editable-table-row'>
 								<td class="acctnu" value="" >
@@ -611,7 +593,9 @@
 									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item COASelect">
 										<option disabled value="" selected>-Select Account Name-</option>
 										@foreach ($chartOfAccount as $account)
-											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_name }}</option>
+											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">
+                                                {{$account->account_number}} - {{$account->account_name}}
+                                            </option>
 										@endforeach
 									</select>
 								</td>
@@ -661,14 +645,31 @@
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
                                 }));
+                            $('.select-account').select2({
+                                placeholder: 'Select Account',
+                                allowClear: true,
+                            });
                         });
                     }
+
+
                 },
                 error: function() {
                     console.log("Error");
                 }
             });
+
+            $('#journalModalEdit').modal('show');
+            
         });
+
+        $(document).on('change', '#edit_book_id', function(e) {
+            e.preventDefault();
+
+            $('#edit_journal_no').val($(this).find(':selected').attr('_count'));
+            $('#edit_LrefNo').text($(this).find(':selected').attr('_count'));
+        });
+
         $(document).on('click', '.JnalView', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
@@ -737,7 +738,7 @@
                                     .journal_details_debit);
                                 total_credit += parseFloat(vv
                                     .journal_details_credit);
-                                console.log(v.journal_details)
+                                // console.log(v.journal_details)
                                 $('#tbl-create-journalview-container').append(`
 								<tr class='editable-table-row'>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
@@ -782,30 +783,31 @@
                     console.log("Error");
                 }
             });
-        })
-        $(document).on('click', '.JnalView', function(e) {
-            e.preventDefault();
-            var id = $(this).attr('value');
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "POST",
-                data: {
-                    journal_id: id
-                },
-                url: "{{ route('journal.JournalEntryFetch') }}",
-                dataType: "json",
-                success: function(response) {
-                    if (response.message == 'fetch') {
-                        console.log(response);
-                    }
-                },
-                error: function() {
-                    console.log("Error");
-                }
-            });
-        })
+        });
+
+        // $(document).on('click', '.JnalView', function(e) {
+        //     e.preventDefault();
+        //     var id = $(this).attr('value');
+        //     $.ajax({
+        //         headers: {
+        //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //         },
+        //         type: "POST",
+        //         data: {
+        //             journal_id: id
+        //         },
+        //         url: "{{ route('journal.JournalEntryFetch') }}",
+        //         dataType: "json",
+        //         success: function(response) {
+        //             if (response.message == 'fetch') {
+        //                 console.log(response);
+        //             }
+        //         },
+        //         error: function() {
+        //             console.log("Error");
+        //         }
+        //     });
+        // })
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
             var s_data = $(this).serialize();
@@ -858,7 +860,7 @@
         });
         $(document).on('blur', '#cheque_no', function(e) {
             e.preventDefault();
-            console.log($(this).val())
+            // console.log($(this).val())
             if ($(this).val() == '') {
                 $('#cheque_date').removeAttr('required');
             } else {
@@ -974,6 +976,7 @@
             $(this).find('.editableform').each(function() {
                 $(this).on('keydown', function(e) {
                     if ((e.keyCode || e.which) == 13) {
+                        // console.log('editable');
                         submitEditable();
                     }
                 })
@@ -1070,6 +1073,7 @@
             $.each(elem.find('tr'), function(k, v) {
                 var field = $(v).children()
                 var accountName = $(field[1]).find('.select2').text().split("- ")
+
                 var debit = ($(field[2]).find('.editable-row-item').text() === '') ?
                     '0' : $(field[2]).find('.editable-row-item').text()
                 var credit = ($(field[3]).find('.editable-row-item').text() === '') ?
@@ -1204,7 +1208,7 @@
         });
 
         function editJournal(id) {
-            console.log(id)
+         
             $('#journalModal').modal('show')
         }
         String.prototype.float = function() {

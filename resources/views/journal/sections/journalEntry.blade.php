@@ -238,7 +238,9 @@
 										<select  fieldName="account_id" class="select-account form-control editable-row-item form-control-sm COASelect">
 											<option disabled value="" selected>-Select Account Name-</option>
 											@foreach($chartOfAccount as $account)
-												<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">{{$account->account_number}}<span> - </span> {{$account->account_name}}</span></option>
+												<option value="{{$account->account_id}}" acct-num="{{$account->account_number}}">
+													{{$account->account_number}} - {{$account->account_name}}
+												</option>
 											@endforeach
 										</select>
 									</td>

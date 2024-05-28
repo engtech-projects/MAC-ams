@@ -60,6 +60,9 @@ class JournalController extends MainController
             'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get()
         ];
 
+        // echo '<pre>';
+        // var_export(JournalBook::getBookWithJournalCount());
+        // echo '</pre>';
         return view('journal.sections.journalEntry', $data);
     }
 
@@ -79,8 +82,6 @@ class JournalController extends MainController
     {
         $journalEntry = JournalEntry::with(['bookDetails',  'journalEntryDetails','journalEntryDetails.account','branch','journalEntryDetails.subsidiary'])->where('journal_id', $request->journal_id)->get();
         return response()->json(['message' => 'fetch', 'data' => $journalEntry]);
-
-        //return json_encode(['message' => 'fetch', 'data' => JournalEntry::with(['bookDetails', 'journalEntryDetails'])->where('journal_id', $request->journal_id)->get()]);
     }
     public function JournalEntryDelete(Request $request)
     {
@@ -92,6 +93,7 @@ class JournalController extends MainController
     }
     public function JournalEntryEdit(Request $request)
     {
+        
         $journal = JournalEntry::find($request->edit_journal_id);
         $journal->journal_no = $request->edit_journal_no;
         $journal->journal_date = $request->edit_journal_date;
@@ -136,7 +138,7 @@ class JournalController extends MainController
 
         $data = [
             'title' => 'MAC-AMS | Journal Entry List',
-            'journalBooks' => JournalBook::get(),
+            'journalBooks' => JournalBook::getBookWithJournalCount(),
             'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
             'journalEntryList' => JournalEntry::fetch('posted', $current_date->toDateString(), $current_date->toDateString()),
             'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get(),

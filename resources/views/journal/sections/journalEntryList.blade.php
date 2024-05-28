@@ -95,7 +95,7 @@
                                                     <option value="" disabled selected>-All-</option>
                                                     @foreach ($journalBooks as $journalBook)
                                                         <option value="{{ $journalBook->book_id }}">
-                                                            {{ $journalBook->book_code }} - {{ $journalBook->book_name }}
+                                                            {{ $journalBook->book_name }} ({{ $journalBook->book_code }})
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -478,8 +478,8 @@
                                                                 <option value="{{ $journalBook->book_id }}"
                                                                     _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
                                                                     book-src="{{ $journalBook->book_src }}">
-                                                                    {{ $journalBook->book_code }} -
-                                                                    {{ $journalBook->book_name }}</option>
+                                                                    {{ $journalBook->book_name }} ({{ $journalBook->book_code }})
+                                                                </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -492,6 +492,7 @@
                                                     <label class="label-normal" for="">Reference No.</label>
                                                     <div class="input-group">
                                                         <label class="label-normal" id="edit_LrefNo"></label>
+                                                        <input type="hidden" name="edit_journal_no" id="edit_journal_no"> 
                                                     </div>
                                                 </div>
                                             </div>
@@ -614,9 +615,7 @@
                                                     <th style="width: 5%;">Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="tbl-create-edit-container">
-
-                                            </tbody>
+                                            <tbody id="tbl-create-edit-container"></tbody>
                                             <tfoot>
                                                 <tr class="text-center">
                                                     <th></th>
