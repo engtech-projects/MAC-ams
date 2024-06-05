@@ -93,19 +93,24 @@ class JournalController extends MainController
     }
     public function JournalEntryEdit(Request $request)
     {
-        $journal = JournalEntry::find($request->edit_journal_id);
-        $journal->journal_no = $request->edit_journal_no;
-        $journal->journal_date = $request->edit_journal_date;
-        $journal->branch_id = $request->edit_branch_id;
-        $journal->book_id = $request->edit_book_id;
-        $journal->source = $request->edit_source;
-        $journal->cheque_no = $request->edit_cheque_no;
-        $journal->cheque_date = $request->edit_cheque_date;
-        $journal->amount = $request->edit_amount;
-        $journal->status = $request->edit_status;
-        $journal->payee = $request->edit_payee;
-        $journal->remarks = $request->edit_remarks;
-        $journal->save();
+        $journal = JournalEntry::find($request->journal_entry['edit_journal_id']);
+        DB::transaction(function() use($request, $journal){
+            $journal->journal_no = $request->journal_entry['edit_journal_no'];
+            $journal->journal_date = $request->journal_entry['edit_journal_date'];
+            $journal->branch_id = $request->journal_entry['edit_branch_id'];
+            $journal->book_id = $request->journal_entry['edit_book_id'];
+            $journal->source = $request->journal_entry['edit_source'];
+            $journal->cheque_no = $request->journal_entry['edit_cheque_no'];
+            $journal->cheque_date = $request->journal_entry['edit_cheque_date'];
+            $journal->amount = $request->journal_entry['edit_amount'];
+            $journal->status = $request->journal_entry['edit_status'];
+            $journal->payee = $request->journal_entry['edit_payee'];
+            $journal->remarks = $request->journal_entry['edit_remarks'];
+            $journal->save();
+            $journal->details()->delete();
+            $journal->details()->createMany($request->details);
+        });
+        $journal->refresh();
         return json_encode(['message' => 'update', 'id' => $journal->journal_id]);
     }
 

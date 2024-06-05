@@ -502,6 +502,7 @@
                                                 <div class="form-group">
                                                     <label class="label-normal" for="">Reference No.</label>
                                                     <div class="input-group">
+                                                        <input type="hidden" name="edit_journal_no" id="edit_journal_no">
                                                         <label class="label-normal" id="edit_LrefNo"></label>
                                                     </div>
                                                 </div>
