@@ -402,7 +402,7 @@
             console.log(spanBal);
 
             if (parseFloat(spanBal) == 0) {
-                alert("Debit and Credit equal")
+                // alert("Debit and Credit equal")
               
                 var serialized = $(this).serializeArray();
                 var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
@@ -469,7 +469,7 @@
                     alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
             }else {
-                alert("Debit and Credit not equal")
+                alert("Unable to save Debit and Credit not equal")
             }
 
         });
