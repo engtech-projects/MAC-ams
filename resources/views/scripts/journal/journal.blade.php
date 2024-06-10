@@ -396,44 +396,52 @@
         $(document).on('submit', '#journalEntryForm', function(e) {
             e.preventDefault();
 
-            var serialized = $(this).serializeArray();
-            var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
-            serialized.push({
-                name: 'amount',
-                value: amount
-            })
-            var _st = false;
-            $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
-                var field = $(v).children()
-                if ($(field[0]).find('.editable-row-item').text() == '' ||
-                    $(field[1]).find('.editable-row-item').val() == '' ||
-                    $(field[4]).find('.editable-row-item').val() == '') {
-                    _st = false;
-                    return false;
-                } else {
-                    _st = true;
-                }
-            });
-            if (parseFloat($('#debit_balance').text().float()) != 0) {
-                if (_st) {
-                    var serialized = $(this).serializeArray();
-                    var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
-                    serialized.push({
-                        name: 'amount',
-                        value: amount
-                    })
-                    var entry = {};
-                    serialized.map(function(i) {
-                        entry[i.name] = i.value;
-                    });
+            var balances = document.getElementById("balance_debit");
+            var spanBal = balances.innerText;
 
-                    var details = saveJournalEntryDetails('save');
+            console.log(spanBal);
+
+            if (parseInt(spanBal) == 0) {
+                alert("Debit and Credit equal")
+              
+                var serialized = $(this).serializeArray();
+                var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
+                serialized.push({
+                    name: 'amount',
+                    value: amount
+                })
+                var _st = false;
+                $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
+                    var field = $(v).children()
+                    if ($(field[0]).find('.editable-row-item').text() == '' ||
+                        $(field[1]).find('.editable-row-item').val() == '' ||
+                        $(field[4]).find('.editable-row-item').val() == '') {
+                        _st = false;
+                        return false;
+                    } else {
+                        _st = true;
+                    }
+                });
+                if (parseFloat($('#debit_balance').text().float()) != 0) {
+                    if (_st) {
+                        var serialized = $(this).serializeArray();
+                        var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
+                        serialized.push({
+                            name: 'amount',
+                            value: amount
+                        })
+                        var entry = {};
+                        serialized.map(function(i) {
+                            entry[i.name] = i.value;
+                        });
+
+                        var details = saveJournalEntryDetails('save');
 
 
-                    var data = Object.assign({
-                        "journal_entry": entry,
-                        "details": details
-                    });
+                        var data = Object.assign({
+                            "journal_entry": entry,
+                            "details": details
+                        });
 
                     // console.log(data);
 
@@ -455,11 +463,15 @@
                         }
                     });
                 }
-            } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
-                alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
-            } else {
-                alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+                } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
+                    alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
+                } else {
+                    alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+                }
+            }else {
+                alert("Debit and Credit not equal")
             }
+
         });
         $(document).on('click', '.JnalFetch', function(e) {
             e.preventDefault();
