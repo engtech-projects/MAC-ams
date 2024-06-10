@@ -401,7 +401,7 @@
 
             console.log(spanBal);
 
-            if (parseInt(spanBal) == 0) {
+            if (parseFloat(spanBal) == 0) {
                 alert("Debit and Credit equal")
               
                 var serialized = $(this).serializeArray();
