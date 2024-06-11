@@ -619,46 +619,55 @@
                     _st = true;
                 }
             });
-            if (parseFloat($('#edit_balance_debit').text().float()) <= 0) {
-                if (_st) {
-                    var serialized = $(this).serializeArray();
-                    var amount = Number($('#edit_amount').val().replace(/[^0-9\.-]+/g, ""))
-                    serialized.push({
-                        name: 'amount',
-                        value: amount
-                    })
-                    var entry = {};
-                    serialized.map(function(i) {
-                        entry[i.name] = i.value;
-                    });
-                    var details = saveJournalEntryDetails();
-                    var data = Object.assign({
-                        "journal_entry": entry,
-                        "details": details
-                    });
-                    $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        type: "POST",
-                        url: "{{ route('journal.JournalEntryEdit') }}",
-                        data: data,
-                        dataType: "json",
-                        success: function(data) {
-                            toastr.success(data.message);
-                            saveJournalEntryDetails(data.id, 'update')
-                            reload();
-                        },
-                        error: function(data) {
-                            toastr.error('Error');
-                        }
-                    });
+
+            var edit_balance = document.getElementById("edit_balance_debit");
+            var edit_bal = edit_balance.innerText;
+
+            if (parseFloat(edit_bal) == 0){
+                if (parseFloat($('#edit_balance_debit').text().float()) <= 0) {
+                    if (_st) {
+                        var serialized = $(this).serializeArray();
+                        var amount = Number($('#edit_amount').val().replace(/[^0-9\.-]+/g, ""))
+                        serialized.push({
+                            name: 'amount',
+                            value: amount
+                        })
+                        var entry = {};
+                        serialized.map(function(i) {
+                            entry[i.name] = i.value;
+                        });
+                        var details = saveJournalEntryDetails();
+                        var data = Object.assign({
+                            "journal_entry": entry,
+                            "details": details
+                        });
+                        $.ajax({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            type: "POST",
+                            url: "{{ route('journal.JournalEntryEdit') }}",
+                            data: data,
+                            dataType: "json",
+                            success: function(data) {
+                                toastr.success(data.message);
+                                saveJournalEntryDetails(data.id, 'update')
+                                reload();
+                            },
+                            error: function(data) {
+                                toastr.error('Error');
+                            }
+                        });
                 }
-            } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
-                alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
-            } else {
-                alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+                } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
+                    alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
+                } else {
+                    alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+                }
+            }else {
+                alert("Unable to save, debit and credit is not equal")
             }
+           
         });
         $(document).on('click', '.JnalEdit', function(e) {
             $('#journalModalEdit').modal('show');
