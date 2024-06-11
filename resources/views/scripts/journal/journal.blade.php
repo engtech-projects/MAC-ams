@@ -601,24 +601,64 @@
         });
         $('#journalEntryFormEdit').submit(function(e) {
             e.preventDefault();
-            var s_data = $(this).serialize();
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "POST",
-                url: "{{ route('journal.JournalEntryEdit') }}",
-                data: s_data,
-                dataType: "json",
-                success: function(data) {
-                    if (data.message == 'update') {
-                        saveJournalEntryDetails(data.id, 'update')
-                    }
-                },
-                error: function(data) {
-                    toastr.error('Error');
+            var serialized = $(this).serializeArray();
+            var amount = Number($('#edit_amount').val().replace(/[^0-9\.-]+/g, ""))
+            serialized.push({
+                name: 'amount',
+                value: amount
+            })
+            var _st = false;
+            $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
+                var field = $(v).children()
+                if ($(field[0]).find('.editable-row-item').text() == '' ||
+                    $(field[1]).find('.editable-row-item').val() == '' ||
+                    $(field[4]).find('.editable-row-item').val() == '') {
+                    _st = false;
+                    return false;
+                } else {
+                    _st = true;
                 }
             });
+            if (parseFloat($('#edit_balance_debit').text().float()) <= 0) {
+                if (_st) {
+                    var serialized = $(this).serializeArray();
+                    var amount = Number($('#edit_amount').val().replace(/[^0-9\.-]+/g, ""))
+                    serialized.push({
+                        name: 'amount',
+                        value: amount
+                    })
+                    var entry = {};
+                    serialized.map(function(i) {
+                        entry[i.name] = i.value;
+                    });
+                    var details = saveJournalEntryDetails();
+                    var data = Object.assign({
+                        "journal_entry": entry,
+                        "details": details
+                    });
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: "POST",
+                        url: "{{ route('journal.JournalEntryEdit') }}",
+                        data: data,
+                        dataType: "json",
+                        success: function(data) {
+                            toastr.success(data.message);
+                            saveJournalEntryDetails(data.id, 'update')
+                            reload();
+                        },
+                        error: function(data) {
+                            toastr.error('Error');
+                        }
+                    });
+                }
+            } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
+                alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
+            } else {
+                alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+            }
         });
         $(document).on('click', '.JnalEdit', function(e) {
             $('#journalModalEdit').modal('show');
