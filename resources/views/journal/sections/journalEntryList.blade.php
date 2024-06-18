@@ -52,6 +52,15 @@
         .editable-container.editable-inline .control-group.form-group .editable-input input:not([type=radio]):not([type=checkbox]):not([type=submit]) {
             width: 100%;
         }
+
+        td.actions {
+            display: flex; 
+            flex-wrap: wrap; 
+            flex-direction: row; 
+            gap: 5px; 
+            justify-content: center;
+        }
+
     </style>
     <!-- Main content -->
     <section class="content">
@@ -102,7 +111,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="col-md-{{ Gate::allows('manager') ? '4':'6' }}">
                                         <div class="form-group">
                                             <label class="label-normal" for="s_status">Status</label>
@@ -143,8 +151,7 @@
                                             <label class="label-normal" for="book_ref" style="margin"></label>
                                             <br>
                                             <div class="input-group">
-                                                <button class="btn btn-flat btn-sm bg-gradient-success"
-                                                    id="searchJournal">SEARCH</button>
+                                                <button type="submit" class="btn btn-flat btn-sm bg-gradient-success">Search</button>
                                             </div>
                                         </div>
                                     </div>
@@ -158,9 +165,9 @@
                 <div class="col-md-12">
                     <!-- Table -->
                     <section class="content">
-                        {{--                 <a class="" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                       <!--  {{--                 <a class="" data-widget="control-sidebar" data-slide="true" href="#" role="button">
                     <i class="fas fa-cog"></i>
-                </a> --}}
+                </a> --}} -->
 
 
                         <div class="container-fluid">
@@ -171,7 +178,7 @@
                                         <th>Book Code</th>
                                         <th>Journal #</th>
                                         <th>Source</th>
-                                        <th>Amount</th>
+                                        <th class="text-right">Amount</th>
                                         <th>Remarks</th>
                                         <th>Branch</th>
                                         <th>Status</th>
@@ -181,7 +188,6 @@
                                         @foreach ($journalEntryList as $journal)
                                             <tr class="tbl-row" data-id="{{ $journal->journal_id }}">
                                                 <td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('M d, Y') }}</td>
-                                                <!-- <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td> -->
                                                 <td class="font-weight-bold">{{ $journal->journal_no }}</td>
                                                 <td>{{ $journal->source }}</td>
                                                 <td class="journal-amount">{{ $journal->amount }}</td>
@@ -191,73 +197,41 @@
                                                         <li> {{ $remark }}</li>
                                                     @endforeach
                                                 </td>
-                                                <!-- <td class="font-weight-bold">{{ $journal->branch_id }}</td> -->
                                                 <td
                                                     class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
                                                     <b>{{ ucfirst($journal->status) }}</b>
                                                 </td>
-                                                <td>
-                                                    <button value="{{ $journal->journal_id }}"
-                                                        {{ $journal->status == 'posted' ? 'disabled' : '' }}
-                                                        class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i
-                                                            class="fa fa-trash"></i></button>
-                                                    <button value="{{ $journal->journal_id }}"
-                                                        class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i
-                                                            class="fa fa-eye"></i></button>
-                                                    <button value="{{ $journal->journal_id }}"
-                                                        {{ $journal->status == 'posted' ? 'disabled' : '' }}
-                                                        class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i
-                                                            class="fa fa-edit"></i></button>
-                                                    <button value="{{ $journal->journal_id }}"
-                                                        {{ $journal->status == 'posted' ? 'disabled' : '' }}
-                                                        class="btn btn-flat btn-xs bg-gradient-success stStatus"><i
-                                                            class="fa fa-check"></i></button>
+                                                <td class="actions"> 
+
+                                                    <button value="{{ $journal->journal_id }}" class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"
+                                                        disabled="{{ ($journal->status == 'posted') ? 'true' : 'false' }}"
+                                                        >
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+
+                                                    <button value="{{ $journal->journal_id }}" class="btn btn-flat btn-xs JnalView bg-gradient-primary">
+                                                        <i class="fa fa-eye"></i>
+                                                    </button>
+
+                                                    <button 
+                                                        data-route="{{ route('journal.JournalEntryFetch') }}" 
+                                                        value="{{ $journal->journal_id }}"
+                                                        disabled="{{ ($journal->status == 'posted') ? 'true' : 'false' }}"
+                                                        class="btn btn-flat btn-xs JnalEdit bg-gradient-info">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+
+                                                    <button value="{{ $journal->journal_id }}" disabled="{{ ($journal->status == 'posted') ? 'true' : 'false' }}"
+                                                        class="btn btn-flat btn-xs bg-gradient-success stStatus">
+                                                        <i class="fa fa-check"></i>
+                                                    </button>
+
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <!-- <div id="account-details">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <table class="table table-bordered table-sm" id="tbl-create-journal">
-                                                    <thead>
-                                                        <tr class="text-center">
-                                                            <th>Account #</th>
-                                                            <th>Account Name</th>
-
-                                                            <th>S/L</th>
-                                                            <th width="150">Debit</th>
-                                                            <th width="150">Credit</th>
-
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="tbl-preview-container">
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr class="text-center">
-                                                            <th></th>
-                                                            <th width="200"></th>
-                                                            <th width="200">TOTAL</th>
-                                                            <th width="150" id="vtotal_debit">0</th>
-                                                            <th width="150" id="vtotal_credit">0</th>
-
-                                                        </tr>
-                                                        <tr class="text-center">
-                                                            <th></th>
-                                                            <th width="200"></th>
-                                                            <th width="200">BALANCE</th>
-                                                            <th width="150" id="vbalance_debit">0</th>
-                                                            <th width="150" id="vbalance_credit">0</th>
-
-
-                                                        </tr>
-
-                                                    </tfoot>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div> -->
+                             
                             </div>
                         </div>
                     </section>
@@ -266,6 +240,9 @@
             </div>
         </div>
         </div>
+
+
+
         <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
             aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
@@ -426,191 +403,191 @@
             </div>
         </div>
         </div>
+
         <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit"
             aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="container-fluid ">
+                            <form id="journalEntryFormEdit" method="POST" action="{{ route('journal.JournalEntryEdit') }}">
+                            @csrf
+                                <input type="hidden" class="form-control form-control-sm rounded-0" name="edit_journal_id" id="edit_journal_id" placeholder="">
                             <div class="col-md-12">
-                                <form id="journalEntryFormEdit" method="POST">
-                                    @csrf
-                                    <input type="hidden" class="form-control form-control-sm rounded-0"
-                                        name="edit_journal_id" id="edit_journal_id" placeholder="">
-                                    <div class="row">
-                                        <div class="col-md-8 frm-header">
-                                            <h4><b>Journal Entry (Edit)</b></h4>
+                                
+                                <div class="row">
+                                    <div class="col-md-8 frm-header">
+                                        <h4><b>Journal Entry (Edit)</b></h4>
+                                    </div>
+                                    <div class="col-md-2 frm-header">
+                                        <label class="label-normal" for="date">Journal Date</label>
+                                        <div class="input-group">
+                                            <input type="date" class="form-control form-control-sm rounded-0"
+                                                name="edit_journal_date" id="edit_journal_date"
+                                                placeholder="Journal Date" required>
                                         </div>
-                                        <div class="col-md-4 frm-header">
-                                            <label class="label-normal" for="date">Journal Date</label>
-                                            <div class="input-group">
-                                                <input type="date" class="form-control form-control-sm rounded-0"
-                                                    name="edit_journal_date" id="edit_journal_date"
-                                                    placeholder="Journal Date" required>
-                                            </div>
+                                    </div>
+                                    <div class="col-md-2 frm-header">
+                                        <label class="label-normal" for="">Reference #</label>
+                                        <div class="input-group">
+                                            <label class="label-normal" id="edit_LrefNo"></label>
+                                            <input type="hidden" name="edit_journal_no" id="edit_journal_no"> 
                                         </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_branch_id">Branch</label>
-                                                    <div class="input-group">
-                                                        <select name="edit_branch_id" class="form-control form-control-sm"
-                                                            id="edit_branch_id" required>
-                                                            <option value="" disabled selected>-Select Branch-
-                                                            </option>
-                                                            <option value="1">Butuan City Branch</option>
-                                                            <option value="2">Nasipit Branch</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="">Book Reference</label>
-                                                    <div class="input-group">
-                                                        <select name="edit_book_id" class="form-control form-control-sm"
-                                                            id="edit_book_id" required>
-                                                            <option value="" disabled selected>-Select Book
-                                                                References-</option>
-                                                            @foreach ($journalBooks as $journalBook)
-                                                                <option value="{{ $journalBook->book_id }}"
-                                                                    _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
-                                                                    book-src="{{ $journalBook->book_src }}">
-                                                                    {{ $journalBook->book_name }} ({{ $journalBook->book_code }})
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="">Reference No.</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal" id="edit_LrefNo"></label>
-                                                        <input type="hidden" name="edit_journal_no" id="edit_journal_no"> 
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_source">Source</label>
-                                                    <div class="input-group">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm rounded-0"
-                                                            name="edit_source" id="edit_source" placeholder="Source"
-                                                            required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_cheque_no">Cheque No</label>
-                                                    <div class="input-group">
-                                                        <input type="Number"
-                                                            class="form-control form-control-sm rounded-0"
-                                                            name="edit_cheque_no" id="edit_cheque_no"
-                                                            placeholder="Cheque No">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_cheque_date">Cheque Date</label>
-                                                    <div class="input-group">
-                                                        <input type="date"
-                                                            class="form-control form-control-sm rounded-0"
-                                                            name="edit_cheque_date" id="edit_cheque_date"
-                                                            placeholder="Cheque Date">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_status">Status</label>
-                                                    <div class="input-group">
-                                                        <select name="edit_status" class="form-control form-control-sm"
-                                                            id="edit_status" required>
-                                                            <option value="unposted" selected>Unposted</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_amount">Amount</label>
-                                                    <div class="input-group">
-                                                        <input type="number"
-                                                            class="form-control form-control-sm rounded-0"
-                                                            name="edit_amount" id="edit_amount" step="any"
-                                                            placeholder="Amount" required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_payee">Payee</label>
-                                                    <div class="input-group">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm rounded-0"
-                                                            name="edit_payee" id="edit_payee" placeholder="Payee"
-                                                            required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_remarks">Remarks (<font
-                                                            style="color:red;">Separate with double colon (::) for the next
-                                                            remarks</font>)</label>
-                                                    <div class="input-group">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm rounded-0"
-                                                            name="edit_remarks" id="edit_remarks" placeholder="Remarks"
-                                                            required>
-                                                    </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_branch_id">Branch</label>
+                                                <div class="input-group">
+                                                    <select name="edit_branch_id" class="form-control form-control-sm"
+                                                        id="edit_branch_id" required>
+                                                        <option value="" disabled selected>-Select Branch-
+                                                        </option>
+                                                        <option value="1">Butuan City Branch</option>
+                                                        <option value="2">Nasipit Branch</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <button id="edit_btn_submit" style="display:none;"> UPDATE</button>
-                                </form>
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="">Book Reference</label>
+                                                <div class="input-group">
+                                                    <select name="edit_book_id" class="form-control form-control-sm"
+                                                        id="edit_book_id" required>
+                                                        <option value="" disabled selected>-Select Book
+                                                            References-</option>
+                                                        @foreach ($journalBooks as $journalBook)
+                                                            <option value="{{ $journalBook->book_id }}"
+                                                                _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
+                                                                book-src="{{ $journalBook->book_src }}">
+                                                                {{ $journalBook->book_name }} ({{ $journalBook->book_code }})
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_source">Source</label>
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                        class="form-control form-control-sm rounded-0"
+                                                        name="edit_source" id="edit_source" placeholder="Source"
+                                                        required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_cheque_no">Cheque No</label>
+                                                <div class="input-group">
+                                                    <input type="Number"
+                                                        class="form-control form-control-sm rounded-0"
+                                                        name="edit_cheque_no" id="edit_cheque_no"
+                                                        placeholder="Cheque No">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_cheque_date">Cheque Date</label>
+                                                <div class="input-group">
+                                                    <input type="date"
+                                                        class="form-control form-control-sm rounded-0"
+                                                        name="edit_cheque_date" id="edit_cheque_date"
+                                                        placeholder="Cheque Date">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_status">Status</label>
+                                                <div class="input-group">
+                                                    <select name="edit_status" class="form-control form-control-sm"
+                                                        id="edit_status" required>
+                                                        <option value="unposted" selected>Unposted</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_amount">Amount</label>
+                                                <div class="input-group">
+                                                    <input type="number"
+                                                        class="form-control form-control-sm rounded-0"
+                                                        name="edit_amount" id="edit_amount" step="any"
+                                                        placeholder="Amount" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_payee">Payee</label>
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                        class="form-control form-control-sm rounded-0"
+                                                        name="edit_payee" id="edit_payee" placeholder="Payee"
+                                                        required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="edit_remarks">Remarks (<font
+                                                        style="color:red;">Separate with double colon (::) for the next
+                                                        remarks</font>)</label>
+                                                <div class="input-group">
+                                                    <textarea rows="3"
+                                                        class="form-control form-control-sm rounded-0"
+                                                        name="edit_remarks" id="edit_remarks" placeholder="Remarks"
+                                                        required>
+                                                    </textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                             </div>
                             <div class="co-md-12" style="height:10px;"></div>
                             <div class="col-md-12">
                                 <div class="col-md-12 text-right">
-                                    <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i
-                                            class="fa fa-plus"></i> Add Details </button>
+                                    <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item">
+                                        <i class="fa fa-plus"></i> Add Details 
+                                    </button>
                                 </div>
+
                                 <div class="co-md-12" style="height:10px;"></div>
+
                                 <div class="row">
                                     <div class="col-md-12">
                                         <table class="table table-bordered table-sm text-center"
                                             id="tbl-create-journal-container" style="table-layout: fixed;">
                                             <thead>
                                                 <tr class="text-center">
-                                                    <th style="width: 10%;">Account #</th>
-                                                    <th style="width: 30%;">Account Name</th>
-                                                    <th style="width: 15%;">Debit</th>
-                                                    <th style="width: 15%;">Credit</th>
+                                                    <th style="width: 14%">Account #</th>
+                                                    <th style="width: 25%;">Account</th>
+                                                    <th class="text-right" style="width: 13%;">Debit</th>
+                                                    <th class="text-right" style="width: 13%;">Credit</th>
                                                     <th style="width: 30%;">S/L</th>
                                                     <th style="width: 5%;">Action</th>
                                                 </tr>
@@ -619,16 +596,16 @@
                                             <tfoot>
                                                 <tr class="text-center">
                                                     <th></th>
-                                                    <th>TOTAL</th>
-                                                    <th width="150">₱<span id="edit_total_debit">0.00</span></th>
-                                                    <th width="150">₱<span id="edit_total_credit">0.00</span></th>
+                                                    <th class="text-right">TOTAL</th>
+                                                    <th class="text-right" width="150">₱<span id="edit_total_debit">0.00</span></th>
+                                                    <th class="text-right" width="150">₱<span id="edit_total_credit">0.00</span></th>
                                                     <th></th>
                                                     <th class="text-right" width="50"></th>
                                                 </tr>
-                                                <tr class="text-center">
+                                                <tr>
                                                     <th></th>
-                                                    <th>BALANCE</th>
-                                                    <th>₱<span id="edit_balance_debit">0.00</span></th>
+                                                    <th class="text-right">BALANCE</th>
+                                                    <th class="text-right">₱<span id="edit_balance_debit">0.00</span></th>
                                                     <th></th>
                                                     <th></th>
                                                     <th class="text-right" width="50"></th>
@@ -639,9 +616,9 @@
                                 </div>
                             </div>
                             <div class="col-md-12 text-right">
-                                <button class="btn btn-flat btn-sm bg-gradient-success"
-                                    onclick="$('#edit_btn_submit').click()"> UPDATE JOURNAL</button>
+                                <button type="submit" class="btn btn-flat btn-sm bg-gradient-success"> Save and Close </button>
                             </div>
+                            </form>
                             <!-- Button trigger modal -->
                         </div>
                     </div>
@@ -649,6 +626,7 @@
             </div>
         </div>
         </div>
+
         <!-- Modal -->
         <div class="modal fade" id="journalDetailsVoucher" tabindex="2" role="dialog"
             aria-labelledby="journalDetailsVoucherLabel" aria-hidden="true">
@@ -749,26 +727,6 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-lg-4 col-sm-5"></div>
-                                            <div class="col-lg-4 col-sm-5 ml-auto">
-
-                                                <!-- <table class="table table-clear">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="left">
-                                                                    <strong>TOTAL</strong>
-                                                                </td>
-                                                                <td class="left"><strong id="total_debit_voucher"></strong>
-                                                                </td>
-                                                                <td class="left"><strong id="total_credit_voucher"></strong>
-                                                                </td>
-                                                            </tr>
-
-                                                        </tbody>
-                                                    </table> -->
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -785,4 +743,5 @@
 
     @section('footer-scripts')
         @include('scripts.journal.journal')
+        @include('scripts.journal.script')
     @endsection

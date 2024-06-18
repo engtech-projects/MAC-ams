@@ -265,18 +265,19 @@
         });
 
 
-        $('[data-toggle="tooltip"]').tooltip({
-            show: true,
-            html: true,
-            title: "Hello",
-            template: `
-        <div class="custom-tooltip tooltip">
-            <div class="tooltip-inner">Hi</div>
-        </div>
-        `
-        })
+        // $('[data-toggle="tooltip"]').tooltip({
+        //     show: true,
+        //     html: true,
+        //     title: "Hello",
+        //     template: `
+        // <div class="custom-tooltip tooltip">
+        //     <div class="tooltip-inner">Hi</div>
+        // </div>
+        // `
+        // })
 
         $('form').attr('autocomplete', 'off');
+
         var journalEntryDetails = $('#journalEntryDetails').DataTable({
             dom: 'Bftrip',
             pageLength: 10,
@@ -303,14 +304,13 @@
                 },
             ],
         });
+
         var Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 3000
         });
-
-
 
         $('.select2').select2({
             placeholder: 'Select',
@@ -327,10 +327,10 @@
             allowClear: true,
         });
 
-        $(document).on('change', '#amount', function() {
-            if ($.isNumeric($(this).val())) {
-            }
-        })
+        // $(document).on('change', '#amount', function() {
+        //     if ($.isNumeric($(this).val())) {
+        //     }
+        // })
 
 
 
@@ -352,12 +352,13 @@
 
         $(".editables").on("shown", function(e, editable) {
 
-            // console.log(editable.input.$input)
+            console.log(editable.input.$input)
         });
 
         function submitEditable() {
            $('.editable-table-data .editableform').editable().submit();
         }
+
         $(document).on('click', '.remove-journalDetails', function(e) {
             $(this).parents('tr').remove();
         })
@@ -526,140 +527,141 @@
         $(document).on('click', '.stsVoucher', function(e) {
             $('#journalDetailsVoucher').modal('show')
         });
-        $('#journalEntryFormEdit').submit(function(e) {
-            e.preventDefault();
+        // $('#journalEntryFormEdit').submit(function(e) {
+        //     e.preventDefault();
 
-            var s_data = $(this).serialize();
+        //     var s_data = $(this).serialize();
 
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "POST",
-                url: "{{ route('journal.JournalEntryEdit') }}",
-                data: s_data,
-                dataType: "json",
-                success: function(data) {
-                    if (data.message == 'update') {
-                        saveJournalEntryDetails('update');
-                        toastr.success('Record has been updated');
-                    }
-                },
-                error: function(data) {
-                    toastr.error('Error');
-                }
-            });
-        });
+        //     $.ajax({
+        //         headers: {
+        //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //         },
+        //         type: "POST",
+        //         url: "{{ route('journal.JournalEntryEdit') }}",
+        //         data: s_data,
+        //         dataType: "json",
+        //         success: function(data) {
+        //             if (data.message == 'update') {
+        //                 saveJournalEntryDetails('update');
+        //                 toastr.success('Record has been updated');
+        //             }
+        //         },
+        //         error: function(data) {
+        //             toastr.error('Error');
+        //         }
+        //     });
+        // });
         $(document).on('click', '.JnalEdit', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
             $('#tbl-create-edit-container').html('');
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "POST",
-                data: {
-                    journal_id: id
-                },
-                url: "{{ route('journal.JournalEntryFetch') }}",
-                dataType: "json",
-                success: function(response) {
-                    if (response.message == 'fetch') {
-                        $.each(response.data, function(k, v) {
-                            var total_debit = 0;
-                            var total_credit = 0;
-                            var balance = 0;
-                            $('#edit_LrefNo').text(v.journal_no)
-                            $('#edit_journal_no').val(v.journal_no);
-                            $('#edit_journal_id').val(v.journal_id);
-                            $('#edit_journal_date').val(v.journal_date);
-                            $('#edit_branch_id').val(v.branch_id);
-                            $('#edit_book_id').val(v.book_id);
-                            $('#edit_source').val(v.source);
-                            $('#edit_cheque_no').val(v.cheque_no);
-                            $('#edit_cheque_date').val(v.cheque_date);
-                            $('#edit_status').val(v.status);
-                            $('#edit_amount').val(v.amount);
-                            $('#edit_payee').val(v.payee);
-                            $('#edit_remarks').val(v.remarks);
+            // $.ajax({
+                // headers: {
+                //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                // },
+                // type: "POST",
+                // data: {
+                //     journal_id: id
+                // },
+                // url: "{{ route('journal.JournalEntryFetch') }}",
+                // dataType: "json",
+                // success: function(response) {
+       //              if (response.message == 'fetch') {
+       //                  $.each(response.data, function(k, v) {
+       //                      var total_debit = 0;
+       //                      var total_credit = 0;
+       //                      var balance = 0;
+       //                      $('#edit_LrefNo').text(v.journal_no)
+       //                      $('#edit_journal_no').val(v.journal_no);
+       //                      $('#edit_journal_id').val(v.journal_id);
+       //                      $('#edit_journal_date').val(v.journal_date);
+       //                      $('#edit_branch_id').val(v.branch_id);
+       //                      $('#edit_book_id').val(v.book_id);
+       //                      $('#edit_source').val(v.source);
+       //                      $('#edit_cheque_no').val(v.cheque_no);
+       //                      $('#edit_cheque_date').val(v.cheque_date);
+       //                      $('#edit_status').val(v.status);
+       //                      $('#edit_amount').val(v.amount);
+       //                      $('#edit_payee').val(v.payee);
+       //                      $('#edit_remarks').val(v.remarks);
 
-                            $.each(v.journal_entry_details, function(kk, vv) {
-                                $('#tbl-create-edit-container').append(`<tr class='editable-table-row'>
-								<td class="acctnu" value="" >
-									<a href="#" class="editable-row-item journal_details_account_no">${vv.account.account_number}</a>
-								</td>
-								<td class='editable-table-data' value="" >
-									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item COASelect">
-										<option disabled value="" selected>-Select Account Name-</option>
-										@foreach ($chartOfAccount as $account)
-											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">
-                                                {{$account->account_number}} - {{$account->account_name}}
-                                            </option>
-										@endforeach
-									</select>
-								</td>
-                            </td>
-                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
-                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
-
-
-								<td class='editable-table-data' value="" >
-									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
-										@foreach ($subsidiaries as $subsidiary)
-											<option value="{{ $subsidiary->sub_id }}">{{ $subsidiary->sub_name }}</option>
-										@endforeach
-									</select>
-								</td>
-								<td>
-									<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
-										<span>
-											<i class="fas fa-trash" aria-hidden="true"></i>
-										</span>
-									</button>
-								</td>
-							</tr>`);
-                                $('#subsidiary_acct_' + vv.journal_details_id)
-                                    .val(vv.account_id);
-                                $('#subsidiary_' + vv.journal_details_id).val(vv
-                                    .subsidiary_id);
-                                total_debit = parseFloat(total_debit) +
-                                    parseFloat(vv.journal_details_debit)
-                                total_credit = parseFloat(total_credit) +
-                                    parseFloat(vv.journal_details_credit)
-                                balance = parseFloat(total_debit) - parseFloat(
-                                    total_credit)
-                            });
-                            $('#edit_total_debit').text(Number(total_debit)
-                                .toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                }));
-                            $('#edit_total_credit').text(Number(total_credit)
-                                .toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                }));
-                            $('#edit_balance_debit').text(Number(balance)
-                                .toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                }));
-                            $('.select-account').select2({
-                                placeholder: 'Select Account',
-                                allowClear: true,
-                            });
-                        });
-                    }
+       //                      $.each(v.journal_entry_details, function(kk, vv) {
+       //                          $('#tbl-create-edit-container').append(`<tr class='editable-table-row'>
+							// 	<td class="acctnu" value="" >
+							// 		<a href="#" class="editable-row-item journal_details_account_no">${vv.account.account_number}</a>
+							// 	</td>
+							// 	<td class='editable-table-data' value="" >
+							// 		<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item COASelect">
+							// 			<option disabled value="" selected>-Select Account Name-</option>
+							// 			@foreach ($chartOfAccount as $account)
+							// 				<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">
+       //                                          {{$account->account_number}} - {{$account->account_name}}
+       //                                      </option>
+							// 			@endforeach
+							// 		</select>
+							// 	</td>
+       //                      </td>
+       //                     <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
+       //                     <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
 
 
-                },
-                error: function() {
-                    console.log("Error");
-                }
-            });
+							// 	<td class='editable-table-data' value="" >
+							// 		<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
+							// 			@foreach ($subsidiaries as $subsidiary)
+							// 				<option value="{{ $subsidiary->sub_id }}">{{ $subsidiary->sub_name }}</option>
+							// 			@endforeach
+							// 		</select>
+							// 	</td>
+							// 	<td>
+							// 		<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
+							// 			<span>
+							// 				<i class="fas fa-trash" aria-hidden="true"></i>
+							// 			</span>
+							// 		</button>
+							// 	</td>
+							// </tr>`);
+                            
+       //                          $('#subsidiary_acct_' + vv.journal_details_id)
+       //                              .val(vv.account_id);
+       //                          $('#subsidiary_' + vv.journal_details_id).val(vv
+       //                              .subsidiary_id);
+       //                          total_debit = parseFloat(total_debit) +
+       //                              parseFloat(vv.journal_details_debit)
+       //                          total_credit = parseFloat(total_credit) +
+       //                              parseFloat(vv.journal_details_credit)
+       //                          balance = parseFloat(total_debit) - parseFloat(
+       //                              total_credit)
+       //                      });
+       //                      $('#edit_total_debit').text(Number(total_debit)
+       //                          .toLocaleString(undefined, {
+       //                              minimumFractionDigits: 2,
+       //                              maximumFractionDigits: 2
+       //                          }));
+       //                      $('#edit_total_credit').text(Number(total_credit)
+       //                          .toLocaleString(undefined, {
+       //                              minimumFractionDigits: 2,
+       //                              maximumFractionDigits: 2
+       //                          }));
+       //                      $('#edit_balance_debit').text(Number(balance)
+       //                          .toLocaleString(undefined, {
+       //                              minimumFractionDigits: 2,
+       //                              maximumFractionDigits: 2
+       //                          }));
+       //                      $('.select-account').select2({
+       //                          placeholder: 'Select Account',
+       //                          allowClear: true,
+       //                      });
+       //                  });
+       //              }
 
-            $('#journalModalEdit').modal('show');
+
+                // },
+                // error: function() {
+                //     console.log("Error");
+                // }
+            // });
+
+            
             
         });
 
@@ -808,56 +810,7 @@
         //         }
         //     });
         // })
-        $('#SearchJournalForm').submit(function(e) {
-            e.preventDefault();
-            var s_data = $(this).serialize();
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "GET",
-                url: "{{ route('journal.searchJournalEntry') }}",
-                data: s_data,
-                dataType: "json",
-                success: function(data) {
-                    $('#journalEntryDetails').DataTable().destroy();
-                    $('#journalEntryDetailsContent').html('');
 
-                    $.each(data, function(k, v) {
-
-                        var status = (v.status == 'posted') ? 'text-success' :
-                            'text-danger';
-                        var disabled = (v.status == 'posted') ? 'disabled' : '';
-
-                        $('#journalEntryDetailsContent').append(
-                            `<tr>
-                            <td>${v.journal_date}</td>
-							<td class="font-weight-bold">${v.book_details.book_code}</td>
-                            <td>${v.journal_no}</td>
-							<td>${v.source}</td>
-							<td>${v.amount}</td>
-							<td>${v.remarks}</td>
-                            <td>${v.branch_id}</td>
-							<td class="text-danger"><b>${v.status}</b></td>
-							<td>
-                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs bg-gradient-danger jnalDelete"><i class="fa fa-trash"></i></button>
-                                <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary"><i class="fa fa-eye"></i></button>
-                                <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info"><i class="fa fa-edit"></i></button>
-                                <button value="${v.journal_id}" class="btn btn-flat btn-xs bg-gradient-success stStatus"><i class="fa fa-check"></i></button>
-							</td>
-						</tr>`
-                        );
-
-
-
-                    });
-                    $('#journalEntryDetails').DataTable();
-                },
-                error: function(data) {
-                    toastr.error('Error');
-                }
-            });
-        });
         $(document).on('blur', '#cheque_no', function(e) {
             e.preventDefault();
             // console.log($(this).val())

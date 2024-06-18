@@ -121,15 +121,25 @@ class JournalController extends MainController
     }
     public function searchJournalEntry(Request $request)
     {
-        return json_encode(
-            JournalEntry::fetch(
-                $request->s_status,
-                $request->s_from,
-                $request->s_to,
-                $request->s_book_id,
-                $request->s_branch_id
-            )
+
+       // Fetch journal entries
+        $journalEntries = JournalEntry::fetch(
+            $request->s_status,
+            $request->s_from,
+            $request->s_to,
+            $request->s_book_id,
+            $request->s_branch_id
         );
+
+        // Append branch name to each journal entry
+        foreach ($journalEntries as $entry) {
+            $entry->branch_name = $entry->branch->branch_name;
+        }
+
+        // Return JSON response with journal entries including branch name
+        return response()->json($journalEntries);
+
+
     }
     public function journalEntryList(Request $request)
     {   
@@ -144,18 +154,7 @@ class JournalController extends MainController
             'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get(),
             'default_date_start' => $current_date->toDateString()
         ];
-        // return response()->json(['data' => $data]); 
-
-        // echo '<pre>';
-        // var_export($current_date->toDateString());
-        // echo '</pre>';
+        
         return view('journal.sections.journalEntryList', $data);
     }
-    public function show($id)
-    {
-    }
-    public function populate()
-    {
-    }
-
 }
