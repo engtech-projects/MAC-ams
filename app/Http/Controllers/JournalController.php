@@ -30,6 +30,12 @@ class JournalController extends MainController
     {
         $this->journalEntry();
     }
+
+    public function generateJournalNumber(JournalBook $journalBook)
+    {
+        $journalNumber = $journalBook->generateJournalNumber();
+        return response()->json(['data' => $journalNumber]);
+    }
     public function create()
     {
         $transactionType = TransactionType::where('transaction_type', 'journal')->first();
@@ -77,7 +83,7 @@ class JournalController extends MainController
     }
     public function JournalEntryFetch(Request $request)
     {
-        $journalEntry = JournalEntry::with(['bookDetails',  'journalEntryDetails','journalEntryDetails.account','branch','journalEntryDetails.subsidiary'])->where('journal_id', $request->journal_id)->get();
+        $journalEntry = JournalEntry::with(['bookDetails',  'journalEntryDetails', 'journalEntryDetails.account', 'branch', 'journalEntryDetails.subsidiary'])->where('journal_id', $request->journal_id)->get();
         return response()->json(['message' => 'fetch', 'data' => $journalEntry]);
 
         //return json_encode(['message' => 'fetch', 'data' => JournalEntry::with(['bookDetails', 'journalEntryDetails'])->where('journal_id', $request->journal_id)->get()]);
@@ -93,8 +99,9 @@ class JournalController extends MainController
     }
     public function JournalEntryEdit(Request $request)
     {
-        $journal = JournalEntry::find($request->journal_entry['edit_journal_id']);
-        DB::transaction(function() use($request, $journal){
+        $journal = JournalEntry::find($request->edit_journal_id);
+
+        DB::transaction(function () use ($request, $journal) {
             $journal->journal_no = $request->journal_entry['edit_journal_no'];
             $journal->journal_date = $request->journal_entry['edit_journal_date'];
             $journal->branch_id = $request->journal_entry['edit_branch_id'];
@@ -124,11 +131,11 @@ class JournalController extends MainController
         if ($journal->save()) {
             return response()->json(['message' => $journal->status]);
         }
-        
+
         return response()->json(['message' => 'error']);
     }
     public function searchJournalEntry(Request $request)
-    {   
+    {
         // Fetch journal entries
         $journalEntries = JournalEntry::fetch(
             $request->s_status,
@@ -147,7 +154,7 @@ class JournalController extends MainController
         return response()->json($journalEntries);
     }
     public function journalEntryList(Request $request)
-    {   
+    {
         $accounting = Accounting::getFiscalYear();
         $current_date = Carbon::now();
 
@@ -159,7 +166,7 @@ class JournalController extends MainController
             'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get(),
             'default_date_start' => $current_date->toDateString()
         ];
-        // return response()->json(['data' => $data]); 
+        // return response()->json(['data' => $data]);
 
         // echo '<pre>';
         // var_export($current_date->toDateString());
@@ -172,5 +179,4 @@ class JournalController extends MainController
     public function populate()
     {
     }
-
 }

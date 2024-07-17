@@ -46,14 +46,14 @@ class journalEntry extends Model
 
     public function journalEntryDetails()
     {
-        return $this->hasMany(journalEntryDetails::class,'journal_id','journal_id');
+        return $this->hasMany(journalEntryDetails::class, 'journal_id', 'journal_id');
     }
 
-    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id='', $order = 'ASC', $journal_no = '')
-    {   
+    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'ASC', $journal_no = '')
+    {
         if (!$branch_id && !Gate::allows('manager')) {
             $branch_id = session()->get('auth_user_branch');
-        } 
+        }
 
         $query = journalEntry::with(['journalDetails', 'bookDetails']);
         // $query = journalEntry::with(['bookDetails']);
@@ -98,6 +98,7 @@ class journalEntry extends Model
         return $this->belongsTo(Accounts::class, 'account_id');
     }
 
+
     public function createJournalEntry($request)
     {
         $requestEntry = $request["journal_entry"];
@@ -140,19 +141,19 @@ class journalEntry extends Model
             ->when($branchId, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })->with([
-                    'branch' => function ($query) {
-                        $query->select('branch_id', 'branch_name');
-                    },
-                    'details' => function ($query) {
-                        $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')->whereIn('account_id', [
-                            Accounts::CASH_IN_BANK_BDO_ACC,
-                            Accounts::CASH_IN_BANK_MYB_ACC,
-                            Accounts::CASH_ON_HAND_ACC,
-                            Accounts::PAYABLE_CHECK_ACC,
-                            Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC,
-                        ]);
-                    }
-                ])->get();
+                'branch' => function ($query) {
+                    $query->select('branch_id', 'branch_name');
+                },
+                'details' => function ($query) {
+                    $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')->whereIn('account_id', [
+                        Accounts::CASH_IN_BANK_BDO_ACC,
+                        Accounts::CASH_IN_BANK_MYB_ACC,
+                        Accounts::CASH_ON_HAND_ACC,
+                        Accounts::PAYABLE_CHECK_ACC,
+                        Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC,
+                    ]);
+                }
+            ])->get();
 
 
         $collectionEntries = [
@@ -198,7 +199,6 @@ class journalEntry extends Model
             } else {
                 return $item["book_id"] == $books;
             }
-
         })->map(function ($item) use ($account, $type, $transaction) {
             $entry = collect($item);
             $entry["details"] = collect($entry["details"])->filter(function ($detail) use ($account, $type, $transaction) {
@@ -235,41 +235,40 @@ class journalEntry extends Model
                 $query->when(isset($filter['account_id']), function ($query) use ($filter) {
                     $query->where('account_id', $filter['account_id']);
                 })
-                ->with('entries', function ($query) use($filter) {
-                    $query->select([
-                        'journal_entry_details.journal_details_id',
-                        'journal_entry.journal_id',
-                        'journal_entry_details.account_id',
-                        'journal_entry.journal_no',
-                        'journal_entry.source',
-                        'journal_entry.cheque_no',
-                        'journal_entry.journal_date',
-                        'journal_entry.branch_id',
-                        'journal_entry.status',
-                        'journal_entry_details.journal_details_debit as debit',
-                        'journal_entry_details.journal_details_credit as credit'
-                    ])->when(isset($filter['as_of']),function($query) use($filter) {
-                        $query->where('journal_entry.journal_date','<=',$filter['as_of']);
-                    })->when(isset($filter["date_from"]) && isset($filter["date_to"]), function ($query) use($filter) {
-                        $query->whereBetween('journal_entry.journal_date', [$filter['date_from'], $filter['date_to']]);
-                    })
-                    ->posted()
-                    ->with('branch:branch_id,branch_code,branch_name');
-                });
+                    ->with('entries', function ($query) use ($filter) {
+                        $query->select([
+                            'journal_entry_details.journal_details_id',
+                            'journal_entry.journal_id',
+                            'journal_entry_details.account_id',
+                            'journal_entry.journal_no',
+                            'journal_entry.source',
+                            'journal_entry.cheque_no',
+                            'journal_entry.journal_date',
+                            'journal_entry.branch_id',
+                            'journal_entry.status',
+                            'journal_entry_details.journal_details_debit as debit',
+                            'journal_entry_details.journal_details_credit as credit'
+                        ])->when(isset($filter['as_of']), function ($query) use ($filter) {
+                            $query->where('journal_entry.journal_date', '<=', $filter['as_of']);
+                        })->when(isset($filter["date_from"]) && isset($filter["date_to"]), function ($query) use ($filter) {
+                            $query->whereBetween('journal_entry.journal_date', [$filter['date_from'], $filter['date_to']]);
+                        })
+                            ->posted()
+                            ->with('branch:branch_id,branch_code,branch_name');
+                    });
             })
             ->select('account_id', 'account_number', 'account_name')
             ->get();
         return $journalEntry;
-
     }
 
 
     public function getSubsidiaryListing(array $filter)
     {
         $collections = collect($this->getJournalEntry($filter));
-        $subsidiaryListing = $collections->map(function($item,$key) {
-            $item["entries"] = collect($item["entries"])->groupBy(function($item) {
-                return $item["branch"] == null ? "NO BRANCH" : $item["branch"]["branch_code"] .' '. $item["branch"]["branch_name"];
+        $subsidiaryListing = $collections->map(function ($item, $key) {
+            $item["entries"] = collect($item["entries"])->groupBy(function ($item) {
+                return $item["branch"] == null ? "NO BRANCH" : $item["branch"]["branch_code"] . ' ' . $item["branch"]["branch_name"];
             });
 
             $data = [
@@ -278,14 +277,14 @@ class journalEntry extends Model
                 "account_name" => $item["account_name"],
                 "entries" => $item["entries"],
             ];
-            $data["entries"] = collect($data["entries"])->map(function($item) {
+            $data["entries"] = collect($data["entries"])->map(function ($item) {
 
                 $newJournalEntryCollection = [];
                 $balance = 0;
                 $item = collect($item)->sortByDesc("journal_date");
-                $item->each(function($item) use(&$newJournalEntryCollection, &$balance) {
-                    $balance-=$item["credit"];
-                    $balance+=$item["debit"];
+                $item->each(function ($item) use (&$newJournalEntryCollection, &$balance) {
+                    $balance -= $item["credit"];
+                    $balance += $item["debit"];
                     $newJournalEntryCollection[] = [
                         "journal_date" => $item["journal_date"],
                         "account_id" => $item["account_id"],
@@ -299,7 +298,6 @@ class journalEntry extends Model
                         "balance" => $balance
                     ];
                     return $item;
-
                 });
 
                 return $newJournalEntryCollection;
@@ -308,11 +306,10 @@ class journalEntry extends Model
         })->values()->all();
 
         return $subsidiaryListing;
-
     }
 
     public function getBankReconciliationReport(array $filter)
-    {   
+    {
         $collections = collect($this->getJournalEntry($filter));
         $journalEntries = $collections->map(function ($item, $key) {
             $data = [
@@ -336,15 +333,12 @@ class journalEntry extends Model
                     ];
                 })
             ];
-            $data["entries"] = collect($data["entries"])->sortByDesc(['withdrawals','journal_date']);
+            $data["entries"] = collect($data["entries"])->sortByDesc(['withdrawals', 'journal_date']);
             return $data;
         })
-        ->values();
+            ->values();
         return $journalEntries;
 
         // return $collections;
     }
-
-
-
 }

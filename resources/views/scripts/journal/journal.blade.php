@@ -403,7 +403,7 @@
 
             if (parseFloat(spanBal) == 0) {
                 // alert("Debit and Credit equal")
-              
+
                 var serialized = $(this).serializeArray();
                 var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
                 serialized.push({
@@ -599,9 +599,28 @@
         $(document).on('click', '.stsVoucher', function(e) {
             $('#journalDetailsVoucher').modal('show')
         });
+
+        $(document).on('change','#edit_book_id',function(e) {
+            var bookId = this.value
+            var url = '{{ route("journal.generateJournalNumber", ":journalBook") }}';
+                    url = url.replace(':journalBook',bookId);
+           $.ajax({
+             headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "GET",
+                url: url,
+                dataType: "json",
+                success:function(response) {
+                                $('#edit_journal_no').val(response.data);
+                                $('#edit_LrefNo').text(response.data);
+                }
+           })
+        })
         $('#journalEntryFormEdit').submit(function(e) {
             e.preventDefault();
             var serialized = $(this).serializeArray();
+            console.log(serialized);
             var amount = Number($('#edit_amount').val().replace(/[^0-9\.-]+/g, ""))
             serialized.push({
                 name: 'amount',
@@ -637,6 +656,7 @@
                             entry[i.name] = i.value;
                         });
                         var details = saveJournalEntryDetails();
+                        console.log(entry)
                         var data = Object.assign({
                             "journal_entry": entry,
                             "details": details
@@ -667,8 +687,9 @@
             }else {
                 alert("Unable to save, debit and credit is not equal")
             }
-           
+
         });
+
         $(document).on('click', '.JnalEdit', function(e) {
             $('#journalModalEdit').modal('show');
             var id = $(this).attr('value');
@@ -686,10 +707,12 @@
                 success: function(response) {
                     if (response.message == 'fetch') {
                         $.each(response.data, function(k, v) {
+
                             var total_debit = 0;
                             var total_credit = 0;
                             var balance = 0;
-                            $('#edit_LrefNo').text(v.journal_no)
+                            $('#edit_LrefNo').text(v.edit_LrefNo)
+                            $('#edit_journal_no').val(v.edit_journal_no)
                             $('#edit_journal_id').val(v.journal_id);
                             $('#edit_journal_date').val(v.journal_date);
                             $('#edit_branch_id').val(v.branch_id);
@@ -971,7 +994,7 @@
                         @if(Gate::allows('manager'))
                             branchColumn = `<td>${v.branch_name}</td>`;
                         @endif
-                        
+
                         var remarks = v.remarks ? v.remarks.replace(/::/g, '<br>') : '';
 
                         $('#journalEntryDetailsContent').append(
@@ -1343,9 +1366,11 @@
             });
         });
         $(document).on('change', '#book_id', function() {
-            $('#journal_no').val($(this).find(':selected').attr('_count'));
+            console.log(this.value)
+            $('#journal_number').val($(this).find(':selected').attr('_count'));
             $('#LrefNo').text($(this).find(':selected').attr('_count'));
         });
+
 
         function editJournal(id) {
             console.log(id)

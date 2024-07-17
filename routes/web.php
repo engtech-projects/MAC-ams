@@ -1,25 +1,26 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\JournalController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\SalesController;
-use App\Http\Controllers\JournalController;
-use App\Http\Controllers\ProductsServicesController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\SystemSetupController;
-use App\Http\Controllers\ReportsController;
-use App\Http\Controllers\GeneralSettingsController;
-use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\CollectionController;
-use App\Http\Controllers\BranchController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\JournalBookController;
+use App\Http\Controllers\SystemSetupController;
+use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\GeneralSettingsController;
+use App\Http\Controllers\ProductsServicesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,8 +42,8 @@ Route::get('get-token', function () {
 Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user');
 Route::get('login', [LoginController::class, 'index'])->name('login');
 Route::get('logout', [LoginController::class, 'userLogout'])->name('logout');
-Route::get('/me',[AuthController::class, 'getAuthUser'])->name('auth.user');
-Route::get('branch',[BranchController::class, 'index'])->name('branch.list');
+Route::get('/me', [AuthController::class, 'getAuthUser'])->name('auth.user');
+Route::get('branch', [BranchController::class, 'index'])->name('branch.list');
 
 /* Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user'); */
 // DashboardController
@@ -136,8 +137,8 @@ Route::get('sales/invoice', [SalesController::class, 'invoice'])->name('sales.in
 //reports
 Route::get('reports/subsidiaryledger', [ReportsController::class, 'subsidiaryLedger'])->name('reports.subsidiaryledger');
 
-Route::post('reports/subsidiary-ledger',[ReportsController::class, 'subsidiaryLedgerReports'])->name('reports.subsidiary-ledger');
-Route::get('reports/subsidiary-ledger-listing',[ReportsController::class, 'subsidiaryListing'])->name('reports.subsidiary.listing');
+Route::post('reports/subsidiary-ledger', [ReportsController::class, 'subsidiaryLedgerReports'])->name('reports.subsidiary-ledger');
+Route::get('reports/subsidiary-ledger-listing', [ReportsController::class, 'subsidiaryListing'])->name('reports.subsidiary.listing');
 
 
 
@@ -163,10 +164,10 @@ Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'sh
 
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
-Route::post('reports/bank-reconciliation', [ReportsController::class,'bankReconciliation'])->name('reports.bank.reconciliation');
+Route::post('reports/bank-reconciliation', [ReportsController::class, 'bankReconciliation'])->name('reports.bank.reconciliation');
 
-Route::post('collections',[CollectionController::class, 'store'])->name('create.collection.breakdown');
-Route::delete('collections/{collection}',[CollectionController::class, 'destroy'])->name('delete.collection');
+Route::post('collections', [CollectionController::class, 'store'])->name('create.collection.breakdown');
+Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
 
 Route::get('reports/cashTransactionBlotter/cashblotter', [ReportsController::class, 'cashBlotterIndex'])->name('reports.cashblotter');
 Route::post('reports/cashTransactionBlotter/storecashblotter', [ReportsController::class, 'storeCashBlotter'])->name('reports.storeCashBlotter');
@@ -207,6 +208,8 @@ Route::get('journal/searchJournalEntry', [JournalController::class, 'searchJourn
 Route::get('journal', [JournalController::class, 'create'])->name('journal.create');
 Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
 Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
+Route::get('journal/generate-journal-number/{journalBook}', [JournalController::class, 'generateJournalNumber'])->name('journal.generateJournalNumber');
+
 
 // JOURNAL ENTRY BLADES TEMPLATES
 Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryList'])->name('journal.journalEntryList');
