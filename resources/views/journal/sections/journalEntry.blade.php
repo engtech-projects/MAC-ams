@@ -145,7 +145,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="">Reference No.</label>
 									<div class="input-group">
-                                        <input type="text" name="journal_number" id="journal_number">
+                                        <input type="hidden" name="journal_no" id="journal_no">
 										<label class="label-normal" id="LrefNo" ></label>
 									</div>
 								</div>
@@ -276,7 +276,7 @@
 										// var_export($data['subsidiaries']);
 										// echo '</pre>';
 														?>
-										<select  fieldName="subsidiary_id" class="select-account form-control form-control-sm editable-row-item">
+										<select required fieldName="subsidiary_id"  id="subsidiary_id" class="select-account form-control form-control-sm editable-row-item">
 											<option disabled value="" selected>-Select S/L-</option>
 											<?php
 												$temp = '';

@@ -442,9 +442,7 @@
                             "journal_entry": entry,
                             "details": details
                         });
-
-                    // console.log(data);
-
+                    if(details.length > 0) {
                     $.ajax({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -462,6 +460,7 @@
                             toastr.error('Error');
                         }
                     });
+                    }
                 }
                 } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
@@ -503,6 +502,12 @@
             }));
             getBalance()
             checkTotalAndAmount()
+        })
+        $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
+            if ($('#subsidiary_id').val() == '') {
+                let amount = prompt("Please ");
+            }
+
         })
         $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
             $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
@@ -601,6 +606,23 @@
         });
 
         $(document).on('change','#edit_book_id',function(e) {
+            var bookId = this.value
+            var url = '{{ route("journal.generateJournalNumber", ":journalBook") }}';
+                    url = url.replace(':journalBook',bookId);
+           $.ajax({
+             headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "GET",
+                url: url,
+                dataType: "json",
+                success:function(response) {
+                                $('#edit_journal_no').val(response.data);
+                                $('#edit_LrefNo').text(response.data);
+                }
+           })
+        })
+        $(document).on('change','#book_id',function(e) {
             var bookId = this.value
             var url = '{{ route("journal.generateJournalNumber", ":journalBook") }}';
                     url = url.replace(':journalBook',bookId);
@@ -1048,6 +1070,12 @@
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
+                    $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
+            if ($('#subsidiary_id').val() == '') {
+                let amount = prompt("Please ");
+            }
+
+        })
             var content = `<tr class='editable-table-row'>
 			<td class="acctnu" value="">
 				<a href="#" class="editable-row-item journal_details_account_no"></a>
@@ -1233,9 +1261,14 @@
             if (type == 'save') {
                 elem = $('#tbl-create-journal-container');
             }
+
             var details = [];
             $.each(elem.find('tr'), function(k, v) {
                 var field = $(v).children()
+            if($(field[4]).find('.editable-row-item').val() == null) {
+                alert("Subsidiary is required.");
+                return false;
+            }
                 var accountName = $(field[1]).find('.select2').text().split("- ")
                 var debit = ($(field[2]).find('.editable-row-item').text() === '') ?
                     '0' : $(field[2]).find('.editable-row-item').text()
