@@ -640,7 +640,7 @@
         $('#journalEntryFormEdit').submit(function(e) {
             e.preventDefault();
             var serialized = $(this).serializeArray();
-            console.log(serialized);
+
             var amount = Number($('#edit_amount').val().replace(/[^0-9\.-]+/g, ""))
             serialized.push({
                 name: 'amount',
@@ -649,6 +649,12 @@
             var _st = false;
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
                 var field = $(v).children()
+                if($(field[1]).find('.editable-row-item').val() == null) {
+                    return alert("Account is required.");
+                }
+                if($(field[4]).find('.editable-row-item').val() == null) {
+                    return alert("Subsidiary is required.");
+                }
                 if ($(field[0]).find('.editable-row-item').text() == '' ||
                     $(field[1]).find('.editable-row-item').val() == '' ||
                     $(field[4]).find('.editable-row-item').val() == '') {
@@ -658,9 +664,13 @@
                     _st = true;
                 }
             });
+            var details = saveJournalEntryDetails();
 
             var edit_balance = document.getElementById("edit_balance_debit");
             var edit_bal = edit_balance.innerText;
+            if(details.length <1) {
+                return alert("Journal details is required.")
+            }
 
             if (parseFloat(edit_bal) == 0){
                 if (parseFloat($('#edit_balance_debit').text().float()) <= 0) {
@@ -675,12 +685,12 @@
                         serialized.map(function(i) {
                             entry[i.name] = i.value;
                         });
-                        var details = saveJournalEntryDetails();
-                        console.log(entry)
+    
                         var data = Object.assign({
                             "journal_entry": entry,
                             "details": details
                         });
+    
                         $.ajax({
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -750,7 +760,7 @@
 									<a href="#" class="editable-row-item journal_details_account_no">${vv.account.account_number}</a>
 								</td>
 								<td class='editable-table-data' value="" >
-									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item COASelect">
+									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id} account_id" class="select-account form-control form-control-sm editable-row-item COASelect">
 										<option disabled value="" selected>-Select Account Name-</option>
 										@foreach ($chartOfAccount as $account)
 											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_name }}</option>
@@ -1070,7 +1080,10 @@
             e.preventDefault();
                     $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
             if ($('#subsidiary_id').val() == '') {
-                let amount = prompt("Please ");
+                alert("Subsidiary is required.")
+            }
+            if ($('#account_id').val() == '') {
+                alert("Account is required.")
             }
 
         })
@@ -1098,7 +1111,7 @@
                                                 </a>
                                             </td>
 			<td class='editable-table-data' width="250">
-				<select  fieldName="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
+				<select fieldName="subsidiary_id" id="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
 					<?php
      $temp = '';
@@ -1263,14 +1276,7 @@
             var details = [];
             $.each(elem.find('tr'), function(k, v) {
                 var field = $(v).children()
-            if($(field[4]).find('.editable-row-item').val() == null) {
-                alert("Subsidiary is required.");
-                return false;
-            }
-            if($('#edit_book_id').val() == null) {
-                alert("Book reference is required.");
-                return false;
-            }
+
 
                 var accountName = $(field[1]).find('.select2').text().split("- ")
                 var debit = ($(field[2]).find('.editable-row-item').text() === '') ?
@@ -1286,6 +1292,9 @@
                     subsidiary_id: $(field[4]).find('.editable-row-item').val(),
                 });
             });
+            if(details.lenght<1) {
+            return false;
+            }
             return details;
 
         }
