@@ -99,7 +99,8 @@ class JournalController extends MainController
     }
     public function JournalEntryEdit(Request $request)
     {
-        $journal = JournalEntry::find($request->edit_journal_id);
+        $journal = JournalEntry::find($request->journal_entry['edit_journal_id']);
+
 
         DB::transaction(function () use ($request, $journal) {
             $journal->journal_no = $request->journal_entry['edit_journal_no'];
