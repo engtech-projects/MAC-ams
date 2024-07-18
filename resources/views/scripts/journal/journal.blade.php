@@ -441,23 +441,33 @@
                             "details": details
                         });
 
-                    $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        type: "POST",
-                        url: "{{ route('journal.saveJournalEntry') }}",
-                        data: data,
-                        dataType: "json",
-                        success: function(data) {
-                            // console.log(data)
-                            toastr.success(data.message);
-                            reload();
-                        },
-                        error: function(data) {
-                            toastr.error('Error');
+                        details.forEach((element, index) => {
+                            if (element.subsidiary_id === null || element.account_id) {
+                                details = false;
+                            }
+                        });
+                        if(!details) {
+                           return details
+                        }else {
+                            $.ajax({
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                type: "POST",
+                                url: "{{ route('journal.saveJournalEntry') }}",
+                                data: data,
+                                dataType: "json",
+                                success: function(data) {
+                                    // console.log(data)
+                                    toastr.success(data.message);
+                                    reload();
+                                },
+                                error: function(data) {
+                                    toastr.error('Error');
+                                }
+                            });
                         }
-                    });
+
 
                 }
                 } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
@@ -692,23 +702,34 @@
                             "details": details
                         });
 
-                        $.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            type: "POST",
-                            url: "{{ route('journal.JournalEntryEdit') }}",
-                            data: data,
-                            dataType: "json",
-                            success: function(data) {
-                                toastr.success(data.message);
-                                saveJournalEntryDetails(data.id, 'update')
-                                reload();
-                            },
-                            error: function(data) {
-                                toastr.error('Error');
+                         details.forEach((element, index) => {
+                            if (element.subsidiary_id === null || element.account_id) {
+                                details = false;
                             }
                         });
+                        if(!details) {
+                           return details
+                        }else {
+                            console.log("qsdasd")
+                            $.ajax({
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                type: "POST",
+                                url: "{{ route('journal.JournalEntryEdit') }}",
+                                data: data,
+                                dataType: "json",
+                                success: function(data) {
+                                    toastr.success(data.message);
+                                    saveJournalEntryDetails(data.id, 'update')
+                                    reload();
+                                },
+                                error: function(data) {
+                                    toastr.error('Error');
+                                }
+                            });
+                        }
+
                 }
                 } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
@@ -716,7 +737,7 @@
                     alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
             }else {
-                alert("Unable to save, debit and credit is not equal")
+                //alert("Unable to save, debit and credit is not equal")
             }
 
         });
