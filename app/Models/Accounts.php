@@ -995,7 +995,11 @@ class Accounts extends Model
             }   
 
             // $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
-            $subtotal = abs($account->total);
+             if( strtolower($account->account_category) == 'expense' ) {
+                $subtotal = $account->total;
+            }else{
+                $subtotal = abs($account->total);    
+            }
             // if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
             //     $subtotal = ($account->total + $opening_balance);
             // }else{
