@@ -335,14 +335,6 @@
             allowClear: true,
         });
 
-        $(document).on('change', '#amount', function() {
-            if ($.isNumeric($(this).val())) {
-                console.log("Numeric")
-            } else {
-                console.log("String")
-            }
-        })
-
 
 
         $.fn.editable.defaults.mode = 'inline';
@@ -411,6 +403,12 @@
                 var _st = false;
                 $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
                     var field = $(v).children()
+                                    if($(field[1]).find('.editable-row-item').val() == null) {
+                    return alert("Account is required.");
+                }
+                if($(field[4]).find('.editable-row-item').val() == null) {
+                    return alert("Subsidiary is required.");
+                }
                     if ($(field[0]).find('.editable-row-item').text() == '' ||
                         $(field[1]).find('.editable-row-item').val() == '' ||
                         $(field[4]).find('.editable-row-item').val() == '') {
@@ -420,6 +418,11 @@
                         _st = true;
                     }
                 });
+                var details = saveJournalEntryDetails('save');
+                if(details.length <1) {
+                    return alert("Journal details is required.")
+                }
+
                 if (parseFloat($('#debit_balance').text().float()) != 0) {
                     if (_st) {
                         var serialized = $(this).serializeArray();
@@ -433,14 +436,11 @@
                             entry[i.name] = i.value;
                         });
 
-                        var details = saveJournalEntryDetails('save');
-
-
                         var data = Object.assign({
                             "journal_entry": entry,
                             "details": details
                         });
-                    if(details.length > 0) {
+
                     $.ajax({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -458,7 +458,7 @@
                             toastr.error('Error');
                         }
                     });
-                    }
+
                 }
                 } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
@@ -647,6 +647,7 @@
                 value: amount
             })
             var _st = false;
+
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
                 var field = $(v).children()
                 if($(field[1]).find('.editable-row-item').val() == null) {
@@ -668,7 +669,7 @@
 
             var edit_balance = document.getElementById("edit_balance_debit");
             var edit_bal = edit_balance.innerText;
-            if(details.length <1) {
+            if(details.lengt <1) {
                 return alert("Journal details is required.")
             }
 
@@ -685,12 +686,12 @@
                         serialized.map(function(i) {
                             entry[i.name] = i.value;
                         });
-    
+
                         var data = Object.assign({
                             "journal_entry": entry,
                             "details": details
                         });
-    
+
                         $.ajax({
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
