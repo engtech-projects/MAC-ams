@@ -731,9 +731,8 @@
                             var total_debit = 0;
                             var total_credit = 0;
                             var balance = 0;
-                            console.log(v)
-                            $('#edit_LrefNo').text(v.edit_LrefNo)
-                            $('#edit_journal_no').val(v.edit_journal_no)
+                            $('#edit_LrefNo').text(v.journal_no)
+                            $('#edit_journal_no').val(v.journal_no)
                             $('#edit_journal_id').val(v.journal_id);
                             $('#edit_journal_date').val(v.journal_date);
                             $('#edit_branch_id').val(v.branch_id);
