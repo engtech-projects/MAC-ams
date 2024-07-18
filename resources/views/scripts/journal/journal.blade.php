@@ -100,8 +100,6 @@
                         $.each(response.data, function(k, v) {
                             $('#posted-content').html('');
                             var content = '';
-
-                            console.log(v.remarks)
                             $.each(v.remarks.split('::'), function(k, vv) {
                                 $('#vjournal_remarks').append(
                                     `<p>${vv}</p>`
@@ -733,6 +731,7 @@
                             var total_debit = 0;
                             var total_credit = 0;
                             var balance = 0;
+                            console.log(v)
                             $('#edit_LrefNo').text(v.edit_LrefNo)
                             $('#edit_journal_no').val(v.edit_journal_no)
                             $('#edit_journal_id').val(v.journal_id);
@@ -1269,6 +1268,11 @@
                 alert("Subsidiary is required.");
                 return false;
             }
+            if($('#edit_book_id').val() == null) {
+                alert("Book reference is required.");
+                return false;
+            }
+
                 var accountName = $(field[1]).find('.select2').text().split("- ")
                 var debit = ($(field[2]).find('.editable-row-item').text() === '') ?
                     '0' : $(field[2]).find('.editable-row-item').text()

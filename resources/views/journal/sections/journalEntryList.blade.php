@@ -482,8 +482,8 @@
                                                     <label class="label-normal" for="">Book Reference</label>
                                                     <div class="input-group">
 
-                                                        <select name="edit_book_id" class="select2 form-control form-control-sm" id="edit_book_id" required>
-										<option value="" disabled selected>-Select Book References-</option>
+                                                        <select required name="edit_book_id" class="form-control form-control-sm" id="edit_book_id">
+										<option id="edit_book_id" value="" disabled selected></option>
 										@foreach($journalBooks as $journalBook)
 											<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 										@endforeach
