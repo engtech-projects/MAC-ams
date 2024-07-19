@@ -425,68 +425,66 @@
                     return alert("Journal details is required.")
                 }
 
-                /*                 if (parseFloat($('#debit_balance').text().float()) != 0) { */
-                if (_st) {
-                    var serialized = $(this).serializeArray();
-                    var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
-                    serialized.push({
-                        name: 'amount',
-                        value: amount
-                    })
-                    var entry = {};
-                    serialized.map(function(i) {
-                        entry[i.name] = i.value;
-                    });
-
-                    var data = Object.assign({
-                        "journal_entry": entry,
-                        "details": details
-                    });
-                    let isEmptyDetails = false;
-
-                    details.forEach((element, index) => {
-                        if (element.subsidiary_id === null || element.account_id === null) {
-                            isEmptyDetails = true;
-                            return;
-                        }
-                        isEmptyDetails = false;
-                        return false;
-                    });
-                    alert(isEmptyDetails)
-                    if (!isEmptyDetails) {
-
-                        $.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            type: "POST",
-                            url: "{{ route('journal.saveJournalEntry') }}",
-                            data: data,
-                            dataType: "json",
-                            success: function(data) {
-                                // console.log(data)
-                                toastr.success(data.message);
-                                reload();
-                            },
-                            error: function(data) {
-                                toastr.error('Error');
-                            }
+                if (parseFloat($('#debit_balance').text().float()) != 0) {
+                    if (_st) {
+                        var serialized = $(this).serializeArray();
+                        var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
+                        serialized.push({
+                            name: 'amount',
+                            value: amount
+                        })
+                        var entry = {};
+                        serialized.map(function(i) {
+                            entry[i.name] = i.value;
                         });
+
+                        var data = Object.assign({
+                            "journal_entry": entry,
+                            "details": details
+                        });
+                        let isEmptyDetails = false;
+
+                        details.forEach((element, index) => {
+                            if (element.subsidiary_id === null || element.account_id === null) {
+                                isEmptyDetails = true;
+                                return;
+                            }
+                            isEmptyDetails = false;
+                            return false;
+                        });
+                        if (!isEmptyDetails) {
+
+                            $.ajax({
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                type: "POST",
+                                url: "{{ route('journal.saveJournalEntry') }}",
+                                data: data,
+                                dataType: "json",
+                                success: function(data) {
+                                    // console.log(data)
+                                    toastr.success(data.message);
+                                    reload();
+                                },
+                                error: function(data) {
+                                    toastr.error('Error');
+                                }
+                            });
+                        }
+                        //}
+
+
                     }
-                    //}
 
-
+                } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
+                    alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
+                } else {
+                    alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
-
-            } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
-                alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
             } else {
-                alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+                alert("Unable to save Debit and Credit not equal")
             }
-            //}
-            /* else {
-                           alert("Unable to save Debit and Credit not equal")
-                       } */
 
         });
         $(document).on('click', '.JnalFetch', function(e) {
@@ -728,7 +726,6 @@
                         if (!details) {
                             return details
                         } else {
-                            console.log("qsdasd")
                             $.ajax({
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -755,7 +752,7 @@
                     alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
             } else {
-                //alert("Unable to save, debit and credit is not equal")
+                alert("Unable to save, debit and credit is not equal")
             }
 
         });
