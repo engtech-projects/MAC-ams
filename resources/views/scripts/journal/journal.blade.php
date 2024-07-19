@@ -17,114 +17,114 @@
 </style>
 <script type="text/javascript">
     (function($) {
-            'use strict'
+        'use strict'
 
-            $('.select-branch2').select2({
-                placeholder: 'Select-Branch',
-                allowClear: true,
-            });
+        $('.select-branch2').select2({
+            placeholder: 'Select-Branch',
+            allowClear: true,
+        });
 
-            $("#amount").on("focus", function() {
-                if ((parseFloat(this.value) - parseInt(this.value)) == 0) {
-                    this.value = amountConverter(this.value)
-                }
-            });
-            $("#amount").on("blur", function() {
-                if (this.value) {
-                    this.value = amountConverter(this.value)
-                } else {
-                    this.value = amountConverter(this.value)
-                }
-            });
+        $("#amount").on("focus", function() {
+            if ((parseFloat(this.value) - parseInt(this.value)) == 0) {
+                this.value = amountConverter(this.value)
+            }
+        });
+        $("#amount").on("blur", function() {
+            if (this.value) {
+                this.value = amountConverter(this.value)
+            } else {
+                this.value = amountConverter(this.value)
+            }
+        });
 
-            $("#debit").on("focus", function() {
-                if ((parseFloat(this.value) - parseInt(this.value)) == 0) {
-                    this.value = parseFloat(this.value).toFixed(0)
-                }
-            });
-            $("#debit").on("blur", function() {
-                if (this.value) {
-                    this.value = parseFloat(this.value).toFixed(2)
-                } else {
-                    this.value = parseFloat(0).toFixed(2)
-                }
-            });
+        $("#debit").on("focus", function() {
+            if ((parseFloat(this.value) - parseInt(this.value)) == 0) {
+                this.value = parseFloat(this.value).toFixed(0)
+            }
+        });
+        $("#debit").on("blur", function() {
+            if (this.value) {
+                this.value = parseFloat(this.value).toFixed(2)
+            } else {
+                this.value = parseFloat(0).toFixed(2)
+            }
+        });
 
 
-            $('.journal-amount').each(function(index, value) {
-                var ja = $(this).text()
-                var val = amountConverter(ja)
+        $('.journal-amount').each(function(index, value) {
+            var ja = $(this).text()
+            var val = amountConverter(ja)
 
-                $(this).text(val)
+            $(this).text(val)
+        })
+
+
+
+        $('tbody .tbl-row').click(function() {
+            console.log("Clicked");
+
+            var id = $(this).data("id")
+
+            var $sidebar = $('.control-sidebar')
+            var $container = $('<div />', {
+                class: 'p-3 control-sidebar-content'
             })
 
+            $sidebar.append($container)
 
+            $container.append(
+                '<h6><i class="fa fa-users"></i> Account Details</h6><hr class="mb-2"/>'
+            )
+            $container.append(
+                '<h6><i class="fa fa-users"></i>' + id + '</h6><hr class="mb-2"/>'
+            )
 
-            $('tbody .tbl-row').click(function() {
-                console.log("Clicked");
+            $("#account-details").slideDown("slow");
 
-                var id = $(this).data("id")
+            var id = $(this).data("id")
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "POST",
+                data: {
+                    journal_id: id
+                },
+                url: "{{ route('journal.JournalEntryFetch') }}",
+                dataType: "json",
+                success: function(response) {
+                    if (response.message == 'fetch') {
+                        var total_debit = 0;
+                        var total_credit = 0;
+                        $('#tbl-preview-container').html('');
+                        $('#journalVoucherContent').html('');
+                        $('#vjournal_remarks').html('');
+                        $.each(response.data, function(k, v) {
+                            $('#posted-content').html('');
+                            var content = '';
+                            $.each(v.remarks.split('::'), function(k, vv) {
+                                $('#vjournal_remarks').append(
+                                    `<p>${vv}</p>`
+                                );
+                            });
 
-                var $sidebar = $('.control-sidebar')
-                var $container = $('<div />', {
-                    class: 'p-3 control-sidebar-content'
-                })
-
-                $sidebar.append($container)
-
-                $container.append(
-                    '<h6><i class="fa fa-users"></i> Account Details</h6><hr class="mb-2"/>'
-                )
-                $container.append(
-                    '<h6><i class="fa fa-users"></i>' + id + '</h6><hr class="mb-2"/>'
-                )
-
-                $("#account-details").slideDown("slow");
-
-                var id = $(this).data("id")
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    type: "POST",
-                    data: {
-                        journal_id: id
-                    },
-                    url: "{{ route('journal.JournalEntryFetch') }}",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.message == 'fetch') {
-                            var total_debit = 0;
-                            var total_credit = 0;
-                            $('#tbl-preview-container').html('');
-                            $('#journalVoucherContent').html('');
-                            $('#vjournal_remarks').html('');
-                            $.each(response.data, function(k, v) {
-                                $('#posted-content').html('');
-                                var content = '';
-                                $.each(v.remarks.split('::'), function(k, vv) {
-                                    $('#vjournal_remarks').append(
-                                        `<p>${vv}</p>`
-                                    );
-                                });
-
-                                if (v.status == 'unposted') {
-                                    content =
-                                        `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                            if (v.status == 'unposted') {
+                                content =
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
                                         <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
 
-                                } else {
-                                    content =
-                                        `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
+                            } else {
+                                content =
+                                    `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
 										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
-                                }
-                                $('#posted-content').html(content);
-                                $.each(v.journal_details, function(kk, vv) {
-                                    total_debit += parseFloat(vv
-                                        .journal_details_debit);
-                                    total_credit += parseFloat(vv
-                                        .journal_details_credit);
-                                    $('#tbl-preview-container').append(`
+                            }
+                            $('#posted-content').html(content);
+                            $.each(v.journal_details, function(kk, vv) {
+                                total_debit += parseFloat(vv
+                                    .journal_details_debit);
+                                total_credit += parseFloat(vv
+                                    .journal_details_credit);
+                                $('#tbl-preview-container').append(`
 								<tr class='editable-table-row'>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_number}</label></td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.chart_of_account.account_name}</label> </td>
@@ -137,7 +137,7 @@
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_credit}</label> </td>
 								</tr>
 							`);
-                                    $('#journalVoucherContent').append(`
+                                $('#journalVoucherContent').append(`
 								<tr>
 									<td class="center">${vv.chart_of_account.account_number}</td>
 									<td class="left">${vv.chart_of_account.account_name}</td>
@@ -145,88 +145,88 @@
 									<td class="center">${vv.journal_details_debit}</td>
 									<td class="right">${vv.journal_details_credit}</td>
 								</tr>`);
-                                })
-                                $('#vtotal_debit, #total_debit_voucher').text(total_debit
-                                    .toLocaleString("en-US"))
-                                $('#vtotal_credit, #total_credit_voucher').text(total_credit
-                                    .toLocaleString("en-US"))
-                                $('#vbalance_debit').text(amountConverter((parseFloat(
-                                    total_debit) - parseFloat(total_credit))))
-                            });
-                        }
-
-                    },
-                    error: function() {
-                        console.log("Error");
+                            })
+                            $('#vtotal_debit, #total_debit_voucher').text(total_debit
+                                .toLocaleString("en-US"))
+                            $('#vtotal_credit, #total_credit_voucher').text(total_credit
+                                .toLocaleString("en-US"))
+                            $('#vbalance_debit').text(amountConverter((parseFloat(
+                                total_debit) - parseFloat(total_credit))))
+                        });
                     }
-                });
 
-            })
+                },
+                error: function() {
+                    console.log("Error");
+                }
+            });
 
-
-            //Convert Amount Currency
-            function amountConverter(amount) {
-                const formatter = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'PHP',
-
-                });
-
-                return formatter.format(amount)
-            }
-
-            function reverseAmountConverter(val) {
-                const covertedNumber = Number(val.replace(/[^0-9.-]+/g, ""));
-                return covertedNumber
-            }
+        })
 
 
-            $('tbodys .tbl-rows').click(function() {
-                var id = $(this).data("id")
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    type: "POST",
-                    data: {
-                        journal_id: id
-                    },
-                    url: "{{ route('journal.JournalEntryFetch') }}",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.message == 'fetch') {
-                            var total_debit = 0;
-                            var total_credit = 0;
-                            $('#tbl-preview-container').html('');
-                            $('#journalVoucherContent').html('');
-                            $('#vjournal_remarks').html('');
-                            $.each(response.data, function(k, v) {
-                                $('#posted-content').html('');
-                                var content = '';
-                                if (v.remarks) {
-                                    $.each(v.remarks.split('::'), function(k, vv) {
-                                        $('#vjournal_remarks').append(
-                                            `<p>${vv}</p>`
-                                        );
-                                    });
-                                }
-                                if (v.status == 'unposted') {
-                                    content =
-                                        `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+        //Convert Amount Currency
+        function amountConverter(amount) {
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'PHP',
+
+            });
+
+            return formatter.format(amount)
+        }
+
+        function reverseAmountConverter(val) {
+            const covertedNumber = Number(val.replace(/[^0-9.-]+/g, ""));
+            return covertedNumber
+        }
+
+
+        $('tbodys .tbl-rows').click(function() {
+            var id = $(this).data("id")
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "POST",
+                data: {
+                    journal_id: id
+                },
+                url: "{{ route('journal.JournalEntryFetch') }}",
+                dataType: "json",
+                success: function(response) {
+                    if (response.message == 'fetch') {
+                        var total_debit = 0;
+                        var total_credit = 0;
+                        $('#tbl-preview-container').html('');
+                        $('#journalVoucherContent').html('');
+                        $('#vjournal_remarks').html('');
+                        $.each(response.data, function(k, v) {
+                            $('#posted-content').html('');
+                            var content = '';
+                            if (v.remarks) {
+                                $.each(v.remarks.split('::'), function(k, vv) {
+                                    $('#vjournal_remarks').append(
+                                        `<p>${vv}</p>`
+                                    );
+                                });
+                            }
+                            if (v.status == 'unposted') {
+                                content =
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
                                     <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
 
-                                } else {
-                                    content =
-                                        `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
+                            } else {
+                                content =
+                                    `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
 										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
-                                }
-                                $('#posted-content').html(content);
-                                $.each(v.journal_entry_details, function(kk, vv) {
-                                    total_debit += parseFloat(vv
-                                        .journal_details_debit);
-                                    total_credit += parseFloat(vv
-                                        .journal_details_credit);
-                                    $('#tbl-preview-container').append(`
+                            }
+                            $('#posted-content').html(content);
+                            $.each(v.journal_entry_details, function(kk, vv) {
+                                total_debit += parseFloat(vv
+                                    .journal_details_debit);
+                                total_credit += parseFloat(vv
+                                    .journal_details_credit);
+                                $('#tbl-preview-container').append(`
 								<tr class='editable-table-row'>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
@@ -240,7 +240,7 @@
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.journal_details_credit}</label> </td>
 								</tr>
 							`);
-                                    $('#journalVoucherContent').append(`
+                                $('#journalVoucherContent').append(`
 								<tr>
 									<td class="center">${vv.account.account_number}</td>
 									<td class="left">${vv.account.account_name}</td>
@@ -248,244 +248,248 @@
 									<td class="center">${vv.journal_details_debit}</td>
 									<td class="right">${vv.journal_details_credit}</td>
 								</tr>`);
-                                })
-                                $('#vtotal_debit, #total_debit_voucher').text(total_debit
-                                    .toLocaleString("en-US"))
-                                $('#vtotal_credit, #total_credit_voucher').text(total_credit
-                                    .toLocaleString("en-US"))
-                                $('#vbalance_debit').text((parseFloat(total_debit) -
-                                    parseFloat(total_credit)).toLocaleString(
-                                    "en-US"))
-                            });
-                        }
-
-                    },
-                    error: function() {
-                        console.log("Error");
+                            })
+                            $('#vtotal_debit, #total_debit_voucher').text(total_debit
+                                .toLocaleString("en-US"))
+                            $('#vtotal_credit, #total_credit_voucher').text(total_credit
+                                .toLocaleString("en-US"))
+                            $('#vbalance_debit').text((parseFloat(total_debit) -
+                                parseFloat(total_credit)).toLocaleString(
+                                "en-US"))
+                        });
                     }
-                });
-            })
 
-
-
-            $(document).on('change', '#s_from', function(e) {
-                $('#s_to').val($('#s_from').val());
-                $('#s_to').removeAttr("disabled");
-                $('#s_to').attr('min', $('#s_from').val());
+                },
+                error: function() {
+                    console.log("Error");
+                }
             });
+        })
 
 
-            $('[data-toggle="tooltip"]').tooltip({
-                show: true,
-                html: true,
-                title: "Hello",
-                template: `
+
+        $(document).on('change', '#s_from', function(e) {
+            $('#s_to').val($('#s_from').val());
+            $('#s_to').removeAttr("disabled");
+            $('#s_to').attr('min', $('#s_from').val());
+        });
+
+
+        $('[data-toggle="tooltip"]').tooltip({
+            show: true,
+            html: true,
+            title: "Hello",
+            template: `
         <div class="custom-tooltip tooltip">
             <div class="tooltip-inner">Hi</div>
         </div>
         `
-            })
+        })
 
-            $('form').attr('autocomplete', 'off');
-            var journalEntryDetails = $('#journalEntryDetails').DataTable({
-                dom: 'Bftrip',
-                pageLength: 10,
-                buttons: ['print', 'csv',
-                    {
-                        text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
-                        className: 'btn btn-flat btn-sm btn-default',
-                        titleAttr: 'Export',
-                        action: function(e, dt, node, config) {
-                            var exportBtn = document.getElementsByClassName(
-                                'btn btn-secondary buttons-csv buttons-html5')[0];
-                            exportBtn.click();
-                        }
-                    },
-                    {
-                        text: '<i class="fas fa-print" aria-hidden="true"></i>',
-                        className: 'btn btn-flat btn-sm btn-default',
-                        titleAttr: 'Print',
-                        action: function(e, dt, node, config) {
-                            var printBtn = document.getElementsByClassName(
-                                'btn btn-secondary buttons-print')[0];
-                            printBtn.click();
-                        }
-                    },
-                ],
-            });
-            var Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-
-
-
-            $('.select2').select2({
-                placeholder: 'Select',
-                allowClear: true,
-            });
-
-            $('.select-account').select2({
-                placeholder: 'Select Account',
-                allowClear: true,
-            });
-
-            $('.select-subsidary').select2({
-                placeholder: 'Select S/L',
-                allowClear: true,
-            });
+        $('form').attr('autocomplete', 'off');
+        var journalEntryDetails = $('#journalEntryDetails').DataTable({
+            dom: 'Bftrip',
+            pageLength: 10,
+            buttons: ['print', 'csv',
+                {
+                    text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
+                    className: 'btn btn-flat btn-sm btn-default',
+                    titleAttr: 'Export',
+                    action: function(e, dt, node, config) {
+                        var exportBtn = document.getElementsByClassName(
+                            'btn btn-secondary buttons-csv buttons-html5')[0];
+                        exportBtn.click();
+                    }
+                },
+                {
+                    text: '<i class="fas fa-print" aria-hidden="true"></i>',
+                    className: 'btn btn-flat btn-sm btn-default',
+                    titleAttr: 'Print',
+                    action: function(e, dt, node, config) {
+                        var printBtn = document.getElementsByClassName(
+                            'btn btn-secondary buttons-print')[0];
+                        printBtn.click();
+                    }
+                },
+            ],
+        });
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
 
 
 
-            $.fn.editable.defaults.mode = 'inline';
+        $('.select2').select2({
+            placeholder: 'Select',
+            allowClear: true,
+        });
 
-            $('.records').editable({
-                type: 'text',
-                emptytext: '',
-                showbuttons: false,
-                toggle: 'manual',
-                onblur: 'cancel',
-                inputclass: 'form-control form-control-sm block input-text',
-                display: function(value) {
+        $('.select-account').select2({
+            placeholder: 'Select Account',
+            allowClear: true,
+        });
 
-                    $(this).text(amountConverter(value))
-                }
-            })
-
-            /*          $('.editable-row-item').editable({
-                        type: 'text',
-                        emptytext: '',
-                        showbuttons: false,
-                        unsavedclass: null,
-                        toggle: 'manual',
-                        onblur: 'cancel',
-                        inputclass: 'form-control form-control-sm block input-text',
-                        success: function(newValue) {
-                            var id = $(this).attr('id')
-                            var input = $('.input-text').val();
-                            switch (id) {
-                                case 'debit':
-                                    $('a#debit').text(amountConverter(input))
-                            }
-
-                        }
-                    }); */
+        $('.select-subsidary').select2({
+            placeholder: 'Select S/L',
+            allowClear: true,
+        });
 
 
-            $(".editables").on("shown", function(e, editable) {
 
-                console.log(editable.input.$input)
-            });
+        $.fn.editable.defaults.mode = 'inline';
 
-            function submitEditable() {
-                $('.editable-table-data .editableform').editable().submit();
+        $('.records').editable({
+            type: 'text',
+            emptytext: '',
+            showbuttons: false,
+            toggle: 'manual',
+            onblur: 'cancel',
+            inputclass: 'form-control form-control-sm block input-text',
+            display: function(value) {
+
+                $(this).text(amountConverter(value))
             }
-            $(document).on('click', '.remove-journalDetails', function(e) {
-                $(this).parents('tr').remove();
-            })
-            $(document).on('submit', '#journalEntryForm', function(e) {
-                    e.preventDefault();
+        })
 
-                    var balances = document.getElementById("balance_debit");
-                    var spanBal = balances.innerText;
+        /*          $('.editable-row-item').editable({
+                    type: 'text',
+                    emptytext: '',
+                    showbuttons: false,
+                    unsavedclass: null,
+                    toggle: 'manual',
+                    onblur: 'cancel',
+                    inputclass: 'form-control form-control-sm block input-text',
+                    success: function(newValue) {
+                        var id = $(this).attr('id')
+                        var input = $('.input-text').val();
+                        switch (id) {
+                            case 'debit':
+                                $('a#debit').text(amountConverter(input))
+                        }
 
-                    console.log(spanBal);
+                    }
+                }); */
 
-                    if (parseFloat(spanBal) == 0) {
-                        // alert("Debit and Credit equal")
 
-                        var serialized = $(this).serializeArray();
-                        var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
-                        serialized.push({
-                            name: 'amount',
-                            value: amount
-                        })
-                        var _st = false;
-                        $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
-                            var field = $(v).children()
-                            if ($(field[1]).find('.editable-row-item').val() == null) {
-                                return alert("Account is required.");
-                            }
-                            if ($(field[4]).find('.editable-row-item').val() == null) {
-                                return alert("Subsidiary is required.");
-                            }
-                            if ($(field[0]).find('.editable-row-item').text() == '' ||
-                                $(field[1]).find('.editable-row-item').val() == '' ||
-                                $(field[4]).find('.editable-row-item').val() == '') {
-                                _st = false;
-                                return false;
-                            } else {
-                                _st = true;
+        $(".editables").on("shown", function(e, editable) {
+
+            console.log(editable.input.$input)
+        });
+
+        function submitEditable() {
+            $('.editable-table-data .editableform').editable().submit();
+        }
+        $(document).on('click', '.remove-journalDetails', function(e) {
+            $(this).parents('tr').remove();
+        })
+        $(document).on('submit', '#journalEntryForm', function(e) {
+            e.preventDefault();
+
+            var balances = document.getElementById("balance_debit");
+            var spanBal = balances.innerText;
+
+            console.log(spanBal);
+
+            if (parseFloat(spanBal) == 0) {
+                // alert("Debit and Credit equal")
+
+                var serialized = $(this).serializeArray();
+                var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
+                serialized.push({
+                    name: 'amount',
+                    value: amount
+                })
+                var _st = false;
+                $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
+                    var field = $(v).children()
+                    if ($(field[1]).find('.editable-row-item').val() == null) {
+                        return alert("Account is required.");
+                    }
+                    if ($(field[4]).find('.editable-row-item').val() == null) {
+                        return alert("Subsidiary is required.");
+                    }
+                    if ($(field[0]).find('.editable-row-item').text() == '' ||
+                        $(field[1]).find('.editable-row-item').val() == '' ||
+                        $(field[4]).find('.editable-row-item').val() == '') {
+                        _st = false;
+                        return false;
+                    } else {
+                        _st = true;
+                    }
+                });
+                var details = saveJournalEntryDetails('save');
+                if (details.length < 1) {
+                    return alert("Journal details is required.")
+                }
+
+                /*                 if (parseFloat($('#debit_balance').text().float()) != 0) { */
+                if (_st) {
+                    var serialized = $(this).serializeArray();
+                    var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
+                    serialized.push({
+                        name: 'amount',
+                        value: amount
+                    })
+                    var entry = {};
+                    serialized.map(function(i) {
+                        entry[i.name] = i.value;
+                    });
+
+                    var data = Object.assign({
+                        "journal_entry": entry,
+                        "details": details
+                    });
+                    let isEmptyDetails = false;
+
+                    details.forEach((element, index) => {
+                        if (element.subsidiary_id === null || element.account_id === null) {
+                            isEmptyDetails = true;
+                            return;
+                        }
+                        isEmptyDetails = false;
+                        return false;
+                    });
+                    alert(isEmptyDetails)
+                    if (!isEmptyDetails) {
+
+                        $.ajax({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            type: "POST",
+                            url: "{{ route('journal.saveJournalEntry') }}",
+                            data: data,
+                            dataType: "json",
+                            success: function(data) {
+                                // console.log(data)
+                                toastr.success(data.message);
+                                reload();
+                            },
+                            error: function(data) {
+                                toastr.error('Error');
                             }
                         });
-                        var details = saveJournalEntryDetails('save');
-                        if (details.length < 1) {
-                            return alert("Journal details is required.")
-                        }
-
-                        if (parseFloat($('#debit_balance').text().float()) != 0) {
-                            if (_st) {
-                                var serialized = $(this).serializeArray();
-                                var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
-                                serialized.push({
-                                    name: 'amount',
-                                    value: amount
-                                })
-                                var entry = {};
-                                serialized.map(function(i) {
-                                    entry[i.name] = i.value;
-                                });
-
-                                var data = Object.assign({
-                                    "journal_entry": entry,
-                                    "details": details
-                                });
-                                let isEmptyDetails = false;
-
-                                details.forEach((element, index) => {
-                                    if (element.subsidiary_id === null || element.account_id === null) {
-                                        isEmptyDetails = true;
-                                        return;
-                                    }
-                                    isEmptyDetails = false;
-                                    return false;
-                                });
-                                if (!isEmptyDetails) {
-                                    $.ajax({
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        type: "POST",
-                                        url: "{{ route('journal.saveJournalEntry') }}",
-                                        data: data,
-                                        dataType: "json",
-                                        success: function(data) {
-                                            // console.log(data)
-                                            toastr.success(data.message);
-                                            reload();
-                                        },
-                                        error: function(data) {
-                                            toastr.error('Error');
-                                        }
-                                    });
-                                }
-                            }
-
-
-                        }
-
-                    } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
-                        alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
-                    } else {
-                        alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                     }
-                } else {
-                    alert("Unable to save Debit and Credit not equal")
+                    //}
+
+
                 }
 
-            }); $(document).on('click', '.JnalFetch', function(e) {
+            } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
+                alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
+            } else {
+                alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+            }
+            //}
+            /* else {
+                           alert("Unable to save Debit and Credit not equal")
+                       } */
+
+        });
+        $(document).on('click', '.JnalFetch', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
             $.ajax({
@@ -505,7 +509,8 @@
                     toastr.error('Error');
                 }
             });
-        }) $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
+        })
+        $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
             $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
                 minimumFractionDigits: 2
             }));
@@ -514,12 +519,14 @@
             }));
             getBalance()
             checkTotalAndAmount()
-        }) $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
+        })
+        $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
             if ($('#subsidiary_id').val() == '') {
                 let amount = prompt("Please ");
             }
 
-        }) $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
+        })
+        $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
             $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
                 minimumFractionDigits: 2
             }));
@@ -528,10 +535,12 @@
             }));
             getBalance()
             checkTotalAndAmount()
-        }) $(document).on('change', '.COASelect', function(e) {
+        })
+        $(document).on('change', '.COASelect', function(e) {
             var accnu = $(this).parent().siblings('.acctnu').first().find('.journal_details_account_no')
                 .text($('option:selected', this).attr('acct-num'));
-        }); $(document).on('click', '.jnalCancel', function(e) {
+        });
+        $(document).on('click', '.jnalCancel', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
@@ -569,7 +578,8 @@
                     }
                 });
             }
-        }) $(document).on('click', '.stStatus', function(e) {
+        })
+        $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
             var editButton = $(this).closest('tr').find(
@@ -616,7 +626,8 @@
                     toastr.error('Error occurred');
                 }
             });
-        }); $(document).on('click', '.stsVoucher', function(e) {
+        });
+        $(document).on('click', '.stsVoucher', function(e) {
             $('#journalDetailsVoucher').modal('show')
         });
 
@@ -636,7 +647,8 @@
                     $('#edit_LrefNo').text(response.data);
                 }
             })
-        }) $(document).on('change', '#book_id', function(e) {
+        })
+        $(document).on('change', '#book_id', function(e) {
             var bookId = this.value
             var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
             url = url.replace(':journalBook', bookId);
@@ -652,7 +664,8 @@
                     $('#edit_LrefNo').text(response.data);
                 }
             })
-        }) $('#journalEntryFormEdit').submit(function(e) {
+        })
+        $('#journalEntryFormEdit').submit(function(e) {
             e.preventDefault();
             var serialized = $(this).serializeArray();
 
@@ -847,7 +860,8 @@
                     console.log("Error");
                 }
             });
-        }); $(document).on('click', '.JnalView', function(e) {
+        });
+        $(document).on('click', '.JnalView', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b'); // Get reference to status element
@@ -1011,7 +1025,8 @@
                     });
                 }
             });
-        }) $(document).on('click', '.JnalView', function(e) {
+        })
+        $(document).on('click', '.JnalView', function(e) {
             e.preventDefault();
             var id = $(this).attr('value');
             $.ajax({
@@ -1033,7 +1048,8 @@
                     console.log("Error");
                 }
             });
-        }) $('#SearchJournalForm').submit(function(e) {
+        })
+        $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
             var s_data = $(this).serialize();
             $.ajax({
@@ -1090,7 +1106,8 @@
                     toastr.error('Error');
                 }
             });
-        }); $(document).on('blur', '#cheque_no', function(e) {
+        });
+        $(document).on('blur', '#cheque_no', function(e) {
             e.preventDefault();
             console.log($(this).val())
             if ($(this).val() == '') {
@@ -1099,7 +1116,8 @@
                 $('#cheque_date').prop('required', true);
 
             }
-        }); $(document).on('click', '#printVoucher', function(e) {
+        });
+        $(document).on('click', '#printVoucher', function(e) {
             var winPrint = window.open('', '',
                 'left=0,top=0,width=800,height=600,toolbar=0,scrollbars=0,status=0');
             winPrint.document.write($('#toPrintVouch').html());
@@ -1202,7 +1220,8 @@
         $(document).on('click', '#open_voucher', function(e) {
             e.preventDefault();
             setVoucherData();
-        }); $(document).on('click', '.editable-table-data', function(e) {
+        });
+        $(document).on('click', '.editable-table-data', function(e) {
             e.stopPropagation();
             e.preventDefault();
             var field = $(this)
@@ -1426,7 +1445,8 @@
         }
         $(document).click(function() {
             submitEditable();
-        }); $(document).on('submit', '#frm-journal-entry', function(e) {
+        });
+        $(document).on('submit', '#frm-journal-entry', function(e) {
             e.preventDefault();
             var form = $(this);
             var formData = form.serializeArray();
@@ -1448,7 +1468,8 @@
 			</tr>
 			`;
             $('#footer-row').before(markup);
-        }); $(document).on('submit', '#frm-create-journal', function(e) {
+        });
+        $(document).on('submit', '#frm-create-journal', function(e) {
             e.preventDefault();
             var form = $(this);
             var formData = form.serializeArray();
@@ -1458,7 +1479,8 @@
             posting.done(function(response) {
                 console.log(response);
             });
-        }); $(document).on('change', '#book_id', function() {
+        });
+        $(document).on('change', '#book_id', function() {
             console.log(this.value)
             $('#journal_number').val($(this).find(':selected').attr('_count'));
             $('#LrefNo').text($(this).find(':selected').attr('_count'));
