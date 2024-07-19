@@ -2,8 +2,10 @@
     .editable-buttons {
         display: none !important;
     }
+
     .action-buttons {
-        width: calc(50% - 10px); /* Adjust width and margins as needed */
+        width: calc(50% - 10px);
+        /* Adjust width and margins as needed */
         border-radius: 5px;
         color: white;
         text-align: center;
@@ -403,12 +405,12 @@
                 var _st = false;
                 $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
                     var field = $(v).children()
-                                    if($(field[1]).find('.editable-row-item').val() == null) {
-                    return alert("Account is required.");
-                }
-                if($(field[4]).find('.editable-row-item').val() == null) {
-                    return alert("Subsidiary is required.");
-                }
+                    if ($(field[1]).find('.editable-row-item').val() == null) {
+                        return alert("Account is required.");
+                    }
+                    if ($(field[4]).find('.editable-row-item').val() == null) {
+                        return alert("Subsidiary is required.");
+                    }
                     if ($(field[0]).find('.editable-row-item').text() == '' ||
                         $(field[1]).find('.editable-row-item').val() == '' ||
                         $(field[4]).find('.editable-row-item').val() == '') {
@@ -419,65 +421,72 @@
                     }
                 });
                 var details = saveJournalEntryDetails('save');
-                if(details.length <1) {
+                if (details.length < 1) {
                     return alert("Journal details is required.")
                 }
 
-                if (parseFloat($('#debit_balance').text().float()) != 0) {
-                    if (_st) {
-                        var serialized = $(this).serializeArray();
-                        var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
-                        serialized.push({
-                            name: 'amount',
-                            value: amount
-                        })
-                        var entry = {};
-                        serialized.map(function(i) {
-                            entry[i.name] = i.value;
-                        });
+                /*                 if (parseFloat($('#debit_balance').text().float()) != 0) { */
+                if (_st) {
+                    var serialized = $(this).serializeArray();
+                    var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
+                    serialized.push({
+                        name: 'amount',
+                        value: amount
+                    })
+                    var entry = {};
+                    serialized.map(function(i) {
+                        entry[i.name] = i.value;
+                    });
 
-                        var data = Object.assign({
-                            "journal_entry": entry,
-                            "details": details
-                        });
+                    var data = Object.assign({
+                        "journal_entry": entry,
+                        "details": details
+                    });
+                    let isEmptyDetails = false;
 
-                        details.forEach((element, index) => {
-                            if (element.subsidiary_id === null || element.account_id) {
-                                details = false;
+                    details.forEach((element, index) => {
+                        if (element.subsidiary_id === null || element.account_id === null) {
+                            isEmptyDetails = true;
+                            return;
+                        }
+                        isEmptyDetails = false;
+                        return false;
+                    });
+                    alert(isEmptyDetails)
+                    if (!isEmptyDetails) {
+
+                        $.ajax({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            type: "POST",
+                            url: "{{ route('journal.saveJournalEntry') }}",
+                            data: data,
+                            dataType: "json",
+                            success: function(data) {
+                                // console.log(data)
+                                toastr.success(data.message);
+                                reload();
+                            },
+                            error: function(data) {
+                                toastr.error('Error');
                             }
                         });
-                        if(!details) {
-                           return details
-                        }else {
-                            $.ajax({
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                type: "POST",
-                                url: "{{ route('journal.saveJournalEntry') }}",
-                                data: data,
-                                dataType: "json",
-                                success: function(data) {
-                                    // console.log(data)
-                                    toastr.success(data.message);
-                                    reload();
-                                },
-                                error: function(data) {
-                                    toastr.error('Error');
-                                }
-                            });
-                        }
+                    }
+                    //}
 
 
                 }
-                } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
-                    alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
-                } else {
-                    alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
-                }
-            }else {
-                alert("Unable to save Debit and Credit not equal")
+
+            } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
+                alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
+            } else {
+                alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
             }
+            //}
+            /* else {
+                           alert("Unable to save Debit and Credit not equal")
+                       } */
 
         });
         $(document).on('click', '.JnalFetch', function(e) {
@@ -535,8 +544,10 @@
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
+            var cancelButton = $(this).closest('tr').find(
+                '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
 
             if (confirm("Are you sure you want to cancel this Journal Entry?")) {
@@ -557,7 +568,8 @@
                             statusElement.removeClass('text-success').addClass('text-danger');
                             cancelButton.prop('disabled', true); // Disable the cancel button
                             editButton.prop('disabled', false); // Disable the edit button
-                            stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success');
+                            stStatusButton.removeClass('bg-gradient-danger').addClass(
+                                'bg-gradient-success');
                             stStatusButton.text('Post');
                         }
                     },
@@ -570,8 +582,10 @@
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
+            var cancelButton = $(this).closest('tr').find(
+                '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this); // Store reference to the clicked button
 
             $.ajax({
@@ -590,16 +604,20 @@
                         toastr.success('Journal entry has been posted');
                         statusElement.html('<b>Posted</b>');
                         statusElement.removeClass('text-danger').addClass('text-success');
-                        stStatusButton.text('Unpost'); // Change the text content of the clicked button
-                        stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
+                        stStatusButton.text(
+                            'Unpost'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-success').addClass(
+                            'bg-gradient-danger'); // Change button background color
                         editButton.prop('disabled', true); // Disable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     } else if (data.message == 'unposted') {
                         toastr.success('Journal entry has been unposted');
                         statusElement.html('<b>Unposted</b>');
                         statusElement.removeClass('text-success').addClass('text-danger');
-                        stStatusButton.text('Post'); // Change the text content of the clicked button
-                        stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
+                        stStatusButton.text(
+                            'Post'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-danger').addClass(
+                            'bg-gradient-success'); // Change button background color
                         editButton.prop('disabled', false); // Enable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     }
@@ -613,39 +631,39 @@
             $('#journalDetailsVoucher').modal('show')
         });
 
-        $(document).on('change','#edit_book_id',function(e) {
+        $(document).on('change', '#edit_book_id', function(e) {
             var bookId = this.value
-            var url = '{{ route("journal.generateJournalNumber", ":journalBook") }}';
-                    url = url.replace(':journalBook',bookId);
-           $.ajax({
-             headers: {
+            var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
+            url = url.replace(':journalBook', bookId);
+            $.ajax({
+                headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: "GET",
                 url: url,
                 dataType: "json",
-                success:function(response) {
-                                $('#edit_journal_no').val(response.data);
-                                $('#edit_LrefNo').text(response.data);
+                success: function(response) {
+                    $('#edit_journal_no').val(response.data);
+                    $('#edit_LrefNo').text(response.data);
                 }
-           })
+            })
         })
-        $(document).on('change','#book_id',function(e) {
+        $(document).on('change', '#book_id', function(e) {
             var bookId = this.value
-            var url = '{{ route("journal.generateJournalNumber", ":journalBook") }}';
-                    url = url.replace(':journalBook',bookId);
-           $.ajax({
-             headers: {
+            var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
+            url = url.replace(':journalBook', bookId);
+            $.ajax({
+                headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: "GET",
                 url: url,
                 dataType: "json",
-                success:function(response) {
-                                $('#edit_journal_no').val(response.data);
-                                $('#edit_LrefNo').text(response.data);
+                success: function(response) {
+                    $('#edit_journal_no').val(response.data);
+                    $('#edit_LrefNo').text(response.data);
                 }
-           })
+            })
         })
         $('#journalEntryFormEdit').submit(function(e) {
             e.preventDefault();
@@ -660,10 +678,10 @@
 
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
                 var field = $(v).children()
-                if($(field[1]).find('.editable-row-item').val() == null) {
+                if ($(field[1]).find('.editable-row-item').val() == null) {
                     return alert("Account is required.");
                 }
-                if($(field[4]).find('.editable-row-item').val() == null) {
+                if ($(field[4]).find('.editable-row-item').val() == null) {
                     return alert("Subsidiary is required.");
                 }
                 if ($(field[0]).find('.editable-row-item').text() == '' ||
@@ -679,11 +697,11 @@
 
             var edit_balance = document.getElementById("edit_balance_debit");
             var edit_bal = edit_balance.innerText;
-            if(details.lengt <1) {
+            if (details.lengt < 1) {
                 return alert("Journal details is required.")
             }
 
-            if (parseFloat(edit_bal) == 0){
+            if (parseFloat(edit_bal) == 0) {
                 if (parseFloat($('#edit_balance_debit').text().float()) <= 0) {
                     if (_st) {
                         var serialized = $(this).serializeArray();
@@ -702,14 +720,14 @@
                             "details": details
                         });
 
-                         details.forEach((element, index) => {
+                        details.forEach((element, index) => {
                             if (element.subsidiary_id === null || element.account_id) {
                                 details = false;
                             }
                         });
-                        if(!details) {
-                           return details
-                        }else {
+                        if (!details) {
+                            return details
+                        } else {
                             console.log("qsdasd")
                             $.ajax({
                                 headers: {
@@ -730,13 +748,13 @@
                             });
                         }
 
-                }
+                    }
                 } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
                 } else {
                     alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
-            }else {
+            } else {
                 //alert("Unable to save, debit and credit is not equal")
             }
 
@@ -847,8 +865,10 @@
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b'); // Get reference to status element
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
+            var cancelButton = $(this).closest('tr').find(
+                '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
 
             $.ajax({
@@ -887,14 +907,17 @@
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
                             $('#voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
-                            if(v.remarks) {
+                            if (v.remarks) {
                                 $.each(v.remarks.split('::'), function(k, vv) {
                                     $('#vjournal_remarks').append(
                                         `<p>${vv}</p>`
                                     );
                                 });
                             }
-                            $('#voucher_particular').html(v.remarks ? v.remarks.replace(/::/g, '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;') : '');
+                            $('#voucher_particular').html(v.remarks ? v.remarks.replace(
+                                    /::/g,
+                                    '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;') :
+                                '');
                             $('#vjournal_branch, #voucher_branch').text(v.branch
                                 .branch_name);
                             $('#vjournal_cheque_date').text((v.cheque_date) ?
@@ -962,7 +985,7 @@
                     console.log("Error");
                 }
             });
-            $('#journalModalView').on('hidden.bs.modal', function (e) {
+            $('#journalModalView').on('hidden.bs.modal', function(e) {
                 // Update status immediately after closing modal
                 if (statusElement) {
                     $.ajax({
@@ -980,11 +1003,19 @@
                                 // Update status element in the main table
                                 if (response.data[0].status === 'posted') {
                                     statusElement.html('<b>Posted</b>');
-                                    statusElement.removeClass('text-danger').addClass('text-success');
-                                    stStatusButton.text('Unpost'); // Change the text content of the clicked button
-                                    stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
-                                    editButton.prop('disabled', true); // Disable the edit button
-                                    cancelButton.prop('disabled', false); // Enable the cancel button
+                                    statusElement.removeClass('text-danger').addClass(
+                                        'text-success');
+                                    stStatusButton.text(
+                                        'Unpost'
+                                    ); // Change the text content of the clicked button
+                                    stStatusButton.removeClass('bg-gradient-success')
+                                        .addClass(
+                                            'bg-gradient-danger'
+                                        ); // Change button background color
+                                    editButton.prop('disabled',
+                                        true); // Disable the edit button
+                                    cancelButton.prop('disabled',
+                                        false); // Enable the cancel button
                                 }
                             }
                         },
@@ -1039,11 +1070,12 @@
                             'text-danger';
                         var disabled = (v.status == 'posted') ? 'disabled' : '';
                         var cancelled = (v.status == 'cancelled') ? 'disabled' : '';
-                        var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' : 'bg-gradient-success';
+                        var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' :
+                            'bg-gradient-success';
                         var ifpost = (v.status == 'posted') ? 'Unpost' : 'Post';
 
                         var branchColumn = '';
-                        @if(Gate::allows('manager'))
+                        @if (Gate::allows('manager'))
                             branchColumn = `<td>${v.branch_name}</td>`;
                         @endif
 
@@ -1100,15 +1132,15 @@
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
-                    $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
-            if ($('#subsidiary_id').val() == '') {
-                alert("Subsidiary is required.")
-            }
-            if ($('#account_id').val() == '') {
-                alert("Account is required.")
-            }
+            $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
+                if ($('#subsidiary_id').val() == '') {
+                    alert("Subsidiary is required.")
+                }
+                if ($('#account_id').val() == '') {
+                    alert("Account is required.")
+                }
 
-        })
+            })
             var content = `<tr class='editable-table-row'>
 			<td class="acctnu" value="">
 				<a href="#" class="editable-row-item journal_details_account_no"></a>
@@ -1241,6 +1273,21 @@
             return false;
         }
 
+        /*         function hasEmptyJournalDetails(details) {
+
+                    let hasNull = new Boolean(false);
+                    details.forEach((element, index) => {
+                        if (element.subsidiary_id == null || element.account_id == null) {
+                            hasNull = true;
+                            return true;
+                        }
+
+                    });
+
+                    return hasNull;
+
+                } */
+
         function setVoucherData() {
             // if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
             // 	 && $('#JDetailsVoucher').val() && $('#source').val() && $('#JDetailsVoucher').val() && $('#amount').val()){
@@ -1251,7 +1298,8 @@
             $('#journal_voucher_date').text(moment($('#journal_date')).format('MMMM D, YYYY'));
             $('#journal_voucher_ref_no').text($('#LrefNo').html())
             $('#journal_voucher_source').text($('#source').val())
-            $('#journal_voucher_particular').html($('#remarks').val().replace(/::/g, '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'));
+            $('#journal_voucher_particular').html($('#remarks').val().replace(/::/g,
+                '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'));
             // $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
             $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
 
@@ -1314,8 +1362,8 @@
                     subsidiary_id: $(field[4]).find('.editable-row-item').val(),
                 });
             });
-            if(details.lenght<1) {
-            return false;
+            if (details.lenght < 1) {
+                return false;
             }
             return details;
 
