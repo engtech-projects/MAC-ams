@@ -2,8 +2,10 @@
     .editable-buttons {
         display: none !important;
     }
+
     .action-buttons {
-        width: calc(50% - 10px); /* Adjust width and margins as needed */
+        width: calc(50% - 10px);
+        /* Adjust width and margins as needed */
         border-radius: 5px;
         color: white;
         text-align: center;
@@ -15,6 +17,7 @@
 </style>
 <script type="text/javascript">
     (function($) {
+        let hasAccess;
         'use strict'
 
         $('.select-branch2').select2({
@@ -55,6 +58,11 @@
 
             $(this).text(val)
         })
+
+
+
+
+
 
 
 
@@ -101,7 +109,6 @@
                             $('#posted-content').html('');
                             var content = '';
 
-                            console.log(v.remarks)
                             $.each(v.remarks.split('::'), function(k, vv) {
                                 $('#vjournal_remarks').append(
                                     `<p>${vv}</p>`
@@ -403,7 +410,7 @@
 
             if (parseFloat(spanBal) == 0) {
                 // alert("Debit and Credit equal")
-              
+
                 var serialized = $(this).serializeArray();
                 var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
                 serialized.push({
@@ -443,32 +450,32 @@
                             "details": details
                         });
 
-                    // console.log(data);
+                        // console.log(data);
 
-                    $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        type: "POST",
-                        url: "{{ route('journal.saveJournalEntry') }}",
-                        data: data,
-                        dataType: "json",
-                        success: function(data) {
-                            // console.log(data)
-                            toastr.success(data.message);
-                            reload();
-                        },
-                        error: function(data) {
-                            toastr.error('Error');
-                        }
-                    });
-                }
+                        $.ajax({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            type: "POST",
+                            url: "{{ route('journal.saveJournalEntry') }}",
+                            data: data,
+                            dataType: "json",
+                            success: function(data) {
+                                // console.log(data)
+                                toastr.success(data.message);
+                                reload();
+                            },
+                            error: function(data) {
+                                toastr.error('Error');
+                            }
+                        });
+                    }
                 } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
                 } else {
                     alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
-            }else {
+            } else {
                 alert("Unable to save Debit and Credit not equal")
             }
 
@@ -522,8 +529,10 @@
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
+            var cancelButton = $(this).closest('tr').find(
+                '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
 
             if (confirm("Are you sure you want to cancel this Journal Entry?")) {
@@ -544,7 +553,8 @@
                             statusElement.removeClass('text-success').addClass('text-danger');
                             cancelButton.prop('disabled', true); // Disable the cancel button
                             editButton.prop('disabled', false); // Disable the edit button
-                            stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success');
+                            stStatusButton.removeClass('bg-gradient-danger').addClass(
+                                'bg-gradient-success');
                             stStatusButton.text('Post');
                         }
                     },
@@ -557,8 +567,10 @@
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
+            var cancelButton = $(this).closest('tr').find(
+                '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this); // Store reference to the clicked button
 
             $.ajax({
@@ -577,16 +589,20 @@
                         toastr.success('Journal entry has been posted');
                         statusElement.html('<b>Posted</b>');
                         statusElement.removeClass('text-danger').addClass('text-success');
-                        stStatusButton.text('Unpost'); // Change the text content of the clicked button
-                        stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
+                        stStatusButton.text(
+                            'Unpost'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-success').addClass(
+                            'bg-gradient-danger'); // Change button background color
                         editButton.prop('disabled', true); // Disable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     } else if (data.message == 'unposted') {
                         toastr.success('Journal entry has been unposted');
                         statusElement.html('<b>Unposted</b>');
                         statusElement.removeClass('text-success').addClass('text-danger');
-                        stStatusButton.text('Post'); // Change the text content of the clicked button
-                        stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
+                        stStatusButton.text(
+                            'Post'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-danger').addClass(
+                            'bg-gradient-success'); // Change button background color
                         editButton.prop('disabled', false); // Enable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     }
@@ -623,7 +639,7 @@
             var edit_balance = document.getElementById("edit_balance_debit");
             var edit_bal = edit_balance.innerText;
 
-            if (parseFloat(edit_bal) == 0){
+            if (parseFloat(edit_bal) == 0) {
                 if (parseFloat($('#edit_balance_debit').text().float()) <= 0) {
                     if (_st) {
                         var serialized = $(this).serializeArray();
@@ -658,16 +674,16 @@
                                 toastr.error('Error');
                             }
                         });
-                }
+                    }
                 } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
                 } else {
                     alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
                 }
-            }else {
+            } else {
                 alert("Unable to save, debit and credit is not equal")
             }
-           
+
         });
         $(document).on('click', '.JnalEdit', function(e) {
             $('#journalModalEdit').modal('show');
@@ -772,8 +788,10 @@
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b'); // Get reference to status element
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
-            var cancelButton = $(this).closest('tr').find('.jnalCancel'); // Find the cancel button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
+            var cancelButton = $(this).closest('tr').find(
+                '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
 
             $.ajax({
@@ -812,14 +830,17 @@
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
                             $('#voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
-                            if(v.remarks) {
+                            if (v.remarks) {
                                 $.each(v.remarks.split('::'), function(k, vv) {
                                     $('#vjournal_remarks').append(
                                         `<p>${vv}</p>`
                                     );
                                 });
                             }
-                            $('#voucher_particular').html(v.remarks ? v.remarks.replace(/::/g, '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;') : '');
+                            $('#voucher_particular').html(v.remarks ? v.remarks.replace(
+                                    /::/g,
+                                    '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;') :
+                                '');
                             $('#vjournal_branch, #voucher_branch').text(v.branch
                                 .branch_name);
                             $('#vjournal_cheque_date').text((v.cheque_date) ?
@@ -887,7 +908,7 @@
                     console.log("Error");
                 }
             });
-            $('#journalModalView').on('hidden.bs.modal', function (e) {
+            $('#journalModalView').on('hidden.bs.modal', function(e) {
                 // Update status immediately after closing modal
                 if (statusElement) {
                     $.ajax({
@@ -905,11 +926,19 @@
                                 // Update status element in the main table
                                 if (response.data[0].status === 'posted') {
                                     statusElement.html('<b>Posted</b>');
-                                    statusElement.removeClass('text-danger').addClass('text-success');
-                                    stStatusButton.text('Unpost'); // Change the text content of the clicked button
-                                    stStatusButton.removeClass('bg-gradient-success').addClass('bg-gradient-danger'); // Change button background color
-                                    editButton.prop('disabled', true); // Disable the edit button
-                                    cancelButton.prop('disabled', false); // Enable the cancel button
+                                    statusElement.removeClass('text-danger').addClass(
+                                        'text-success');
+                                    stStatusButton.text(
+                                        'Unpost'
+                                    ); // Change the text content of the clicked button
+                                    stStatusButton.removeClass('bg-gradient-success')
+                                        .addClass(
+                                            'bg-gradient-danger'
+                                        ); // Change button background color
+                                    editButton.prop('disabled',
+                                        true); // Disable the edit button
+                                    cancelButton.prop('disabled',
+                                        false); // Enable the cancel button
                                 }
                             }
                         },
@@ -943,6 +972,7 @@
                 }
             });
         })
+
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
             var s_data = $(this).serialize();
@@ -959,22 +989,22 @@
                     $('#journalEntryDetailsContent').html('');
 
                     $.each(data, function(k, v) {
-
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
                         var disabled = (v.status == 'posted') ? 'disabled' : '';
                         var cancelled = (v.status == 'cancelled') ? 'disabled' : '';
-                        var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' : 'bg-gradient-success';
+                        var postcolor = (v.status == 'posted') ? 'bg-gradient-danger' :
+                            'bg-gradient-success';
                         var ifpost = (v.status == 'posted') ? 'Unpost' : 'Post';
 
                         var branchColumn = '';
-                        @if(Gate::allows('manager'))
+                        @if (Gate::allows('manager'))
                             branchColumn = `<td>${v.branch_name}</td>`;
                         @endif
-                        
+
                         var remarks = v.remarks ? v.remarks.replace(/::/g, '<br>') : '';
 
-                        $('#journalEntryDetailsContent').append(
+                        var journalListTable =
                             `<tr>
 							<td class="font-weight-bold">${v.journal_date}</td>
                             <td>${v.book_details.book_code}</td>
@@ -984,15 +1014,26 @@
 							<td>${remarks}</td>
                             ${branchColumn}
 							<td class="${status}"><b>${v.status.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</b></td>
-							<td>
+                            <td>
                                 <button value="${v.journal_id}" ${cancelled} class="btn btn-flat btn-xs bg-gradient-danger jnalCancel action-buttons">Cancel</button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary action-buttons">View</button>
                                 <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
-                                <button value="${v.journal_id}" class="btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>
-							</td>
-						</tr>`
-                        );
+                                <button id="postunpostbtn" value="${v.journal_id}" class="postunpost btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>`
+
+                        const button = isHaveAccessToPostUnpost().then((result) => {
+                            console.log(result);
+                            if (!result) {
+                                $('.postunpost').hide();
+                                return result;
+                            }
+
+                        }).catch((err) => {
+                            console.log(err);
+                        });
+                        journalListTable += `</td></tr>`
+                        $('#journalEntryDetailsContent').append(journalListTable)
                     });
+
                     $('#journalEntryDetails').DataTable();
                 },
                 error: function(data) {
@@ -1167,7 +1208,8 @@
             $('#journal_voucher_date').text(moment($('#journal_date')).format('MMMM D, YYYY'));
             $('#journal_voucher_ref_no').text($('#LrefNo').html())
             $('#journal_voucher_source').text($('#source').val())
-            $('#journal_voucher_particular').html($('#remarks').val().replace(/::/g, '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'));
+            $('#journal_voucher_particular').html($('#remarks').val().replace(/::/g,
+                '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'));
             // $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
             $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
 
@@ -1305,6 +1347,31 @@
                 }
             }
         }
+
+        async function isHaveAccessToPostUnpost() {
+            try {
+
+                const result = await fetchAuthUser();
+                const accessibilities = result.accessibilities;
+                const hasAccess = accessibilities.some(accessibility => accessibility['sml_id'] === 265);
+                return hasAccess;
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+
+        function fetchAuthUser() {
+            return $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]')
+                        .attr('content')
+                },
+                type: "GET",
+                url: "{{ route('auth.user') }}",
+                dataType: "json",
+            });
+        }
         $(document).click(function() {
             submitEditable();
         });
@@ -1346,6 +1413,9 @@
             $('#journal_no').val($(this).find(':selected').attr('_count'));
             $('#LrefNo').text($(this).find(':selected').attr('_count'));
         });
+
+
+
 
         function editJournal(id) {
             console.log(id)
