@@ -678,9 +678,9 @@
 
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
                 var field = $(v).children()
-                if ($(field[1]).find('.editable-row-item').val() == null) {
-                    return alert("Account is required.");
-                }
+                /*  if ($(field[1]).find('.editable-row-item').val() == null) {
+                     return alert("Account is required.");
+                 } */
                 if ($(field[4]).find('.editable-row-item').val() == null) {
                     return alert("Subsidiary is required.");
                 }
@@ -800,7 +800,7 @@
 								</td>
 								<td class='editable-table-data' value="" >
 									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id} account_id" class="select-account form-control form-control-sm editable-row-item COASelect">
-										<option disabled value="" selected>-Select Account Name-</option>
+										<option disabled value="${vv.account.account_id}" selected>${vv.account.account_name}</option>
 										@foreach ($chartOfAccount as $account)
 											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_name }}</option>
 										@endforeach
@@ -1135,7 +1135,7 @@
                 if ($('#subsidiary_id').val() == '') {
                     alert("Subsidiary is required.")
                 }
-                if ($('#account_id').val() == '') {
+                if ($('#account_id').val() == null) {
                     alert("Account is required.")
                 }
 
