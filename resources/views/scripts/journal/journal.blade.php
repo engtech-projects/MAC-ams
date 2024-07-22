@@ -397,6 +397,7 @@
                 // alert("Debit and Credit equal")
 
                 var serialized = $(this).serializeArray();
+                console.log(serialized);
                 var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
                 serialized.push({
                     name: 'amount',
@@ -646,6 +647,7 @@
                 }
             })
         })
+
         $(document).on('change', '#book_id', function(e) {
             var bookId = this.value
             var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
@@ -658,8 +660,8 @@
                 url: url,
                 dataType: "json",
                 success: function(response) {
-                    $('#edit_journal_no').val(response.data);
-                    $('#edit_LrefNo').text(response.data);
+                    $('#journal_number').val(response.data);
+                    $('#LrefNo').text(response.data);
                 }
             })
         })

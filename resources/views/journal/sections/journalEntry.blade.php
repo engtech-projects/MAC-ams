@@ -145,7 +145,7 @@
 								<div class="form-group">
 									<label class="label-normal" for="">Reference No.</label>
 									<div class="input-group">
-                                        <input type="hidden" name="journal_no" id="journal_no">
+                                        <input type="hidden" name="journal_no" id="journal_number">
 										<label class="label-normal" id="LrefNo" ></label>
 									</div>
 								</div>
