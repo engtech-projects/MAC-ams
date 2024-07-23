@@ -720,14 +720,17 @@
                             "details": details
                         });
 
+                        let isEmptyDetails = false;
                         details.forEach((element, index) => {
-                            if (element.subsidiary_id === null || element.account_id) {
-                                details = false;
+                            console.log(element)
+                            if (element.subsidiary_id === null || element.account_id === null) {
+                                isEmptyDetails = true;
+                                return;
                             }
+                            isEmptyDetails = false;
+                            return false;
                         });
-                        if (!details) {
-                            return details
-                        } else {
+                        if (!isEmptyDetails) {
                             $.ajax({
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -800,7 +803,7 @@
 								</td>
 								<td class='editable-table-data' value="" >
 									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id} account_id" class="select-account form-control form-control-sm editable-row-item COASelect">
-										<option disabled value="${vv.account.account_id}" selected>${vv.account.account_name}</option>
+										<option value="${vv.account.account_id}" selected>${vv.account.account_name}</option>
 										@foreach ($chartOfAccount as $account)
 											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_name }}</option>
 										@endforeach
@@ -1352,6 +1355,7 @@
                     '0' : $(field[2]).find('.editable-row-item').text()
                 var credit = ($(field[3]).find('.editable-row-item').text() === '') ?
                     '0' : $(field[3]).find('.editable-row-item').text()
+                    console.log($(field[0]).find('.editable-row-item').text());
                 details.push({
                     journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
                     account_id: $(field[1]).find('.editable-row-item').val(),
