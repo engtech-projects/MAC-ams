@@ -18,24 +18,27 @@ class RedirectIfNoAccess
      */
     public function handle(Request $request, Closure $next)
     {
-		$isNumeric = false;
-		foreach(explode('/',strtolower($request->path())) as $value)
-		{
-			if(is_numeric($value))
-			{
-				$isNumeric = true;
-			}
-		}
-		$user = Auth::user();
-		foreach($user->accessibilities as $accessibility){
-			if(strtolower($accessibility['subModuleList']['route']) == strtolower($request->path()) || $isNumeric)
-			{
-				return $next($request);
-			}
-		}
-		if ($request->path() == '/') {
-			return $next($request);
-		}
-		abort(404, 'You have no access in this function try contact admin to add this function in your access list');
+        $isNumeric = false;
+        foreach (explode('/', strtolower($request->path())) as $value) {
+            if (is_numeric($value)) {
+                $isNumeric = true;
+            }
+        }
+        $user = Auth::user();
+
+        foreach ($user->accessibilities as $accessibility) {
+            $accessibility = $accessibility->toArray();
+
+            if (isset($accessibility['sub_module_list']['route'])) {
+                if (strtolower($accessibility['sub_module_list']['route']) == strtolower($request->path()) || $isNumeric) {
+                    return $next($request);
+                }
+            }
+        }
+        if ($request->path() == '/') {
+            return $next($request);
+        }
+
+        abort(404, 'You have no access in this function try contact admin to add this function in your access list');
     }
 }

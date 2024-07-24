@@ -18,7 +18,7 @@ class AccessList extends Model
     ];
 
 
-	public function subModuleList(){
+	public function sub_module_list(){
 		return $this->hasMany(subModuleList::class, 'al_id');
     }
 

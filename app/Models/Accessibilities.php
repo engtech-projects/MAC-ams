@@ -16,9 +16,9 @@ class Accessibilities extends Model
     protected $fillable = ['user_id', 'sml_id', 'date_created'];
 
 
-    public function subModuleList()
+    public function sub_module_list()
     {
-        return $this->belongsTo(subModuleList::class, 'sml_id');
+        return $this->belongsTo(SubModuleList::class, 'sml_id');
     }
 
 

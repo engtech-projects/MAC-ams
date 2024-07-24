@@ -84,8 +84,9 @@ function checkUserHasAccessModule($type, $moduleName)
     if ($type == 'module') {
         $accessLists = App\Models\AccessList::where('module_name', $moduleName)->pluck('al_id');
         if (count($accessLists) > 0) {
-            foreach ($user['accessibilities'] as $accessibility) {
-                if ($accessibility['subModuleList']['al_id'] == $accessLists[0]) {
+            $accessbilities = $user->accessibilities->toArray();
+            foreach ($accessbilities as $accessibility) {
+                if (isset($accessibility['sub_module_list']['al_id']) && $accessibility['sub_module_list']['al_id'] == $accessLists[0]) {
                     return true;
                 }
             }
@@ -93,8 +94,7 @@ function checkUserHasAccessModule($type, $moduleName)
         return false;
     } else if ($type == 'sub-module') {
         foreach ($user['accessibilities'] as $accessibility) {
-
-            if ($accessibility['subModuleList']['route'] == $moduleName) {
+            if (isset($accessibility['sub_module_list']['route']) && $accessibility['sub_module_list']['route'] == $moduleName) {
                 return true;
             }
         }

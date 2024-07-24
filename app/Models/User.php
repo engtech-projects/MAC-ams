@@ -15,7 +15,7 @@ use App\Models\Accessibilities;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    public $with = ['personal_info', 'accessibilities.subModuleList', 'userBranch','userRole'];
+    public $with = ['personal_info', 'accessibilities.sub_module_list', 'userBranch','userRole'];
 
     protected $fillable = [
         'username',

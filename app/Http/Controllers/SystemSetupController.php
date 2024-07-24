@@ -28,7 +28,7 @@ class SystemSetupController extends MainController
 			'title' 	=> 'MAC-AMS | System Setup',
 			'nav' 		=> ['settings', 'general'],
 			'company' 	=> Company::with('address')->first(),
-			'accessLists' => AccessList::with('subModuleList')->get(),
+			'accessLists' => AccessList::with('sub_module_list')->get(),
 			'journalBookList' => JournalBook::get(),
 			'subsidiaryCategories' => SubsidiaryCategory::get(),
 			'currencies' => Currency::all(),
@@ -91,8 +91,8 @@ class SystemSetupController extends MainController
 		$book_id = $request->bookId;
 		$journ = new JournalBook;
 		$status = $journ->checkBookCode($request->book_code, $request->book_id);
-		
-		
+
+
 		if($book_id == '')
 		{
 			if(!$status)
@@ -124,7 +124,7 @@ class SystemSetupController extends MainController
 			}else{
 				return json_encode(['status' => 'book_code_duplicate', 'book_id'=>'']);
 			}
-			
+
 		}
 	}
 
@@ -222,7 +222,7 @@ class SystemSetupController extends MainController
 	public function deleteCategoryFile(Request $request)
 	{
 		$cat_id = $request->catId;
-		return json_encode(SubsidiaryCategory::find($cat_id)->delete());	
+		return json_encode(SubsidiaryCategory::find($cat_id)->delete());
 	}
 
 	public function userMasterFileCreateOrUpdateAccessibility(Request $request)
