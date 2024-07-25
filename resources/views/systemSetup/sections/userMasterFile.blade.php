@@ -98,6 +98,18 @@
                             id="password" placeholder="Password" required>
                     </div>
                 </div>
+
+                <div class="form-group" style="margin-right:10px;flex:1;">
+                        <label class="label-normal" for="gender">Gender</label>
+                        <div class="input-group">
+                            <select name="branch_id" class="form-control form-control-sm" id="gender">
+                                <option value="" disabled selected>Select Branch</option>
+                                @foreach ($branch as $item)
+                                    <option value="{{ $item->branch_id }}">{{ $item->branch_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 <div class="input-group">
                     <input type="submit" style="flex:1" class="btn btn-success form-control-sm form-control"
                         value="SAVE/UPDATE">
