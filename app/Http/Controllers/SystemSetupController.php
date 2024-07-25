@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Company;
-use App\Models\CompanyAddress;
-use App\Models\Currency;
-use App\Models\Accounting;
-use App\Models\User;
-use App\Models\PersonalInfo;
-use App\Models\JournalBook;
-use App\Models\SubsidiaryCategory;
-use App\Models\Accessibilities;
-use App\Models\AccessList;
-use Carbon\Carbon;
-
-use Hash;
-
-use Session;
 use DB;
+use Hash;
+use Session;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Company;
+use App\Models\Currency;
+use App\Models\AccessList;
+use App\Models\Accounting;
+use App\Models\JournalBook;
+use Illuminate\Support\Str;
+use App\Models\PersonalInfo;
+
+use Illuminate\Http\Request;
+
+use App\Models\CompanyAddress;
+use App\Models\Accessibilities;
+use App\Models\SubsidiaryCategory;
 
 
 class SystemSetupController extends MainController
@@ -153,6 +154,7 @@ class SystemSetupController extends MainController
 			$person->displayname = $request->displayname;
 			$person->email_address = $request->email;
 			$person->phone_number = $request->phone_number;
+
 			$person->save();
 
 			$user = new User;
@@ -160,6 +162,7 @@ class SystemSetupController extends MainController
 			$user->password = bcrypt($request->password);
 			$user->status = 'active';
 			$user->role_id = '1';
+            $user->salt = Str::random(10);
 			$person->userInfo()->save($user);
 
 			return json_encode('create');
