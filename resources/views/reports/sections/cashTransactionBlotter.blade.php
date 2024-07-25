@@ -69,7 +69,7 @@
                             </div>
                         </div>
 
-                        @if(Gate::allows(['accounting-staff']))
+                        @if(Gate::allows(['accounting-staff']) || Gate::allows(['manager']))
                         <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6':'2' }}">
                             <div class="mt-4 text-right">
                                 <button type="button" class="btn btn-primary" data-type="create"
