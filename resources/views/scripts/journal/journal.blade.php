@@ -3,7 +3,10 @@
         display: none !important;
     }
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     .action-buttons {
         width: calc(50% - 10px);
         /* Adjust width and margins as needed */
@@ -452,6 +455,7 @@
                         });
                         let isEmptyDetails = false;
 
+<<<<<<< Updated upstream
                         details.forEach((element, index) => {
                             if (element.subsidiary_id === null || element.account_id === null) {
                                 isEmptyDetails = true;
@@ -485,6 +489,28 @@
 
                     }
 
+=======
+                        // console.log(data);
+
+                        $.ajax({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            type: "POST",
+                            url: "{{ route('journal.saveJournalEntry') }}",
+                            data: data,
+                            dataType: "json",
+                            success: function(data) {
+                                // console.log(data)
+                                toastr.success(data.message);
+                                reload();
+                            },
+                            error: function(data) {
+                                toastr.error('Error');
+                            }
+                        });
+                    }
+>>>>>>> Stashed changes
                 } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
                 } else {
@@ -737,6 +763,7 @@
                             isEmptyDetails = false;
                             return false;
                         });
+<<<<<<< Updated upstream
                         if (!isEmptyDetails) {
                             $.ajax({
                                 headers: {
@@ -757,6 +784,8 @@
                             });
                         }
 
+=======
+>>>>>>> Stashed changes
                     }
                 } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
@@ -1309,6 +1338,7 @@
                 } */
 
         function setVoucherData() {
+
             // if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
             // 	 && $('#JDetailsVoucher').val() && $('#source').val() && $('#JDetailsVoucher').val() && $('#amount').val()){
             $('#journal_VoucherContent').html('')
@@ -1323,9 +1353,23 @@
             // $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
             $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
 
+            $('.cheque-number').text($('#cheque_no').val());
+            $('.cheque-date').text($('#cheque_date').val());
+            var journalBook = $('#LrefNo').text();
+            let bookRef = journalBook.split("-");
+            let prefix = bookRef[0];
+            if (prefix === "CDB" || prefix === "CSDB") {
+                $('.received-payment').show();
+            } else {
+                $('.received-payment').hide();
+            }
+
+
             $('#journal_voucher_amount_in_words').text(numberToWords(parseFloat(Number($('#amount').val().replace(
                 /[^0-9\.-]+/g, "")))))
 
+            $('.journal_voucher_amount_in_words').text(numberToWords(parseFloat(Number($('#amount').val().replace(
+                /[^0-9\.-]+/g, "")))))
 
             $('#journal_total_debit_voucher').text($('#total_debit').text())
             $('#journal_total_credit_voucher').text($('#total_credit').text())
