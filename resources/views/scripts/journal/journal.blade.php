@@ -3,10 +3,6 @@
         display: none !important;
     }
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     .action-buttons {
         width: calc(50% - 10px);
         /* Adjust width and margins as needed */
@@ -455,7 +451,6 @@
                         });
                         let isEmptyDetails = false;
 
-<<<<<<< Updated upstream
                         details.forEach((element, index) => {
                             if (element.subsidiary_id === null || element.account_id === null) {
                                 isEmptyDetails = true;
@@ -489,28 +484,6 @@
 
                     }
 
-=======
-                        // console.log(data);
-
-                        $.ajax({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            type: "POST",
-                            url: "{{ route('journal.saveJournalEntry') }}",
-                            data: data,
-                            dataType: "json",
-                            success: function(data) {
-                                // console.log(data)
-                                toastr.success(data.message);
-                                reload();
-                            },
-                            error: function(data) {
-                                toastr.error('Error');
-                            }
-                        });
-                    }
->>>>>>> Stashed changes
                 } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
                 } else {
@@ -763,7 +736,6 @@
                             isEmptyDetails = false;
                             return false;
                         });
-<<<<<<< Updated upstream
                         if (!isEmptyDetails) {
                             $.ajax({
                                 headers: {
@@ -784,8 +756,6 @@
                             });
                         }
 
-=======
->>>>>>> Stashed changes
                     }
                 } else if ($('#edit_amount').val() != parseFloat($('#edit_total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');

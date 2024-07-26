@@ -47,51 +47,9 @@
             float: right !important;
         }
 
-<<<<<<< Updated upstream
-							</div>
-						</div>
-                        @endif
-						<div class="col-md-{{ Gate::allows('manager') ? '2':'4' }} col-xs-12">
-							<div class="box">
-								<div class="form-group">
-									<label class="label-normal" for="">Book Reference</label>
-									<div class="input-group">
-									<select name="book_id" class="select2 form-control form-control-sm" id="book_id" required>
-										<option value="" disabled selected>-Select Book References-</option>
-										@foreach($journalBooks as $journalBook)
-											<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
-										@endforeach
-									</select>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-2 col-xs-12">
-							<div class="box">
-								<div class="form-group">
-									<label class="label-normal" for="">Reference No.</label>
-									<div class="input-group">
-                                        <input type="hidden" name="journal_no" id="journal_number">
-										<label class="label-normal" id="LrefNo" ></label>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-2 col-xs-12">
-							<div class="box">
-								<div class="form-group">
-									<label class="label-normal" for="source">Source</label>
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm rounded-0" name="source" id="source"  placeholder="Source" required>
-									</div>
-								</div>
-							</div>
-						</div>
-=======
         .editable {
             color: black;
         }
->>>>>>> Stashed changes
 
         .select2 {
             width: 100% !important
@@ -109,11 +67,11 @@
 
             /* Apply custom styles for printed pages */
             /* body {
-                                   font-size: 12pt;
-                                   line-height: 1.5;
-                                   margin: 0;
-                                   padding: 0;
-                                  } */
+                               font-size: 12pt;
+                               line-height: 1.5;
+                               margin: 0;
+                               padding: 0;
+                              } */
 
             /* Add page breaks if needed */
             .page-break {
@@ -345,44 +303,6 @@
                                                     class="editable-row-item records">
                                                 </a>
                                             </td>
-<<<<<<< Updated upstream
-									<td class='editable-table-data' value="" >
-										<?php
-										// echo '<pre>';
-										// var_export($data['subsidiaries']);
-										// echo '</pre>';
-														?>
-										<select required fieldName="subsidiary_id"  id="subsidiary_id" class="select-account form-control form-control-sm editable-row-item">
-											<option disabled value="" selected>-Select S/L-</option>
-											<?php
-												$temp = '';
-												foreach($subsidiaries as $subsidiary) {
-													if( is_array($subsidiary->toArray()["subsidiary_category"]) && ( $subsidiary->toArray()["subsidiary_category"] > 0) ){
-														if($temp == '')
-														{
-															$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
-															echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-														}else if($temp != $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"])
-														{
-															echo '<optgroup label="'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_name"].'">';
-															$temp = $subsidiary->toArray()["subsidiary_category"]["sub_cat_name"];
-														}
-														echo '<option value="'.$subsidiary->sub_id.'">'.$subsidiary->toArray()["subsidiary_category"]["sub_cat_code"].' - '.$subsidiary->sub_name.'</option>';
-													}
-												}
-											?>
-										</select>
-									</td>
-									<td>
-										<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
-											<span>
-												<i class="fas fa-trash" aria-hidden="true"></i>
-											</span>
-										</button>
-									</td>
-								</tr>
-							@endfor
-=======
                                             <td class='editable-table-data' value="">
                                                 <?php
                                                 // echo '<pre>';
@@ -419,7 +339,6 @@
                                             </td>
                                         </tr>
                                     @endfor
->>>>>>> Stashed changes
                                 </tbody>
                                 <tfoot>
                                     <tr class="text-center">
@@ -562,38 +481,35 @@
                                             </div>
                                         </div>
                                         <div class="received-payment">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <h6
-                                                        style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
-                                                        Received payment from MICRO ACCESS LOANS CORPORATION CORPORATION the
-                                                        of
-                                                        sum
-                                                        <span
-                                                            class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
-                                                    </h6>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <h6>Cheque Number: &nbsp;&nbsp;&nbsp; <span
-                                                            class="cheque-number"></span>
-                                                    </h6>
-
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <h6>Cheque Date: <span class="cheque-date"></span></h6>
-                                                </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h6
+                                                    style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
+                                                    Received payment from MICRO ACCESS LOANS CORPORATION CORPORATION the of
+                                                    sum
+                                                    <span class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
+                                                </h6>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <h6>Approved By:________________________________________</h6>
+                                            <div class="col-md-12">
+                                                <h6>Cheque Number: &nbsp;&nbsp;&nbsp; <span class="cheque-number"></span>
+                                                </h6>
 
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <h6>Date:_______________________</h6>
-                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <h6>Cheque Date: <span class="cheque-date"></span></h6>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Approved By:________________________________________</h6>
+
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <h6>Date:_______________________</h6>
+                                            </div>
+                                        </div>
+                                    </div>
                                         <div class="row">
                                             <div class="col-lg-4 col-sm-5">
 
@@ -601,16 +517,16 @@
                                             <div class="col-lg-4 col-sm-5 ml-auto">
 
                                                 <!-- <table class="table table-clear" style="padding-right:232px">
-                                          <tbody>
-                                          <tr>
-                                           <td class="left">
-                                           <strong>TOTAL</strong>
-                                           </td>
-                                           <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
-                                           <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
-                                          </tr>
-                                          </tbody>
-                                         </table> -->
+                                      <tbody>
+                                      <tr>
+                                       <td class="left">
+                                       <strong>TOTAL</strong>
+                                       </td>
+                                       <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
+                                       <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
+                                      </tr>
+                                      </tbody>
+                                     </table> -->
                                                 <div>
                                                     <button @click="print" class="btn btn-success float-right no-print"
                                                         data-dismiss="modal" style="padding:5px 32px">Print</button>
