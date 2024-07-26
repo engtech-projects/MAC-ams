@@ -1072,7 +1072,7 @@
                 success: function(data) {
                     $('#journalEntryDetails').DataTable().destroy();
                     $('#journalEntryDetailsContent').html('');
-
+                    isHaveAccessToPostUnpost();
                     $.each(data, function(k, v) {
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
@@ -1103,18 +1103,7 @@
                                 <button value="${v.journal_id}" ${cancelled} class="btn btn-flat btn-xs bg-gradient-danger jnalCancel action-buttons">Cancel</button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary action-buttons">View</button>
                                 <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
-                                <button id="postunpostbtn" value="${v.journal_id}" class="postunpost btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>`
-
-                        const button = isHaveAccessToPostUnpost().then((result) => {
-                            console.log(result);
-                            if (!result) {
-                                $('.postunpost').hide();
-                                return result;
-                            }
-
-                        }).catch((err) => {
-                            console.log(err);
-                        });
+                                <button id="postunpostbtn" value="${v.journal_id}" class="postunpostbtn btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>`
                         journalListTable += `</td></tr>`
                         $('#journalEntryDetailsContent').append(journalListTable)
                     });
@@ -1387,7 +1376,7 @@
                     '0' : $(field[2]).find('.editable-row-item').text()
                 var credit = ($(field[3]).find('.editable-row-item').text() === '') ?
                     '0' : $(field[3]).find('.editable-row-item').text()
-                    console.log($(field[0]).find('.editable-row-item').text());
+                console.log($(field[0]).find('.editable-row-item').text());
                 details.push({
                     journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
                     account_id: $(field[1]).find('.editable-row-item').val(),
@@ -1481,10 +1470,13 @@
 
         async function isHaveAccessToPostUnpost() {
             try {
-
                 const result = await fetchAuthUser();
                 const accessibilities = result.accessibilities;
                 const hasAccess = accessibilities.some(accessibility => accessibility['sml_id'] === 265);
+                if (!hasAccess) {
+                    console.log(hasAccess);
+                    $('.postunpostbtn').hide();
+                }
                 return hasAccess;
             } catch (error) {
                 console.log(error);
