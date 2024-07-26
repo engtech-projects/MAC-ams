@@ -666,7 +666,7 @@
                 url: url,
                 dataType: "json",
                 success: function(response) {
-                    $('#journal_number').val(response.data);
+                    $('#journal_no').val(response.data);
                     $('#LrefNo').text(response.data);
                 }
             })
