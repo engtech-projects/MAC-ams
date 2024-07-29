@@ -67,11 +67,11 @@
 
             /* Apply custom styles for printed pages */
             /* body {
-                               font-size: 12pt;
-                               line-height: 1.5;
-                               margin: 0;
-                               padding: 0;
-                              } */
+                                   font-size: 12pt;
+                                   line-height: 1.5;
+                                   margin: 0;
+                                   padding: 0;
+                                  } */
 
             /* Add page breaks if needed */
             .page-break {
@@ -481,35 +481,38 @@
                                             </div>
                                         </div>
                                         <div class="received-payment">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <h6
-                                                    style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
-                                                    Received payment from MICRO ACCESS LOANS CORPORATION CORPORATION the of
-                                                    sum
-                                                    <span class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
-                                                </h6>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <h6>Cheque Number: &nbsp;&nbsp;&nbsp; <span class="cheque-number"></span>
-                                                </h6>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <h6
+                                                        style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
+                                                        Received payment from MICRO ACCESS LOANS CORPORATION CORPORATION the
+                                                        of
+                                                        sum
+                                                        <span
+                                                            class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
+                                                    </h6>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <h6>Cheque Number: &nbsp;&nbsp;&nbsp; <span
+                                                            class="cheque-number"></span>
+                                                    </h6>
 
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <h6>Cheque Date: <span class="cheque-date"></span></h6>
+                                                </div>
                                             </div>
-                                            <div class="col-md-12">
-                                                <h6>Cheque Date: <span class="cheque-date"></span></h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6>Approved By:________________________________________</h6>
+
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <h6>Date:_______________________</h6>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h6>Approved By:________________________________________</h6>
-
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <h6>Date:_______________________</h6>
-                                            </div>
-                                        </div>
-                                    </div>
                                         <div class="row">
                                             <div class="col-lg-4 col-sm-5">
 
@@ -517,16 +520,16 @@
                                             <div class="col-lg-4 col-sm-5 ml-auto">
 
                                                 <!-- <table class="table table-clear" style="padding-right:232px">
-                                      <tbody>
-                                      <tr>
-                                       <td class="left">
-                                       <strong>TOTAL</strong>
-                                       </td>
-                                       <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
-                                       <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
-                                      </tr>
-                                      </tbody>
-                                     </table> -->
+                                          <tbody>
+                                          <tr>
+                                           <td class="left">
+                                           <strong>TOTAL</strong>
+                                           </td>
+                                           <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
+                                           <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
+                                          </tr>
+                                          </tbody>
+                                         </table> -->
                                                 <div>
                                                     <button @click="print" class="btn btn-success float-right no-print"
                                                         data-dismiss="modal" style="padding:5px 32px">Print</button>

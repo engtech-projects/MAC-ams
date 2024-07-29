@@ -309,6 +309,7 @@
                                                 <div class="input-group">
                                                     <label class="label-normal" id="vjournal_book_reference"></label>
                                                 </div>
+                                                <input type="hidden" name="book_id" id="journalEntryBookId">
                                             </div>
                                         </div>
                                     </div>
@@ -761,6 +762,39 @@
                                             <p>______________________________________________________</p></div>
                                             <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Certified Correct By:</h6><p>______________________________________________________</p></div>
                                             <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Approved By:</h6><p>______________________________________________________</p></div>
+                                        </div>
+                                        <div class="received-payment">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <h6
+                                                        style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
+                                                        Received payment from MICRO ACCESS LOANS CORPORATION CORPORATION the
+                                                        of
+                                                        sum
+                                                        <span
+                                                            class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
+                                                    </h6>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <h6>Cheque Number: &nbsp;&nbsp;&nbsp; <span
+                                                            class="cheque-number"></span>
+                                                    </h6>
+
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <h6>Cheque Date: <span class="cheque-date"></span></h6>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6>Approved By:________________________________________</h6>
+
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <h6>Date:_______________________</h6>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-lg-4 col-sm-5"></div>

@@ -67,7 +67,6 @@
 
 
         $('tbody .tbl-row').click(function() {
-            console.log("Clicked");
 
             var id = $(this).data("id")
 
@@ -382,7 +381,6 @@
 
         $(".editables").on("shown", function(e, editable) {
 
-            console.log(editable.input.$input)
         });
 
         function submitEditable() {
@@ -397,13 +395,11 @@
             var balances = document.getElementById("balance_debit");
             var spanBal = balances.innerText;
 
-            console.log(spanBal);
 
             if (parseFloat(spanBal) == 0) {
                 // alert("Debit and Credit equal")
 
                 var serialized = $(this).serializeArray();
-                console.log(serialized);
                 var amount = Number($('#amount').val().replace(/[^0-9\.-]+/g, ""))
                 serialized.push({
                     name: 'amount',
@@ -470,7 +466,6 @@
                                 data: data,
                                 dataType: "json",
                                 success: function(data) {
-                                    // console.log(data)
                                     toastr.success(data.message);
                                     reload();
                                 },
@@ -508,7 +503,8 @@
                 },
                 dataType: "json",
                 success: function(data) {
-                    console.log(data)
+
+
                 },
                 error: function() {
                     toastr.error('Error');
@@ -604,7 +600,6 @@
                 },
                 dataType: "json",
                 success: function(data) {
-                    console.log(data);
                     if (data.message == 'posted') {
                         toastr.success('Journal entry has been posted');
                         statusElement.html('<b>Posted</b>');
@@ -634,6 +629,7 @@
         });
         $(document).on('click', '.stsVoucher', function(e) {
             $('#journalDetailsVoucher').modal('show')
+            receivedPaymentVoucher();
         });
 
         $(document).on('change', '#edit_book_id', function(e) {
@@ -728,7 +724,6 @@
 
                         let isEmptyDetails = false;
                         details.forEach((element, index) => {
-                            console.log(element)
                             if (element.subsidiary_id === null || element.account_id === null) {
                                 isEmptyDetails = true;
                                 return;
@@ -948,7 +943,6 @@
                                     .journal_details_debit);
                                 total_credit += parseFloat(vv
                                     .journal_details_credit);
-                                console.log(v.journal_details)
                                 $('#tbl-create-journalview-container').append(`
 								<tr class='editable-table-row'>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
@@ -1049,7 +1043,8 @@
                 dataType: "json",
                 success: function(response) {
                     if (response.message == 'fetch') {
-                        console.log(response);
+                        var data = response.data[0]
+                        $('#journalEntryBookId').val(data.book_id);
                     }
                 },
                 error: function() {
@@ -1117,7 +1112,6 @@
         });
         $(document).on('blur', '#cheque_no', function(e) {
             e.preventDefault();
-            console.log($(this).val())
             if ($(this).val() == '') {
                 $('#cheque_date').removeAttr('required');
             } else {
@@ -1296,6 +1290,22 @@
 
                 } */
 
+
+        function receivedPaymentVoucher() {
+            $('.cheque-number').text($('#cheque_no').val());
+            $('.cheque-date').text($('#cheque_date').val());
+            var journalEntryBook = $('#book_id').val();
+
+            if (!journalEntryBook) {
+                journalEntryBook = $('#journalEntryBookId').val();
+            }
+            if (journalEntryBook == 1 || journalEntryBook == 6) {
+                $('.received-payment').show();
+            } else {
+                $('.received-payment').hide();
+            }
+        }
+
         function setVoucherData() {
 
             // if($('#payee').val() && $('#branch_id').val() && $('#journal_date').val()
@@ -1312,16 +1322,8 @@
             // $('#journal_voucher_amount').text(Number($('#amount').val().replace(/[^0-9\.-]+/g, "")))
             $('#journal_voucher_amount').text($('#amount').val().toLocaleString("en-US"))
 
-            $('.cheque-number').text($('#cheque_no').val());
-            $('.cheque-date').text($('#cheque_date').val());
-            var journalBook = $('#LrefNo').text();
-            let bookRef = journalBook.split("-");
-            let prefix = bookRef[0];
-            if (prefix === "CDB" || prefix === "CSDB") {
-                $('.received-payment').show();
-            } else {
-                $('.received-payment').hide();
-            }
+            /* add received payment,approved by for journal CDB and CSDB */
+            receivedPaymentVoucher();
 
 
             $('#journal_voucher_amount_in_words').text(numberToWords(parseFloat(Number($('#amount').val().replace(
@@ -1376,7 +1378,6 @@
                     '0' : $(field[2]).find('.editable-row-item').text()
                 var credit = ($(field[3]).find('.editable-row-item').text() === '') ?
                     '0' : $(field[3]).find('.editable-row-item').text()
-                console.log($(field[0]).find('.editable-row-item').text());
                 details.push({
                     journal_details_account_no: $(field[0]).find('.editable-row-item').text(),
                     account_id: $(field[1]).find('.editable-row-item').val(),
@@ -1474,7 +1475,6 @@
                 const accessibilities = result.accessibilities;
                 const hasAccess = accessibilities.some(accessibility => accessibility['sml_id'] === 265);
                 if (!hasAccess) {
-                    console.log(hasAccess);
                     $('.postunpostbtn').hide();
                 }
                 return hasAccess;
@@ -1526,21 +1526,18 @@
             var form = $(this);
             var formData = form.serializeArray();
             var url = form.prop('action');
-            // console.log(formData);
             var posting = $.post(url, formData);
             posting.done(function(response) {
-                console.log(response);
+
             });
         });
         $(document).on('change', '#book_id', function() {
-            console.log(this.value)
             $('#journal_number').val($(this).find(':selected').attr('_count'));
             $('#LrefNo').text($(this).find(':selected').attr('_count'));
         });
 
 
         function editJournal(id) {
-            console.log(id)
             $('#journalModal').modal('show')
         }
         String.prototype.float = function() {
