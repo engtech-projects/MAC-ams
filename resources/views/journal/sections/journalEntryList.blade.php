@@ -328,7 +328,7 @@
                                             <div class="form-group">
                                                 <label class="label-bold label-sty" for="cheque_no">Cheque No</label>
                                                 <div class="input-group">
-                                                    <label class="label-normal" id="vjournal_cheque"></label>
+                                                    <label class="label-normal" class="vjournal_cheque"></label>
                                                 </div>
                                             </div>
                                         </div>
@@ -338,7 +338,7 @@
                                             <div class="form-group">
                                                 <label class="label-bold label-sty" for="cheque_no">Cheque Date</label>
                                                 <div class="input-group">
-                                                    <label class="label-bold" id="vjournal_cheque_date"></label>
+                                                    <label class="label-bold" class="vjournal_cheque_date"></label>
                                                 </div>
                                             </div>
                                         </div>
@@ -779,18 +779,18 @@
                                                 </div>
                                                 <div class="col-md-12">
                                                     <h6>Cheque Number: &nbsp;&nbsp;&nbsp; <span
-                                                            class="cheque-number"></span>
+                                                            class="vjournal_cheque"></span>
                                                     </h6>
 
                                                 </div>
                                                 <div class="col-md-12">
-                                                    <h6>Cheque Date: <span class="cheque-date"></span></h6>
+                                                    <h6>Cheque Date: <span class="vjournal_cheque_date"></span></h6>
                                                 </div>
                                             </div>
                                         <br><br>
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <h6>Approved By:________________________________________</h6>
+                                                    <h6>Received By:________________________________________</h6>
 
                                                 </div>
 

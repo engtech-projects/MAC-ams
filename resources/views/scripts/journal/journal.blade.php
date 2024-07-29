@@ -899,7 +899,7 @@
                             $('#vjournal_book_reference, #voucher_ref_no').text(v
                                 .book_details.book_name);
                             $('#vjournal_source, #voucher_source').text(v.source);
-                            $('#vjournal_cheque').text((v.cheque_no) ? v.cheque_no :
+                            $('.vjournal_cheque').text((v.cheque_no) ? v.cheque_no :
                                 'NO CHEQUE');
                             $('#vjournal_status').text(v.status);
                             $('#vjournal_amount, #voucher_amount').text(parseFloat(v
@@ -923,7 +923,7 @@
                                 '');
                             $('#vjournal_branch, #voucher_branch').text(v.branch
                                 .branch_name);
-                            $('#vjournal_cheque_date').text((v.cheque_date) ?
+                            $('.vjournal_cheque_date').text((v.cheque_date) ?
                                 moment(v.cheque_date).format('MM/DD/YYYY') :
                                 'NO CHEQUE');
                             if (v.status == 'unposted') {
