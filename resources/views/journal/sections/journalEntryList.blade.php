@@ -735,7 +735,7 @@
                                             <div class="col-md-12">
                                                 <div class="col-md-12">
                                                     <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
-                                                            id="voucher_amount_in_words"
+                                                            class="voucher_amount_in_words"
                                                             style="text-transform:capitalize;"></strong></h6>
 
                                                 </div>
@@ -757,7 +757,7 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="row" style="border-top: 10px solid gray;">
+                                        <div class="row" style="border-top: 10px solid gray; ">
                                             <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Prepared By:</h6>
                                             <p>______________________________________________________</p></div>
                                             <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Certified Correct By:</h6><p>______________________________________________________</p></div>
@@ -765,14 +765,16 @@
                                         </div>
                                         <div class="received-payment">
                                             <div class="row">
-                                                <div class="col-md-12">
+                                                <br>
+                                                <br>
+                                                <div class="col-md-12" >
                                                     <h6
                                                         style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
                                                         Received payment from MICRO ACCESS LOANS CORPORATION CORPORATION the
                                                         of
                                                         sum
                                                         <span
-                                                            class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
+                                                            class="voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
                                                     </h6>
                                                 </div>
                                                 <div class="col-md-12">
@@ -785,6 +787,7 @@
                                                     <h6>Cheque Date: <span class="cheque-date"></span></h6>
                                                 </div>
                                             </div>
+                                        <br><br>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <h6>Approved By:________________________________________</h6>

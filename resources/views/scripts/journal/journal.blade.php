@@ -908,7 +908,7 @@
                                 maximumFractionDigits: 2
                             }));
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
-                            $('#voucher_amount_in_words').text(numberToWords(parseFloat(
+                            $('.voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
                             if (v.remarks) {
                                 $.each(v.remarks.split('::'), function(k, vv) {

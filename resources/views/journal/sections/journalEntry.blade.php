@@ -443,7 +443,7 @@
                                             <div class="col-md-12">
                                                 <div class="col-md-12">
                                                     <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
-                                                            id="journal_voucher_amount_in_words"
+                                                            class="journal_voucher_amount_in_words"
                                                             style="text-transform:capitalize;"></strong></h6>
 
                                                 </div>
@@ -482,6 +482,7 @@
                                         </div>
                                         <div class="received-payment">
                                             <div class="row">
+                                                <br><br>
                                                 <div class="col-md-12">
                                                     <h6
                                                         style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
@@ -489,7 +490,7 @@
                                                         of
                                                         sum
                                                         <span
-                                                            class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
+                                                        class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
                                                     </h6>
                                                 </div>
                                                 <div class="col-md-12">
@@ -502,6 +503,7 @@
                                                     <h6>Cheque Date: <span class="cheque-date"></span></h6>
                                                 </div>
                                             </div>
+                                            <br><br>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <h6>Approved By:________________________________________</h6>
