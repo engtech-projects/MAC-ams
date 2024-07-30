@@ -328,7 +328,7 @@
                                             <div class="form-group">
                                                 <label class="label-bold label-sty" for="cheque_no">Cheque No</label>
                                                 <div class="input-group">
-                                                    <label class="label-normal" class="vjournal_cheque"></label>
+                                                    <label class="label-normal vjournal_cheque"></label>
                                                 </div>
                                             </div>
                                         </div>
@@ -338,7 +338,7 @@
                                             <div class="form-group">
                                                 <label class="label-bold label-sty" for="cheque_no">Cheque Date</label>
                                                 <div class="input-group">
-                                                    <label class="label-bold" class="vjournal_cheque_date"></label>
+                                                    <label class="label-bold vjournal_cheque_date"></label>
                                                 </div>
                                             </div>
                                         </div>
@@ -522,7 +522,7 @@
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_cheque_no">Cheque No</label>
                                                     <div class="input-group">
-                                                        <input type="Number"
+                                                        <input type="Text"
                                                             class="form-control form-control-sm rounded-0"
                                                             name="edit_cheque_no" id="edit_cheque_no"
                                                             placeholder="Cheque No">
