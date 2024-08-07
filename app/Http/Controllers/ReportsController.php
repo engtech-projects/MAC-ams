@@ -323,9 +323,10 @@ class ReportsController extends MainController
     public function trialBalance(Request $request)
     {
         $accounts = [];
+        $acc = new Accounts();
         $fiscalYear = Accounting::getFiscalyear();
-        $accounts = Accounts::getTrialBalance($fiscalYear->start_date, TransactionDate::get_date());
-        $accounts = $accounts->toArray();
+        $tDate =  $request->input("date") ? new Carbon($request->input("date")) : Carbon::parse(TransactionDate::get_date());
+        $accounts = $acc->getTrialBalance([$fiscalYear->start_date, $tDate]);
         $currentPage = $request->page ? $request->page : 1;
         $perPage = 25;
         $data = [
@@ -342,7 +343,7 @@ class ReportsController extends MainController
                 ]
             ),
             'trialbalanceList' => '',
-            'transactionDate' => TransactionDate::get_date()
+            'transactionDate' => $tDate->toDateString(),
         ];
         return view('reports.sections.trialBalance', $data);
     }

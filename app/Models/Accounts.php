@@ -307,23 +307,120 @@ class Accounts extends Model
 
         return $expense;
     }
-    public static function getTrialBalance($from = '', $to = '', $account_id = '')
+    public function getTrialBalance($range = []) 
     {
-        $query = DB::table("chart_of_accounts")
-            ->select(DB::raw("chart_of_accounts.account_name,
-                    chart_of_accounts.account_number    ,
-                    SUM(journal_entry_details.journal_details_debit) as total_debit ,
-                    SUM(journal_entry_details.journal_details_credit) as total_credit"))
-            ->join("journal_entry_details", function ($join) {
-                $join->on("chart_of_accounts.account_id", "=", "journal_entry_details.account_id");
-            })
-            ->join("journal_entry", function ($join) {
-                $join->on("journal_entry_details.journal_id", "=", "journal_entry.journal_id");
-            });
+        $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
+        ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+        ->select(
+            'ac.account_category', 'ac.account_category_id','ac.to_increase',
+            'at.account_type', 'at.account_type_id',
+            'coa.account_id', 'coa.account_number', 'coa.account_name',
+        )
+        ->from('chart_of_accounts as coa')
+        ->where(['coa.status' => 'active'])
+        ->whereIn('coa.type', ['L', 'R', 'X'])
+        ->orderBy('coa.account_number', 'ASC')
+        ->groupBy('coa.account_id')
+        ->get();
 
-        $query->groupBy("chart_of_accounts.account_id");
-        return $query->get();
+        $sheet = [
+            'accounts' => [],
+            'total_asset' => 0
+        ];
+
+        foreach ($accounts as $account) {
+            
+            $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
+            ->select(
+                DB::raw('SUM(jed.journal_details_debit) as debit'),
+                DB::raw('SUM(jed.journal_details_credit) as credit'),
+                DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
+            )
+            ->from('journal_entry as je')
+            ->whereBetween("je.journal_date", $range)
+            ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
+            ->groupBy('jed.account_id')
+            ->groupBy('jed.journal_details_account_no')
+            ->limit(1)
+            ->first();
+
+            if( $data ) {
+                $account->debit = $data['debit'];
+                $account->credit = $data['credit'];
+                $account->total = $data['total'];
+            }else{
+
+                // account id of Current Earnings
+                if( $account->account_id == 84 ) {
+                    $account->debit = 0;
+                    $account->credit = 0;
+                    $account->total = $this->currentEarnings($range);
+                }else{
+                    $account->debit = 0;
+                    $account->credit = 0;
+                    $account->total = 0;
+                }
+            }
+
+            // ------------------------------------------------------------------------
+
+            if( !isset($sheet['accounts'][$account->account_category]) ) {
+                $sheet['accounts'][$account->account_category] = [
+                    'total' => 0,
+                    'types' => []
+                ];
+            }
+
+            if ( !isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]) ) {
+                $sheet['accounts'][$account->account_category]['types'][$account->account_type_id] = [
+                    'total' => 0,
+                    'name' => $account->account_type,
+                    'accounts' => []
+
+                ];
+              
+            }else{
+              
+            }   
+            $opening_balance = in_array($account->account_category, ["revenue", "expense"]) && $account->debit == 0 && $account->credit == 0 ? 0 : $this->getAccountBalance($range[0], $range[1], $account->account_id);
+            // $opening_balance = $this->getAccountBalance($range[0], $range[1], $account->account_id);
+     
+            if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
+                $subtotal = ($account->total + $opening_balance);
+            }else{
+                  $subtotal = abs($account->total - $opening_balance); 
+                // if( $account->total >= 0 ) {
+                //    $subtotal = abs($account->total + $opening_balance);
+                // }else{
+                //     $subtotal = abs($account->total + ($opening_balance) * -1); 
+                // }
+
+            
+            }
+
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
+                'account_number' => $account->account_number,
+                'account_name' => $account->account_name,
+                'debit' =>  $account->debit,
+                'credit' => $account->credit,
+                'opening_balance' => $opening_balance,
+                'total' => $subtotal,
+                'computed' => $subtotal
+            ];
+
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
+
+            $sheet['accounts'][$account->account_category]['total'] += $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed'];
+        }
+
+        $sheet['total_asset'] = [
+            'title' => 'TOTAL LIABILITIES AND EQUITY',
+            'value' => ($sheet['accounts']['liabilities']['total'] + $sheet['accounts']['equity']['total'])
+        ];
+
+        return $sheet;
     }
+
     //gerneralLedger (All Account)
     public static function generalLedger_fetchAccounts($from = '', $to = '', $account_id = '')
     {

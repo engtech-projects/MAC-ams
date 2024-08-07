@@ -42,7 +42,7 @@
   <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
 	<div class="row">
 		<div class="col-md-12">
-			<form id="bookJournalForm" method="get">
+			<form id="getTrialBalance" method="get">
 				@csrf
 				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div class="row">
@@ -57,7 +57,7 @@
 								<div class="form-group" style="flex:1">
 									<label class="label-normal" for="book_ref">As of</label>
 									<div class="input-group">
-										<input disabled v-model="filter.asof" type="date" class="form-control form-control-sm rounded-0" name="asof" id="book_ref"  placeholder="Book Reference" required>
+										<input v-model="filter.asof" value="{{ $transactionDate }}" type="date" class="form-control form-control-sm rounded-0" name="date" id="book_ref"  placeholder="Book Reference" required>
 									</div>
 								</div>
 							</div>
@@ -91,27 +91,49 @@
 									<th>Account Name</th>
 									<th>Debit</th>
 									<th>Credit</th>
-
 								</thead>
 								<tbody id="trialBalance">
-									@if(count($trialBalance)==0)
+									@if(count($trialBalance["accounts"])==0)
 									<tr><td>No data found.</td></tr>
 									@endif
 									<?php
 										$totaldeb = 0;
 										$totalcred = 0;
 									?>
-									@foreach($trialBalance as $data)
-									<tr>
-										<td class="font-weight-bold">{{$data->account_number}}</td>
-										<td>{{$data->account_name}}</td>
-										<td>{{number_format($data->total_debit, 2, '.', ',')}}</td>
-										<td>{{number_format($data->total_credit, 2, '.', ',')}}</td>
-									</tr>
-									<?php
-										$totaldeb += $data->total_debit;
-										$totalcred += $data->total_credit;
-									?>
+									@foreach($trialBalance["accounts"] as $category => $categoryData)
+										<!-- <tr>
+											<td colspan="4" class="font-weight-bold">{{ Str::upper($category) }}</td>
+										</tr> -->
+										@foreach($categoryData["types"] as $type => $typeData)
+											@foreach($typeData["accounts"] as $accountIndex => $account)
+											<tr>
+												<td class="font-weight-bold">{{$account['account_number']}}</td>
+												<!-- <td>{{$account['account_name']}}</td> -->
+												<td>{{$account['account_name']}} {{$account['opening_balance']}} {{$account['debit']}} {{$account['credit']}}</td>
+												<td>{{in_array($category, ['assets', 'expense']) ? number_format($account['total'], 2, '.', ',') : ""}}</td>
+												<td>{{in_array($category, ['liabilities', 'equity', 'revenue']) ? number_format($account['total'], 2, '.', ',') : ""}}</td>
+											</tr>
+											<?php
+												switch ($category) {
+													case 'assets':
+														$totaldeb += $account['total'];
+														break;
+													case 'liabilities':
+														$totalcred += $account['total'];
+														break;
+													case 'equity':
+														$totalcred += $account['total'];
+														break;
+													case 'revenue':
+														$totalcred += $account['total'];
+														break;
+													case 'expense':
+														$totaldeb += $account['total'];
+														break;
+												}
+											?>
+											@endforeach
+										@endforeach
 									@endforeach
 									<tr>
 										<td class="font-weight-bold"></td>
