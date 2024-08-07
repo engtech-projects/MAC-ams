@@ -109,7 +109,7 @@
 											<tr>
 												<td class="font-weight-bold">{{$account['account_number']}}</td>
 												<!-- <td>{{$account['account_name']}}</td> -->
-												<td>{{$account['account_name']}} {{$account['opening_balance']}} {{$account['debit']}} {{$account['credit']}}</td>
+												<td>{{$account['account_name']}} </td>
 												<td>{{in_array($category, ['assets', 'expense']) ? number_format($account['total'], 2, '.', ',') : ""}}</td>
 												<td>{{in_array($category, ['liabilities', 'equity', 'revenue']) ? number_format($account['total'], 2, '.', ',') : ""}}</td>
 											</tr>
