@@ -382,8 +382,8 @@ class Accounts extends Model
             }else{
               
             }   
-            $opening_balance = in_array($account->account_category, ["revenue", "expense"]) && $account->debit == 0 && $account->credit == 0 ? 0 : $this->getAccountBalance($range[0], $range[1], $account->account_id);
-            // $opening_balance = $this->getAccountBalance($range[0], $range[1], $account->account_id);
+            // $opening_balance = in_array($account->account_category, ["revenue", "expense"]) && $account->debit == 0 && $account->credit == 0 ? 0 : $this->getAccountBalance($range[0], $range[1], $account->account_id);
+            $opening_balance = $this->getAccountBalance($range[0], $range[1], $account->account_id);
      
             if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
                 $subtotal = ($account->total + $opening_balance);
