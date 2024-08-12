@@ -31,6 +31,28 @@
             font-size: 11px;
 
         }
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            #to-print {
+                display: block;
+            }
+        }
+
+        .editable-container.editable-inline,
+        .editable-container.editable-inline .control-group.form-group,
+        .editable-container.editable-inline .control-group.form-group .editable-input,
+        .editable-container.editable-inline .control-group.form-group .editable-input textarea,
+        .editable-container.editable-inline .control-group.form-group .editable-input select,
+        .editable-container.editable-inline .control-group.form-group .editable-input input:not([type=radio]):not([type=checkbox]):not([type=submit]) {
+            width: 100%;
+        }
 
         .select2 {
             width: 100% !important;
@@ -40,6 +62,11 @@
     <!-- Main content -->
 
     <section class="content" id="app">
+            <div id="to-print">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda veniam, nihil nesciunt suscipit provident
+                adipisci, natus a nostrum odit non eligendi, ullam earum itaque voluptatum minus expedita quam! Qui,
+                quaerat.</p>
+        </div>
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -380,7 +407,7 @@
             aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
-                    <div class="modal-body">
+                    <div class="modal-body" id="printContent">
                         <div class="container-fluid ">
                             <div id="ui-view">
                                 <div class="card">
@@ -645,8 +672,8 @@
                                     <div class="col-lg-4 col-sm-5 ml-auto">
 
                                         <div>
-                                            <button class="btn btn-success float-right no-print" data-dismiss="modal"
-                                                style="padding:5px 32px">Print</button>
+                                             <button @click="print" class="btn btn-success float-right no-print"
+                                                        data-dismiss="modal" style="padding:5px 32px">Print</button>
                                         </div>
                                     </div>
                                 </div>
@@ -703,6 +730,14 @@
                 },
                 getSelectedBranch(branchId) {
                     this.filter.branch_id = branchId
+                },
+                print: function() {
+                    var content = document.getElementById('printContent').innerHTML;
+                    var toPrint = document.getElementById('to-print');
+                    toPrint.innerHTML = content;
+                    setTimeout(() => {
+                        window.print();
+                    }, 500);
                 },
                 filterCollections: function() {
                     var data = {
@@ -881,7 +916,7 @@
             mounted() {
                 /*                 this.getBranchList(); */
                 this.data = @json($cash_blotter);
-                // console.log(this.data); 
+                // console.log(this.data);
             }
         });
     </script>
