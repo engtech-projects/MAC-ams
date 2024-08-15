@@ -32,7 +32,10 @@
 
         }
         @media print {
-            .no-print {
+            body {
+                margin: 10px !important;
+            }
+            .no-print, .toast {
                 display: none;
             }
             .table td {
@@ -392,9 +395,6 @@
                 </div>
             </div>
         </div>
-
-
-
         <div class="modal fade" id="cashBlotterPreviewModal" tabindex="2" role="dialog"
             aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
@@ -676,13 +676,6 @@
             </div>
 
         </div>
-        </div>
-        </div>
-
-
-
-
-
 
     </section>
     @include('includes.branches')
