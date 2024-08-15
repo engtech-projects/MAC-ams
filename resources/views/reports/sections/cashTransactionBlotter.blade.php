@@ -35,7 +35,9 @@
             .no-print {
                 display: none;
             }
-
+            .table td {
+                padding: 1px !important;
+            }
             .page-break {
                 page-break-before: always;
             }
@@ -62,12 +64,9 @@
     <!-- Main content -->
 
     <section class="content" id="app">
-            <div id="to-print">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda veniam, nihil nesciunt suscipit provident
-                adipisci, natus a nostrum odit non eligendi, ullam earum itaque voluptatum minus expedita quam! Qui,
-                quaerat.</p>
+        <div id="to-print">
         </div>
-        <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+        <div class="container-fluid no-print" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
                     <div class="row">
@@ -252,13 +251,6 @@
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm"
                                                                     id="accountofficer_id">
-                                                                <!-- <account-officers :data="accountOfficers"></account-officers> -->
-                                                                <!-- <select class="account-officer select-officer form-control form-control-sm rounded-0" name="accountofficer_id" id="accountofficer_id" form="frm-add-account-officer-details">
-                           <option class="default-select" value="" disabled selected>Select-Officer</option>
-                           @foreach ($account_officers as $account_officer)
-    <option value="{{ $account_officer->accountofficer_id }}">{{ $account_officer->name }}</option>
-    @endforeach
-                          </select> -->
                                                             </td>
                                                             <td>
                                                                 <input type="text" id="remarks"
@@ -644,7 +636,7 @@
                                 </div>
                                 <div style="margin-top: 24px;">
                                     <p style="font-size:16px;"><span style="padding-left:32px">I HEREBY CERTIFY that the
-                                            above total cash and COCI is in my possession as my CASH ON HAND.</span> </br>
+                                            above total cash and COCI is in my possession as my CASH ON HAND.</span>
                                         <span>As Branch Cashier I am aware the the said amount is my cash accountability to
                                             MICRO ACCESS LOAN CORP.</span>
                                     </p>
@@ -737,6 +729,7 @@
                     toPrint.innerHTML = content;
                     setTimeout(() => {
                         window.print();
+                        toPrint.innerHTML = ""
                     }, 500);
                 },
                 filterCollections: function() {
