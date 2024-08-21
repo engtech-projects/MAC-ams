@@ -47,6 +47,7 @@ class ReportsController extends MainController
     {
         /* ----- start journal ledger ----- */
 
+
         $accounting = Accounting::getFiscalYear();
         $from = $request->from ? $request->from : $accounting->default_start;
         $to = $request->to ? $request->to : $accounting->default_end;
@@ -90,12 +91,12 @@ class ReportsController extends MainController
             }
 
             $entryDate = null;
-            $entryDate = Carbon::parse($entry->journal_date)->format('m/d/Y'); 
+            $entryDate = Carbon::parse($entry->journal_date)->format('m/d/Y');
 
-            if( !in_array($entry->journal_date, $page) ) {
-                $page[] = $entry->journal_date; 
+            if (!in_array($entry->journal_date, $page)) {
+                $page[] = $entry->journal_date;
             }
-            
+
 
             $journal_ledger[] = [
                 'date' => $entryDate,
@@ -143,10 +144,10 @@ class ReportsController extends MainController
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'MAC-AMS | Subsidiary Ledger',
             'subsidiaryLedgerList' => '',
-			'accounts' => Accounts::all()
+            'accounts' => Accounts::all()
         ];
 
-		return view('reports.sections.subsidiaryledger', $data);
+        return view('reports.sections.subsidiaryledger', $data);
     }
 
 
@@ -158,7 +159,7 @@ class ReportsController extends MainController
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'MAC-AMS | Subsidiary Ledger',
             'subsidiaryLedgerList' => '',
-			'accounts' => Accounts::all(),
+            'accounts' => Accounts::all(),
         ];
         switch ($filter["type"]) {
             case 'subsidiary-ledger-listing-report':
@@ -171,21 +172,20 @@ class ReportsController extends MainController
                 $revenueMinusExpenseReport = $this->revenueMinusExpense($filter);
                 return response()->json(['data' => $revenueMinusExpenseReport]);
 
-			case 'subsidiary_all_account':
+            case 'subsidiary_all_account':
 
-				$transactions = Accounts::subsidiaryLedger($request->from, $request->to, '', $request->subsidiary_id);
-				return response()->json(['data' => $transactions]);
+                $transactions = Accounts::subsidiaryLedger($request->from, $request->to, '', $request->subsidiary_id);
+                return response()->json(['data' => $transactions]);
 
-			case 'subsidiary_per_account':
+            case 'subsidiary_per_account':
 
-				$transactions = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id, $request->subsidiary_id);
-				return response()->json(['data' => $transactions]);
+                $transactions = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id, $request->subsidiary_id);
+                return response()->json(['data' => $transactions]);
 
 
             case 'subsidiary-ledger':
                 return view('reports.sections.subsidiaryledger', $data);
         }
-
     }
     public function subsidiarySaveorEdit(Request $request)
     {
@@ -205,7 +205,7 @@ class ReportsController extends MainController
             $sub->sub_no_amort = $request->sub_no_amort;
             $sub->sub_salvage = $request->sub_salvage;
             $sub->sub_date_post = $request->sub_date_post;
-			$sub->sub_code = $request->sub_acct_no;
+            $sub->sub_code = $request->sub_acct_no;
             if ($sub->save()) {
                 return json_encode(['message' => 'save', 'sub_id' => $sub->sub_id]);
             }
@@ -246,14 +246,10 @@ class ReportsController extends MainController
 
             $journalEntries = Accounts::generalLedger_fetchAccounts($genLedgerFrom, $genLedgerTo, $id);
             return json_encode($journalEntries);
-
         } else {
             $journalEntries = Accounts::generalLedger_fetchAccounts();
             return json_encode($journalEntries);
-
         }
-
-
     }
 
 
@@ -296,7 +292,7 @@ class ReportsController extends MainController
     }
  */
     public function generalLedger(Request $request)
-    {   
+    {
 
         $glAccounts = new Accounts();
         $accounting = Accounting::getFiscalYear();
@@ -311,11 +307,11 @@ class ReportsController extends MainController
         $data = [
             'title' => 'MAC-AMS | General Ledger',
             'chartOfAccount' => $accounts,
-            'requests' => ['from' => $from, 'to' => $to, 'account_id' => $account_id  ],
+            'requests' => ['from' => $from, 'to' => $to, 'account_id' => $account_id],
             'fiscalYear' => $accounting,
             'transactions' => $transactions,
         ];
-        
+
         return view('reports.sections.generalledger', $data);
     }
 
@@ -353,7 +349,7 @@ class ReportsController extends MainController
     {
         $data = [
 
-			'chartOfAccount' => \App\Models\Accounts::where(['type' => 'L'])->get(),
+            'chartOfAccount' => \App\Models\Accounts::where(['type' => 'L'])->get(),
             'title' => 'MAC-AMS | Bank Reconciliation',
             'trialbalanceList' => ''
         ];
@@ -407,7 +403,6 @@ class ReportsController extends MainController
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
         return response()->json($cashTransactionsEntries);
-
     }
     public function cashBlotterIndex()
     {
@@ -451,7 +446,7 @@ class ReportsController extends MainController
 
     public function showCashBlotter($id, Request $request)
     {
- 
+
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
         return response()->json([
@@ -634,7 +629,6 @@ class ReportsController extends MainController
         $data = $journalEntryModel->getBankReconciliationReport($request->validated());
 
         return $data;
-
     }
 
 
@@ -650,10 +644,10 @@ class ReportsController extends MainController
 
 
         return 'journal entry';
-
     }
 
-    public function balanceSheet(Request $request) {
+    public function balanceSheet(Request $request)
+    {
 
         $coa = new Accounts();
         $accounting = Accounting::getFiscalYear();
@@ -673,15 +667,14 @@ class ReportsController extends MainController
 
         $data = [
             'title' => 'MAC-AMS | Balance Sheet',
-            'requests' => ['from' => $from, 'to' => $to ],
+            'requests' => ['from' => $from, 'to' => $to],
             'fiscalYear' => $accounting,
             'balanceSheet' => $balanceSheet,
             'current_date' => $to->toDateString(),
             // 'currentEarnings' => $currentEarnings
         ];
-        
-        return view('reports.sections.balanceSheet', $data);
 
+        return view('reports.sections.balanceSheet', $data);
     }
 
     public function incomeStatement(Request $request)
@@ -697,7 +690,7 @@ class ReportsController extends MainController
 
         $data = [
             'title' => 'MAC-AMS | Income Statement',
-            'requests' => ['from' => $from, 'to' => $to ],
+            'requests' => ['from' => $from, 'to' => $to],
             'fiscalYear' => $accounting,
             'incomeStatement' => $incomeStatement,
             'from' => $from,
