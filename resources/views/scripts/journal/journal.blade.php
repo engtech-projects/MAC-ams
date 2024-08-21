@@ -274,9 +274,9 @@
 
 
         $(document).on('change', '#s_from', function(e) {
-            $('#s_to').val($('#s_from').val());
+            //$('#s_to').val($('#s_from').val());
             $('#s_to').removeAttr("disabled");
-            $('#s_to').attr('min', $('#s_from').val());
+            //$('#s_to').attr('min', $('#s_from').val());
         });
 
 
