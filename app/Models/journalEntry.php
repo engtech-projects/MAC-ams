@@ -61,10 +61,10 @@ class journalEntry extends Model
             $query->where('status', $status);
         }
         if ($from != '' && $to != '') {
+            $query->whereBetween('journal_date', [$from, $to]);
             if ($journal_no != '') {
-                $query = $query->where('journal_no', $journal_no);
+                $query->orWhere('journal_no', $journal_no);
             }
-            $query = $query->whereBetween('journal_date', [$from, $to]);
         }
         if ($book_id != '') {
             $query->where('book_id', $book_id);
