@@ -9,6 +9,9 @@
                         <div class="col-md-12">
                             <img src="{{ asset('img/mac_logo.fw.png') }}" alt="mac_logo" class="img img-responsive">
                         </div>
+                        <div class="col-md-12">
+                            <h6 class="text-uppercase">Accounting</h6>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div v-if="responseMessage?.errors">
