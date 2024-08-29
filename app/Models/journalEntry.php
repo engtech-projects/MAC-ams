@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class journalEntry extends Model
 {
@@ -128,6 +130,47 @@ class journalEntry extends Model
         return $journalEntry;
     }
 
+    public function getBeginningBalance($transactionDate, $branchId)
+    {
+        $bal = CollectionBreakdown::BEGINNING_BAL;
+        $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
+            ->whereBetween('journal_date',  ['2024-05-01', $transactionDate])
+            ->posted()
+            ->when($branchId, function ($query, $branchId) {
+                $query->where('branch_id', $branchId);
+            })
+            ->with([
+                'branch' => function ($query) {
+                    $query->select('branch_id', 'branch_name');
+                },
+                'details' => function ($query) {
+                    $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')
+                        ->whereIn('account_id', [
+                            Accounts::CASH_IN_BANK_BDO_ACC,
+                            Accounts::CASH_IN_BANK_MYB_ACC,
+                            Accounts::CASH_ON_HAND_ACC,
+                            Accounts::PAYABLE_CHECK_ACC,
+                            Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC,
+                        ]);
+                }
+            ])->get();
+        $entries->map(function ($item) {
+            $item['total'] = [
+                'cash_in' => $item->details->sum('cash_in'),
+                'cash_out' => $item->details->sum('cash_out')
+            ];
+            return $item;
+        });
+        $cashRecieved = 0;
+        $cashPaid = 0;
+        foreach ($entries as $val) {
+            $cashRecieved += $val['total']['cash_in'];
+            $cashPaid += $val['total']['cash_out'];
+        }
+        $total = (CollectionBreakdown::BEGINNING_BAL + $cashRecieved) - $cashPaid;
+        /* dd(['BGN_BAL' => CollectionBreakdown::BEGINNING_BAL, 'CSHPD' => $cashPaid, 'CSHRCV' => $cashRecieved]); */
+        return $total;
+    }
 
     public function getCashBlotterEntries($id, $branchId)
     {
@@ -138,7 +181,10 @@ class journalEntry extends Model
 
         $books = $books->getCashBlotterBooks();
         $prevCollection = $collectionBreakdown->getPreviousCollection($id);
-        $transactionDate = $prevCollection ? $prevCollection["transaction_date"] : null;
+
+        //$transactionDate = $prevCollection ? $prevCollection["transaction_date"] : null;
+        $transactionDate = $collections->transaction_date;
+        $bal = $this->getBeginningBalance($transactionDate, $branchId);
 
         $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
             ->whereDate('journal_date', '=', $transactionDate)
@@ -164,7 +210,7 @@ class journalEntry extends Model
         $collectionEntries = [
             'begining_balance' => [
                 'transaction_date' => $prevCollection ? $prevCollection["prev_transaction_date"] : null,
-                'total' => $prevCollection ? $prevCollection["total"] : 0
+                'total' => $bal //$prevCollection ? $prevCollection["total"] : 0
             ],
             'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),

@@ -15,6 +15,7 @@ class CollectionBreakdown extends Model
 
     const COLLECTION_GRP_ACCOUNT_OFFICER = "account_officer";
     const COLLECTION_FLAG = "P";
+    const BEGINNING_BAL = 54611;
 
     protected $primaryKey = 'collection_id';
     protected $table = 'collection_breakdown';
@@ -42,19 +43,19 @@ class CollectionBreakdown extends Model
         return $this->hasMany(AccountOfficerCollection::class, 'collection_id');
     }
 
+
     public static function getCollectionById($id)
     {
         $collection = CollectionBreakdown::with(['accountOfficerCollection'])->where('collection_id', $id)->first();
         return $collection;
     }
-    public static function getCollectionBreakdownByBranch($transactionDate,$branchId)
+    public static function getCollectionBreakdownByBranch($transactionDate, $branchId)
     {
         return CollectionBreakdown::where('branch_id', $branchId)
-        ->when($transactionDate,function($query,$transactionDate) {
-            $query->where('transaction_date',$transactionDate);
-
-        })->orderBy('transaction_date','desc')
-        ->get();
+            ->when($transactionDate, function ($query, $transactionDate) {
+                $query->where('transaction_date', $transactionDate);
+            })->orderBy('transaction_date', 'desc')
+            ->get();
     }
     public function getCollectionByTransactionDate($transactionDate, $branchId)
     {
@@ -78,7 +79,6 @@ class CollectionBreakdown extends Model
         return DB::transaction(function () use ($attributes, $collection_ao) {
             self::create($attributes)->accountOfficerCollection()->createMany($collection_ao);
         });
-
     }
 
     public function getPreviousCollection($id)
@@ -99,9 +99,5 @@ class CollectionBreakdown extends Model
         return $collections;
     }
 
-    public function deleteCollection($collection)
-    {
-
-    }
-
+    public function deleteCollection($collection) {}
 }
