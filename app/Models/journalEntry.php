@@ -161,6 +161,8 @@ class journalEntry extends Model
             ];
             return $item;
         });
+
+
         $cashRecieved = 0;
         $cashPaid = 0;
         foreach ($entries as $val) {
@@ -168,6 +170,7 @@ class journalEntry extends Model
             $cashPaid += $val['total']['cash_out'];
         }
         $total = (CollectionBreakdown::BEGINNING_BAL + $cashRecieved) - $cashPaid;
+        //dd("Beginning Balance: " . CollectionBreakdown::BEGINNING_BAL, "Total Credit: " . $cashPaid, "Total Debit: " . $cashRecieved);
         /* dd(['BGN_BAL' => CollectionBreakdown::BEGINNING_BAL, 'CSHPD' => $cashPaid, 'CSHRCV' => $cashRecieved]); */
         return $total;
     }
