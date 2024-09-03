@@ -15,7 +15,7 @@ class CollectionBreakdown extends Model
 
     const COLLECTION_GRP_ACCOUNT_OFFICER = "account_officer";
     const COLLECTION_FLAG = "P";
-    const BEGINNING_BAL = 20560;
+    const BEGINNING_BAL = 54611;
 
     protected $primaryKey = 'collection_id';
     protected $table = 'collection_breakdown';
