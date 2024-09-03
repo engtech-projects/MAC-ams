@@ -214,7 +214,7 @@ class journalEntry extends Model
         $collectionEntries = [
             'begining_balance' => [
                 'transaction_date' => $prevCollection ? $prevCollection["prev_transaction_date"] : null,
-                'total' => $transactionDate->lt('2024-05-01') ? $collections->total : $bal //$prevCollection ? $prevCollection["total"] : 0
+                'total' => $transactionDate->lt('2024-01-01') ? $collections->total : $bal //$prevCollection ? $prevCollection["total"] : 0
             ],
             'cash_received' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_RECEIVED_BOOKS, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_DEBIT),
             'cash_paid' => $this->mapCashBlotterEntries($entries, JournalBook::CASH_PAID_BOOK, Accounts::CASH_ON_HAND_ACC, journalBook::BOOK_CREDIT),
