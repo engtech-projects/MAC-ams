@@ -134,8 +134,9 @@ class journalEntry extends Model
     {
         $bal = CollectionBreakdown::BEGINNING_BAL;
         $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
-            ->whereBetween('journal_date',  ['2024-05-02', $transactionDate])
-            /*             ->whereDate('journal_date', '>', ) */
+            /* ->whereBetween('journal_date',  ['2024-05-02', $transactionDate]) */
+            ->whereDate('journal_date', '>', '2024-05-02')
+            ->whereDate('journal_date', '<', $transactionDate)
             ->posted()
             ->when($branchId, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
