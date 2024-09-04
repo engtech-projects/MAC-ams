@@ -803,7 +803,7 @@
 									<a href="#" class="editable-row-item journal_details_account_no">${vv.account.account_number}</a>
 								</td>
 								<td class='editable-table-data' value="" >
-									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id} account_id" class="select-account form-control form-control-sm editable-row-item COASelect">
+									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id} account_id" class="select-account form-control form-control-sm editable-row-item COASelect ">
 										<option value="${vv.account.account_id}" selected>${vv.account.account_name}</option>
 										@foreach ($chartOfAccount as $account)
 											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_name }}</option>
@@ -856,6 +856,15 @@
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
                                 }));
+                        });
+                        $('.select-account').select2({
+                            placeholder: 'Select',
+                            allowClear: true,
+                        });
+
+                        $('.select-subsidary').select2({
+                            placeholder: 'Select S/L',
+                            allowClear: true,
                         });
                     }
                 },
