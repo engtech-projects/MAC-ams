@@ -132,7 +132,7 @@ class journalEntry extends Model
 
     public function getBeginningBalance($transactionDate, $branchId)
     {
-        $bal = CollectionBreakdown::BEGINNING_BAL;
+        $bal = CollectionBreakdownBeginningBalance::where('branch_id', $branchId)->first();
         $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
             /* ->whereBetween('journal_date',  ['2024-05-02', $transactionDate]) */
             ->whereDate('journal_date', '>', '2024-04-30')
@@ -169,7 +169,7 @@ class journalEntry extends Model
             $cashRecieved += $val['total']['cash_in'];
             $cashPaid += $val['total']['cash_out'];
         }
-        $total = (CollectionBreakdown::BEGINNING_BAL + $cashRecieved) - $cashPaid;
+        $total = ($bal + $cashRecieved) - $cashPaid;
         /*         dd($total); */
         /* dd(['BGN_BAL' => CollectionBreakdown::BEGINNING_BAL, 'CSHPD' => $cashPaid, 'CSHRCV' => $cashRecieved]); */
         /*         return $bal; */
