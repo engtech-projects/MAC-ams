@@ -169,7 +169,7 @@ class journalEntry extends Model
             $cashRecieved += $val['total']['cash_in'];
             $cashPaid += $val['total']['cash_out'];
         }
-        $total = ($bal + $cashRecieved) - $cashPaid;
+        $total = ($bal->balance + $cashRecieved) - $cashPaid;
         /*         dd($total); */
         /* dd(['BGN_BAL' => CollectionBreakdown::BEGINNING_BAL, 'CSHPD' => $cashPaid, 'CSHRCV' => $cashRecieved]); */
         /*         return $bal; */
