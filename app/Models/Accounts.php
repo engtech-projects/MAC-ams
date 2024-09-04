@@ -307,7 +307,7 @@ class Accounts extends Model
 
         return $expense;
     }
-    public function getTrialBalance($range = []) 
+    public function getTrialBalance($range = [])
     {
         $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
         ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
@@ -329,7 +329,7 @@ class Accounts extends Model
         ];
 
         foreach ($accounts as $account) {
-            
+
             $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
             ->select(
                 DB::raw('SUM(jed.journal_details_debit) as debit'),
@@ -378,24 +378,24 @@ class Accounts extends Model
                     'accounts' => []
 
                 ];
-              
+
             }else{
-              
-            }   
+
+            }
             // $opening_balance = in_array($account->account_category, ["revenue", "expense"]) && $account->debit == 0 && $account->credit == 0 ? 0 : $this->getAccountBalance($range[0], $range[1], $account->account_id);
             $opening_balance = $this->getAccountBalance($range[0], $range[1], $account->account_id);
-     
+
             if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
                 $subtotal = ($account->total + $opening_balance);
             }else{
-                  $subtotal = abs($account->total - $opening_balance); 
+                  $subtotal = abs($account->total - $opening_balance);
                 // if( $account->total >= 0 ) {
                 //    $subtotal = abs($account->total + $opening_balance);
                 // }else{
-                //     $subtotal = abs($account->total + ($opening_balance) * -1); 
+                //     $subtotal = abs($account->total + ($opening_balance) * -1);
                 // }
 
-            
+
             }
 
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
@@ -440,6 +440,7 @@ class Accounts extends Model
                 'chart_of_accounts.account_name',
                 'opening_balance.opening_balance',
                 'subsidiary.sub_name',
+                'jounal_entry.journal_id',
                 'journal_entry.journal_date',
                 'journal_entry.journal_no',
                 'journal_entry.source',
@@ -745,7 +746,7 @@ class Accounts extends Model
 
             if( $account ){
                 if($account->to_increase == "debit"){
-                    return $balance + $account->total_debit - $account->total_credit;    
+                    return $balance + $account->total_debit - $account->total_credit;
                 }else{
                     return $balance - $account->total_debit + $account->total_credit;
                 }
@@ -778,7 +779,7 @@ class Accounts extends Model
                             'ac.account_category','ac.to_increase',
                             'at.account_type',
                             'coa.account_id', 'coa.account_number', 'coa.account_name',
-                            'je.journal_date','je.journal_no','je.source', 'je.cheque_no','je.cheque_date', 'je.payee', 'je.remarks',
+                            'je.journal_date','je.journal_id','je.journal_no','je.source', 'je.cheque_no','je.cheque_date', 'je.payee', 'je.remarks',
                             'jed.journal_details_debit','jed.journal_details_credit',
                             'sub.sub_name',
                             'ac.account_category','ac.to_increase',
@@ -803,7 +804,7 @@ class Accounts extends Model
         $total_credit = 0;
 
         foreach ($data as $key => $value) {
-            
+
             if( !isset($ledger[$value->account_id]) ) {
 
                 $balance = $this->getAccountBalance($range[0], $range[1], $value->account_id);
@@ -840,6 +841,7 @@ class Accounts extends Model
             $ledger[$value->account_id]['total_credit'] = number_format($total_credit, 2);
 
             $ledger[$value->account_id]['entries'][] = [
+                'journal_id' => $value->journal_id,
                 'branch_name' => $value->branch_name,
                 'sub_name' => $value->sub_name,
                 'journal_date' => Carbon::parse($value->journal_date)->format('m/d/y'),
@@ -880,7 +882,7 @@ class Accounts extends Model
         ];
 
         foreach ($accounts as $account) {
-            
+
             $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
             ->select(
                 DB::raw('SUM(jed.journal_details_debit) as debit'),
@@ -929,24 +931,24 @@ class Accounts extends Model
                     'accounts' => []
 
                 ];
-              
+
             }else{
-              
-            }   
+
+            }
 
             $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
-     
+
             if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
                 $subtotal = ($account->total + $opening_balance);
             }else{
-                  $subtotal = abs($account->total - $opening_balance); 
+                  $subtotal = abs($account->total - $opening_balance);
                 // if( $account->total >= 0 ) {
                 //    $subtotal = abs($account->total + $opening_balance);
                 // }else{
-                //     $subtotal = abs($account->total + ($opening_balance) * -1); 
+                //     $subtotal = abs($account->total + ($opening_balance) * -1);
                 // }
 
-            
+
             }
 
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
@@ -1037,7 +1039,7 @@ class Accounts extends Model
         ];
 
         foreach ($accounts as $account) {
-            
+
             $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
             ->select(
                 DB::raw('SUM(jed.journal_details_debit) as debit'),
@@ -1086,21 +1088,21 @@ class Accounts extends Model
                     'accounts' => []
 
                 ];
-              
+
             }else{
-              
-            }   
+
+            }
 
             // $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
              if( strtolower($account->account_category) == 'expense' ) {
                 $subtotal = $account->total;
             }else{
-                $subtotal = abs($account->total);    
+                $subtotal = abs($account->total);
             }
             // if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
             //     $subtotal = ($account->total + $opening_balance);
             // }else{
-            //       $subtotal = abs($account->total - $opening_balance); 
+            //       $subtotal = abs($account->total - $opening_balance);
             // }
 
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
