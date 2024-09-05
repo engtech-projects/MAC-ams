@@ -45,6 +45,7 @@ class ReportsController extends MainController
 
     public function journalLedger(Request $request)
     {
+
         /* ----- start journal ledger ----- */
 
 
@@ -57,9 +58,11 @@ class ReportsController extends MainController
         $status = $request->status ? $request->status : null;
         $book_id = $request->book_id ? $request->book_id : '';
         $journal_no = $request->journal_no ? $request->journal_no : '';
+        $journal_source = $request->journal_source ? $request->journal_source : '';
+        $journal_payee = $request->journal_payee ? $request->journal_payee : '';
 
         // $branch = Branch::find($branch_id);
-        $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no);
+        $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no, $journal_source, $journal_payee);
         $journal_ledger = [];
 
         $page = [];

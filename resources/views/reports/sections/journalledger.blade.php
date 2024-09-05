@@ -74,6 +74,12 @@
 								</select>
 							</div>
 						</div>
+                        <div class="form-group" style="display:flex;align-items:center">
+							<label class="label-normal" for="branch_id" style="flex:1" >Payee</label>
+							<div class="input-group" style="flex:3">
+								<input v-model="filter.journal_no" name="journal_payee" value="{{request('journal_payee')}}" type="text" class="form-control form-control-sm">
+							</div>
+						</div>
 					</div>
 					<div style="display:flex;flex:1;flex-direction:column;margin-right:32px;">
 						<div class="form-group" style="display:flex;align-items:center">
@@ -91,6 +97,12 @@
 								<input v-model="filter.journal_no" name="journal_no" value="{{request('journal_no')}}" type="text" class="form-control form-control-sm">
 							</div>
 						</div>
+                        <div class="form-group" style="display:flex;align-items:center">
+							<label class="label-normal" for="branch_id" style="flex:1" >Source</label>
+							<div class="input-group" style="flex:3">
+								<input v-model="filter.journal_no" name="journal_source" value="{{request('journal_source')}}" type="text" class="form-control form-control-sm">
+							</div>
+						</div>
 					</div>
 					<div style="display:flex;flex:1;flex-direction:column;">
 						<div class="form-group" style="display:flex;align-items:center">
@@ -101,7 +113,7 @@
 						</div>
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="to" style="flex:1" >To:</label>
-							<div class="input-group" style="flex:3"> 
+							<div class="input-group" style="flex:3">
 								<input name="to" type="date" value="{{ $requests['to'] }}" class="form-control form-control-sm">
 							</div>
 						</div>
@@ -178,7 +190,7 @@
 												<td style="display:none"></td>
 												<td style="display:none"></td>
 											</tr>
-											
+
 											@foreach ($jl['details'] as $jld)
 											<?php $totalDebit += $jld['debit']; $totalCredit += $jld['credit']; ?>
 											<tr>
@@ -215,7 +227,7 @@
 												<td style="display:none"></td>
 												<td style="display:none"></td>
 											</tr>
-													
+
 											<!-- 	<td style="display:none"></td>
 												<td style="display:none"></td>
 												<td style="display:none"></td>

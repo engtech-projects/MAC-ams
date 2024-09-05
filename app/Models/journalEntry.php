@@ -51,7 +51,7 @@ class journalEntry extends Model
         return $this->hasMany(journalEntryDetails::class, 'journal_id', 'journal_id');
     }
 
-    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'ASC', $journal_no = '')
+    public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'ASC', $journal_no = '', $journal_source = '', $journal_payee = '')
     {
         if (!$branch_id && !Gate::allows('manager')) {
             $branch_id = session()->get('auth_user_branch');
@@ -61,6 +61,12 @@ class journalEntry extends Model
         // $query = journalEntry::with(['bookDetails']);
         if ($status != '') {
             $query->where('status', $status);
+        }
+        if ($journal_source != '') {
+            $query->where('source', $journal_source);
+        }
+        if ($journal_payee != '') {
+            $query->where('payee', $journal_payee);
         }
         if ($from != '' && $to != '') {
             $query->whereBetween('journal_date', [$from, $to]);

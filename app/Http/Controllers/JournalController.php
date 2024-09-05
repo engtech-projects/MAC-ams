@@ -142,7 +142,7 @@ class JournalController extends MainController
             $request->s_from,
             $request->s_to,
             $request->s_book_id,
-            $request->s_branch_id
+            $request->s_branch_id,
         );
 
         // Append branch name to each journal entry
