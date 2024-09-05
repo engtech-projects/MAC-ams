@@ -724,6 +724,194 @@
 				});
 			}
 		});
+        $(document).on('click', '.JnalView', function(e) {
+            e.preventDefault();
+            var id = $(this).attr('value');
+            var statusElement = $(this).closest('tr').find('b'); // Get reference to status element
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
+            var cancelButton = $(this).closest('tr').find(
+                '.jnalCancel'); // Find the cancel button within the same row
+            var stStatusButton = $(this).closest('tr').find('.stStatus');
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "POST",
+                data: {
+                    journal_id: id
+                },
+                url: "{{ route('journal.JournalEntryFetch') }}",
+                dataType: "json",
+                success: function(response) {
+                    if (response.message == 'fetch') {
+                        var total_debit = 0;
+                        var total_credit = 0;
+                        $('#tbl-create-journalview-container').html('');
+                        $('#journalVoucherContent').html('');
+                        $('#vjournal_remarks').html('');
+                        $.each(response.data, function(k, v) {
+                            $('#posted-content').html('');
+                            var content = '';
+                            $('#vjournal_date, #voucher_date').text(moment(v
+                                .journal_date).format('MMMM D, YYYY'));
+                            $('#vjournal_book_reference, #voucher_ref_no').text(v
+                                .book_details.book_name);
+                            $('#vjournal_source, #voucher_source').text(v.source);
+                            $('.vjournal_cheque').text((v.cheque_no) ? v.cheque_no :
+                                'NO CHEQUE');
+                            $('#vjournal_status').text(v.status);
+                            $('#vjournal_amount, #voucher_amount').text(parseFloat(v
+                                .amount).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }));
+                            $('#vjournal_payee, #voucher_pay').text(v.payee);
+                            $('.voucher_amount_in_words').text(numberToWords(parseFloat(
+                                v.amount)));
+                            if (v.remarks) {
+                                $.each(v.remarks.split('::'), function(k, vv) {
+                                    $('#vjournal_remarks').append(
+                                        `<p>${vv}</p>`
+                                    );
+                                });
+                            }
+                            $('#voucher_particular').html(v.remarks ? v.remarks.replace(
+                                    /::/g,
+                                    '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;') :
+                                '');
+                            $('#vjournal_branch, #voucher_branch').text(v.branch
+                                .branch_name);
+                            $('.vjournal_cheque_date').text((v.cheque_date) ?
+                                moment(v.cheque_date).format('MM/DD/YYYY') :
+                                'NO CHEQUE');
+                            if (v.status == 'unposted') {
+                                content =
+                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                    <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
+                            } else if (v.status == 'cancelled') {
+                                content = ``
+                            } else {
+                                content =
+                                    `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
+										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
+                            }
+                            $('#posted-content').html(content);
+                            $.each(v.journal_entry_details, function(kk, vv) {
+                                total_debit += parseFloat(vv
+                                    .journal_details_debit);
+                                total_credit += parseFloat(vv
+                                    .journal_details_credit);
+                                $('#tbl-create-journalview-container').append(`
+								<tr class='editable-table-row'>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
+
+									<td class='editable-table-data' value="" >
+										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
+									</td>
+                                    <td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_debit)}</label> </td>
+									<td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_credit)}</label> </td>
+								</tr>
+							`);
+                                $('#journalVoucherContent').append(`
+								<tr>
+									<td class="center">${vv.account.account_number}</td>
+									<td class="left">${vv.account.account_name}</td>
+									<td class="left">${vv.subsidiary.sub_name}</td>
+									<td class="center">${amountConverter(vv.journal_details_debit)}</td>
+									<td class="right">${amountConverter(vv.journal_details_credit)}</td>
+								</tr>`);
+                            })
+                            $('#journalVoucherContent').append(`
+                                <tr style="border-top:4px dashed black; border-bottom:none">
+                                    <td></td>
+                                    <td></td>
+                                    <td><b>TOTAL</b></td>
+                                    <td><strong id="total_debit_voucher"></strong></td>
+                                    <td><strong id="total_credit_voucher"></strong></td>
+                                </tr>
+                            `)
+                            $('#vtotal_debit, #total_debit_voucher').text(
+                                amountConverter(total_debit))
+                            $('#vtotal_credit, #total_credit_voucher').text(
+                                amountConverter(total_credit))
+                            $('#vbalance_debit').text(amountConverter((parseFloat(
+                                total_debit) - parseFloat(total_credit))))
+                        });
+                    }
+                    $('#journalModalView').modal('show')
+                },
+                error: function() {
+                    console.log("Error");
+                }
+            });
+            $('#journalModalView').on('hidden.bs.modal', function(e) {
+                // Update status immediately after closing modal
+                if (statusElement) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: "POST",
+                        data: {
+                            journal_id: id
+                        },
+                        url: "{{ route('journal.JournalEntryFetch') }}",
+                        dataType: "json",
+                        success: function(response) {
+                            if (response.message == 'fetch') {
+                                // Update status element in the main table
+                                if (response.data[0].status === 'posted') {
+                                    statusElement.html('<b>Posted</b>');
+                                    statusElement.removeClass('text-danger').addClass(
+                                        'text-success');
+                                    stStatusButton.text(
+                                        'Unpost'
+                                    ); // Change the text content of the clicked button
+                                    stStatusButton.removeClass('bg-gradient-success')
+                                        .addClass(
+                                            'bg-gradient-danger'
+                                        ); // Change button background color
+                                    editButton.prop('disabled',
+                                        true); // Disable the edit button
+                                    cancelButton.prop('disabled',
+                                        false); // Enable the cancel button
+                                }
+                            }
+                        },
+                        error: function() {
+                            console.log("Error");
+                        }
+                    });
+                }
+            });
+        })
+        $(document).on('click', '.JnalView', function(e) {
+            e.preventDefault();
+            var id = $(this).attr('value');
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "POST",
+                data: {
+                    journal_id: id
+                },
+                url: "{{ route('journal.JournalEntryFetch') }}",
+                dataType: "json",
+                success: function(response) {
+                    if (response.message == 'fetch') {
+                        var data = response.data[0]
+                        $('#journalEntryBookId').val(data.book_id);
+                    }
+                },
+                error: function() {
+                    console.log("Error");
+                }
+            });
+        })
 		$(document).on('submit','#subsidiaryForm',function(e){
 			e.preventDefault();
 			var dataSerialize = $(this).serialize();
@@ -903,6 +1091,50 @@
 	})(jQuery);
 
 
+    function numberToWords(number) {
+            var digit = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+            var elevenSeries = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
+                'seventeen', 'eighteen', 'nineteen'
+            ];
+            var countingByTens = ['twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+            var shortScale = ['', 'thousand', 'million', 'billion', 'trillion'];
+            number = number.toString();
+            number = number.replace(/[\, ]/g, '');
+            if (number != parseFloat(number)) return 'not a number';
+            var x = number.indexOf('.');
+            if (x == -1) x = number.length;
+            if (x > 15) return 'too big';
+            var n = number.split('');
+            var str = '';
+            var sk = 0;
+            for (var i = 0; i < x; i++) {
+                if ((x - i) % 3 == 2) {
+                    if (n[i] == '1') {
+                        str += elevenSeries[Number(n[i + 1])] + ' ';
+                        i++;
+                        sk = 1;
+                    } else if (n[i] != 0) {
+                        str += countingByTens[n[i] - 2] + ' ';
+                        sk = 1;
+                    }
+                } else if (n[i] != 0) {
+                    str += digit[n[i]] + ' ';
+                    if ((x - i) % 3 == 0) str += 'hundred ';
+                    sk = 1;
+                }
+                if ((x - i) % 3 == 1) {
+                    if (sk) str += shortScale[(x - i - 1) / 3] + ' ';
+                    sk = 0;
+                }
+            }
+            if (x != number.length) {
+                var y = number.length;
+                str += 'point ';
+                for (var i = x + 1; i < y; i++) str += digit[n[i]] + ' ';
+            }
+            str = str.replace(/\number+/g, ' ');
+            return str.trim() + " Pesos Only.";
+        }
 
 
 

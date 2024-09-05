@@ -248,6 +248,7 @@ class ReportsController extends MainController
             $genLedgerTo = $request->genLedgerTo;
 
             $journalEntries = Accounts::generalLedger_fetchAccounts($genLedgerFrom, $genLedgerTo, $id);
+            dd($journalEntries);
             return json_encode($journalEntries);
         } else {
             $journalEntries = Accounts::generalLedger_fetchAccounts();
