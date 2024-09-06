@@ -327,6 +327,7 @@ class journalEntry extends Model
     public function getSubsidiaryListing(array $filter)
     {
         $collections = collect($this->getJournalEntry($filter));
+
         $subsidiaryListing = $collections->map(function ($item, $key) {
             $item["entries"] = collect($item["entries"])->groupBy(function ($item) {
                 return $item["branch"] == null ? "NO BRANCH" : $item["branch"]["branch_code"] . ' ' . $item["branch"]["branch_name"];
@@ -365,6 +366,7 @@ class journalEntry extends Model
             });
             return $data;
         })->values()->all();
+        dd($subsidiaryListing);
 
         return $subsidiaryListing;
     }

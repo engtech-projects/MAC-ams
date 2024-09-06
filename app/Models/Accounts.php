@@ -211,14 +211,11 @@ class Accounts extends Model
             return response()->json(array('success' => false, 'error_message' => $e->getMessage(), 'message' => 'Failed on updating Account.!'), 422);
         }
         return response()->json(array('success' => true, 'message' => $message), $code);
-
     }
 
     # function that checks transaction that is linked to a particular account.
     # fix associated transactions
-    public function checkAccountLink()
-    {
-    }
+    public function checkAccountLink() {}
 
     public function setStatus(Request $request)
     {
@@ -310,18 +307,23 @@ class Accounts extends Model
     public function getTrialBalance($range = [])
     {
         $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
-        ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
-        ->select(
-            'ac.account_category', 'ac.account_category_id','ac.to_increase',
-            'at.account_type', 'at.account_type_id',
-            'coa.account_id', 'coa.account_number', 'coa.account_name',
-        )
-        ->from('chart_of_accounts as coa')
-        ->where(['coa.status' => 'active'])
-        ->whereIn('coa.type', ['L', 'R', 'X'])
-        ->orderBy('coa.account_number', 'ASC')
-        ->groupBy('coa.account_id')
-        ->get();
+            ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+            ->select(
+                'ac.account_category',
+                'ac.account_category_id',
+                'ac.to_increase',
+                'at.account_type',
+                'at.account_type_id',
+                'coa.account_id',
+                'coa.account_number',
+                'coa.account_name',
+            )
+            ->from('chart_of_accounts as coa')
+            ->where(['coa.status' => 'active'])
+            ->whereIn('coa.type', ['L', 'R', 'X'])
+            ->orderBy('coa.account_number', 'ASC')
+            ->groupBy('coa.account_id')
+            ->get();
 
         $sheet = [
             'accounts' => [],
@@ -331,31 +333,31 @@ class Accounts extends Model
         foreach ($accounts as $account) {
 
             $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
-            ->select(
-                DB::raw('SUM(jed.journal_details_debit) as debit'),
-                DB::raw('SUM(jed.journal_details_credit) as credit'),
-                DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
-            )
-            ->from('journal_entry as je')
-            ->whereBetween("je.journal_date", $range)
-            ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
-            ->groupBy('jed.account_id')
-            ->groupBy('jed.journal_details_account_no')
-            ->limit(1)
-            ->first();
+                ->select(
+                    DB::raw('SUM(jed.journal_details_debit) as debit'),
+                    DB::raw('SUM(jed.journal_details_credit) as credit'),
+                    DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
+                )
+                ->from('journal_entry as je')
+                ->whereBetween("je.journal_date", $range)
+                ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
+                ->groupBy('jed.account_id')
+                ->groupBy('jed.journal_details_account_no')
+                ->limit(1)
+                ->first();
 
-            if( $data ) {
+            if ($data) {
                 $account->debit = $data['debit'];
                 $account->credit = $data['credit'];
                 $account->total = $data['total'];
-            }else{
+            } else {
 
                 // account id of Current Earnings
-                if( $account->account_id == 84 ) {
+                if ($account->account_id == 84) {
                     $account->debit = 0;
                     $account->credit = 0;
                     $account->total = $this->currentEarnings($range);
-                }else{
+                } else {
                     $account->debit = 0;
                     $account->credit = 0;
                     $account->total = 0;
@@ -364,31 +366,29 @@ class Accounts extends Model
 
             // ------------------------------------------------------------------------
 
-            if( !isset($sheet['accounts'][$account->account_category]) ) {
+            if (!isset($sheet['accounts'][$account->account_category])) {
                 $sheet['accounts'][$account->account_category] = [
                     'total' => 0,
                     'types' => []
                 ];
             }
 
-            if ( !isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]) ) {
+            if (!isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id])) {
                 $sheet['accounts'][$account->account_category]['types'][$account->account_type_id] = [
                     'total' => 0,
                     'name' => $account->account_type,
                     'accounts' => []
 
                 ];
-
-            }else{
-
+            } else {
             }
             // $opening_balance = in_array($account->account_category, ["revenue", "expense"]) && $account->debit == 0 && $account->credit == 0 ? 0 : $this->getAccountBalance($range[0], $range[1], $account->account_id);
             $opening_balance = $this->getAccountBalance($range[0], $range[1], $account->account_id);
 
-            if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
+            if (isset($account->to_increase) && strtolower($account->to_increase) == 'debit') {
                 $subtotal = ($account->total + $opening_balance);
-            }else{
-                  $subtotal = abs($account->total - $opening_balance);
+            } else {
+                $subtotal = abs($account->total - $opening_balance);
                 // if( $account->total >= 0 ) {
                 //    $subtotal = abs($account->total + $opening_balance);
                 // }else{
@@ -465,13 +465,40 @@ class Accounts extends Model
             ->get();
     }
 
-    public static function subsidiaryLedger($from = '', $to = '', $account_id = '', $subsidiary_id = '') {
+    public static function getSubsidiaryOpenningBalance($from, $account_id, $subsidiary_id)
+    {
+        $accounting = Accounting::where('status', 'open')->first();
+        $opening_balance = OpeningBalance::where('account_id', $account_id)->where('accounting_id', $accounting->accounting_id)->first();
+        $entries = JournalEntry::with(['details' => function ($query) use ($subsidiary_id, $account_id) {
+            $query->where('subsidiary_id', $subsidiary_id)->where('account_id', $account_id);
+        }])->posted()
+            ->whereDate('journal_date', '<', $from)
+            ->get();
+
+        $entries->map(function ($item) {
+            $item['total_credit'] = $item->details->sum('journal_details_credit');
+            $item['total_debit'] = $item->details->sum('journal_details_debit');
+            return $item;
+        });
+        $debit = 0;
+        $credit = 0;
+        foreach ($entries as $val) {
+            $credit += $val['total_credit'];
+            $debit += $val['total_debit'];
+        }
+        $total = ($opening_balance->opening_balance + $debit) - $credit;
+        return $total;
+    }
+
+
+    public static function subsidiaryLedger($from = '', $to = '', $account_id = '', $subsidiary_id = '')
+    {
 
         $query = Subsidiary::select(
-                            'subsidiary.sub_id',
-                            'subsidiary.sub_name',
-                            'subsidiary.sub_code'
-                        );
+            'subsidiary.sub_id',
+            'subsidiary.sub_name',
+            'subsidiary.sub_code'
+        );
 
         if ($subsidiary_id != '') {
             $query->where('subsidiary.sub_id', $subsidiary_id);
@@ -480,61 +507,62 @@ class Accounts extends Model
         $subsidiaries = $query->get()->toArray();
         $subLedger = [];
 
+
         foreach ($subsidiaries as $subsidiary) {
 
             $entries = [];
             $data = [];
 
             $journalEntries = JournalEntry::join('journal_book', 'journal_entry.book_id', '=', 'journal_book.book_id')
-                                    ->join('journal_entry_details', 'journal_entry_details.journal_id', '=', 'journal_entry.journal_id')
-                                    ->join('chart_of_accounts', 'journal_entry_details.account_id', '=', 'chart_of_accounts.account_id')
-                                    ->join('subsidiary', 'journal_entry_details.subsidiary_id', '=', 'subsidiary.sub_id')
-                                    ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
-                                    ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
-                                    ->leftJoin('opening_balance', 'chart_of_accounts.account_id', '=', 'opening_balance.account_id')
-                                    ->select(
-                                        'account_category.account_category',
-                                        'account_category.to_increase',
-                                        'account_type.account_type',
-                                        'chart_of_accounts.account_id',
-                                        'chart_of_accounts.account_number',
-                                        'chart_of_accounts.account_name',
-                                        'opening_balance.opening_balance',
-                                        'subsidiary.sub_name',
-                                        'journal_entry.journal_date',
-                                        'journal_entry.journal_no',
-                                        'journal_entry.source',
-                                        'journal_entry.cheque_no',
-                                        'journal_entry.cheque_date',
-                                        'journal_entry.remarks',
-                                        'journal_entry.payee',
-                                        'journal_entry_details.journal_id',
-                                        'journal_entry_details.subsidiary_id',
-                                        'journal_entry_details.journal_details_id',
-                                        'journal_entry_details.journal_details_debit',
-                                        'journal_entry_details.journal_details_credit',
-                                    );
+                ->join('journal_entry_details', 'journal_entry_details.journal_id', '=', 'journal_entry.journal_id')
+                ->join('chart_of_accounts', 'journal_entry_details.account_id', '=', 'chart_of_accounts.account_id')
+                ->join('subsidiary', 'journal_entry_details.subsidiary_id', '=', 'subsidiary.sub_id')
+                ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
+                ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
+                ->leftJoin('opening_balance', 'chart_of_accounts.account_id', '=', 'opening_balance.account_id')
+                ->select(
+                    'account_category.account_category',
+                    'account_category.to_increase',
+                    'account_type.account_type',
+                    'chart_of_accounts.account_id',
+                    'chart_of_accounts.account_number',
+                    'chart_of_accounts.account_name',
+                    'opening_balance.opening_balance',
+                    'subsidiary.sub_name',
+                    'journal_entry.journal_date',
+                    'journal_entry.journal_no',
+                    'journal_entry.source',
+                    'journal_entry.cheque_no',
+                    'journal_entry.cheque_date',
+                    'journal_entry.remarks',
+                    'journal_entry.payee',
+                    'journal_entry_details.journal_id',
+                    'journal_entry_details.subsidiary_id',
+                    'journal_entry_details.journal_details_id',
+                    'journal_entry_details.journal_details_debit',
+                    'journal_entry_details.journal_details_credit',
+                );
 
-                                if ($from != '' && $to != '') {
-                                    $journalEntries->whereBetween("journal_entry.journal_date", [$from, $to]);
-                                }
+            if ($from != '' && $to != '') {
+                $journalEntries->whereBetween("journal_entry.journal_date", [$from, $to]);
+            }
 
-                                if ($account_id != '') {
-                                    $journalEntries->where('chart_of_accounts.account_id', $account_id);
-                                }
+            if ($account_id != '') {
+                $journalEntries->where('chart_of_accounts.account_id', $account_id);
+            }
 
-                                $journalEntries->where('journal_entry_details.subsidiary_id', $subsidiary['sub_id']);
+            $journalEntries->where('journal_entry_details.subsidiary_id', $subsidiary['sub_id']);
 
             $data =  $journalEntries->orderBy('chart_of_accounts.account_number', 'ASC')
-                                ->orderBy('journal_entry.journal_date', 'ASC')
-                                ->orderBy('journal_entry_details.journal_id', 'ASC')
-                                ->get()->toArray();
+                ->orderBy('journal_entry.journal_date', 'ASC')
+                ->orderBy('journal_entry_details.journal_id', 'ASC')
+                ->get()->toArray();
 
-            if( count($data) > 0 ) {
+            if (count($data) > 0) {
 
                 foreach ($data as $key => $value) {
 
-                    if( !array_key_exists($value['account_number'], $entries) )  {
+                    if (!array_key_exists($value['account_number'], $entries)) {
 
                         $entries[$value['account_number']]['account_id'] = $value['account_id'];
                         $entries[$value['account_number']]['account_number'] = $value['account_number'];
@@ -547,30 +575,29 @@ class Accounts extends Model
                             'journal_date' => $value['journal_date'],
                             'journal_no' => $value['journal_no'],
                             'payee' => $value['payee'],
-							'remarks' => $value['remarks'],
+                            'remarks' => $value['remarks'],
                             'source' => $value['source'],
-                            'cheque_no' =>$value['cheque_no'],
+                            'cheque_no' => $value['cheque_no'],
                             'cheque_date' => $value['cheque_date'],
-                            'journal_id' =>$value['journal_id'],
+                            'journal_id' => $value['journal_id'],
                             'debit' => $value['journal_details_debit'],
                             'credit' => $value['journal_details_credit'],
                         ];
-                    }else{
+                    } else {
                         $entries[$value['account_number']]['data'][] = [
                             'sub_name' => $value['sub_name'],
                             'journal_date' => $value['journal_date'],
                             'journal_no' => $value['journal_no'],
                             'payee' => $value['payee'],
-							'remarks' => $value['remarks'],
+                            'remarks' => $value['remarks'],
                             'source' => $value['source'],
-                            'cheque_no' =>$value['cheque_no'],
+                            'cheque_no' => $value['cheque_no'],
                             'cheque_date' => $value['cheque_date'],
-                            'journal_id' =>$value['journal_id'],
+                            'journal_id' => $value['journal_id'],
                             'debit' => $value['journal_details_debit'],
                             'credit' => $value['journal_details_credit'],
                         ];
-                   }
-
+                    }
                 }
 
                 foreach ($entries as $key => $entry) {
@@ -580,12 +607,12 @@ class Accounts extends Model
 
                     foreach ($entry['data'] as $k => $v) {
 
-                        if( $entry['to_increase'] == 'debit' ){
+                        if ($entry['to_increase'] == 'debit') {
                             $balance += $v['debit'];
                             $balance -= $v['credit'];
                         }
 
-                        if( $entry['to_increase'] == 'credit' ) {
+                        if ($entry['to_increase'] == 'credit') {
                             $balance += $v['credit'];
                             $balance -= $v['debit'];
                         }
@@ -602,10 +629,9 @@ class Accounts extends Model
                     'entries' => $entries
                 ];
             }
-
         }
 
-         return $subLedger;
+        return $subLedger;
     }
 
 
@@ -711,7 +737,8 @@ class Accounts extends Model
         return $accountsJournalEntries;
     }
 
-    public function getAccountBalance($from, $to, $account_id) {
+    public function getAccountBalance($from, $to, $account_id)
+    {
 
         $cycle = Accounting::getFiscalYear(1);
         $startDate = Carbon::parse($cycle->start_date);
@@ -722,32 +749,32 @@ class Accounts extends Model
 
         $balance = $this->getOpeningBalance($account_id);
 
-        if( $diff > 0 ) {
+        if ($diff > 0) {
 
             $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
-                        ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
-                        ->join('account_type as acctype', 'acctype.account_type_id', '=', 'coa.account_type_id')
-                        ->join('account_category as acccat', 'acccat.account_category_id', '=', 'acctype.account_category_id')
-                        ->select(
-                            'coa.account_id',
-                            'coa.account_number',
-                            'coa.account_name',
-                            'acccat.to_increase',
-                            DB::raw('COALESCE(SUM(jed.journal_details_debit)) AS total_debit'),
-                            DB::raw('COALESCE(SUM(jed.journal_details_credit)) AS total_credit')
-                        )
-                        ->from('chart_of_accounts as coa')
-                        ->whereIn('coa.type', ["L", "R"])
-                        ->where(['coa.account_id' => $account_id, 'je.status' => 'posted' ])
-                        ->whereBetween("je.journal_date", [$startDate->toDateString(), $endDate->toDateString()])
-                        ->groupBy('coa.account_id','coa.account_number','coa.account_name')
-                        ->first();
+                ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
+                ->join('account_type as acctype', 'acctype.account_type_id', '=', 'coa.account_type_id')
+                ->join('account_category as acccat', 'acccat.account_category_id', '=', 'acctype.account_category_id')
+                ->select(
+                    'coa.account_id',
+                    'coa.account_number',
+                    'coa.account_name',
+                    'acccat.to_increase',
+                    DB::raw('COALESCE(SUM(jed.journal_details_debit)) AS total_debit'),
+                    DB::raw('COALESCE(SUM(jed.journal_details_credit)) AS total_credit')
+                )
+                ->from('chart_of_accounts as coa')
+                ->whereIn('coa.type', ["L", "R"])
+                ->where(['coa.account_id' => $account_id, 'je.status' => 'posted'])
+                ->whereBetween("je.journal_date", [$startDate->toDateString(), $endDate->toDateString()])
+                ->groupBy('coa.account_id', 'coa.account_number', 'coa.account_name')
+                ->first();
 
 
-            if( $account ){
-                if($account->to_increase == "debit"){
+            if ($account) {
+                if ($account->to_increase == "debit") {
                     return $balance + $account->total_debit - $account->total_credit;
-                }else{
+                } else {
                     return $balance - $account->total_debit + $account->total_credit;
                 }
             }
@@ -756,46 +783,60 @@ class Accounts extends Model
         return $balance;
     }
 
-    public function getOpeningBalance($account_id) {
+    public function getOpeningBalance($account_id)
+    {
 
         $obj = OpeningBalance::where(['account_id' => $account_id])->first('opening_balance');
 
-        if( $obj && isset($obj->opening_balance) ) {
+        if ($obj && isset($obj->opening_balance)) {
             return $obj->opening_balance;
         }
 
         return 0;
     }
 
-    public function ledger($range = [], $account_id = '') {
+    public function ledger($range = [], $account_id = '')
+    {
 
         $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
-                        ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
-                        ->join('subsidiary as sub', 'jed.subsidiary_id', '=', 'sub.sub_id')
-                        ->join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
-                        ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
-                        ->join('branch as br', 'br.branch_id', '=', 'je.branch_id')
-                        ->select(
-                            'ac.account_category','ac.to_increase',
-                            'at.account_type',
-                            'coa.account_id', 'coa.account_number', 'coa.account_name',
-                            'je.journal_date','je.journal_id','je.journal_no','je.source', 'je.cheque_no','je.cheque_date', 'je.payee', 'je.remarks',
-                            'jed.journal_details_debit','jed.journal_details_credit',
-                            'sub.sub_name',
-                            'ac.account_category','ac.to_increase',
-                            'br.branch_name'
-                        )
-                        ->from('chart_of_accounts as coa')
-                        ->where(['je.status' => 'posted', 'coa.status' => 'active'])
-                        ->whereBetween("je.journal_date", $range);
+            ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
+            ->join('subsidiary as sub', 'jed.subsidiary_id', '=', 'sub.sub_id')
+            ->join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
+            ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+            ->join('branch as br', 'br.branch_id', '=', 'je.branch_id')
+            ->select(
+                'ac.account_category',
+                'ac.to_increase',
+                'at.account_type',
+                'coa.account_id',
+                'coa.account_number',
+                'coa.account_name',
+                'je.journal_date',
+                'je.journal_id',
+                'je.journal_no',
+                'je.source',
+                'je.cheque_no',
+                'je.cheque_date',
+                'je.payee',
+                'je.remarks',
+                'jed.journal_details_debit',
+                'jed.journal_details_credit',
+                'sub.sub_name',
+                'ac.account_category',
+                'ac.to_increase',
+                'br.branch_name'
+            )
+            ->from('chart_of_accounts as coa')
+            ->where(['je.status' => 'posted', 'coa.status' => 'active'])
+            ->whereBetween("je.journal_date", $range);
 
-        if( $account_id ) {
+        if ($account_id) {
             $account->where(['coa.account_id' => $account_id]);
         }
 
         $data = $account->orderBy('je.journal_date', 'ASC')
-                        ->orderBy('jed.journal_id', 'ASC')
-                        ->get();
+            ->orderBy('jed.journal_id', 'ASC')
+            ->get();
 
         $ledger = [];
 
@@ -805,7 +846,7 @@ class Accounts extends Model
 
         foreach ($data as $key => $value) {
 
-            if( !isset($ledger[$value->account_id]) ) {
+            if (!isset($ledger[$value->account_id])) {
 
                 $balance = $this->getAccountBalance($range[0], $range[1], $value->account_id);
                 $current_balance = $balance;
@@ -827,9 +868,9 @@ class Accounts extends Model
                 ];
             }
 
-            if( isset($value->to_increase) && strtolower($value->to_increase) == 'debit' ) {
+            if (isset($value->to_increase) && strtolower($value->to_increase) == 'debit') {
                 $current_balance += ($value->journal_details_debit - $value->journal_details_credit);
-            }else{
+            } else {
                 $current_balance += ($value->journal_details_credit - $value->journal_details_debit);
             }
 
@@ -847,7 +888,7 @@ class Accounts extends Model
                 'journal_date' => Carbon::parse($value->journal_date)->format('m/d/y'),
                 'journal_no' => $value->journal_no,
                 'source' => $value->source,
-                'cheque_no' => $value->cheque_no ,
+                'cheque_no' => $value->cheque_no,
                 'cheque_date' => ($value->cheque_date) ? Carbon::parse($value->cheque_date)->format('m/d/y') : NULL,
                 'debit' => number_format($value->journal_details_debit, 2),
                 'credit' => number_format($value->journal_details_credit, 2),
@@ -860,21 +901,27 @@ class Accounts extends Model
         return $ledger;
     }
 
-    public function balanceSheet($range = []) {
+    public function balanceSheet($range = [])
+    {
         $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
-        ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
-        ->select(
-            'ac.account_category', 'ac.account_category_id','ac.to_increase',
-            'at.account_type', 'at.account_type_id',
-            'coa.account_id', 'coa.account_number', 'coa.account_name',
-        )
-        ->from('chart_of_accounts as coa')
-        ->where(['coa.status' => 'active'])
-        ->whereIn('coa.type', ['L', 'R', 'X'])
-        ->whereIn('at.account_category_id', [1,2,3])
-        ->orderBy('coa.account_number', 'ASC')
-        ->groupBy('coa.account_id')
-        ->get();
+            ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+            ->select(
+                'ac.account_category',
+                'ac.account_category_id',
+                'ac.to_increase',
+                'at.account_type',
+                'at.account_type_id',
+                'coa.account_id',
+                'coa.account_number',
+                'coa.account_name',
+            )
+            ->from('chart_of_accounts as coa')
+            ->where(['coa.status' => 'active'])
+            ->whereIn('coa.type', ['L', 'R', 'X'])
+            ->whereIn('at.account_category_id', [1, 2, 3])
+            ->orderBy('coa.account_number', 'ASC')
+            ->groupBy('coa.account_id')
+            ->get();
 
         $sheet = [
             'accounts' => [],
@@ -884,31 +931,31 @@ class Accounts extends Model
         foreach ($accounts as $account) {
 
             $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
-            ->select(
-                DB::raw('SUM(jed.journal_details_debit) as debit'),
-                DB::raw('SUM(jed.journal_details_credit) as credit'),
-                DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
-            )
-            ->from('journal_entry as je')
-            ->whereBetween("je.journal_date", $range)
-            ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
-            ->groupBy('jed.account_id')
-            ->groupBy('jed.journal_details_account_no')
-            ->limit(1)
-            ->first();
+                ->select(
+                    DB::raw('SUM(jed.journal_details_debit) as debit'),
+                    DB::raw('SUM(jed.journal_details_credit) as credit'),
+                    DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
+                )
+                ->from('journal_entry as je')
+                ->whereBetween("je.journal_date", $range)
+                ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
+                ->groupBy('jed.account_id')
+                ->groupBy('jed.journal_details_account_no')
+                ->limit(1)
+                ->first();
 
-            if( $data ) {
+            if ($data) {
                 $account->debit = $data['debit'];
                 $account->credit = $data['credit'];
                 $account->total = $data['total'];
-            }else{
+            } else {
 
                 // account id of Current Earnings
-                if( $account->account_id == 84 ) {
+                if ($account->account_id == 84) {
                     $account->debit = 0;
                     $account->credit = 0;
                     $account->total = $this->currentEarnings($range);
-                }else{
+                } else {
                     $account->debit = 0;
                     $account->credit = 0;
                     $account->total = 0;
@@ -917,31 +964,29 @@ class Accounts extends Model
 
             // ------------------------------------------------------------------------
 
-            if( !isset($sheet['accounts'][$account->account_category]) ) {
+            if (!isset($sheet['accounts'][$account->account_category])) {
                 $sheet['accounts'][$account->account_category] = [
                     'total' => 0,
                     'types' => []
                 ];
             }
 
-            if ( !isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]) ) {
+            if (!isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id])) {
                 $sheet['accounts'][$account->account_category]['types'][$account->account_type_id] = [
                     'total' => 0,
                     'name' => $account->account_type,
                     'accounts' => []
 
                 ];
-
-            }else{
-
+            } else {
             }
 
             $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
 
-            if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
+            if (isset($account->to_increase) && strtolower($account->to_increase) == 'debit') {
                 $subtotal = ($account->total + $opening_balance);
-            }else{
-                  $subtotal = abs($account->total - $opening_balance);
+            } else {
+                $subtotal = abs($account->total - $opening_balance);
                 // if( $account->total >= 0 ) {
                 //    $subtotal = abs($account->total + $opening_balance);
                 // }else{
@@ -974,17 +1019,18 @@ class Accounts extends Model
         return $sheet;
     }
 
-    public function currentEarnings($range) {
+    public function currentEarnings($range)
+    {
 
-            // $book_id = 9;
-            $total = 0;
-            // $accounts = [ 87, 166];
-            // $account_id = 84;
-            $accs = Accounts::whereHas('accountType.accountCategory', function (Builder $query) {
-                $query->whereIn('account_category_id', [4, 5]);
-            })
+        // $book_id = 9;
+        $total = 0;
+        // $accounts = [ 87, 166];
+        // $account_id = 84;
+        $accs = Accounts::whereHas('accountType.accountCategory', function (Builder $query) {
+            $query->whereIn('account_category_id', [4, 5]);
+        })
             ->get()->pluck("account_id");
-            $data = journalEntry::join('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
+        $data = journalEntry::join('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
             ->select(
                 'je.journal_id',
                 'je.journal_date',
@@ -1003,25 +1049,31 @@ class Accounts extends Model
             ->whereIn('jed.account_id', $accs)
             ->get();
 
-            // $balance = $this->getOpeningBalance($account_id);
-            foreach ($data as $d) {
-                // $d->net = $d->credit - $d->vat;
-                $total -= $d->credit;
-                $total += $d->debit;
-            }
+        // $balance = $this->getOpeningBalance($account_id);
+        foreach ($data as $d) {
+            // $d->net = $d->credit - $d->vat;
+            $total -= $d->credit;
+            $total += $d->debit;
+        }
 
-            // return ['data' => $data->toArray(), $range, 'entries' => count($data->toArray()) , 'current_earnings' => round($total, 2)];
-            return round($total, 2);
+        // return ['data' => $data->toArray(), $range, 'entries' => count($data->toArray()) , 'current_earnings' => round($total, 2)];
+        return round($total, 2);
     }
 
-    public function incomeStatement($range) {
+    public function incomeStatement($range)
+    {
 
         $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
             ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
             ->select(
-                'ac.account_category', 'ac.account_category_id','ac.to_increase',
-                'at.account_type', 'at.account_type_id',
-                'coa.account_id', 'coa.account_number', 'coa.account_name',
+                'ac.account_category',
+                'ac.account_category_id',
+                'ac.to_increase',
+                'at.account_type',
+                'at.account_type_id',
+                'coa.account_id',
+                'coa.account_number',
+                'coa.account_name',
             )
             ->from('chart_of_accounts as coa')
             ->where(['coa.status' => 'active'])
@@ -1041,24 +1093,24 @@ class Accounts extends Model
         foreach ($accounts as $account) {
 
             $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
-            ->select(
-                DB::raw('SUM(jed.journal_details_debit) as debit'),
-                DB::raw('SUM(jed.journal_details_credit) as credit'),
-                DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
-            )
-            ->from('journal_entry as je')
-            ->whereBetween("je.journal_date", $range)
-            ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
-            ->groupBy('jed.account_id')
-            ->groupBy('jed.journal_details_account_no')
-            ->limit(1)
-            ->first();
+                ->select(
+                    DB::raw('SUM(jed.journal_details_debit) as debit'),
+                    DB::raw('SUM(jed.journal_details_credit) as credit'),
+                    DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
+                )
+                ->from('journal_entry as je')
+                ->whereBetween("je.journal_date", $range)
+                ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
+                ->groupBy('jed.account_id')
+                ->groupBy('jed.journal_details_account_no')
+                ->limit(1)
+                ->first();
 
-            if( $data ) {
+            if ($data) {
                 $account->debit = $data['debit'];
                 $account->credit = $data['credit'];
                 $account->total = $data['total'];
-            }else{
+            } else {
 
                 // // account id of Current Earnings
                 // if( $account->account_id == 84 ) {
@@ -1066,37 +1118,35 @@ class Accounts extends Model
                 //     $account->credit = 0;
                 //     $account->total = $this->currentEarnings($range);
                 // }else{
-                    $account->debit = 0;
-                    $account->credit = 0;
-                    $account->total = 0;
+                $account->debit = 0;
+                $account->credit = 0;
+                $account->total = 0;
                 // }
             }
 
             // ------------------------------------------------------------------------
 
-            if( !isset($sheet['accounts'][$account->account_category]) ) {
+            if (!isset($sheet['accounts'][$account->account_category])) {
                 $sheet['accounts'][$account->account_category] = [
                     'total' => 0,
                     'types' => []
                 ];
             }
 
-            if ( !isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]) ) {
+            if (!isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id])) {
                 $sheet['accounts'][$account->account_category]['types'][$account->account_type_id] = [
                     'total' => 0,
                     'name' => $account->account_type,
                     'accounts' => []
 
                 ];
-
-            }else{
-
+            } else {
             }
 
             // $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
-             if( strtolower($account->account_category) == 'expense' ) {
+            if (strtolower($account->account_category) == 'expense') {
                 $subtotal = $account->total;
-            }else{
+            } else {
                 $subtotal = abs($account->total);
             }
             // if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
@@ -1137,11 +1187,7 @@ class Accounts extends Model
         ];
 
         return $sheet;
-
     }
 
-    public function bankReconciliation() {
-
-    }
-
+    public function bankReconciliation() {}
 }
