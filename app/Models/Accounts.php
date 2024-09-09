@@ -472,7 +472,7 @@ class Accounts extends Model
         $entries = JournalEntry::with(['details' => function ($query) use ($subsidiary_id, $account_id) {
             $query->where('subsidiary_id', $subsidiary_id)->where('account_id', $account_id);
         }])->posted()
-            ->whereBetwee('journal_date', '<', $from)
+            ->whereDate('journal_date', '<', $from)
             ->get();
 
         $entries->map(function ($item) {
