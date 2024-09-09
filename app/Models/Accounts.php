@@ -468,7 +468,7 @@ class Accounts extends Model
     public static function getSubsidiaryOpenningBalance($from, $account_id, $subsidiary_id)
     {
         $accounting = Accounting::where('status', 'open')->first();
-        $opening_balance = OpeningBalance::where('account_id', $account_id)->where('accounting_id', $accounting->accounting_id)->first();
+        $opening_balance = SubsidiaryOpeningBalance::where('account_id', $account_id)->where('sub_id',$subsidiary_id)->first();
         $entries = JournalEntry::with(['details' => function ($query) use ($subsidiary_id, $account_id) {
             $query->where('subsidiary_id', $subsidiary_id)->where('account_id', $account_id);
         }])->posted()
