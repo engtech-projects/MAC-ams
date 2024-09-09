@@ -465,14 +465,14 @@ class Accounts extends Model
             ->get();
     }
 
-    public static function getSubsidiaryOpenningBalance($from, $account_id, $subsidiary_id)
+    public static function getSubsidiaryOpenningBalance($from, $to, $account_id, $subsidiary_id)
     {
-        $accounting = Accounting::where('status', 'open')->first();
-        $opening_balance = SubsidiaryOpeningBalance::where('account_id', $account_id)->where('sub_id',$subsidiary_id)->first();
-        $entries = JournalEntry::with(['details' => function ($query) use ($subsidiary_id, $account_id) {
+       /*  $accounting = Accounting::where('status', 'open')->first(); */
+        $opening_balance = SubsidiaryOpeningBalance::where('account_id', $account_id)->where('sub_id', $subsidiary_id)->first();
+        /* $entries = JournalEntry::with(['details' => function ($query) use ($subsidiary_id, $account_id) {
             $query->where('subsidiary_id', $subsidiary_id)->where('account_id', $account_id);
         }])->posted()
-            ->whereDate('journal_date', '<', $from)
+            ->whereBetween('journal_date', [$from, $to])
             ->get();
 
         $entries->map(function ($item) {
@@ -486,8 +486,8 @@ class Accounts extends Model
             $credit += $val['total_credit'];
             $debit += $val['total_debit'];
         }
-        $total = ($opening_balance->opening_balance + $debit) - $credit;
-        return $total;
+        $total = ($opening_balance->opening_balance + $debit) - $credit; */
+        return $opening_balance->opening_balance;
     }
 
 

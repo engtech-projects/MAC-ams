@@ -183,7 +183,7 @@ class ReportsController extends MainController
             case 'subsidiary_per_account':
 
                 $transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
-                $balance = Accounts::getSubsidiaryOpenningBalance($filter['from'], $filter['account_id'], $filter['subsidiary_id']);
+                $balance = Accounts::getSubsidiaryOpenningBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
                 return response()->json(['data' => [$transactions, $balance]]);
 
 
