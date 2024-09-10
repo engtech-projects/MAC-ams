@@ -487,7 +487,7 @@ class Accounts extends Model
             $debit += $val['total_debit'];
         }
         $total = ($opening_balance->opening_balance + $debit) - $credit;
-        return $total;
+        return $opening_balance->opening_balance;
     }
 
 
@@ -519,7 +519,8 @@ class Accounts extends Model
                 ->join('subsidiary', 'journal_entry_details.subsidiary_id', '=', 'subsidiary.sub_id')
                 ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
                 ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
-                ->leftJoin('opening_balance', 'chart_of_accounts.account_id', '=', 'opening_balance.account_id')
+                /* ->leftJoin('opening_balance', 'chart_of_accounts.account_id', '=', 'opening_balance.account_id') */
+                ->with('subsidiary_opening_balance')
                 ->select(
                     'account_category.account_category',
                     'account_category.to_increase',
@@ -527,7 +528,6 @@ class Accounts extends Model
                     'chart_of_accounts.account_id',
                     'chart_of_accounts.account_number',
                     'chart_of_accounts.account_name',
-                    'opening_balance.opening_balance',
                     'subsidiary.sub_name',
                     'journal_entry.journal_date',
                     'journal_entry.journal_no',
@@ -557,18 +557,18 @@ class Accounts extends Model
                 ->orderBy('journal_entry.journal_date', 'ASC')
                 ->orderBy('journal_entry_details.journal_id', 'ASC')
                 ->get()->toArray();
-
             if (count($data) > 0) {
 
                 foreach ($data as $key => $value) {
 
                     if (!array_key_exists($value['account_number'], $entries)) {
 
+
                         $entries[$value['account_number']]['account_id'] = $value['account_id'];
                         $entries[$value['account_number']]['account_number'] = $value['account_number'];
                         $entries[$value['account_number']]['account_name'] = $value['account_name'];
                         $entries[$value['account_number']]['to_increase'] = $value['to_increase'];
-                        $entries[$value['account_number']]['opening_balance'] = $value['opening_balance'];
+                        $entries[$value['account_number']]['opening_balance'] = $value['subsidiary_opening_balance']['opening_balance'] ?: 0;
 
                         $entries[$value['account_number']]['data'][] = [
                             'sub_name' => $value['sub_name'],
@@ -606,6 +606,7 @@ class Accounts extends Model
                     $balance = $entry['opening_balance'];
 
                     foreach ($entry['data'] as $k => $v) {
+
 
                         if ($entry['to_increase'] == 'debit') {
                             $balance += $v['debit'];
@@ -736,8 +737,54 @@ class Accounts extends Model
 
         return $accountsJournalEntries;
     }
+    public static function getSubsidiaryAccountBalance($from, $to, $account_id, $subsidiary_id)
+    {
 
-    public function getAccountBalance($from, $to, $account_id)
+        $cycle = Accounting::getFiscalYear(1);
+        $startDate = Carbon::parse($cycle->start_date);
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+        $diff = $startDate->diffInDays($fromDate);
+        $endDate = Carbon::parse($fromDate->toDateString())->subDay(1);
+
+        //$balance = $this->getOpeningBalance($account_id);
+        $opening_balance = SubsidiaryOpeningBalance::where('account_id', $account_id)->where('sub_id', $subsidiary_id)->first();
+        $balance = $opening_balance->opening_balance;
+
+        if ($diff > 0) {
+
+            $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
+                ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
+                ->join('account_type as acctype', 'acctype.account_type_id', '=', 'coa.account_type_id')
+                ->join('account_category as acccat', 'acccat.account_category_id', '=', 'acctype.account_category_id')
+                ->select(
+                    'coa.account_id',
+                    'coa.account_number',
+                    'coa.account_name',
+                    'acccat.to_increase',
+                    DB::raw('COALESCE(SUM(jed.journal_details_debit)) AS total_debit'),
+                    DB::raw('COALESCE(SUM(jed.journal_details_credit)) AS total_credit')
+                )
+                ->from('chart_of_accounts as coa')
+                ->whereIn('coa.type', ["L", "R"])
+                ->where(['coa.account_id' => $account_id, 'je.status' => 'posted','jed.subsidiary_id' => $subsidiary_id])
+                ->whereBetween("je.journal_date", [$startDate->toDateString(), $endDate->toDateString()])
+                ->groupBy('coa.account_id', 'coa.account_number', 'coa.account_name')
+                ->first();
+
+            if ($account) {
+                if ($account->to_increase == "debit") {
+                    return $balance + $account->total_debit - $account->total_credit;
+                } else {
+                    return $balance - $account->total_debit + $account->total_credit;
+                }
+            }
+        }
+
+        return $balance;
+    }
+
+    public function getAccountBalance($from, $to, $account_id,)
     {
 
         $cycle = Accounting::getFiscalYear(1);

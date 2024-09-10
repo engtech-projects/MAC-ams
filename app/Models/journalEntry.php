@@ -38,6 +38,10 @@ class journalEntry extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
+    public function subsidiary_opening_balance()
+    {
+        return $this->belongsTo(SubsidiaryOpeningBalance::class, 'account_id', 'account_id');
+    }
 
 
     public function scopePosted($query)
@@ -366,7 +370,7 @@ class journalEntry extends Model
             });
             return $data;
         })->values()->all();
-        dd($subsidiaryListing);
+
 
         return $subsidiaryListing;
     }
