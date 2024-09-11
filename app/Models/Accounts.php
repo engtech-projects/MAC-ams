@@ -788,7 +788,7 @@ class Accounts extends Model
         return $balance;
     }
 
-    public function getAccountBalance($from, $to, $account_id,)
+    public function getAccountBalance($from, $to, $account_id)
     {
 
         $cycle = Accounting::getFiscalYear(1);
