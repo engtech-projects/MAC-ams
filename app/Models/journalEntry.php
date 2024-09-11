@@ -38,6 +38,10 @@ class journalEntry extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
+    public function subsidiary_opening_balance()
+    {
+        return $this->belongsTo(SubsidiaryOpeningBalance::class, 'account_id', 'account_id');
+    }
 
 
     public function scopePosted($query)
@@ -327,6 +331,7 @@ class journalEntry extends Model
     public function getSubsidiaryListing(array $filter)
     {
         $collections = collect($this->getJournalEntry($filter));
+
         $subsidiaryListing = $collections->map(function ($item, $key) {
             $item["entries"] = collect($item["entries"])->groupBy(function ($item) {
                 return $item["branch"] == null ? "NO BRANCH" : $item["branch"]["branch_code"] . ' ' . $item["branch"]["branch_name"];
@@ -365,6 +370,7 @@ class journalEntry extends Model
             });
             return $data;
         })->values()->all();
+
 
         return $subsidiaryListing;
     }
