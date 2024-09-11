@@ -749,7 +749,11 @@ class Accounts extends Model
 
         //$balance = $this->getOpeningBalance($account_id);
         $opening_balance = SubsidiaryOpeningBalance::where('account_id', $account_id)->where('sub_id', $subsidiary_id)->first();
-        $balance = $opening_balance?->opening_balance ?? 0;
+        if ($opening_balance) {
+            $balance = $opening_balance->opening_balance;
+        } else {
+            $balance = 0;
+        }
 
         if ($diff > 0) {
 
