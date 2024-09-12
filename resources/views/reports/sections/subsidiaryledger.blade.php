@@ -518,6 +518,7 @@
                             }
                         })
                         .then(response => {
+                            console.log(response.data.data[0]);
                             this.subsidiaryAll = response.data.data[0];
                             this.balance = response.data.data[1];
                             // console.log(response.data.data);
