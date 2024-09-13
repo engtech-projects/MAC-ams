@@ -395,13 +395,17 @@ class ReportsController extends MainController
     public function searchCashTransactionBlotter(Request $request)
     {
         $transactionDate = $request["transaction_date"];
+        $branch = Branch::find($request->branch_id);
         $branchId = session()->get("auth_user_branch");
         if (isset($request->branch_id)) {
             $branchId = $request->branch_id;
         }
         $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
         $message = $collections->count() > 0 ? "Collections fetched." : "No record found.";
-        return response()->json(['message' => $message, 'data' => $collections]);
+        return response()->json(['message' => $message, 'data' => [
+            'collections' => $collections,
+            'branch' => $branch
+        ]]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)

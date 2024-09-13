@@ -427,7 +427,7 @@
                                             <div class="col-md-6">
                                                 <div class="col-md-12">
                                                     <h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong
-                                                            id="">00001 MAIN BRANCH - BUTUAN BRANCH</strong></h6>
+                                                            id="">@{{branch}}</strong></h6>
 
                                                 </div>
                                             </div>
@@ -687,6 +687,7 @@
                 accountOfficers: @json($account_officers),
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
                 branches: null,
+                branch:null,
                 filter: {
                     transaction_date: null,
                     branch_id:null,
@@ -733,7 +734,9 @@
                     var url = "{{ route('reports.cashTransactionBlotter') }}"
                     axios.post(url, data)
                         .then(response => {
+                            console.log(response.data.data)
                             this.data = response.data.data
+                            this.branch = response.data.data.branch.branch_name
                             // console.log(this.data);
                             toastr.success(response.data.message);
                         }).catch(error => {
@@ -833,7 +836,7 @@
             },
             computed: {
                 collectionsBreakdown: function() {
-                    return this.data
+                    return this.data.collections
                 },
 
                 filteredCashBlotter: function() {
