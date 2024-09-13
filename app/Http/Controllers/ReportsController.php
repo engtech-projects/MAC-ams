@@ -181,11 +181,13 @@ class ReportsController extends MainController
                 return response()->json(['data' => $transactions]);
 
             case 'subsidiary_per_account':
+                $glAccounts = new Accounts();
+                $transactions = $glAccounts->ledger([$filter['from'], $filter['to']], $filter['account_id'], $filter['subsidiary_id']);
 
-                $transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
+                $ss = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
                 $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
 
-                return response()->json(['data' => [$transactions, $balance]]);
+                return response()->json(['data' => [$ss, $balance]]);
 
 
             case 'subsidiary-ledger':

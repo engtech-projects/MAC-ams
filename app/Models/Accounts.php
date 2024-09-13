@@ -494,6 +494,8 @@ class Accounts extends Model
     public static function subsidiaryLedger($from = '', $to = '', $account_id = '', $subsidiary_id = '')
     {
 
+        $balance = SubsidiaryOpeningBalance::where(['account_id' => $account_id, 'sub_id' => $subsidiary_id])->first();
+
         $query = Subsidiary::select(
             'subsidiary.sub_id',
             'subsidiary.sub_name',
@@ -520,7 +522,10 @@ class Accounts extends Model
                 ->join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
                 ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
                 /* ->leftJoin('opening_balance', 'chart_of_accounts.account_id', '=', 'opening_balance.account_id') */
-                ->with('subsidiary_opening_balance')
+                /* ->join('subsidiary_opening_balance', 'subsidiary_opening_balance.sub_id', '=', 'subsidiary.sub_id') */
+                ->with(['subsidiary_opening_balance' => function ($query) use ($subsidiary_id) {
+                    $query->where('sub_id', $subsidiary_id);
+                }])
                 ->select(
                     'account_category.account_category',
                     'account_category.to_increase',
@@ -541,6 +546,7 @@ class Accounts extends Model
                     'journal_entry_details.journal_details_id',
                     'journal_entry_details.journal_details_debit',
                     'journal_entry_details.journal_details_credit',
+
                 );
 
             if ($from != '' && $to != '') {
@@ -746,8 +752,6 @@ class Accounts extends Model
         $toDate = Carbon::parse($to);
         $diff = $startDate->diffInDays($fromDate);
         $endDate = Carbon::parse($fromDate->toDateString())->subDay(1);
-
-        //$balance = $this->getOpeningBalance($account_id);
         $opening_balance = SubsidiaryOpeningBalance::where('account_id', $account_id)->where('sub_id', $subsidiary_id)->first();
         if ($opening_balance) {
             $balance = $opening_balance->opening_balance;
@@ -756,7 +760,6 @@ class Accounts extends Model
         }
 
         if ($diff > 0) {
-
             $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
                 ->join('journal_entry as je', 'jed.journal_id', '=', 'je.journal_id')
                 ->join('account_type as acctype', 'acctype.account_type_id', '=', 'coa.account_type_id')
@@ -771,11 +774,10 @@ class Accounts extends Model
                 )
                 ->from('chart_of_accounts as coa')
                 ->whereIn('coa.type', ["L", "R"])
-                ->where(['coa.account_id' => $account_id, 'je.status' => 'posted','jed.subsidiary_id' => $subsidiary_id])
+                ->where(['coa.account_id' => $account_id, 'je.status' => 'posted', 'jed.subsidiary_id' => $subsidiary_id])
                 ->whereBetween("je.journal_date", [$startDate->toDateString(), $endDate->toDateString()])
                 ->groupBy('coa.account_id', 'coa.account_number', 'coa.account_name')
                 ->first();
-
             if ($account) {
                 if ($account->to_increase == "debit") {
                     return $balance + $account->total_debit - $account->total_credit;
@@ -846,7 +848,7 @@ class Accounts extends Model
         return 0;
     }
 
-    public function ledger($range = [], $account_id = '')
+    public function ledger($range = [], $account_id = '', $subsidiary_id = '')
     {
 
         $account = Accounts::join('journal_entry_details as jed', 'coa.account_id', '=', 'jed.account_id')
@@ -881,8 +883,12 @@ class Accounts extends Model
             ->where(['je.status' => 'posted', 'coa.status' => 'active'])
             ->whereBetween("je.journal_date", $range);
 
+
         if ($account_id) {
             $account->where(['coa.account_id' => $account_id]);
+        }
+        if ($subsidiary_id) {
+            $account->where(['jed.subsidiary_id' => $subsidiary_id]);
         }
 
         $data = $account->orderBy('je.journal_date', 'ASC')
