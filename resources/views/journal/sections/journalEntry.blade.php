@@ -293,14 +293,14 @@
                                             <td class='editable-table-data journalNum text-center' id="deb"
                                                 value="">
                                                 <a href="#" fieldName="journal_details_debit" id="debit"
-                                                    class="editable-row-item records">
+                                                    class="journalentryItemsEditables editable-row-item records">
                                                 </a>
                                             </td>
 
                                             <td class='editable-table-data journalNum text-center' id="cre"
                                                 value="">
                                                 <a href="#" fieldName="journal_details_credit" id="credit"
-                                                    class="editable-row-item records">
+                                                    class="journalentryItemsEditables editable-row-item records">
                                                 </a>
                                             </td>
                                             <td class='editable-table-data' value="">
