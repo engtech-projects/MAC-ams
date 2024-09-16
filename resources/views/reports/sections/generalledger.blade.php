@@ -128,7 +128,6 @@
                                     <td class="font-weight-bold" colspan="5">{{ $transaction['account_number'] }} -
                                         {{ $transaction['account_name'] }}</td>
                                     <td colspan="4" class="font-weight-bold text-right" style="padding-right: 10px;">
-                                        {{ dd($transaction) }}
                                         {{ $transaction['balance'] }}</td>
                                 </tr>
                             </thead>
