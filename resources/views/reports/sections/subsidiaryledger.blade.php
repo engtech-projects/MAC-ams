@@ -238,7 +238,7 @@
                                         <div class="input-group">
                                             <select v-model="filter.subsidiary_id" name="subsidiary_id"
                                                 class="select2 form-control form-control-sm" style="width:100%"
-                                                id="subsidiaryDD" required>
+                                                id="subsidiaryDD">
                                                 <option value="" disabled selected>-Select Category-</option>
                                                 @foreach ($subsidiaryData as $subdata)
                                                     <option value="{{ $subdata->sub_id }}">{{ $subdata->sub_name }}
@@ -257,13 +257,15 @@
                                         <label class="label-normal" for="sub_name">Account Title</label>
                                         <div class="input-group">
                                             <select v-model="filter.account_id" name="account_id"
-                                                class="form-control form-control-sm" id="gender" required>
+                                                class="form-control form-control-sm" id="subsidiaryFilterAccountTitle">
                                                 <option value="" disabled selected>-Select Account-</option>
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
-                                                    <option value="{{ $account->account_id }}">
-                                                        {{ $account->account_number }} - {{ $account->account_name }}
-                                                    </option>
+                                                    @if ($account->type == 'L')
+                                                        <option value="{{ $account->account_id }}">
+                                                            {{ $account->account_number }} - {{ $account->account_name }}
+                                                        </option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -503,6 +505,8 @@
                 submitForm: function() {
                     if (this.reportType == 'subsidiary_all_account' || this.reportType ==
                         'subsidiary_per_account') {
+                        this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val();
+                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val();
                         this.fetchSubAll();
                     } else if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();

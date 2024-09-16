@@ -378,6 +378,17 @@
         allowClear: true,
     });
 
+    $('#subsidiaryDD').select2({
+        placeholder: 'Select Subsidiary',
+        allowClear: true,
+        
+    });
+
+    $('#subsidiaryFilterAccountTitle').select2({
+        placeholder: 'Select-Account Title',
+        allowClear: true,
+    });
+
 
     /*
      **********************  CASH BRANCH COLLECTION  **************************
