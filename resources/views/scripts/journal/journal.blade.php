@@ -356,36 +356,7 @@
             display: function(value) {
 
                 $(this).text(amountConverter(value))
-            },
-            success: function () {
-                setTimeout(() => {
-                    if ($(this).attr('fieldName') == 'subsidiary_id') {
-                        if ($('#subsidiary_id').val() == '') {
-                            let amount = prompt("Please ");
-                        }
-                    }
-                    if ($(this).attr('fieldName') == 'journal_details_debit') {
-                        $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        getBalance()
-                        checkTotalAndAmount()
-                    }
-                    if ($(this).attr('fieldName') == 'journal_details_credit') {
-                        $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        getBalance()
-                        checkTotalAndAmount()
-                    }
-                }, 100)
-            },
+            }
         })
 
         /*          $('.editable-row-item').editable({
@@ -540,32 +511,32 @@
                 }
             });
         })
-        // $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
-        //     $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
-        //         minimumFractionDigits: 2
-        //     }));
-        //     $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
-        //         minimumFractionDigits: 2
-        //     }));
-        //     getBalance()
-        //     checkTotalAndAmount()
-        // })
-        // $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
-        //     if ($('#subsidiary_id').val() == '') {
-        //         let amount = prompt("Please ");
-        //     }
+        $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_debit"]', function() {
+            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            getBalance()
+            checkTotalAndAmount()
+        })
+        $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
+            if ($('#subsidiary_id').val() == '') {
+                let amount = prompt("Please ");
+            }
 
-        // })
-        // $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
-        //     $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
-        //         minimumFractionDigits: 2
-        //     }));
-        //     $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
-        //         minimumFractionDigits: 2
-        //     }));
-        //     getBalance()
-        //     checkTotalAndAmount()
-        // })
+        })
+        $(document).on('DOMSubtreeModified', 'a[fieldName="journal_details_credit"]', function() {
+            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                minimumFractionDigits: 2
+            }));
+            getBalance()
+            checkTotalAndAmount()
+        })
         $(document).on('change', '.COASelect', function(e) {
             var accnu = $(this).parent().siblings('.acctnu').first().find('.journal_details_account_no')
                 .text($('option:selected', this).attr('acct-num'));
@@ -1172,15 +1143,15 @@
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
-            // $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
-            //     if ($('#subsidiary_id').val() == '') {
-            //         alert("Subsidiary is required.")
-            //     }
-            //     if ($('#account_id').val() == null) {
-            //         alert("Account is required.")
-            //     }
+            $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
+                if ($('#subsidiary_id').val() == '') {
+                    alert("Subsidiary is required.")
+                }
+                if ($('#account_id').val() == null) {
+                    alert("Account is required.")
+                }
 
-            // })
+            })
             var content = `<tr class='editable-table-row'>
 			<td class="acctnu" value="">
 				<a href="#" class="editable-row-item journal_details_account_no"></a>
@@ -1243,42 +1214,7 @@
                 display: function(value) {
 
                     $(this).text(amountConverter(value))
-                },
-                success: function () {
-                    setTimeout(() => {
-                        if ($(this).attr('fieldName') == 'subsidiary_id') {
-                            // if ($('#subsidiary_id').val() == '') {
-                            //     let amount = prompt("Please ");
-                            // }
-                            if ($('#subsidiary_id').val() == '') {
-                                alert("Subsidiary is required.")
-                            }
-                            if ($('#account_id').val() == null) {
-                                alert("Account is required.")
-                            }
-                        }
-                        if ($(this).attr('fieldName') == 'journal_details_debit') {
-                            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            getBalance()
-                            checkTotalAndAmount()
-                        }
-                        if ($(this).attr('fieldName') == 'journal_details_credit') {
-                            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            getBalance()
-                            checkTotalAndAmount()
-                        }
-                    }, 100)
-                },
+                }
             })
 
             $('.select-account').select2({
