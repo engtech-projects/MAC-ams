@@ -231,17 +231,17 @@
                     <form @submit.prevent="submitForm" action="">
                         <div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'"
                             class="row col-md-12 no-print">
-                            <div class="col-md-2 col-xs-12">
+                            <div class="col-md-2" style="margin-right: 10px;">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
                                         <div class="input-group">
-                                            <select v-model="filter.subsidiary_id" name="subsidiary_id"
+                                            <select name="subsidiary_id"
                                                 class="select2 form-control form-control-sm" style="width:100%"
                                                 id="subsidiaryDD">
-                                                <option value="" disabled selected>-Select Category-</option>
                                                 @foreach ($subsidiaryData as $subdata)
-                                                    <option value="{{ $subdata->sub_id }}">{{ $subdata->sub_name }}
+                                                    <option value="{{ $subdata->sub_id }}">
+                                                        {{ $subdata->sub_code }} - {{ $subdata->sub_name }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -250,15 +250,19 @@
                                 </div>
                             </div>
 
-                            <div v-show="reportType=='subsidiary_per_account'" class="col-md-3 col-xs-12"
-                                style="margin-right:64px;">
+                            
+
+                            <div v-show="reportType=='subsidiary_per_account'" class="col-md-3" >
                                 <div class="box">
-                                    <div class="form-group">
+                                    <div class="form-group" style="width: 100%;">
                                         <label class="label-normal" for="sub_name">Account Title</label>
-                                        <div class="input-group">
-                                            <select v-model="filter.account_id" name="account_id"
-                                                class="form-control form-control-sm" id="subsidiaryFilterAccountTitle">
-                                                <option value="" disabled selected>-Select Account-</option>
+                                        <div class="input-group" style="width: 100% !important;">
+                                            <select 
+                                                name="account_id"
+                                                class="select2 form-control form-control-sm" 
+                                                id="subsidiaryFilterAccountTitle"
+                                                style="width: 100% !important;"
+                                            >
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
                                                     @if ($account->type == 'L')
@@ -490,7 +494,7 @@
                     subsidiary_id: '',
                     from: '',
                     to: '',
-                    account_id: 'all',
+                    account_id: '',
                     type: ''
                 },
                 incomeExpense: {
@@ -503,10 +507,9 @@
             },
             methods: {
                 submitForm: function() {
-                    if (this.reportType == 'subsidiary_all_account' || this.reportType ==
-                        'subsidiary_per_account') {
-                        this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val();
-                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val();
+                    if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {
+                        this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
+                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
                         this.fetchSubAll();
                     } else if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();

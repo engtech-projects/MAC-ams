@@ -379,13 +379,12 @@
     });
 
     $('#subsidiaryDD').select2({
-        placeholder: 'Select Subsidiary',
+        placeholder: 'Select-Subsidiary',
         allowClear: true,
-        
     });
 
     $('#subsidiaryFilterAccountTitle').select2({
-        placeholder: 'Select-Account Title',
+        placeholder: 'Select-AccountTitle',
         allowClear: true,
     });
 
