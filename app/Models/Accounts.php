@@ -574,7 +574,7 @@ class Accounts extends Model
                         $entries[$value['account_number']]['account_number'] = $value['account_number'];
                         $entries[$value['account_number']]['account_name'] = $value['account_name'];
                         $entries[$value['account_number']]['to_increase'] = $value['to_increase'];
-                        $entries[$value['account_number']]['opening_balance'] = $value['subsidiary_opening_balance']['opening_balance'] ?: 0;
+                        $entries[$value['account_number']]['opening_balance'] = is_null($value['subsidiary_opening_balance']) ? 0 : $value['subsidiary_opening_balance']['opening_balance'];
 
                         $entries[$value['account_number']]['data'][] = [
                             'sub_name' => $value['sub_name'],
