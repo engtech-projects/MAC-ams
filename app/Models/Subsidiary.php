@@ -32,7 +32,6 @@ class Subsidiary extends Model
     {
         return $this->belongsTo(SubsidiaryCategory::class, 'sub_cat_id');
     }
-
     public static function fetchBranch()
     {
         $branch = Subsidiary::leftJoin("subsidiary_category", "subsidiary.sub_cat_id", "=", "subsidiary_category.sub_cat_id")
@@ -40,5 +39,10 @@ class Subsidiary extends Model
             ->where("subsidiary_category.sub_cat_id", "=", 48)
             ->get();
         return $branch;
+    }
+    public function getDepreciation($categpryId)
+    {
+        $subsidiary = Subsidiary::where('sub_cat_id', $categpryId)->with('subsidiaryCategory')->get();
+        return $subsidiary;
     }
 }

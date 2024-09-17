@@ -153,6 +153,30 @@ class ReportsController extends MainController
         return view('reports.sections.subsidiaryledger', $data);
     }
 
+    public function monthlyDepreciation(Request $request)
+    {
+        $subsidiary = new Subsidiary();
+
+        $result = $subsidiary->getDepreciation($request->category_id);
+        $data = $result->map(function ($value) {
+            $amount = intval($value->sub_amount);
+            $depreciation = $value->sub_no_depre == 0 ? 1 : $value->sub_no_depre;
+            $numberOfAmortization = $value->sub_no_amort == 0 ? 1 : $value->sub_no_amort;
+            $monthlyAmort = $amount / $numberOfAmortization;
+
+            $value['used'] = round($amount / $depreciation, 2);
+            $value['expensed'] = round($value['used'] * $monthlyAmort);
+            $value['unexpensed'] = round($value['expensed'] - $amount);
+            $value['due_amort'] = $monthlyAmort;
+            $value['remainder'] = $value['used'] - $value->sub_no_amort;
+            return $value;
+        });
+        return response()->json([
+            'data' => $data,
+            'message' => 'Successfully Fetched'
+        ]);
+    }
+
 
     public function subsidiaryLedgerReports(Request $request)
     {
