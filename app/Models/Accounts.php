@@ -526,6 +526,7 @@ class Accounts extends Model
                 ->with(['subsidiary_opening_balance' => function ($query) use ($subsidiary_id) {
                     $query->where('sub_id', $subsidiary_id);
                 }])
+                // ->where(["journal_entry.status" => "posted"])
                 ->select(
                     'account_category.account_category',
                     'account_category.to_increase',
@@ -548,7 +549,6 @@ class Accounts extends Model
                     'journal_entry_details.journal_details_credit',
 
                 );
-
             if ($from != '' && $to != '') {
                 $journalEntries->whereBetween("journal_entry.journal_date", [$from, $to]);
             }
