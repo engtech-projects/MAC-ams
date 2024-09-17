@@ -265,7 +265,7 @@
                                             >
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
-                                                    @if ($account->type == 'L')
+                                                    @if ($account->type == 'L' || $account->type == 'R')
                                                         <option value="{{ $account->account_id }}">
                                                             {{ $account->account_number }} - {{ $account->account_name }}
                                                         </option>
