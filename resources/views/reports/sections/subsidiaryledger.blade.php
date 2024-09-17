@@ -609,13 +609,14 @@
                             totalDebit += parseFloat(data.debit);
                             var row = [data.journal_date,
                                 data.journal_no,
-                                data.sub_name,
+                                data.branch,
                                 data.source,
                                 data.cheque_date,
                                 data.cheque_no,
                                 data.debit != 0 ? this.formatCurrency(data.debit) : '',
                                 data.credit != 0 ? this.formatCurrency(data.credit) : '',
-                                data.balance ? this.formatCurrency(data.balance) : '0.00'
+                                data.balance ? this.formatCurrency(data.balance) : '0.00',
+                                
                             ];
                             rows.push(row);
                             if (this.reportType == 'subsidiary_per_account') {

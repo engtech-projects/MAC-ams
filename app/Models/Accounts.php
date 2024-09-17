@@ -523,6 +523,7 @@ class Accounts extends Model
                 ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
                 /* ->leftJoin('opening_balance', 'chart_of_accounts.account_id', '=', 'opening_balance.account_id') */
                 /* ->join('subsidiary_opening_balance', 'subsidiary_opening_balance.sub_id', '=', 'subsidiary.sub_id') */
+                ->join('branch', 'journal_entry.branch_id', '=', 'branch.branch_id') // Join with branch table
                 ->with(['subsidiary_opening_balance' => function ($query) use ($subsidiary_id) {
                     $query->where('sub_id', $subsidiary_id);
                 }])
@@ -547,6 +548,7 @@ class Accounts extends Model
                     'journal_entry_details.journal_details_id',
                     'journal_entry_details.journal_details_debit',
                     'journal_entry_details.journal_details_credit',
+                    'branch.branch_name'
 
                 );
             if ($from != '' && $to != '') {
@@ -588,6 +590,7 @@ class Accounts extends Model
                             'journal_id' => $value['journal_id'],
                             'debit' => $value['journal_details_debit'],
                             'credit' => $value['journal_details_credit'],
+                            'branch' => $value['branch_name'],
                         ];
                     } else {
                         $entries[$value['account_number']]['data'][] = [
@@ -602,6 +605,7 @@ class Accounts extends Model
                             'journal_id' => $value['journal_id'],
                             'debit' => $value['journal_details_debit'],
                             'credit' => $value['journal_details_credit'],
+                            'branch' => $value['branch_name'],
                         ];
                     }
                 }
