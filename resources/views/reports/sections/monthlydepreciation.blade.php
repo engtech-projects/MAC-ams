@@ -34,7 +34,7 @@
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
-                    <form id="subsidiaryForm" method="post">
+                    <form id="subsidiaryForm" method="get">
                         @csrf
                         <input type="hidden" class="form-control form-control-sm rounded-0" name="sub_id" id="sub_id"
                             placeholder="">
@@ -44,22 +44,39 @@
                             </div>
                             <div class="row col-md-12">
 
-                                <div class="col-md-3 col-xs-12">
+                                <div class="col-md-8 col-xs-12">
                                     <div class="box">
                                         <div class="form-group">
                                             <label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
                                             <div class="input-group">
+
+                                            <div class='col-md-5'>
                                                 <select name="sub_cat_id" class="form-control form-control-sm"
                                                     id="sub_cat_id">
                                                     <option value="" disabled selected>-Select Category-</option>
-                                                    {{-- @foreach ($sub_categories as $sub_category)
+                                                    @foreach ($subsidiary_categories as $sub_category)
                                                         <option value="{{ $sub_category->sub_cat_id }}">
                                                             {{ $sub_category->sub_cat_code }} -
                                                             {{ $sub_category->sub_cat_name }}</option>
-                                                    @endforeach --}}
+                                                    @endforeach
                                                 </select>
                                             </div>
+                                            <div class='col-md-5'>
+                                                <select name="branch_code" class="form-control form-control-sm"
+                                                    id="branch">
+                                                    <option value="" disabled selected>-Select Branch-</option>
+                                                    @foreach ($branches as $branch)
+                                                        <option value="{{ $branch->branch_code }}">
+                                                            {{ $branch->branch_code }} -
+                                                            {{ $branch->branch_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <button class='btn btn-success'>Search</button>
+                                            </div>
+
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -67,88 +84,6 @@
 
                         </div>
 
-                    </form>
-                    <form @submit.prevent="submitForm" action="">
-                        <div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'"
-                            class="row col-md-12 no-print">
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_acct_no">Subsidiary</label>
-                                        <div class="input-group">
-                                            {{-- <select v-model="filter.subsidiary_id" name="subsidiary_id"
-                                                class="select2 form-control form-control-sm" style="width:100%"
-                                                id="subsidiaryDD" required>
-                                                <option value="" disabled selected>-Select Category-</option>
-                                                @foreach ($subsidiaryData as $subdata)
-                                                    <option value="{{ $subdata->sub_id }}">{{ $subdata->sub_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select> --}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-show="reportType=='subsidiary_per_account'" class="col-md-3 col-xs-12"
-                                style="margin-right:64px;">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_name">Account Title</label>
-                                        <div class="input-group">
-                                            {{-- <select v-model="filter.account_id" name="account_id"
-                                                class="form-control form-control-sm" id="gender" required>
-                                                <option value="" disabled selected>-Select Account-</option>
-                                                <option value="all">All Accounts</option>
-                                                @foreach ($accounts as $account)
-                                                    <option value="{{ $account->account_id }}">
-                                                        {{ $account->account_number }} - {{ $account->account_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select> --}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_date">From</label>
-                                        <div class="input-group">
-                                            <input v-model="filter.from" type="date"
-                                                class="form-control form-control-sm rounded-0" name="from"
-                                                id="sub_date" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_date">To</label>
-                                        <div class="input-group">
-                                            <input v-model="filter.to" type="date"
-                                                class="form-control form-control-sm rounded-0" name="to"
-                                                id="sub_date" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_date"></label>
-                                        <div class="input-group">
-                                            <button class="btn btn-flat btn-sm bg-gradient-success " type="submit"
-                                                style="margin-top:8px;width:100px;">Search</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </form>
                 </div>
                 <div class="col-md-12">
@@ -158,7 +93,7 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
-                                    <table v-if="reportType==''" id="subsidiaryledgerTbl" class="table ">
+                                    <table id="subsidiaryledgerTbl" class="table ">
                                         <thead>
                                             <th>No. Particular</th>
                                             <th>Date</th>
