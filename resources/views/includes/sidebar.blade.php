@@ -226,6 +226,14 @@
 						</a>
 					</li>
 					@endif
+                    @if(checkUserHasAccessModule('sub-module','reports/monthly-depreciation'))
+					<li class="nav-item">
+						<a href="{{ route('reports.monthlyDepreciation') }}" class="nav-link {{ (request()->is('reports/monthly-depreciation')) ? 'active' : '' }}">
+							<i class="far fa-circle nav-icon"></i>
+							<p>Monthly Depreciation</p>
+						</a>
+					</li>
+					@endif
 					@if(checkUserHasAccessModule('sub-module','reports/chartOfAccounts'))
 					<li class="nav-item">
 						<a href="{{route('reports.chartOfAccounts')}}" class="nav-link {{ (request()->is('reports/chartOfAccounts')) ? 'active' : '' }}">

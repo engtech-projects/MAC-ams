@@ -254,10 +254,9 @@
                                 style="margin-right:64px;">
                                 <div class="box">
                                     <div class="form-group">
-                                        <label class="label-normal" for="sub_name">Account Title</label>
                                         <div class="input-group">
-                                            <select v-model="filter.account_id" name="account_id"
-                                                class="form-control form-control-sm" id="gender" required>
+                                            <select v-model="filter.account_id" name="account_id" class="form-control form-control-sm"
+                                                id="gender select-account">
                                                 <option value="" disabled selected>-Select Account-</option>
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
@@ -269,6 +268,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="col-md-2 col-xs-12">

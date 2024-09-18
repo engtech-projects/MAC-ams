@@ -155,22 +155,41 @@ class ReportsController extends MainController
 
     public function monthlyDepreciation(Request $request)
     {
+
+        dd($request->input());
+        $branch = Branch::find($request->branch_id);
+
         $subsidiary = new Subsidiary();
 
-        $result = $subsidiary->getDepreciation($request->category_id);
+
+
+        $result = $subsidiary->getDepreciation($request->category_id, $branch->branch_code);
+
         $data = $result->map(function ($value) {
             $amount = intval($value->sub_amount);
             $depreciation = $value->sub_no_depre == 0 ? 1 : $value->sub_no_depre;
             $numberOfAmortization = $value->sub_no_amort == 0 ? 1 : $value->sub_no_amort;
             $monthlyAmort = $amount / $numberOfAmortization;
 
+            $value['montly_amort'] = $monthlyAmort;
             $value['used'] = round($amount / $depreciation, 2);
             $value['expensed'] = round($value['used'] * $monthlyAmort);
             $value['unexpensed'] = round($value['expensed'] - $amount);
             $value['due_amort'] = $monthlyAmort;
-            $value['remainder'] = $value['used'] - $value->sub_no_amort;
+            $value['rem'] = $value['used'] - $value->sub_no_amort;
+            $value['inv'] = 0;
+            $value['no'] = 0;
             return $value;
-        });
+        })->values();
+
+        $data = [
+            'data' => $data,
+            'title' => 'MAC-AMS | Monthly Depreciation',
+        ];
+        return view('reports.sections.monthlyDepreciation', $data);
+        /*        $data['branch_total'] = 100;
+        $data['acct_total'] = 100;
+        $data['grand_total'] = 100; */
         return response()->json([
             'data' => $data,
             'message' => 'Successfully Fetched'

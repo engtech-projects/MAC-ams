@@ -40,9 +40,11 @@ class Subsidiary extends Model
             ->get();
         return $branch;
     }
-    public function getDepreciation($categpryId)
+    public function getDepreciation($categoryId, $branchCode)
     {
-        $subsidiary = Subsidiary::where('sub_cat_id', $categpryId)->with('subsidiaryCategory')->get();
+        $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branchCode) {
+            $query->whereNotNull('sub_per_branch')->where('sub_cat_id', $categoryId)->where('sub_per_branch', $branchCode);
+        })->with('subsidiaryCategory')->get();
         return $subsidiary;
     }
 }
