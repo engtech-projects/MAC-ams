@@ -114,16 +114,17 @@
                                                 <tr>
                                                     <td>{{ $val->sub_code .'-'.$val->sub_name }}</td>
                                                     <td>{{ $val->sub_date }}</td>
-                                                    <td>{{ $val->sub_amount }}</td>
+                                                    <td>{{ number_format($val->sub_amort, 2, '.', ',') }}</td>
                                                     <td>{{ $val->monthly_amort }}</td>
-                                                    <td>{{ $val->used }}</td>
-                                                    <td>{{ $val->expensed }}</td>
-                                                    <td>{{ $val->unexpensed }}</td>
-                                                    <td>{{ $val->due_amort }}</td>
+                                                    <td>{{ number_format($val->used, 2, '.', ',') }}</td>
+
+                                                    <td>{{ number_format($val->expensed, 2, '.', ',') }}</td>
+                                                    <td>{{ number_format($val->unexpensed, 2, '.', ',') }}</td>
+                                                    <td>{{ number_format($val->due_amort, 2, '.', ',') }}</td>
                                                     <td>{{ $val->sub_salvage }}</td>
-                                                    <td>{{ $val->rem }}</td>
-                                                    <td>{{ $val->inv }}</td>
-                                                    <td>{{ $val->no }}</td>
+                                                    <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
+                                                    <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
+                                                    <td>{{ number_format($val->no, 2, '.', ',') }}</td>
                                                     <td></td>
                                                     <td>
                                                         <div class="btn-group">

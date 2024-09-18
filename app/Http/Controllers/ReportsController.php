@@ -171,8 +171,8 @@ class ReportsController extends MainController
             $value['used'] = round($amount / $depreciation, 2);
             $value['expensed'] = round($value['used'] * $monthlyAmort);
             $value['unexpensed'] = round($value['expensed'] - $amount);
-            $value['due_amort'] = $monthlyAmort;
-            $value['rem'] = $value['used'] - $value->sub_no_amort;
+            $value['due_amort'] = round($monthlyAmort, 2);
+            $value['rem'] = round($value['used'] - $value->sub_no_amort, 2);
             $value['inv'] = 0;
             $value['no'] = 0;
             return $value;
