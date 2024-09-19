@@ -20,6 +20,6 @@ class SubsidiaryCategory extends Model
 
     public function accounts()
     {
-        return $this->hasManyThrough(Accounts::class, SubsidiaryCategory::class, 'account_id');
+        /* return $this->hasManyThrough(Accounts::class, SubsidiaryCategory::class, 'sub_cat_id', 'account_id'); */
     }
 }
