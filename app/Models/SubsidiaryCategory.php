@@ -18,8 +18,8 @@ class SubsidiaryCategory extends Model
         'description'
     ];
 
-    /* public function accounts()
+    public function accounts()
     {
-        return $this->hasManyThrough(SubsidiaryCategory::class, Accounts::class);
-    } */
+        return $this->hasManyThrough(Accounts::class, SubsidiaryCategory::class, 'account_id');
+    }
 }

@@ -95,10 +95,12 @@
                                 <div class="col-md-12 table-responsive">
                                     <table id="subsidiaryledgerTbl" class="table ">
                                         <thead>
-                                            <th>No. Particular</th>
+                                        <th>No.</th>
+                                            <th>Particular</th>
                                             <th>Date</th>
                                             <th>Amount</th>
-                                            <th>Amort Monthly</th>
+                                            <th>Monthly</th>
+                                            <th>Amort.</th>
                                             <th>Used</th>
                                             <th>Expensed</th>
                                             <th>Unexpensed</th>
@@ -109,13 +111,15 @@
                                             <th>No.</th>
                                         </thead>
                                         <tbody>
-
-                                            @foreach ($data as $val)
+                                            @foreach ($data as $key => $val)
                                                 <tr>
+                                                <td>{{ $key+=1}}</td>
                                                     <td>{{ $val->sub_code .'-'.$val->sub_name }}</td>
                                                     <td>{{ $val->sub_date }}</td>
                                                     <td>{{ number_format($val->sub_amount, 2, '.', ',') }}</td>
+                                                    <td>{{ number_format($val->monthly_amort, 2, '.', ',') }}</td>
                                                     <td>{{ $val->sub_no_depre }}</td>
+
                                                     <td>{{$val->sub_no_amort }}</td>
 
                                                     <td>{{ number_format($val->expensed, 2, '.', ',') }}</td>
