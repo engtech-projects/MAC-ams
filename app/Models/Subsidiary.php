@@ -44,9 +44,7 @@ class Subsidiary extends Model
     {
         $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branchCode) {
             $query->where('sub_cat_id', $categoryId)->where('sub_per_branch', $branchCode);
-        })->with(['subsidiaryCategory' => function ($query) {
-            $query->with('accounts');
-        }])->get();
+        })->with(['subsidiaryCategory'])->get();
         return $subsidiary;
     }
 }
