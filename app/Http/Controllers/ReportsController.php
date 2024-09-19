@@ -162,12 +162,15 @@ class ReportsController extends MainController
         $subsidiary = new Subsidiary();
         $result = $subsidiary->getDepreciation($request->sub_cat_id, $request->branch_code);
         $data = $result->map(function ($value) {
+            if ($value->sub_no_depre == 0) {
+                $value->sub_no_depre = 1;
+            }
             $monthlyAmort = $value->sub_amount / $value->sub_no_depre;
-            $value['montly_amort'] = $monthlyAmort;
+            $value['monthly_amort'] = $monthlyAmort;
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($value->sub_amount - $value->expensed);
             $value['due_amort'] = round($value->sub_no_amort, 2);
-            $value['rem'] = round($value->sub_no_amort - $value->sub_no_depre, 2);
+            $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
             $value['inv'] = 0;
             $value['no'] = 0;
             return $value;
