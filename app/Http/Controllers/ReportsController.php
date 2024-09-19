@@ -170,6 +170,7 @@ class ReportsController extends MainController
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($value->sub_amount - $value->expensed);
             $value['due_amort'] = round($value->sub_no_amort, 2);
+
             $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
             $value['inv'] = 0;
             $value['no'] = 0;
@@ -181,14 +182,14 @@ class ReportsController extends MainController
             'branches' => $branches,
             'title' => 'MAC-AMS | Monthly Depreciation',
         ];
-        //return view('reports.sections.monthlyDepreciation', $data);
+        return view('reports.sections.monthlyDepreciation', $data);
         /*        $data['branch_total'] = 100;
         $data['acct_total'] = 100;
         $data['grand_total'] = 100; */
-        return response()->json([
+        /* return response()->json([
             'data' => $data,
             'message' => 'Successfully Fetched'
-        ]);
+        ]); */
     }
 
 
