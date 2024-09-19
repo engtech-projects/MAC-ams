@@ -62,13 +62,13 @@
                                                 </select>
                                             </div>
                                             <div class='col-md-5'>
-                                                <select name="branch_code" class="form-control form-control-sm"
+                                                <select name="branch_id" class="form-control form-control-sm"
                                                     id="branch">
                                                     <option value="" disabled selected>-Select Branch-</option>
                                                     @foreach ($branches as $branch)
-                                                        <option value="{{ $branch->branch_code }}">
-                                                            {{ $branch->branch_code }} -
-                                                            {{ $branch->branch_name }}</option>
+                                                        <option value="{{ $branch->branch_id }}">
+                                                            {{ $branch?->branch_code }} -
+                                                            {{ $branch?->branch_name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -95,6 +95,7 @@
                                 <div class="col-md-12 table-responsive">
                                     <table id="subsidiaryledgerTbl" class="table ">
                                         <thead>
+                                        <th>COde</th>
                                         <th>No.</th>
                                             <th>Particular</th>
                                             <th>Date</th>
@@ -111,21 +112,29 @@
                                             <th>No.</th>
                                         </thead>
                                         <tbody>
-                                            @foreach ($data as $key => $val)
+
+                                            @foreach ($data as $key => $row)
                                                 <tr>
-                                                <td>{{ $key+=1}}</td>
+                                                <td colspan="4"><h5>{{ $key }}</h5></td>
+                                                </tr>
+                                                @foreach ($row['subsidiaries'] as $i => $val )
+
+                                                @if ($key === $val['branch'])
+                                                    <tr>
+                                                <td>{{ $val->sub_per_branch }}</td>
+                                                <td>{{ $i+=1}}</td>
                                                     <td>{{ $val->sub_code .'-'.$val->sub_name }}</td>
                                                     <td>{{ $val->sub_date }}</td>
                                                     <td>{{ number_format($val->sub_amount, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->monthly_amort, 2, '.', ',') }}</td>
-                                                    <td>{{ $val->sub_no_depre }}</td>
+                                                    <td>{{ number_format($val->sub_no_depre, 2, '.', ',') }}</td>
 
-                                                    <td>{{$val->sub_no_amort }}</td>
+                                                    <<td>{{ number_format($val->sub_no_amort, 2, '.', ',') }}</td>
 
                                                     <td>{{ number_format($val->expensed, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->unexpensed, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->monthly_amort, 2, '.', ',') }}</td>
-                                                    <td>{{ $val->sub_salvage }}</td>
+                                                    <td>{{ number_format($val->sub_salvage, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->no, 2, '.', ',') }}</td>
@@ -149,7 +158,56 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                <td colspan=4>BRANCH TOTAL</td>
+                                                <td>{{ number_format($row['branch_total_amount'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_monthly'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_used'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_expensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_unexpensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_due_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_sub_salvage'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_rem'],2,'.',) }}</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                </tr>
+
+
+                                                @endif
+
+                                                @endforeach
+
                                             @endforeach
+                                                <tr>
+                                                <td colspan=4>ACC. TOTAL</td>
+                                                <td>{{ number_format($row['branch_total_amount'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_monthly'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_used'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_expensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_unexpensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_due_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_sub_salvage'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_rem'],2,'.',) }}</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                </tr>
+                                                </tr>
+                                                <td colspan=4>GRAND TOTAL</td>
+                                                <td>{{ number_format($row['branch_total_amount'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_monthly'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_used'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_expensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_unexpensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_due_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_sub_salvage'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_rem'],2,'.',) }}</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
