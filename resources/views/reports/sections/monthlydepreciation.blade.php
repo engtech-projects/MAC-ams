@@ -114,9 +114,9 @@
                                                 <tr>
                                                     <td>{{ $val->sub_code .'-'.$val->sub_name }}</td>
                                                     <td>{{ $val->sub_date }}</td>
-                                                    <td>{{ number_format($val->sub_amort, 2, '.', ',') }}</td>
+                                                    <td>{{ number_format($val->sub_amount, 2, '.', ',') }}</td>
                                                     <td>{{ $val->monthly_amort }}</td>
-                                                    <td>{{ number_format($val->used, 2, '.', ',') }}</td>
+                                                    <td>{{$val->sub_no_amort }}</td>
 
                                                     <td>{{ number_format($val->expensed, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->unexpensed, 2, '.', ',') }}</td>

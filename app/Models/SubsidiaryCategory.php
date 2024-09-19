@@ -13,9 +13,13 @@ class SubsidiaryCategory extends Model
     protected $primaryKey = 'sub_cat_id';
 
     protected $fillable = [
-    	'sub_cat_name',
-    	'sub_cat_type',
-    	'description'
+        'sub_cat_name',
+        'sub_cat_type',
+        'description'
     ];
 
+    /* public function accounts()
+    {
+        return $this->hasManyThrough(SubsidiaryCategory::class, Accounts::class);
+    } */
 }

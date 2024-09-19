@@ -165,14 +165,19 @@ class ReportsController extends MainController
             $amount = intval($value->sub_amount);
             $depreciation = $value->sub_no_depre == 0 ? 1 : $value->sub_no_depre;
             $numberOfAmortization = $value->sub_no_amort == 0 ? 1 : $value->sub_no_amort;
-            $monthlyAmort = $amount / $numberOfAmortization;
-
+            $monthlyAmort = $value->sub_amount / $value->sub_no_amort;
+            dd([
+                "sub_amount" => $value->sub_amount,
+                "sub_no_amort" => $value->sub_no_amort,
+                "monthly_amortization" => $value->sub_amount / $value->sub_no_amort,
+            ]);
+            dd($monthlyAmort);
             $value['montly_amort'] = $monthlyAmort;
-            $value['used'] = round($amount / $depreciation, 2);
-            $value['expensed'] = round($value['used'] * $monthlyAmort);
-            $value['unexpensed'] = round($value['expensed'] - $amount);
-            $value['due_amort'] = round($monthlyAmort, 2);
-            $value['rem'] = round($value['used'] - $value->sub_no_amort, 2);
+            $value['expensed'] = $value->sub_no_amort * $monthlyAmort;
+            $value['unexpensed'] = round($value->sub_no_amort - $amount);
+            $value['due_amort'] = round($value->sub_no_amort, 2);
+            $value['rem'] = round($value->sub_no_amort - $value->sub_no_depre, 2);
+            dd($value->sub_no_amort * $monthlyAmort);
             $value['inv'] = 0;
             $value['no'] = 0;
             return $value;
@@ -183,14 +188,14 @@ class ReportsController extends MainController
             'branches' => $branches,
             'title' => 'MAC-AMS | Monthly Depreciation',
         ];
-        return view('reports.sections.monthlyDepreciation', $data);
+        //return view('reports.sections.monthlyDepreciation', $data);
         /*        $data['branch_total'] = 100;
         $data['acct_total'] = 100;
         $data['grand_total'] = 100; */
-        /* return response()->json([
+        return response()->json([
             'data' => $data,
             'message' => 'Successfully Fetched'
-        ]); */
+        ]);
     }
 
 
