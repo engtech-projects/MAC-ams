@@ -93,9 +93,8 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
-                                    <table id="subsidiaryledgerTbl" class="table ">
+                                    <table id="subsidiaryledgerTbl" class="table">
                                         <thead>
-                                        <th>COde</th>
                                         <th>No.</th>
                                             <th>Particular</th>
                                             <th>Date</th>
@@ -121,7 +120,6 @@
 
                                                 @if ($key === $val['branch'])
                                                     <tr>
-                                                <td>{{ $val->sub_per_branch }}</td>
                                                 <td>{{ $i+=1}}</td>
                                                     <td>{{ $val->sub_code .'-'.$val->sub_name }}</td>
                                                     <td>{{ $val->sub_date }}</td>
@@ -129,7 +127,7 @@
                                                     <td>{{ number_format($val->monthly_amort, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->sub_no_depre, 2, '.', ',') }}</td>
 
-                                                    <<td>{{ number_format($val->sub_no_amort, 2, '.', ',') }}</td>
+                                                    <td>{{ number_format($val->sub_no_amort, 2, '.', ',') }}</td>
 
                                                     <td>{{ number_format($val->expensed, 2, '.', ',') }}</td>
                                                     <td>{{ number_format($val->unexpensed, 2, '.', ',') }}</td>
@@ -158,29 +156,31 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                <td colspan=4>BRANCH TOTAL</td>
-                                                <td>{{ number_format($row['branch_total_amount'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_monthly'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_amort'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_used'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_expensed'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_unexpensed'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_due_amort'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_sub_salvage'],2,'.',) }}</td>
-                                                <td>{{ number_format($row['branch_total_rem'],2,'.',) }}</td>
-                                                <td>0</td>
-                                                <td>0</td>
-                                                </tr>
+
 
 
                                                 @endif
 
+
                                                 @endforeach
+                                                <tr>
+                                                <td colspan=3>BRANCH TOTAL</td>
+                                                <td>{{ number_format($row['branch_total_amount'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_monthly'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_used'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_expensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_unexpensed'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_due_amort'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_sub_salvage'],2,'.',) }}</td>
+                                                <td>{{ number_format($row['branch_total_rem'],2,'.',) }}</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                </tr>
 
                                             @endforeach
                                                 <tr>
-                                                <td colspan=4>ACC. TOTAL</td>
+                                                <td colspan=3>ACC. TOTAL</td>
                                                 <td>{{ number_format($row['branch_total_amount'],2,'.',) }}</td>
                                                 <td>{{ number_format($row['branch_total_monthly'],2,'.',) }}</td>
                                                 <td>{{ number_format($row['branch_total_amort'],2,'.',) }}</td>
@@ -194,7 +194,7 @@
                                                 <td>0</td>
                                                 </tr>
                                                 </tr>
-                                                <td colspan=4>GRAND TOTAL</td>
+                                                <td colspan=3>GRAND TOTAL</td>
                                                 <td>{{ number_format($row['branch_total_amount'],2,'.',) }}</td>
                                                 <td>{{ number_format($row['branch_total_monthly'],2,'.',) }}</td>
                                                 <td>{{ number_format($row['branch_total_amort'],2,'.',) }}</td>
