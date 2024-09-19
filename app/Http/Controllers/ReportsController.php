@@ -162,22 +162,12 @@ class ReportsController extends MainController
         $subsidiary = new Subsidiary();
         $result = $subsidiary->getDepreciation($request->sub_cat_id, $request->branch_code);
         $data = $result->map(function ($value) {
-            $amount = intval($value->sub_amount);
-            $depreciation = $value->sub_no_depre == 0 ? 1 : $value->sub_no_depre;
-            $numberOfAmortization = $value->sub_no_amort == 0 ? 1 : $value->sub_no_amort;
-            $monthlyAmort = $value->sub_amount / $value->sub_no_amort;
-            dd([
-                "sub_amount" => $value->sub_amount,
-                "sub_no_amort" => $value->sub_no_amort,
-                "monthly_amortization" => $value->sub_amount / $value->sub_no_amort,
-            ]);
-            dd($monthlyAmort);
+            $monthlyAmort = $value->sub_amount / $value->sub_no_depre;
             $value['montly_amort'] = $monthlyAmort;
-            $value['expensed'] = $value->sub_no_amort * $monthlyAmort;
-            $value['unexpensed'] = round($value->sub_no_amort - $amount);
+            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
+            $value['unexpensed'] = round($value->sub_amount - $value->expensed);
             $value['due_amort'] = round($value->sub_no_amort, 2);
             $value['rem'] = round($value->sub_no_amort - $value->sub_no_depre, 2);
-            dd($value->sub_no_amort * $monthlyAmort);
             $value['inv'] = 0;
             $value['no'] = 0;
             return $value;
