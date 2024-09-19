@@ -527,7 +527,7 @@ class Accounts extends Model
                 ->with(['subsidiary_opening_balance' => function ($query) use ($subsidiary_id) {
                     $query->where('sub_id', $subsidiary_id);
                 }])
-                // ->where(["journal_entry.status" => "posted"])
+                ->where(["journal_entry.status" => "posted"])
                 ->select(
                     'account_category.account_category',
                     'account_category.to_increase',
