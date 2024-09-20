@@ -137,6 +137,7 @@
                                             <th>Rem.</th>
                                             <th>Inv.</th>
                                             <th>No.</th>
+                                            <th></th>
                                         </thead>
                                         <tbody>
 
@@ -215,7 +216,6 @@
                                                             <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
                                                             <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
                                                             <td>{{ number_format($val->no, 2, '.', ',') }}</td>
-                                                            <td></td>
                                                             <td>
                                                                 <div class="btn-group">
                                                                     <button type="button"
@@ -229,10 +229,10 @@
                                                                         role="menu" style="left:0;">
                                                                         <a class="dropdown-item btn-edit-account subsid-view-info"
                                                                             value="{{ $val->sub_id }}"
-                                                                            href="#">Edit</a>
+                                                                            href="#">Post</a>
                                                                         <a class="dropdown-item btn-edit-account subsid-delete"
                                                                             value="{{ $val->sub_id }}"
-                                                                            href="#">delete</a>
+                                                                            href="#">Delete</a>
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -253,7 +253,7 @@
                                                     $total['branch']['total_amount'] += $val->sub_amount;
                                                     $total['branch']['total_monthly'] += $val->monthly_amort;
                                                     $total['branch']['total_amort'] += $val->sub_no_depre;
-                                                    $total['branch']['total_used'] += $val->sub_no_depre;
+                                                    $total['branch']['total_used'] += $val->sub_no_amort;
                                                     $total['branch']['total_expensed'] += $val->expensed;
                                                     $total['branch']['total_unexpensed'] += $val->unexpensed;
                                                     $total['branch']['total_due_amort'] += $val->due_amort;
