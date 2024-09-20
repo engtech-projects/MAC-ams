@@ -156,12 +156,13 @@ class ReportsController extends MainController
     public function monthlyDepreciation(Request $request)
     {
 
-
         $branches = Branch::all();
+        $date = explode("-", $request->sub_date);
 
         $subsidiary = new Subsidiary();
         $branch = Branch::find($request->branch_id);
-        $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch);
+        $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
+
         $data = $result->map(function ($value) use ($branch) {
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
@@ -220,13 +221,10 @@ class ReportsController extends MainController
             'title' => 'MAC-AMS | Monthly Depreciation',
         ];
         return view('reports.sections.monthlyDepreciation', $data);
-        /*        $data['branch_total'] = 100;
-        $data['acct_total'] = 100;
-        $data['grand_total'] = 100; */
-        /* return response()->json([
+        return response()->json([
             'data' => $data,
             'message' => 'Successfully Fetched'
-        ]); */
+        ]);
     }
 
 
