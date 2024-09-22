@@ -163,6 +163,7 @@ class ReportsController extends MainController
         $branch = Branch::find($request->branch_id);
         $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
 
+
         $data = $result->map(function ($value) use ($branch) {
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
@@ -181,7 +182,6 @@ class ReportsController extends MainController
             return $value;
         })->groupBy('branch')->map(function ($item) {
             /*      $item['total_expensed'] = $item->sum('expensed'); */
-
 
             return [
                 'subsidiaries' => $item,
@@ -213,7 +213,6 @@ class ReportsController extends MainController
             $item['grand'] = $grand;
             return $item;
         }) */->all();
-
         $data = [
             'data' => $data,
             'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),

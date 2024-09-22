@@ -259,6 +259,7 @@
                                                     $total['branch']['total_due_amort'] += $val->due_amort;
                                                     $total['branch']['total_sub_salvage'] += $val->sub_salvage;
                                                     $total['branch']['total_rem'] += $val->rem;
+
                                                     ?>
                                                 @endforeach
                                                 <tr>
@@ -281,35 +282,55 @@
                                                     <td>0</td>
                                                 </tr>
                                             @endforeach
-                                            <tr>
-                                                <td colspan=3>ACC. TOTAL</td>
-                                                <td>{{ number_format($total['acct']['total_amount'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_used'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_expensed'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_unexpensed'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_due_amort'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_sub_salvage'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['acct']['total_rem'], 2, '.') }}</td>
-                                                <td>0</td>
-                                                <td>0</td>
-                                            </tr>
-                                            </tr>
-                                            <tr>
-                                                <td colspan=3>GRAND TOTAL</td>
-                                                <td>{{ number_format($total['grand']['total_amount'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_monthly'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_amort'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_used'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_expensed'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_unexpensed'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_due_amort'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_sub_salvage'], 2, '.') }}</td>
-                                                <td>{{ number_format($total['grand']['total_rem'], 2, '.') }}</td>
-                                                <td>0</td>
-                                                <td>0</td>
-                                            </tr>
+
+
+                                           {{--  $total['acct']['total_amount'] += $total['branch']['total_amount'];
+                                                    $total['acct']['total_monthly'] += $total['branch']['total_monthly'];
+                                                    $total['acct']['total_amort'] += $total['branch']['total_amort'];
+                                                    $total['acct']['total_used'] += $total['branch']['total_used'];
+                                                    $total['acct']['total_expensed'] += $total['branch']['total_expensed']
+                                                    $total['acct']['total_unexpensed'] += $total['branch']['total_unexpensed'];
+                                                    $total['acct']['total_due_amort'] += $total['branch']['total_due_amort'];
+                                                    $total['acct']['total_sub_salvage'] += $total['branch']['total_sub_salvage'];
+                                                    $total['acct']['total_rem'] += $total['branch']['total_rem']; --}}
+
+
+                                            @if (count($data) >= 3)
+                                                <tr>
+                                                    <td colspan=3>ACC. TOTAL</td>
+                                                    <td>{{ number_format($total['acct']['total_amount'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['acct']['total_used'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['acct']['total_expensed'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['acct']['total_unexpensed'], 2, '.') }}
+                                                    </td>
+                                                    <td>{{ number_format($total['acct']['total_due_amort'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['acct']['total_sub_salvage'], 2, '.') }}
+                                                    </td>
+                                                    <td>{{ number_format($total['acct']['total_rem'], 2, '.') }}</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                </tr>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan=3>GRAND TOTAL</td>
+                                                    <td>{{ number_format($total['grand']['total_amount'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['grand']['total_monthly'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['grand']['total_amort'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['grand']['total_used'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['grand']['total_expensed'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['grand']['total_unexpensed'], 2, '.') }}
+                                                    </td>
+                                                    <td>{{ number_format($total['grand']['total_due_amort'], 2, '.') }}
+                                                    </td>
+                                                    <td>{{ number_format($total['grand']['total_sub_salvage'], 2, '.') }}
+                                                    </td>
+                                                    <td>{{ number_format($total['grand']['total_rem'], 2, '.') }}</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                </tr>
+                                            @endif
 
                                         </tbody>
                                     </table>
