@@ -177,6 +177,7 @@ Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsCon
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
 /* Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses'); */
 Route::get('reports/monthly-depreciation', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthlyDepreciation');
+Route::post('reports/monthly-depreciation', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');
 Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'])->name('payment.customer');

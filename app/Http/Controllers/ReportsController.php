@@ -153,8 +153,10 @@ class ReportsController extends MainController
         return view('reports.sections.subsidiaryledger', $data);
     }
 
+
     public function monthlyDepreciation(Request $request)
     {
+
 
         $branches = Branch::all();
         $date = explode("-", $request->sub_date);
@@ -208,6 +210,14 @@ class ReportsController extends MainController
             'data' => $data,
             'message' => 'Successfully Fetched'
         ]);
+    }
+
+    public function postMonthlyDepreciation(Request $request)
+    {
+        $data = $request->data;
+        $total = $request->total;
+
+        dd($data);
     }
 
 

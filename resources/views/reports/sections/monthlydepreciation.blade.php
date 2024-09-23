@@ -121,7 +121,7 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
-                                    <table id="subsidiaryledgerTbl" class="table">
+                                    <table class="table">
                                         <thead>
                                             <th>No.</th>
                                             <th>Particular</th>
@@ -137,7 +137,6 @@
                                             <th>Rem.</th>
                                             <th>Inv.</th>
                                             <th>No.</th>
-                                            <th></th>
                                         </thead>
                                         <tbody>
 
@@ -217,43 +216,11 @@
                                                             <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
                                                             <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
                                                             <td>{{ number_format($val->no, 2, '.', ',') }}</td>
-                                                            <td>
-                                                                <div class="btn-group">
-                                                                    <button type="button"
-                                                                        class="btn btn-xs btn-default btn-flat coa-action">Action</button>
-                                                                    <a type="button"
-                                                                        class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action"
-                                                                        data-toggle="dropdown" aria-expanded="false">
-                                                                        <span class="sr-only">Toggle Dropdown</span>
-                                                                    </a>
-                                                                    <div class="dropdown-menu dropdown-menu-right"
-                                                                        role="menu" style="left:0;">
-                                                                        <a class="dropdown-item btn-edit-account subsid-view-info"
-                                                                            value="{{ $val->sub_id }}"
-                                                                            href="#">Post</a>
-                                                                        <a class="dropdown-item btn-edit-account subsid-delete"
-                                                                            value="{{ $val->sub_id }}"
-                                                                            href="#">Delete</a>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
+
                                                         </tr>
 
+
                                                     @endif
-
-
-                                                    {{-- $total['branch']['total_amount'] += $val->sub_amount;
-                                                    $total['branch']['total_monthly'] += $val->monthly_amort;
-                                                    $total['branch']['total_amort'] += $val->sub_no_depre;
-                                                    $total['branch']['total_used'] += $val->sub_no_amort;
-                                                    $total['branch']['total_expensed'] += $val->expensed;
-                                                    $total['branch']['total_unexpensed'] += $val->unexpensed;
-                                                    $total['branch']['total_due_amort'] += $val->due_amort;
-                                                    $total['branch']['total_sub_salvage'] += $val->sub_salvage;
-                                                    $total['branch']['total_rem'] += $val->rem;
-                                                    $total['grand']['total_amount'] += $val->sub_amount;
- --}}
-
                                                 @endforeach
 
                                                 <?php
@@ -311,30 +278,15 @@
                                                     <td>0</td>
                                                     <td>0</td>
                                                 </tr>
+                                                <tr>
+                                                <td><button class='btn btn-danger' @click="post">Post</button></td>
+                                            </tr>
 
                                             @endforeach
 
-
-
-                                            {{-- $total['grand']['total_amount']+= $total['branch']['total_amount'];
-                                                $total['grand']['total_amort']+= $row['branch_total_amort'];
-                                                $total['grand']['total_monthly']+= $row['branch_total_monthly'];
-                                                $total['grand']['total_expensed']+= $row['branch_total_expensed'];
-                                                $total['grand']['total_unexpensed']+= $row['branch_total_unexpensed'];
-                                                $total['grand']['total_monthly_amort']+= $row['branch_total_amort_monthly'];
-                                                $total['grand']['total_used']+= $row['branch_total_used'];
-                                                $total['grand']['total_due_amort']+= $row['branch_total_due_amort'];
-                                                $total['grand']['total_sub_salvage']+= $row['branch_total_sub_salvage'];
-                                                $total['grand']['total_rem']+= $row['branch_total_rem']; --}}
-
-
-
-
-
-
                                             @if (count($data) >= 3)
                                                 <tr>
-                                                    <td colspan=3>ACC. TOTAL</td>
+                                                    <td colspan=4>ACC. TOTAL</td>
                                                     <td>{{ number_format($total['acct']['total_amount'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}</td>
@@ -369,9 +321,12 @@
                                                 </tr>
                                             @endif
 
+
                                         </tbody>
                                     </table>
+
                                 </div>
+
                             </div>
                     </section>
                     <!-- /.Table -->
@@ -399,9 +354,24 @@
                 },
                 subsidiaryAll: [],
                 balance: 0,
-                url: "{{ route('reports.subsidiary-ledger') }}",
+                url: "{{ route('reports.post-monthly-depreciation') }}",
             },
             methods: {
+                post:function() {
+                    var data = {
+                        data:@json($data),
+                        total:@json($total)
+                        };
+                    axios.post(this.url,data, {
+                        headers:{
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+                        }
+                    }).then(response => {
+                        console.log(response)
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                },
                 submitForm: function() {
                     if (this.reportType == 'subsidiary_all_account' || this.reportType ==
                         'subsidiary_per_account') {
@@ -479,6 +449,7 @@
                 }
             },
             computed: {
+
                 processedSubsidiary: function() {
                     var entries = {};
                     var rows = [];
