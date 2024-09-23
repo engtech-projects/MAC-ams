@@ -181,7 +181,6 @@ class ReportsController extends MainController
             $value['no'] = 0;
             return $value;
         })->groupBy('branch')->map(function ($item) {
-            /*      $item['total_expensed'] = $item->sum('expensed'); */
 
             return [
                 'subsidiaries' => $item,
@@ -196,23 +195,8 @@ class ReportsController extends MainController
                 'branch_total_sub_salvage' => round($item->sum('sub_salvage'), 2),
                 'branch_total_rem' => round($item->sum('rem'), 2)
             ];
-        })/* ->map(function ($item,) {
-            $item = collect($item);
-            $grand = [
-                'grand_total_amount' => round($item->sum($item['branch_total_amount']), 2),
-                'grand_total_amort' => round($item->sum('branch_total_amort'), 2),
-                'grand_total_monthly' => round($item->sum('branch_total_monthly'), 2),
-                'grand_total_expensed' => round($item->sum('branch_total_expensed'), 2),
-                'grand_total_unexpensed' => round($item->sum('branch_total_unexpensed'), 2),
-                'grand_total_amort_monthly' => round($item->sum('branch_total_amort_monthly'), 2),
-                'grand_total_used' => round($item->sum('branch_total_used'), 2),
-                'grand_total_due_amort' => round($item->sum('branch_total_due_amort'), 2),
-                'grand_total_sub_salvage' => round($item->sum('branch_total_sub_salvage'), 2),
-                'grand_total_rem' => round($item->sum('branch_total_rem'), 2)
-            ];
-            $item['grand'] = $grand;
-            return $item;
-        }) */->all();
+        })->all();
+
         $data = [
             'data' => $data,
             'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),

@@ -197,6 +197,7 @@
                                                         <h5>{{ $key }}</h5>
                                                     </td>
                                                 </tr>
+                                                <?php $grandtotal = 0;?>
                                                 @foreach ($row['subsidiaries'] as $i => $val)
                                                     @if ($key === $val['branch'])
                                                         <tr>
@@ -237,20 +238,11 @@
                                                                 </div>
                                                             </td>
                                                         </tr>
+
                                                     @endif
-                                                    <?php
 
-                                                    $total['grand']['total_amount'] += $val->sub_amount;
-                                                    $total['grand']['total_monthly'] += $val->monthly_amort;
-                                                    $total['grand']['total_amort'] += $val->sub_no_depre;
-                                                    $total['grand']['total_used'] += $val->sub_no_depre;
-                                                    $total['grand']['total_expensed'] += $val->expensed;
-                                                    $total['grand']['total_unexpensed'] += $val->unexpensed;
-                                                    $total['grand']['total_due_amort'] += $val->due_amort;
-                                                    $total['grand']['total_sub_salvage'] += $val->sub_salvage;
-                                                    $total['grand']['total_rem'] += $val->rem;
 
-                                                    $total['branch']['total_amount'] += $val->sub_amount;
+                                                    {{-- $total['branch']['total_amount'] += $val->sub_amount;
                                                     $total['branch']['total_monthly'] += $val->monthly_amort;
                                                     $total['branch']['total_amort'] += $val->sub_no_depre;
                                                     $total['branch']['total_used'] += $val->sub_no_amort;
@@ -259,9 +251,47 @@
                                                     $total['branch']['total_due_amort'] += $val->due_amort;
                                                     $total['branch']['total_sub_salvage'] += $val->sub_salvage;
                                                     $total['branch']['total_rem'] += $val->rem;
+                                                    $total['grand']['total_amount'] += $val->sub_amount;
+ --}}
 
-                                                    ?>
                                                 @endforeach
+
+                                                <?php
+
+                                                $total['branch']['total_amount']= $row['branch_total_amount'];
+                                                $total['branch']['total_amort']= $row['branch_total_amort'];
+                                                $total['branch']['total_monthly']= $row['branch_total_monthly'];
+                                                $total['branch']['total_expensed']= $row['branch_total_expensed'];
+                                                $total['branch']['total_unexpensed']= $row['branch_total_unexpensed'];
+                                                $total['branch']['total_monthly_amort']= $row['branch_total_amort_monthly'];
+                                                $total['branch']['total_used']= $row['branch_total_used'];
+                                                $total['branch']['total_due_amort']= $row['branch_total_due_amort'];
+                                                $total['branch']['total_sub_salvage']= $row['branch_total_sub_salvage'];
+                                                $total['branch']['total_rem'] = $row['branch_total_rem'];
+
+                                                $total['grand']['total_amount']+= $row['branch_total_amount'];
+                                                $total['grand']['total_amort']+= $row['branch_total_amort'];
+                                                $total['grand']['total_monthly']+= $row['branch_total_monthly'];
+                                                $total['grand']['total_expensed']+= $row['branch_total_expensed'];
+                                                $total['grand']['total_unexpensed']+= $row['branch_total_unexpensed'];
+                                                $total['grand']['total_monthly_amort']+= $row['branch_total_amort_monthly'];
+                                                $total['grand']['total_used']+= $row['branch_total_used'];
+                                                $total['grand']['total_due_amort']+= $row['branch_total_due_amort'];
+                                                $total['grand']['total_sub_salvage']+= $row['branch_total_sub_salvage'];
+                                                $total['grand']['total_rem'] += $row['branch_total_rem'];
+
+
+                                                $total['acct']['total_amount']+= $row['branch_total_amount'];
+                                                $total['acct']['total_amort']+= $row['branch_total_amort'];
+                                                $total['acct']['total_monthly']+= $row['branch_total_monthly'];
+                                                $total['acct']['total_expensed']+= $row['branch_total_expensed'];
+                                                $total['acct']['total_unexpensed']+= $row['branch_total_unexpensed'];
+                                                $total['acct']['total_monthly_amort']+= $row['branch_total_amort_monthly'];
+                                                $total['acct']['total_used']+= $row['branch_total_used'];
+                                                $total['acct']['total_due_amort']+= $row['branch_total_due_amort'];
+                                                $total['acct']['total_sub_salvage']+= $row['branch_total_sub_salvage'];
+                                                $total['acct']['total_rem'] += $row['branch_total_rem'];
+                                                ?>
                                                 <tr>
                                                     <td colspan=3>BRANCH TOTAL</td>
 
@@ -281,18 +311,25 @@
                                                     <td>0</td>
                                                     <td>0</td>
                                                 </tr>
+
                                             @endforeach
 
 
-                                           {{--  $total['acct']['total_amount'] += $total['branch']['total_amount'];
-                                                    $total['acct']['total_monthly'] += $total['branch']['total_monthly'];
-                                                    $total['acct']['total_amort'] += $total['branch']['total_amort'];
-                                                    $total['acct']['total_used'] += $total['branch']['total_used'];
-                                                    $total['acct']['total_expensed'] += $total['branch']['total_expensed']
-                                                    $total['acct']['total_unexpensed'] += $total['branch']['total_unexpensed'];
-                                                    $total['acct']['total_due_amort'] += $total['branch']['total_due_amort'];
-                                                    $total['acct']['total_sub_salvage'] += $total['branch']['total_sub_salvage'];
-                                                    $total['acct']['total_rem'] += $total['branch']['total_rem']; --}}
+
+                                            {{-- $total['grand']['total_amount']+= $total['branch']['total_amount'];
+                                                $total['grand']['total_amort']+= $row['branch_total_amort'];
+                                                $total['grand']['total_monthly']+= $row['branch_total_monthly'];
+                                                $total['grand']['total_expensed']+= $row['branch_total_expensed'];
+                                                $total['grand']['total_unexpensed']+= $row['branch_total_unexpensed'];
+                                                $total['grand']['total_monthly_amort']+= $row['branch_total_amort_monthly'];
+                                                $total['grand']['total_used']+= $row['branch_total_used'];
+                                                $total['grand']['total_due_amort']+= $row['branch_total_due_amort'];
+                                                $total['grand']['total_sub_salvage']+= $row['branch_total_sub_salvage'];
+                                                $total['grand']['total_rem']+= $row['branch_total_rem']; --}}
+
+
+
+
 
 
                                             @if (count($data) >= 3)
