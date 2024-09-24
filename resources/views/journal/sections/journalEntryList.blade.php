@@ -710,6 +710,13 @@
 
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Reference Book: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="voucher_book_name"></strong></h6>
+
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
                                             <div class="col-md-12">

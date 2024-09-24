@@ -934,8 +934,9 @@
                             var content = '';
                             $('#vjournal_date, #voucher_date').text(moment(v
                                 .journal_date).format('MMMM D, YYYY'));
-                            $('#vjournal_book_reference, #voucher_ref_no').text(v
+                            $('#vjournal_book_reference, #voucher_book_name').text(v
                                 .book_details.book_name);
+                            $('#voucher_ref_no').text(v.journal_no);
                             $('#vjournal_source, #voucher_source').text(v.source);
                             $('.vjournal_cheque').text((v.cheque_no) ? v.cheque_no :
                                 'NO CHEQUE');
