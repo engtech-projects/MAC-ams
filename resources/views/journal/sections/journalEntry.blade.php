@@ -417,6 +417,13 @@
 
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12">
+                                                    <h6 class="mb-4">Reference Book: &nbsp;&nbsp;&nbsp; <strong
+                                                            id="journal_voucher_ref_book"></strong></h6>
+
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
                                             <div class="col-md-12">
@@ -585,6 +592,7 @@
 
         // Initial call to set the correct height
         autoResizeTextarea();
+        document.getElementById('journal_date').value = new Date().toISOString().split('T')[0];
     </script>
 @endsection
 @section('footer-scripts')
