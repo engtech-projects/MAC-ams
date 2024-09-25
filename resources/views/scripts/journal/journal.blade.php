@@ -1393,6 +1393,8 @@
             // $('#journal_voucher_date').text($('#journal_date').val())
             $('#journal_voucher_date').text(moment($('#journal_date').val()).format('MMMM D, YYYY'));
             $('#journal_voucher_ref_no').text($('#LrefNo').html())
+            $('#journal_voucher_ref_book').text($('#book_id').find(":selected").text())
+
             $('#journal_voucher_source').text($('#source').val())
             $('#journal_voucher_particular').html($('#remarks').val().replace(/::/g,
                 '<br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'));
