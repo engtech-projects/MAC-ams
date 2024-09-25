@@ -417,6 +417,14 @@
         }
         $(document).on('click', '.remove-journalDetails', function(e) {
             $(this).parents('tr').remove();
+            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+            }));
+            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+            }));
+            getBalance()
+            checkTotalAndAmount()
         })
         $(document).on('submit', '#journalEntryForm', function(e) {
             e.preventDefault();
@@ -439,6 +447,9 @@
                     var field = $(v).children()
                     if ($(field[1]).find('.editable-row-item').val() == null) {
                         return alert("Account is required.");
+                    }
+                    if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3]).find('.editable-row-item').text() === "₱0.00") {
+                        return alert("Debit or credit amount is required.");
                     }
                     if ($(field[4]).find('.editable-row-item').val() == null) {
                         return alert("Subsidiary is required.");
@@ -728,7 +739,7 @@
 
             var edit_balance = document.getElementById("edit_balance_debit");
             var edit_bal = edit_balance.innerText;
-            if (details.lengt < 1) {
+            if (details.length < 1) {
                 return alert("Journal details is required.")
             }
 
@@ -886,6 +897,17 @@
                                     maximumFractionDigits: 2
                                 }));
                         });
+                        $(document).on('click', '.remove-journalDetails', function(e) {
+                            $(this).parents('tr').remove();
+                            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                                                minimumFractionDigits: 2
+                            }));
+                            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                                                minimumFractionDigits: 2
+                            }));
+                            getBalance()
+                            checkTotalAndAmount()
+                        })
                         $('.select-account').select2({
                             placeholder: 'Select',
                             allowClear: true,
