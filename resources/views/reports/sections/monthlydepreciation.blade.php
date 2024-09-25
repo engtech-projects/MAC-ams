@@ -34,7 +34,7 @@
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
-                    <form id="subsidiaryForm" method="get">
+                    <form id="" method="get">
                         @csrf
                         <input type="hidden" class="form-control form-control-sm rounded-0" name="sub_id" id="sub_id"
                             placeholder="">
@@ -141,22 +141,8 @@
                                         <tbody>
 
                                             <?php
+                                            $dataRow = null;
                                             $total = [
-                                                'branch' => [
-                                                    'total_amount' => 0,
-                                                    'total_monthly_amort' => 0,
-                                                    'total_monthly' => 0,
-                                                    'total_no_depre' => 0,
-                                                    'total_no_amort' => 0,
-                                                    'total_amort' => 0,
-                                                    'total_used' => 0,
-                                                    'total_expensed' => 0,
-                                                    'total_unexpensed' => 0,
-                                                    'total_due_amort' => 0,
-                                                    'total_sub_salvage' => 0,
-                                                    'total_rem' => 0,
-                                                    'total_inv' => 0,
-                                                ],
                                                 'grand' => [
                                                     'total_amount' => 0,
                                                     'total_monthly_amort' => 0,
@@ -190,100 +176,132 @@
                                             ];
                                             ?>
 
-                                            @foreach ($data as $key => $row)
+                                            @foreach ($data as $keyCategory => $row)
                                                 <tr>
                                                     <td colspan="4">
-                                                        <h5>{{ $key }}</h5>
+                                                        <h5>{{ $keyCategory }}</h5>
                                                     </td>
                                                 </tr>
-                                                <?php $grandtotal = 0;?>
-                                                @foreach ($row['subsidiaries'] as $i => $val)
-                                                    @if ($key === $val['branch'])
-                                                        <tr>
-                                                            <td>{{ $i += 1 }}</td>
-                                                            <td>{{ $val->sub_code . '-' . $val->sub_name }}</td>
-                                                            <td>{{ $val->sub_date }}</td>
-                                                            <td>{{ number_format($val->sub_amount, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->monthly_amort, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->sub_no_depre, 2, '.', ',') }}</td>
+                                                <?php $grandtotal = 0; ?>
+                                                @foreach ($row as $keyBranch => $cat)
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            <h5>{{ $keyBranch }}</h5>
+                                                        </td>
+                                                    </tr>
 
-                                                            <td>{{ number_format($val->sub_no_amort, 2, '.', ',') }}</td>
+                                                    <?php
+                                                    $category_id = null;
+                                                    $branch_id = null;
+                                                    $branchTotal = [
+                                                        'total_amount' => 0,
+                                                        'total_monthly_amort' => 0,
+                                                        'total_monthly' => 0,
+                                                        'total_no_depre' => 0,
+                                                        'total_no_amort' => 0,
+                                                        'total_amort' => 0,
+                                                        'total_used' => 0,
+                                                        'total_expensed' => 0,
+                                                        'total_unexpensed' => 0,
+                                                        'total_due_amort' => 0,
+                                                        'total_sub_salvage' => 0,
+                                                        'total_rem' => 0,
+                                                        'total_inv' => 0,
+                                                    ];
+                                                    ?>
+                                                    @foreach ($cat as $i => $val)
+                                                        @if ($keyBranch === $val['branch'] && $keyCategory === $val['sub_cat_name'])
+                                                            <?php $category_id = $val['sub_cat_id']; $branch_id = $val['branch_id'] ?>
+                                                            <tr>
+                                                                <td>{{ $i += 1 }}</td>
+                                                                <td>{{ $val->sub_code . '-' . $val->sub_name }}</td>
+                                                                <td>{{ $val->sub_date }}</td>
+                                                                <td>{{ number_format($val->sub_amount, 2, '.', ',') }}</td>
+                                                                <td>{{ number_format($val->monthly_amort, 2, '.', ',') }}
+                                                                </td>
+                                                                <td>{{ number_format($val->sub_no_depre, 2, '.', ',') }}
+                                                                </td>
 
-                                                            <td>{{ number_format($val->expensed, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->unexpensed, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->due_amort, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->sub_salvage, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
-                                                            <td>{{ number_format($val->no, 2, '.', ',') }}</td>
+                                                                <td>{{ number_format($val->sub_no_amort, 2, '.', ',') }}
+                                                                </td>
 
-                                                        </tr>
+                                                                <td>{{ number_format($val->expensed, 2, '.', ',') }}</td>
+                                                                <td>{{ number_format($val->unexpensed, 2, '.', ',') }}</td>
+                                                                <td>{{ number_format($val->due_amort, 2, '.', ',') }}</td>
+                                                                <td>{{ number_format($val->sub_salvage, 2, '.', ',') }}
+                                                                </td>
+                                                                <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
+                                                                <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
+                                                                <td>{{ number_format($val->no, 2, '.', ',') }}</td>
 
+                                                            </tr>
+                                                        @endif
+                                                        <?php
+                                                        $branchTotal['total_amount'] += $val->sub_amount;
+                                                        $branchTotal['total_monthly_amort'] += $val->monthly_amort;
+                                                        $branchTotal['total_monthly'] += $val->sub_no_depre;
+                                                        $branchTotal['total_no_amort'] += $val->sub_no_amort;
+                                                        $branchTotal['total_expensed'] += $val->expensed;
+                                                        $branchTotal['total_unexpensed'] += $val->unexpensed;
+                                                        $branchTotal['total_due_amort'] += $val->due_amort;
+                                                        $branchTotal['total_sub_salvage'] += $val->sub_salvage;
+                                                        $branchTotal['total_rem'] += $val->rem;
 
-                                                    @endif
+                                                        ?>
+                                                    @endforeach
+                                                    <tr>
+                                                        <td colspan=3>BRANCH TOTAL</td>
+
+                                                        <td>{{ number_format($branchTotal['total_amount'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_monthly_amort'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_monthly'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_no_amort'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_expensed'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_unexpensed'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_due_amort'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_sub_salvage'], 2, '.') }}
+                                                        </td>
+                                                        <td>{{ number_format($branchTotal['total_rem'], 2, '.') }}</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><button class='btn btn-danger'
+                                                                @click='post(@json(['total' => $branchTotal, 'category_id' => $category_id, 'branch_id' => $branch_id]))'>Post</button>
+                                                        </td>
+                                                    </tr>
+                                                    <?php
+                                                    $total['grand']['total_amount'] += $branchTotal['total_amount'];
+                                                    $total['grand']['total_amort'] += $branchTotal['total_monthly_amort'];
+                                                    $total['grand']['total_monthly'] += $branchTotal['total_monthly'];
+                                                    $total['grand']['total_expensed'] += $branchTotal['total_expensed'];
+                                                    $total['grand']['total_unexpensed'] += $branchTotal['total_unexpensed'];
+                                                    $total['grand']['total_monthly_amort'] += $branchTotal['total_monthly_amort'];
+                                                    $total['grand']['total_used'] += $branchTotal['total_no_amort'];
+                                                    $total['grand']['total_due_amort'] += $branchTotal['total_due_amort'];
+                                                    $total['grand']['total_sub_salvage'] += $branchTotal['total_sub_salvage'];
+                                                    $total['grand']['total_rem'] += $branchTotal['total_rem'];
+                                                    $total['acct']['total_amount'] += $branchTotal['total_amount'];
+                                                    $total['acct']['total_amort'] += $branchTotal['total_monthly_amort'];
+                                                    $total['acct']['total_monthly'] += $branchTotal['total_monthly'];
+                                                    $total['acct']['total_expensed'] += $branchTotal['total_expensed'];
+                                                    $total['acct']['total_unexpensed'] += $branchTotal['total_unexpensed'];
+                                                    $total['acct']['total_monthly_amort'] += $branchTotal['total_monthly_amort'];
+                                                    $total['acct']['total_used'] += $branchTotal['total_no_amort'];
+                                                    $total['acct']['total_due_amort'] += $branchTotal['total_due_amort'];
+                                                    $total['acct']['total_sub_salvage'] += $branchTotal['total_sub_salvage'];
+                                                    $total['acct']['total_rem'] += $branchTotal['total_rem'];
+
+                                                    ?>
                                                 @endforeach
-
-                                                <?php
-
-                                                $total['branch']['total_amount']= $row['branch_total_amount'];
-                                                $total['branch']['total_amort']= $row['branch_total_amort'];
-                                                $total['branch']['total_monthly']= $row['branch_total_monthly'];
-                                                $total['branch']['total_expensed']= $row['branch_total_expensed'];
-                                                $total['branch']['total_unexpensed']= $row['branch_total_unexpensed'];
-                                                $total['branch']['total_monthly_amort']= $row['branch_total_amort_monthly'];
-                                                $total['branch']['total_used']= $row['branch_total_used'];
-                                                $total['branch']['total_due_amort']= $row['branch_total_due_amort'];
-                                                $total['branch']['total_sub_salvage']= $row['branch_total_sub_salvage'];
-                                                $total['branch']['total_rem'] = $row['branch_total_rem'];
-
-                                                $total['grand']['total_amount']+= $row['branch_total_amount'];
-                                                $total['grand']['total_amort']+= $row['branch_total_amort'];
-                                                $total['grand']['total_monthly']+= $row['branch_total_monthly'];
-                                                $total['grand']['total_expensed']+= $row['branch_total_expensed'];
-                                                $total['grand']['total_unexpensed']+= $row['branch_total_unexpensed'];
-                                                $total['grand']['total_monthly_amort']+= $row['branch_total_amort_monthly'];
-                                                $total['grand']['total_used']+= $row['branch_total_used'];
-                                                $total['grand']['total_due_amort']+= $row['branch_total_due_amort'];
-                                                $total['grand']['total_sub_salvage']+= $row['branch_total_sub_salvage'];
-                                                $total['grand']['total_rem'] += $row['branch_total_rem'];
-
-
-                                                $total['acct']['total_amount']+= $row['branch_total_amount'];
-                                                $total['acct']['total_amort']+= $row['branch_total_amort'];
-                                                $total['acct']['total_monthly']+= $row['branch_total_monthly'];
-                                                $total['acct']['total_expensed']+= $row['branch_total_expensed'];
-                                                $total['acct']['total_unexpensed']+= $row['branch_total_unexpensed'];
-                                                $total['acct']['total_monthly_amort']+= $row['branch_total_amort_monthly'];
-                                                $total['acct']['total_used']+= $row['branch_total_used'];
-                                                $total['acct']['total_due_amort']+= $row['branch_total_due_amort'];
-                                                $total['acct']['total_sub_salvage']+= $row['branch_total_sub_salvage'];
-                                                $total['acct']['total_rem'] += $row['branch_total_rem'];
-                                                ?>
-                                                <tr>
-                                                    <td colspan=3>BRANCH TOTAL</td>
-
-                                                    <td>{{ number_format($total['branch']['total_amount'], 2, '.') }}</td>
-                                                    <td>{{ number_format($total['branch']['total_monthly'], 2, '.') }}</td>
-                                                    <td>{{ number_format($total['branch']['total_amort'], 2, '.') }}</td>
-                                                    <td>{{ number_format($total['branch']['total_used'], 2, '.') }}</td>
-                                                    <td>{{ number_format($total['branch']['total_expensed'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['branch']['total_unexpensed'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['branch']['total_due_amort'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['branch']['total_sub_salvage'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['branch']['total_rem'], 2, '.') }}</td>
-                                                    <td>0</td>
-                                                    <td>0</td>
-                                                </tr>
-                                                <tr>
-                                                <td><button class='btn btn-danger' @click="post">Post</button></td>
-                                            </tr>
-
                                             @endforeach
-
                                             @if (count($data) >= 3)
                                                 <tr>
                                                     <td colspan=4>ACC. TOTAL</td>
@@ -300,7 +318,6 @@
                                                     <td>{{ number_format($total['acct']['total_rem'], 2, '.') }}</td>
                                                     <td>0</td>
                                                     <td>0</td>
-                                                </tr>
                                                 </tr>
                                                 <tr>
                                                     <td colspan=3>GRAND TOTAL</td>
@@ -357,17 +374,14 @@
                 url: "{{ route('reports.post-monthly-depreciation') }}",
             },
             methods: {
-                post:function() {
-                    var data = {
-                        data:@json($data),
-                        total:@json($total)
-                        };
-                    axios.post(this.url,data, {
-                        headers:{
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+                post: function(data) {
+                    axios.post(this.url, data, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
                         }
                     }).then(response => {
-                        console.log(response)
+                        toastr.success(response.data.message);
                     }).catch(err => {
                         console.error(err)
                     })

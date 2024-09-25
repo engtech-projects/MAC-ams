@@ -12,6 +12,11 @@ class SubsidiaryCategory extends Model
     protected $table = 'subsidiary_category';
     protected $primaryKey = 'sub_cat_id';
 
+    const CAT_INSUR = 15;
+    const CAT_SUPPLY = 47;
+    const CAT_AMORT = 45;
+    const CAT_DEPRE = 44;
+
     protected $fillable = [
         'sub_cat_name',
         'sub_cat_type',

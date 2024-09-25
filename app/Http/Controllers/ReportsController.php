@@ -167,12 +167,16 @@ class ReportsController extends MainController
 
 
         $data = $result->map(function ($value) use ($branch) {
+
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
             $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
             $monthlyAmort = $value->sub_amount / $value->sub_no_depre;
             $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
+            $value['branch_id'] = $branch->branch_id;
+            $value['sub_cat_name'] = $value->subsidiaryCategory->sub_cat_name;
+            $value['sub_cat_id'] = $value->subsidiaryCategory->sub_cat_id;
             $value['monthly_amort'] = $monthlyAmort;
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($value->sub_amount - $value->expensed);
@@ -182,8 +186,10 @@ class ReportsController extends MainController
             $value['inv'] = 0;
             $value['no'] = 0;
             return $value;
-        })->groupBy('branch')->map(function ($item) {
-
+        })->groupBy('sub_cat_name')->map(function ($value) {
+            return $value->groupBy('branch');
+        });
+        /* ->groupBy('branch')->map(function ($item) {
             return [
                 'subsidiaries' => $item,
                 'branch_total_amount' => round($item->sum('sub_amount'), 2),
@@ -197,7 +203,7 @@ class ReportsController extends MainController
                 'branch_total_sub_salvage' => round($item->sum('sub_salvage'), 2),
                 'branch_total_rem' => round($item->sum('rem'), 2)
             ];
-        })->all();
+        })->all(); */
 
         $data = [
             'data' => $data,
@@ -214,10 +220,69 @@ class ReportsController extends MainController
 
     public function postMonthlyDepreciation(Request $request)
     {
-        $data = $request->data;
-        $total = $request->total;
+        $data = $request;
 
-        dd($data);
+        $subsidiary = SubsidiaryCategory::with('accounts')->where('sub_cat_id', $request->category_id)->first();
+
+        $journalEntry = new JournalEntry();
+
+
+        $data = $journalEntry->create([
+            'journal_no' => 11,
+            'journal_date' => now()->format('Y-m-d'),
+            'branch_id' => $request->branch_id,
+            'book_id' => $journalEntry::DEPRECIATION_BOOK,
+            'source' => $journalEntry::DEPRECIATION_SOURCE,
+            'cheque_date' => null,
+            'cheque_no' => null,
+            'status' => $journalEntry::STATUS_POSTED,
+            'payee' => null,
+            'remarks' => null,
+            'amount' => $request->total['total_amount'],
+        ]);
+
+        $accounts = $subsidiary->accounts;
+
+        $journalDetails = [];
+
+        foreach ($accounts as $account) {
+            $details = [
+                'account_id' => $account->account_id,
+                'journal_details_title' => $account->account_name,
+                'status' => JournalEntry::STATUS_POSTED,
+                'journal_details_account_no' => $account->account_number,
+                'journal_details_ref_no' => JournalEntry::DEPRECIATION_BOOK,
+            ];
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
+                $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_amount'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
+            }
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
+                $details['journal_details_debit'] = $account->account_number == 1585 ? $request->total['total_amount'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
+            }
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+                $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_amount'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
+            }
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_DEPRE) {
+                if ($account->account_number == 5285) {
+                    $details['journal_details_debit'] = $request->total['total_amount'];
+                    $details['journal_details_credit'] = 0;
+                } else {
+                    $details['journal_details_debit'] = 0;
+                    $details['journal_details_credit'] = $request->total['total_monthly_amort'];
+                }
+            }
+            $journalDetails[] = $details;
+            continue;
+        }
+        try {
+            $data->details()->createMany($journalDetails);
+            return response()->json(['message' => 'Successfully posted.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to save journal entry details. Error: ' . $e->getMessage()], 500);
+        }
     }
 
 
