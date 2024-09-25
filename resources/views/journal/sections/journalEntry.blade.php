@@ -585,6 +585,7 @@
 
         // Initial call to set the correct height
         autoResizeTextarea();
+        document.getElementById('journal_date').value = new Date().toISOString().split('T')[0];
     </script>
 @endsection
 @section('footer-scripts')

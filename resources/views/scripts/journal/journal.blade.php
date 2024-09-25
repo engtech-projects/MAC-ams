@@ -1294,6 +1294,9 @@
         });
 
         $(document).on('click', '#open_voucher', function(e) {
+            if ($('#journal_date').val() > new Date().toISOString().split('T')[0]) {
+                return alert("Journal Date must be current date or earlier.");
+            }
             e.preventDefault();
             setVoucherData();
         });
@@ -1388,7 +1391,7 @@
             $('#journal_voucher_pay').text($('#payee').val())
             $('#journal_voucher_branch').text($('#branch_id').find(":selected").text())
             // $('#journal_voucher_date').text($('#journal_date').val())
-            $('#journal_voucher_date').text(moment($('#journal_date')).format('MMMM D, YYYY'));
+            $('#journal_voucher_date').text(moment($('#journal_date').val()).format('MMMM D, YYYY'));
             $('#journal_voucher_ref_no').text($('#LrefNo').html())
             $('#journal_voucher_source').text($('#source').val())
             $('#journal_voucher_particular').html($('#remarks').val().replace(/::/g,
