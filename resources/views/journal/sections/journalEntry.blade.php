@@ -114,7 +114,7 @@
                                 <label class="label-normal" for="date">Journal Date</label>
                                 <div class="input-group">
                                     <input type="date" class="form-control form-control-sm rounded-0" name="journal_date"
-                                        id="journal_date" placeholder="Journal Date" required>
+                                        id="journal_date" placeholder="Journal Date" required onfocus="this.max = new Date().toISOString().split('T')[0]">
                                 </div>
                             </div>
                             @if (Gate::allows('manager'))
