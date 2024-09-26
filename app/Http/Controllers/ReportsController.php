@@ -254,20 +254,20 @@ class ReportsController extends MainController
                 'journal_details_ref_no' => JournalEntry::DEPRECIATION_BOOK,
             ];
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
-                $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_amount'] : 0;
+                $details['journal_details_debit'] = $account->account_number == 5210 && $request->branch_id == 4 ? $request->total['total_amount'] / 3 : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
             }
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
-                $details['journal_details_debit'] = $account->account_number == 1585 ? $request->total['total_amount'] : 0;
+                $details['journal_details_debit'] = $account->account_number == 1585 && $request->branch_id == 4 ? $request->total['total_amount'] / 3 : 0;
                 $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
             }
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
-                $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_amount'] : 0;
+                $details['journal_details_debit'] = $account->account_number == 5280 && $request->branch_id == 4 ? $request->total['total_amount'] / 3 : 0;
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
             }
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_DEPRE) {
-                if ($account->account_number == 5285) {
-                    $details['journal_details_debit'] = $request->total['total_amount'];
+                if ($account->account_number == 5285 && $request->branch_id == 4) {
+                    $details['journal_details_debit'] = $request->total['total_amount'] / 3;
                     $details['journal_details_credit'] = 0;
                 } else {
                     $details['journal_details_debit'] = 0;
