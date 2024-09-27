@@ -1094,8 +1094,18 @@
 
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
+            
+            var s_status = $('#s_status').val(); // Get the value of 's_status' select input
+            var s_branch_id = $('#s_branch_id').val(); // Get the value of 's_branch_id' select input
+            
             var s_data = $(this).serialize();
-            $.ajax({
+
+            // Condition: If 's_status' is 'unposted', 's_branch_id' is required
+            if (s_status === 'unposted' && (!s_branch_id || s_branch_id === '')) {
+                alert('Please select a branch for unposted status.');
+                return false; // Prevent form submission if the condition is not met
+            }else{
+                $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -1148,6 +1158,8 @@
                     toastr.error('Error');
                 }
             });
+            }
+            
         });
         $(document).on('blur', '#cheque_no', function(e) {
             e.preventDefault();

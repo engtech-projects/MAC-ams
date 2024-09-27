@@ -72,12 +72,75 @@ class journalEntry extends Model
         if ($journal_payee != '') {
             $query->where('payee', $journal_payee);
         }
+        
+        // if ($status == '' && $from != '' && $to !='') {
+        //     $query->whereBetween('journal_date', [$from,$to]);
+
+        //     if ($journal_no != ''){
+        //         $query->orWhere('journal_no', $journal_no);
+        //     }
+
+        // }
+        
+        
         if ($from != '' && $to != '') {
             $query->whereBetween('journal_date', [$from, $to]);
             if ($journal_no != '') {
                 $query->orWhere('journal_no', $journal_no);
             }
         }
+        if ($book_id != '') {
+            $query->where('book_id', $book_id);
+        }
+        if ($branch_id != '') {
+            $query->where('branch_id', $branch_id);
+        }
+        if ($journal_no != '') {
+            $query->where('journal_no', $journal_no);
+        }
+        if ($order != '') {
+            $query->orderBy('journal_date', $order);
+        }
+        $result = $query->get();
+
+
+        return $query->get();
+    }
+
+    public static function fetchs($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'ASC', $journal_no = '', $journal_source = '', $journal_payee = '')
+    {
+        if (!$branch_id && !Gate::allows('manager')) {
+            $branch_id = session()->get('auth_user_branch');
+        }
+
+        $query = journalEntry::with(['journalDetails', 'bookDetails']);
+        // $query = journalEntry::with(['bookDetails']);
+        if ($status != '') {
+            $query->where('status', $status);
+        }
+        if ($journal_source != '') {
+            $query->where('source', $journal_source);
+        }
+        if ($journal_payee != '') {
+            $query->where('payee', $journal_payee);
+        }
+        
+        if (($status == '' || $status == 'posted') && $from != '' && $to !='') {
+            $query->whereBetween('journal_date', [$from,$to]);
+
+            if ($journal_no != ''){
+                $query->orWhere('journal_no', $journal_no);
+            }
+
+        }
+        
+        
+        // if ($from != '' && $to != '') {
+        //     $query->whereBetween('journal_date', [$from, $to]);
+        //     if ($journal_no != '') {
+        //         $query->orWhere('journal_no', $journal_no);
+        //     }
+        // }
         if ($book_id != '') {
             $query->where('book_id', $book_id);
         }
