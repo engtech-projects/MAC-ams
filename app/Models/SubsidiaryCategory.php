@@ -27,4 +27,8 @@ class SubsidiaryCategory extends Model
     {
         return $this->belongsToMany(Accounts::class, 'subsidiary_category_accounts', 'sub_cat_id', 'account_id');
     }
+
+    public function subsidiaries() {
+        return $this->hasMany(Subsidiary::class,'sub_cat_id');
+    }
 }

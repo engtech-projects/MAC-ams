@@ -36,8 +36,6 @@
                 <div class="col-md-12">
                     <form id="" method="get">
                         @csrf
-                        <input type="hidden" class="form-control form-control-sm rounded-0" name="sub_id" id="sub_id"
-                            placeholder="">
                         <div class="row">
                             <div class="col-md-8 frm-header">
                                 <h4><b>Monthly Depreciation</b></h4>
@@ -193,6 +191,7 @@
                                                     <?php
                                                     $category_id = null;
                                                     $branch_id = null;
+                                                    $branch_code = null;
                                                     $branchTotal = [
                                                         'total_amount' => 0,
                                                         'total_monthly_amort' => 0,
@@ -212,6 +211,7 @@
                                                     @foreach ($cat as $i => $val)
                                                         @if ($keyBranch === $val['branch'] && $keyCategory === $val['sub_cat_name'])
                                                             <?php $category_id = $val['sub_cat_id']; $branch_id = $val['branch_id'] ?>
+                                                            <?php $branch_code = $val['branch_code']; ?>
                                                             <tr>
                                                                 <td>{{ $i += 1 }}</td>
                                                                 <td>{{ $val->sub_code . '-' . $val->sub_name }}</td>
@@ -272,9 +272,17 @@
                                                         <td>0</td>
                                                         <td>0</td>
                                                     </tr>
+                                                    <?php $data = [
+                                                        'total' => $branchTotal,
+                                                        'category_id' => $category_id,
+                                                        'branch_id' => $branch_id,
+                                                        'branch_code' => $branch_code,
+                                                        'as_of' => $as_of
+                                                ];?>
+
                                                     <tr>
                                                         <td><button class='btn btn-danger'
-                                                                @click='post(@json(['total' => $branchTotal, 'category_id' => $category_id, 'branch_id' => $branch_id]))'>Post</button>
+                                                                @click='post(@json($data))'>Post</button>
                                                         </td>
                                                     </tr>
                                                     <?php
