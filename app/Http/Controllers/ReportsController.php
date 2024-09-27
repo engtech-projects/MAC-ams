@@ -256,34 +256,37 @@ class ReportsController extends MainController
             ];
 
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
-                $details['journal_details_debit'] = $account->account_number == 5210 ? round($request->total['total_amount'], 2) : 0;
-                $details['journal_details_credit'] = $account->account_number == 1415 ? round($request->total['total_monthly'], 2) : 0;
+                $details['journal_details_debit'] = $account->account_number == 5210 ? round($request->total['total_amount'], 2) : 0.0;
+                $details['journal_details_credit'] = $account->account_number == 1415 ? round($request->total['total_monthly'], 2) : 0.0;
+
             }
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
-                $details['journal_details_debit'] = $account->account_number == 5185 ? round($request->total['total_amount'], 2) : 0;
-                $details['journal_details_credit'] = $account->account_number == 1410 ? round($request->total['total_monthly'], 2) : 0;
+                $details['journal_details_debit'] = $account->account_number == 5185 ? round($request->total['total_amount'], 2) : 0.0;
+                $details['journal_details_credit'] = $account->account_number == 1410 ? round($request->total['total_monthly'], 2) : 0.0;
             }
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
-                $details['journal_details_debit'] = $account->account_number == 5280 ? round($request->total['total_amount'], 2) : 0;
-                $details['journal_details_credit'] = $account->account_number == 1570 ? round($request->total['total_monthly'], 2) : 0;
+                $details['journal_details_debit'] = $account->account_number == 5280 ? round($request->total['total_amount'], 2) : 0.0;
+                $details['journal_details_credit'] = $account->account_number == 1570 ? round($request->total['total_monthly'], 2) : 0.0;
             }
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_DEPRE) {
                 if ($account->account_number == 5285) {
-                    $details['journal_details_debit'] = round($request->total['total_amount'] / 3, 2);
-                    $details['journal_details_credit'] = 0;
+                    $details['journal_details_debit'] = round($request->total['total_amount'], 2);
+                    $details['journal_details_credit'] = 0.0;
                 } else {
-                    $details['journal_details_debit'] = 0;
+                    $details['journal_details_debit'] = 0.0;
                     $details['journal_details_credit'] = round($request->total['total_monthly'], 2);
                 }
             }
             if ($request->branch_id === 4) {
-                $details['journal_details_debit'] = round($request->total['total_amount'] / 3, 2);
+                $details['journal_details_debit'] = round($details['journal_details_debit']  / 3, 2);
 
             }
+
 
             $journalDetails[] = $details;
             continue;
         }
+
         try {
             $data->details()->createMany($journalDetails);
             return response()->json(['message' => 'Successfully posted.']);
