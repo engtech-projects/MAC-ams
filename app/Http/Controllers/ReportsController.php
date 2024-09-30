@@ -220,15 +220,15 @@ class ReportsController extends MainController
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
         } elseif ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
-        }else if($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+        } else if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
-        }else {
-            $accountName = Accounts::where('account_number',5285)->pluck('account_name')->first();
+        } else {
+            $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
         }
-        $lastEntry = JournalEntry::where('book_id',5)->orderBy('journal_id', 'DESC')->pluck('journal_no')->first();
-        $series = explode('-',$lastEntry);
-        $lastSeries = (int) $series[1]+1;
-        $journalNumber = $series[0].'-'.str_pad($lastSeries,6,'0', STR_PAD_LEFT);
+        $lastEntry = JournalEntry::where('book_id', 5)->where('journal_no', '!=', "")->orderBy('journal_id', 'DESC')->pluck('journal_no')->first();
+        $series = explode('-', $lastEntry);
+        $lastSeries = (int) $series[1] + 1;
+        $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
         $data = $journalEntry->create([
             'journal_no' => $journalNumber,
             'journal_date' => now()->format('Y-m-d'),
@@ -236,7 +236,7 @@ class ReportsController extends MainController
             'book_id' => $journalEntry::DEPRECIATION_BOOK,
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
-            'remarks' => 'Representing Month End Schedule As of '. $request->as_of . '-'. $accountName,
+            'remarks' => 'Representing Month End Schedule As of ' . $request->as_of . '-' . $accountName,
             'amount' => $request->total['total_amount'],
         ]);
 
@@ -258,7 +258,6 @@ class ReportsController extends MainController
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? round($request->total['total_amount'], 2) : 0.0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? round($request->total['total_monthly'], 2) : 0.0;
-
             }
             if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
                 $details['journal_details_debit'] = $account->account_number == 5185 ? round($request->total['total_amount'], 2) : 0.0;
@@ -279,7 +278,6 @@ class ReportsController extends MainController
             }
             if ($request->branch_id === 4) {
                 $details['journal_details_debit'] = round($details['journal_details_debit']  / 3, 2);
-
             }
 
 
