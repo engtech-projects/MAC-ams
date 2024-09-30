@@ -312,7 +312,7 @@
                                             @endforeach
                                             @if (count($data) >= 3)
                                                 <tr>
-                                                    <td colspan=4>ACC. TOTAL</td>
+                                                    <td colspan=3>ACC. TOTAL</td>
                                                     <td>{{ number_format($total['acct']['total_amount'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}</td>
@@ -326,6 +326,7 @@
                                                     <td>{{ number_format($total['acct']['total_rem'], 2, '.') }}</td>
                                                     <td>0</td>
                                                     <td>0</td>
+
                                                 </tr>
                                                 <tr>
                                                     <td colspan=3>GRAND TOTAL</td>
