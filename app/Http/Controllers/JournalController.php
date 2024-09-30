@@ -118,7 +118,7 @@ class JournalController extends MainController
             $journal->details()->createMany($request->details);
         });
         $journal->refresh();
-        return json_encode(['message' => 'update', 'id' => $journal->journal_id]);
+        return json_encode(['message' => 'Journal Entry updated successfully.', 'id' => $journal->journal_id]);
     }
 
     public function JournalEntryPostUnpost(Request $request)
