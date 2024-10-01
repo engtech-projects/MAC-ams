@@ -245,7 +245,6 @@ class ReportsController extends MainController
         $journalDetails = [];
 
         foreach ($accounts as $account) {
-            dd($request);
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
