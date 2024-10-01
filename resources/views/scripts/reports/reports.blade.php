@@ -793,6 +793,7 @@
                                 '');
                             $('#vjournal_branch, #voucher_branch').text(v.branch
                                 .branch_name);
+                            $('#voucher_ref_no').text(v.journal_no);
                             $('.vjournal_cheque_date').text((v.cheque_date) ?
                                 moment(v.cheque_date).format('MM/DD/YYYY') :
                                 'NO CHEQUE');

@@ -198,7 +198,7 @@
                             <div class="container-fluid ">
                                 <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-8 frm-header">
+                                        <div class="col-md-4 frm-header">
                                             <h4><b>Journal Entry (Preview)</b></h4>
                                         </div>
                                         <div class="col-md-4 frm-header">
@@ -207,12 +207,21 @@
                                                 <label class="label-bold" id="vjournal_date"></label>
                                             </div>
                                         </div>
+
+                                        <div class="col-md-4 frm-header">
+                                            <label class="label-bold label-sty" for="date">Journal Reference No</label>
+                                            <div class="input-group">
+                                                <label class="label-bold" id="voucher_ref_no"></label>
+                                            </div>
+                                        </div>
+                                        
+                                        
                                         <div class="col-md-3 col-xs-12">
                                             <div class="box">
                                                 <div class="form-group">
                                                     <label class="label-bold label-sty" for="branch_id">Branch</label>
                                                     <div class="input-group">
-                                                        <label class="label-normal" id="vjournal_branch"></label>
+                                                        <label class="label-normal text-bold" id="vjournal_branch"></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -228,6 +237,9 @@
                                                     <input type="hidden" name="book_id" id="journalEntryBookId">
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="col-md-3 col-xs-12">
+                                            
                                         </div>
                                         <div class="col-md-2 col-xs-12">
                                             <div class="box">
