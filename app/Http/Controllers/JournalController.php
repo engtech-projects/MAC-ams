@@ -137,7 +137,7 @@ class JournalController extends MainController
     public function searchJournalEntry(Request $request)
     {
         // Fetch journal entries
-        $journalEntries = JournalEntry::fetchs(
+        $journalEntries = JournalEntry::fetch(
             $request->s_status,
             $request->s_from,
             $request->s_to,
