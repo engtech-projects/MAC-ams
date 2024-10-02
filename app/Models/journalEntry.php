@@ -19,6 +19,8 @@ class journalEntry extends Model
 
     const STATUS_POSTED = 'posted';
     const CASH_RECEIVED_ACC = [];
+    const DEPRECIATION_BOOK = 5;
+    const DEPRECIATION_SOURCE = 'SCHEDULE';
 
     protected $fillable = [
         'journal_no',

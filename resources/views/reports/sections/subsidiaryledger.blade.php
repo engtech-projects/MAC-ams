@@ -254,15 +254,11 @@
 
                             <div v-show="reportType=='subsidiary_per_account'" class="col-md-3" >
                                 <div class="box">
-                                    <div class="form-group" style="width: 100%;">
-                                        <label class="label-normal" for="sub_name">Account Title</label>
-                                        <div class="input-group" style="width: 100% !important;">
-                                            <select 
-                                                name="account_id"
-                                                class="select2 form-control form-control-sm" 
-                                                id="subsidiaryFilterAccountTitle"
-                                                style="width: 100% !important;"
-                                            >
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <select v-model="filter.account_id" name="account_id" class="form-control form-control-sm"
+                                                id="gender select-account">
+                                                <option value="" disabled selected>-Select Account-</option>
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
                                                     @if ($account->type == 'L' || $account->type == 'R')
@@ -275,6 +271,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="col-md-2 col-xs-12">

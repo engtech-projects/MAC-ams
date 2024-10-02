@@ -154,6 +154,152 @@ class ReportsController extends MainController
     }
 
 
+    public function monthlyDepreciation(Request $request)
+    {
+
+
+        $branches = Branch::all();
+        $date = explode("-", $request->sub_date);
+
+        $subsidiary = new Subsidiary();
+        $branch = Branch::find($request->branch_id);
+        $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
+
+
+        $data = $result->map(function ($value) use ($branch) {
+
+            if ($value->sub_no_depre == 0) {
+                $value->sub_no_depre = 1;
+            }
+            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
+            $monthlyAmort = $value->sub_amount / $value->sub_no_depre;
+            $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
+            $value['branch_code'] = $branch->branch_code;
+            $value['branch_id'] = $branch->branch_id;
+            $value['sub_cat_name'] = $value->subsidiaryCategory->sub_cat_name;
+            $value['sub_cat_id'] = $value->subsidiaryCategory->sub_cat_id;
+            $value['monthly_amort'] = $monthlyAmort;
+            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
+            $value['unexpensed'] = round($value->sub_amount - $value->expensed);
+            $value['due_amort'] = round($value->sub_no_amort, 2);
+
+            $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
+            $value['inv'] = 0;
+            $value['no'] = 0;
+            return $value;
+        })->groupBy('sub_cat_name')->map(function ($value) {
+            return $value->groupBy('branch');
+        });
+        $data = [
+            'data' => $data,
+            'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
+            'as_of' => isset($request->sub_date) ? $request->sub_date : null,
+            'branches' => $branches,
+            'title' => 'MAC-AMS | Monthly Depreciation',
+        ];
+        return view('reports.sections.monthlyDepreciation', $data);
+        return response()->json([
+            'data' => $data,
+            'as_of' => isset($request->sub_date) ? $request->sub_date : null,
+            'message' => 'Successfully Fetched'
+        ]);
+    }
+
+    public function postMonthlyDepreciation(Request $request)
+    {
+
+
+        $branchCode = $request->branch_code;
+        $subId = Subsidiary::where('sub_code', $branchCode)->pluck('sub_id')->first();
+        $subsidiary = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
+        $journalEntry = new JournalEntry();
+
+        $accountName = null;
+
+        if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
+            $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
+        } elseif ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
+            $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
+        } else if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+            $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
+        } else {
+            $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
+        }
+        $lastEntry = JournalEntry::where('book_id', 5)->orderBy('journal_id', 'DESC')->pluck('journal_no')->first();
+        $series = explode('-', $lastEntry);
+        $lastSeries = (int) $series[1] + 1;
+        $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
+        $data = $journalEntry->create([
+            'journal_no' => $journalNumber,
+            'journal_date' => now()->format('Y-m-d'),
+            'branch_id' => $request->branch_id,
+            'book_id' => $journalEntry::DEPRECIATION_BOOK,
+            'source' => $journalEntry::DEPRECIATION_SOURCE,
+            'status' => $journalEntry::STATUS_POSTED,
+            'remarks' => 'Representing Month End Schedule As of ' . $request->as_of . '-' . $accountName,
+            'amount' => $request->total['total_monthly'],
+        ]);
+
+        $accounts = $subsidiary->accounts;
+
+        $journalDetails = [];
+
+        foreach ($accounts as $account) {
+            $details = [
+                'account_id' => $account->account_id,
+                'journal_details_title' => $account->account_name,
+                'subsidiary_id' => $subId,
+                'status' => JournalEntry::STATUS_POSTED,
+                'journal_details_account_no' => $account->account_number,
+                'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
+
+            ];
+
+
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
+                $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_monthly_amort'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
+            }
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
+                $details['journal_details_debit'] = $account->account_number == 5185 ? $request->total['total_monthly_amort'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
+            }
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+                $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_monthly_amort'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
+            }
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_DEPRE) {
+                if ($account->account_number == 5285) {
+                    $details['journal_details_debit'] = $request->total['total_monthly_amort'];
+                    $details['journal_details_credit'] = 0.0;
+                } else {
+                    $details['journal_details_debit'] = 0.0;
+                    $details['journal_details_credit'] = $request->total['total_monthly_amort'];
+                }
+            }
+            round($details['journal_details_debit'], 2);
+            round($details['journal_details_credit'], 2);
+            if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
+                $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
+                $details["subsidiary_id"] = 1;
+                $journalDetails[] = $details;
+                $details["subsidiary_id"] = 2;
+                $journalDetails[] = $details;
+            } else {
+                $journalDetails[] = $details;
+            }
+            continue;
+        }
+
+        try {
+            $data->details()->createMany($journalDetails);
+            return response()->json(['message' => 'Successfully posted.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to save journal entry'], 500);
+        }
+    }
+
+
     public function subsidiaryLedgerReports(Request $request)
     {
         $filter = $request->input();
