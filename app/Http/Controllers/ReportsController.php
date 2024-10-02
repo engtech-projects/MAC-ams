@@ -277,15 +277,17 @@ class ReportsController extends MainController
                     $details['journal_details_credit'] = $request->total['total_monthly_amort'];
                 }
             }
-
-            if ($request->branch_id === 4) {
-                $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
-            }
-
             round($details['journal_details_debit'], 2);
             round($details['journal_details_credit'], 2);
-
-            $journalDetails[] = $details;
+            if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
+                $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
+                $details["subsidiary_id"] = 1;
+                $journalDetails[] = $details;
+                $details["subsidiary_id"] = 2;
+                $journalDetails[] = $details;
+            } else {
+                $journalDetails[] = $details;
+            }
             continue;
         }
 
