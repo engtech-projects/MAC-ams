@@ -135,6 +135,7 @@
                                             <th>Rem.</th>
                                             <th>Inv.</th>
                                             <th>No.</th>
+                                            <th>Action</th>
                                         </thead>
                                         <tbody>
 
@@ -212,6 +213,7 @@
                                                         @if ($keyBranch === $val['branch'] && $keyCategory === $val['sub_cat_name'])
                                                             <?php $category_id = $val['sub_cat_id']; $branch_id = $val['branch_id'] ?>
                                                             <?php $branch_code = $val['branch_code']; ?>
+                                                            <?php $subId = $val['sub_id']; ?>
                                                             <tr>
                                                                 <td>{{ $i += 1 }}</td>
                                                                 <td>{{ $val->sub_code . '-' . $val->sub_name }}</td>
@@ -233,6 +235,12 @@
                                                                 <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
                                                                 <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
                                                                 <td>{{ number_format($val->no, 2, '.', ',') }}</td>
+                                                                <td>
+                                                                    {{-- <button class="btn btn-danger btn-xs"
+                                                                    @click='deleteSub(@json($subId))'>
+                                                                    <i class="fa fa-trash fa-xs"></i>
+                                                                    </button> --}}
+                                                                </td>
 
                                                             </tr>
                                                         @endif
@@ -281,7 +289,7 @@
                                                 ];?>
 
                                                     <tr>
-                                                        <td><button class='btn btn-danger'
+                                                        <td><button class='btn btn-primary'
                                                                 @click='post(@json($data))'>Post</button>
                                                         </td>
                                                     </tr>
@@ -312,7 +320,7 @@
                                             @endforeach
                                             @if (count($data) >= 3)
                                                 <tr>
-                                                    <td colspan=4>ACC. TOTAL</td>
+                                                    <td colspan=3>ACC. TOTAL</td>
                                                     <td>{{ number_format($total['acct']['total_amount'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}</td>
@@ -393,6 +401,18 @@
                     }).catch(err => {
                         console.error(err)
                     })
+                },
+                deleteSub:function(data) {
+                    //axios.delete(this.deleteUrl+'/'+data, {
+                    //    headers: {
+                    //        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                    //            .content
+                    //    }
+                    //}).then(response => {
+                    //    toastr.success(response.data.message);
+                    //}).catch(err => {
+                    //    console.error(err)
+                    //})
                 },
                 submitForm: function() {
                     if (this.reportType == 'subsidiary_all_account' || this.reportType ==
