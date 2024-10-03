@@ -78,8 +78,8 @@
                                                                     </option>
                                                                     @foreach ($branches as $branch)
                                                                         <option value="{{ $branch->branch_id }}">
-                                                                            {{ $branch?->branch_code }} -
-                                                                            {{ $branch?->branch_name }}</option>
+                                                                            {{ $branch->branch_code }} -
+                                                                            {{ $branch->branch_name }}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
@@ -211,7 +211,8 @@
                                                     ?>
                                                     @foreach ($cat as $i => $val)
                                                         @if ($keyBranch === $val['branch'] && $keyCategory === $val['sub_cat_name'])
-                                                            <?php $category_id = $val['sub_cat_id']; $branch_id = $val['branch_id'] ?>
+                                                            <?php $category_id = $val['sub_cat_id'];
+                                                            $branch_id = $val['branch_id']; ?>
                                                             <?php $branch_code = $val['branch_code']; ?>
                                                             <?php $subId = $val['sub_id']; ?>
                                                             <tr>
@@ -285,12 +286,15 @@
                                                         'category_id' => $category_id,
                                                         'branch_id' => $branch_id,
                                                         'branch_code' => $branch_code,
-                                                        'as_of' => $as_of
-                                                ];?>
+                                                        'as_of' => $as_of,
+                                                    ]; ?>
 
                                                     <tr>
-                                                        <td><button class='btn btn-primary'
+                                                        <td colspan="2"><button class='btn btn-primary'
                                                                 @click='post(@json($data))'>Post</button>
+                                                            <button type="button" class="btn btn-success"
+                                                                data-toggle="modal" data-target="#createSubsidiaryModal"
+                                                                data-whatever="@mdo">Add</button>
                                                         </td>
                                                     </tr>
                                                     <?php
@@ -367,6 +371,35 @@
             </div>
         </div>
         </div>
+        <div class="modal fade" id="createSubsidiaryModal" tabindex="-1" role="dialog" aria-labelledby="createSubsidiaryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Subsidiary</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="recipient-name" class="col-form-label">Recipient:</label>
+                                <input type="text" class="form-control" id="recipient-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="col-form-label">Message:</label>
+                                <textarea class="form-control" id="message-text"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
     <!-- /.content -->
     <script>
@@ -402,7 +435,10 @@
                         console.error(err)
                     })
                 },
-                deleteSub:function(data) {
+                createSubsidiary: function() {
+
+                },
+                deleteSub: function(data) {
                     //axios.delete(this.deleteUrl+'/'+data, {
                     //    headers: {
                     //        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -414,15 +450,7 @@
                     //    console.error(err)
                     //})
                 },
-                submitForm: function() {
-                    if (this.reportType == 'subsidiary_all_account' || this.reportType ==
-                        'subsidiary_per_account') {
-                        this.fetchSubAll();
-                    } else if (this.reportType == 'income_minus_expense') {
-                        this.fetchIncomeExpense();
-                    }
 
-                },
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
                     axios.post(this.url, this.filter, {
@@ -441,169 +469,8 @@
                             console.error('Error:', error);
                         });
                 },
-                fetchIncomeExpense: function() {
-                    var data = {
-                        subsidiary_id: this.filter.subsidiary_id,
-                        date_from: this.filter.from,
-                        date_to: this.filter.to,
-                        type: this.reportType
-                    };
-                    axios.post(this.url, data, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        })
-                        .then(response => {
-                            this.incomeExpense = response.data.data;
-                            // console.log(response.data.data);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                },
-                rowStyles: function(p, i, r) {
-                    var style = '';
-                    if (i >= 6) {
-                        style += 'text-right';
-                    }
-                    if (i == 0 && !r[1].length) {
-                        style += ' text-bold';
-                    }
-                    return style;
-                },
-                rowStylesIncomeExpense: function(row) {
-                    if (row[0].length && !row[1].length) {
-                        return 'text-bold';
-                    }
-                    if (!row[0].length && (row[6].length || row[7].length)) {
-                        return 'text-bold';
-                    }
-                    return '';
-                },
-                formatCurrency: function(number) {
-                    const formatter = new Intl.NumberFormat('en-US', {
-                        style: 'decimal',
-                        minimumFractionDigits: 2,
-                    });
 
-                    return formatter.format(number);
-                }
             },
-            computed: {
-
-                processedSubsidiary: function() {
-                    var entries = {};
-                    var rows = [];
-
-                    if (this.subsidiaryAll) {
-                        if (this.subsidiaryAll[0]) {
-                            entries = this.subsidiaryAll[0].entries;
-                        }
-                    }
-
-                    for (var i in entries) {
-                        console.log(entries[i]);
-                        var entry = entries[i];
-                        var totalCredit = 0;
-                        var totalDebit = 0;
-                        rows.push([entry.account_number + ' - ' + entry.account_name ? entry.account_name
-                            .toUpperCase() : '' + ':', '', '', '', '', '', '', '', this.formatCurrency(
-                                this.balance)
-                        ]);
-                        for (var d in entry.data) {
-                            var data = entry.data[d];
-                            totalCredit += parseFloat(data.credit);
-                            totalDebit += parseFloat(data.debit);
-                            var row = [data.journal_date,
-                                data.journal_no,
-                                data.sub_name,
-                                data.source,
-                                data.cheque_date,
-                                data.cheque_no,
-                                data.debit != 0 ? this.formatCurrency(data.debit) : '',
-                                data.credit != 0 ? this.formatCurrency(data.credit) : '',
-                                data.balance ? this.formatCurrency(data.balance) : '0.00'
-                            ];
-                            rows.push(row);
-                            if (this.reportType == 'subsidiary_per_account') {
-                                data.payee != null ? rows.push(['', 'PAYEE: ' + data.payee]) : rows.push(['',
-                                    'PAYEE: NONE'
-                                ])
-                                rows.push(['', data.remarks ? data.remarks.toUpperCase() : ''])
-                            }
-                        }
-                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
-                                totalDebit) : '',
-                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
-                            ''
-                        ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', '0.00'])
-                    }
-                    return rows;
-                },
-                processedIncomeExpense: function() {
-                    var result = {
-                        income: [],
-                        expense: []
-                    }
-                    this.incomeExpense.income.forEach(income => {
-                        result.income.push([income.account_name, '', '', '', '', '', '', ''])
-                        var totalAmount = 0;
-                        income.entries.forEach(entry => {
-                            var row = [];
-                            var amount = entry.credit == 0 ? entry.debit : entry.credit;
-                            totalAmount += parseFloat(amount);
-                            row.push(entry.journal_date);
-                            row.push(entry.journal_no);
-                            row.push(entry.subsidiary_name);
-                            row.push(entry.source);
-                            row.push(entry.cheque_date);
-                            row.push(entry.cheque_no);
-                            row.push(this.formatCurrency(amount));
-                            row.push('0.00');
-                            result.income.push(row);
-                        });
-                        if (income.entries.length) {
-                            result.income.push(['', '', '', '', '', '', this.formatCurrency(
-                                totalAmount), ''])
-                            result.income.push(['', '', '', '', '', '', '', '0.00'])
-                        }
-                    });
-                    this.incomeExpense.expense.forEach(expense => {
-                        result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
-                        var totalAmount = 0;
-                        expense.entries.forEach(entry => {
-                            var row = [];
-                            var amount = entry.credit == 0 ? entry.debit : entry.credit;
-                            totalAmount += parseFloat(amount);
-                            row.push(entry.journal_date);
-                            row.push(entry.journal_no);
-                            row.push(entry.subsidiary_name);
-                            row.push(entry.source);
-                            row.push(entry.cheque_date);
-                            row.push(entry.cheque_no);
-                            row.push(this.formatCurrency(amount));
-                            row.push('0.00');
-                            result.expense.push(row);
-                        });
-                        if (expense.entries.length) {
-                            result.expense.push(['', '', '', '', '', '', this.formatCurrency(
-                                totalAmount), ''])
-                            result.expense.push(['', '', '', '', '', '', '', '0.00'])
-                        }
-
-                    });
-                    return result;
-                }
-            },
-            mounted() {
-                // for(var i in this.data){
-                // 	if(this.data[i]){
-                // 		console.log(this.data[i]);
-                // 	}
-                // }
-            }
         });
     </script>
 @endsection
