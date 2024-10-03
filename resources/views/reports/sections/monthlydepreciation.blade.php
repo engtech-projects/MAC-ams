@@ -78,8 +78,8 @@
                                                                     </option>
                                                                     @foreach ($branches as $branch)
                                                                         <option value="{{ $branch->branch_id }}">
-                                                                            {{ $branch?->branch_code }} -
-                                                                            {{ $branch?->branch_name }}</option>
+                                                                            {{ $branch->branch_code }} -
+                                                                            {{ $branch->branch_name }}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
