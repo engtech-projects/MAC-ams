@@ -260,7 +260,6 @@
                                                     @endforeach
                                                     <tr>
                                                         <td colspan=3>BRANCH TOTAL</td>
-
                                                         <td>{{ number_format($branchTotal['total_amount'], 2, '.') }}
                                                         </td>
                                                         <td>{{ number_format($branchTotal['total_monthly_amort'], 2, '.') }}
@@ -370,36 +369,79 @@
                 </div>
             </div>
         </div>
-        </div>
-        <div class="modal fade" id="createSubsidiaryModal" tabindex="-1" role="dialog" aria-labelledby="createSubsidiaryModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Add Subsidiary</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <label for="recipient-name" class="col-form-label">Subsidiary Name</label>
-                                <input type="text" class="form-control" id="subsidiary_name">
+        <div class="modal fade" id="createSubsidiaryModal" tabindex="-1" role="dialog"
+        aria-labelledby="createSubsidiaryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Subsidiary</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="recipient-name" class="col-form-label">Name</label>
+                            <input type="text" v-model="subsidiary.sub_name" class="form-control" id="sub_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">Code:</label>
+                            <input type="text" v-model="subsidiary.sub_code" class="form-control" id="sub_code">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">Address:</label>
+                            <input type="text" v-model="subsidiary.sub_address" class="form-control" id="sub_address">
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="message-text" class="col-form-label">Tel.:</label>
+                                    <input type="text" v-model="subsidiary.sub_tel" class="form-control"
+                                        id="sub_tel">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="message-text" class="col-form-label">Acct. No.:</label>
+                                    <input type="text" v-model="subsidiary.sub_acct_no" class="form-control"
+                                        id="sub_acct_no">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="message-text" class="col-form-label">Salvage :</label>
+                                    <input type="text" v-model="subsidiary.sub_salvage" class="form-control"
+                                        id="sub_salvage">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="message-text" class="col-form-label">Subsidiary Code:</label>
-                                <input type="text" class="form-control" id="subsidiary_code">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="message-text" class="col-form-label">Amount:</label>
+                                    <input type="text" v-model="subsidiary.sub_amount" class="form-control"
+                                        id="sub_amount">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="message-text" class="col-form-label">No. Depre.:</label>
+                                    <input type="text" v-model="subsidiary.sub_no_depre" class="form-control"
+                                        id="sub_no_depre">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="message-text" class="col-form-label">No. Amort :</label>
+                                    <input type="text" v-model="subsidiary.sub_no_amort" class="form-control"
+                                        id="sub_no_amort">
+                                </div>
+
                             </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save</button>
-                    </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button @click="createSubsidiary()" type="submit" class="btn btn-primary">Save</button>
                 </div>
             </div>
         </div>
+    </div>
+        </div>
+
     </section>
     <!-- /.content -->
     <script>
@@ -413,6 +455,16 @@
                     to: '',
                     account_id: 'all',
                     type: ''
+                },
+                subsidiary: {
+                    sub_name: '',
+                    sub_address: '',
+                    sub_code: '',
+                    sub_tel: '',
+                    sub_acct_no: '',
+                    sub_salvage: '',
+                    sub_amount: '',
+                    sub_no_depre: '',
                 },
                 incomeExpense: {
                     income: [],
@@ -436,7 +488,16 @@
                     })
                 },
                 createSubsidiary: function() {
-
+                    //axios.post(this.deleteUrl, this.subsidiary {
+                    //    headers: {
+                    //        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                    //            .content
+                    //    }
+                    //}).then(response => {
+                    //    toastr.success(response.data.message);
+                    //}).catch(err => {
+                    //    console.error(err)
+                    //})
                 },
                 deleteSub: function(data) {
                     //axios.delete(this.deleteUrl+'/'+data, {
