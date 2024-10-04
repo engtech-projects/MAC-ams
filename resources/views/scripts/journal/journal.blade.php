@@ -26,15 +26,33 @@
         });
 
         $("#amount").on("focus", function() {
-            if ((parseFloat(this.value) - parseInt(this.value)) == 0) {
-                this.value = amountConverter(this.value)
+            let currentValue = this.value.replace(/[₱,]/g, ''); // Remove peso sign and commas
+            if (!isNaN(currentValue) && currentValue !== '') {
+                this.value = parseFloat(currentValue);          // Convert to number without formatting
             }
         });
         $("#amount").on("blur", function() {
-            if (this.value) {
-                this.value = amountConverter(this.value)
+            let currentValue = parseFloat(this.value.replace(/[₱,]/g, ''));  // Remove peso sign and commas
+            if (!isNaN(currentValue)) {                                      // Ensure it's a valid number
+                this.value = amountConverter(currentValue);                  // Format with peso sign and 2 decimals
             } else {
-                this.value = amountConverter(this.value)
+                this.value = '';                                             // Clear if input is invalid
+            }
+        });
+
+        $("#edit_amount").on("focus", function() {
+            let currentValue = this.value.replace(/[₱,]/g, ''); // Remove peso sign and commas
+            if (!isNaN(currentValue) && currentValue !== '') {
+                this.value = parseFloat(currentValue);          // Convert to number without formatting
+            }
+        });
+
+        $("#edit_amount").on("blur", function() {
+            let currentValue = parseFloat(this.value.replace(/[₱,]/g, ''));  // Remove peso sign and commas
+            if (!isNaN(currentValue)) {                                      // Ensure it's a valid number
+                this.value = amountConverter(currentValue);                  // Format with peso sign and 2 decimals
+            } else {
+                this.value = '';
             }
         });
 
@@ -797,7 +815,7 @@
                             $('#edit_cheque_no').val(v.cheque_no);
                             $('#edit_cheque_date').val(v.cheque_date);
                             $('#edit_status').val(v.status);
-                            $('#edit_amount').val(v.amount);
+                            $('#edit_amount').val(amountConverter(v.amount));
                             $('#edit_payee').val(v.payee);
                             $('#edit_remarks').val(v.remarks);
                             $.each(v.journal_entry_details, function(kk, vv) {
@@ -1104,18 +1122,22 @@
 
                         var branchColumn = '';
                         @if (Gate::allows('manager'))
-                            branchColumn = `<td>${v.branch_name}</td>`;
+                            var branch_name = v.branch_name ? v.branch_name : '';
+                            branchColumn = `<td>${branch_name}</td>`;
                         @endif
 
+                        var journal_no = v.journal_no ? v.journal_no : '';
+                        var source = v.source ? v.source : '';
+                        var formattedAmount = amountConverter(v.amount);
                         var remarks = v.remarks ? v.remarks.replace(/::/g, '<br>') : '';
 
                         var journalListTable =
                             `<tr>
 							<td class="font-weight-bold">${v.journal_date}</td>
                             <td>${v.book_details.book_code}</td>
-                            <td>${v.journal_no}</td>
-							<td>${v.source}</td>
-							<td>${v.amount}</td>
+                            <td>${journal_no}</td>
+							<td>${source}</td>
+							<td>${formattedAmount}</td>
 							<td>${remarks}</td>
                             ${branchColumn}
 							<td class="${status}"><b>${v.status.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</b></td>
@@ -1192,7 +1214,7 @@
                                                 </a>
                                             </td>
 			<td class='editable-table-data' width="250">
-				<select fieldName="subsidiary_id" id="subsidiary_id" class="select-subsidiary form-control form-control-sm editable-row-item">
+				<select fieldName="subsidiary_id" class="select-subsidiary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
 					<?php
      $temp = '';

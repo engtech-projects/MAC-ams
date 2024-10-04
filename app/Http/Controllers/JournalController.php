@@ -102,6 +102,8 @@ class JournalController extends MainController
         $journal = JournalEntry::find($request->journal_entry['edit_journal_id']);
 
         DB::transaction(function () use ($request, $journal) {
+            $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
+            $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
             $journal->journal_no = $request->journal_entry['edit_journal_no'];
             $journal->journal_date = $request->journal_entry['edit_journal_date'];
             $journal->branch_id = $request->journal_entry['edit_branch_id'];
@@ -109,7 +111,7 @@ class JournalController extends MainController
             $journal->source = $request->journal_entry['edit_source'];
             $journal->cheque_no = $request->journal_entry['edit_cheque_no'];
             $journal->cheque_date = $request->journal_entry['edit_cheque_date'];
-            $journal->amount = $request->journal_entry['edit_amount'];
+            $journal->amount = $amount;
             $journal->status = $request->journal_entry['edit_status'];
             $journal->payee = $request->journal_entry['edit_payee'];
             $journal->remarks = $request->journal_entry['edit_remarks'];
@@ -147,7 +149,11 @@ class JournalController extends MainController
 
         // Append branch name to each journal entry
         foreach ($journalEntries as $entry) {
-            $entry->branch_name = $entry->branch->branch_name;
+            if ($entry->branch) {
+                $entry->branch_name = $entry->branch->branch_name;
+            } else {
+                $entry->branch_name = null;
+            }
         }
 
         // Return JSON response with journal entries including branch name
