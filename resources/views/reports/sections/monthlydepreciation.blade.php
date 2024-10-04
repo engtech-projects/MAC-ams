@@ -369,7 +369,7 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="createSubsidiaryModal" tabindex="-1" role="dialog"
+        <div class="modal fade" v-show="showModal" id="createSubsidiaryModal" tabindex="-1" role="dialog"
         aria-labelledby="createSubsidiaryModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -448,6 +448,7 @@
         new Vue({
             el: '#app',
             data: {
+                showModal:true,
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
@@ -483,21 +484,23 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+
                     }).catch(err => {
                         console.error(err)
                     })
                 },
                 createSubsidiary: function() {
-                    //axios.post(this.deleteUrl, this.subsidiary {
-                    //    headers: {
-                    //        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                    //            .content
-                    //    }
-                    //}).then(response => {
-                    //    toastr.success(response.data.message);
-                    //}).catch(err => {
-                    //    console.error(err)
-                    //})
+                    axios.post('http://localhost/MAC-ams/public/subsidiary', this.subsidiary, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        toastr.success(response.data.message);
+
+                    }).catch(err => {
+                        console.error(err)
+                    })
                 },
                 deleteSub: function(data) {
                     //axios.delete(this.deleteUrl+'/'+data, {

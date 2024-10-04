@@ -41,7 +41,9 @@ class Subsidiary extends Model
         return $branch;
     }
 
-    public function deleteSubsidiary($id) {}
+    public function deleteSubsidiary($id) {
+        
+    }
     public function getDepreciation($categoryId, $branch, $date)
     {
 
