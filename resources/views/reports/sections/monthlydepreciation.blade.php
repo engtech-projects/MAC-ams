@@ -31,6 +31,7 @@
 
     <!-- Main content -->
     <section class="content" id="app">
+    <?php $url = env('APP_URL'); ?>
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -383,49 +384,49 @@
                     <form>
                         <div class="form-group">
                             <label for="recipient-name" class="col-form-label">Name</label>
-                            <input type="text" v-model="subsidiary.sub_name" class="form-control" id="sub_name">
+                            <input type="text" v-model="subsidiary.sub_name" class="form-control" id="sub_name" required>
                         </div>
                         <div class="form-group">
                             <label for="message-text" class="col-form-label">Code:</label>
-                            <input type="text" v-model="subsidiary.sub_code" class="form-control" id="sub_code">
+                            <input type="text" v-model="subsidiary.sub_code" class="form-control" id="sub_code" required>
                         </div>
                         <div class="form-group">
                             <label for="message-text" class="col-form-label">Address:</label>
-                            <input type="text" v-model="subsidiary.sub_address" class="form-control" id="sub_address">
+                            <input type="text" v-model="subsidiary.sub_address" class="form-control" id="sub_address" required>
                         </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-4">
                                     <label for="message-text" class="col-form-label">Tel.:</label>
                                     <input type="text" v-model="subsidiary.sub_tel" class="form-control"
-                                        id="sub_tel">
+                                        id="sub_tel" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="message-text" class="col-form-label">Acct. No.:</label>
                                     <input type="text" v-model="subsidiary.sub_acct_no" class="form-control"
-                                        id="sub_acct_no">
+                                        id="sub_acct_no" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="message-text" class="col-form-label">Salvage :</label>
                                     <input type="text" v-model="subsidiary.sub_salvage" class="form-control"
-                                        id="sub_salvage">
+                                        id="sub_salvage" required>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
                                     <label for="message-text" class="col-form-label">Amount:</label>
                                     <input type="text" v-model="subsidiary.sub_amount" class="form-control"
-                                        id="sub_amount">
+                                        id="sub_amount" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="message-text" class="col-form-label">No. Depre.:</label>
                                     <input type="text" v-model="subsidiary.sub_no_depre" class="form-control"
-                                        id="sub_no_depre">
+                                        id="sub_no_depre" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="message-text" class="col-form-label">No. Amort :</label>
                                     <input type="text" v-model="subsidiary.sub_no_amort" class="form-control"
-                                        id="sub_no_amort">
+                                        id="sub_no_amort" required>
                                 </div>
 
                             </div>
@@ -461,11 +462,13 @@
                     sub_name: '',
                     sub_address: '',
                     sub_code: '',
-                    sub_tel: '',
-                    sub_acct_no: '',
-                    sub_salvage: '',
-                    sub_amount: '',
-                    sub_no_depre: '',
+                    sub_tel: null,
+                    sub_acct_no: null,
+                    sub_salvage: null,
+                    sub_amount: null,
+                    sub_no_depre:null,
+                    sub_cat_id:null,
+                    sub_per_branch:null
                 },
                 incomeExpense: {
                     income: [],
@@ -490,7 +493,11 @@
                     })
                 },
                 createSubsidiary: function() {
-                    axios.post('http://localhost/MAC-ams/public/subsidiary', this.subsidiary, {
+                    var data = @json($cat);
+                    this.subsidiary.sub_cat_id = data.subsidiary_category.sub_cat_id;
+                    this.subsidiary.sub_per_branch = data.branch_code;
+
+                    axios.post(@json(env('APP_URL'))+'/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
