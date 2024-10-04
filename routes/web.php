@@ -16,6 +16,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\SubsidiaryController;
 use App\Http\Controllers\JournalBookController;
 use App\Http\Controllers\SystemSetupController;
 use App\Http\Controllers\UserProfileController;
@@ -178,6 +179,8 @@ Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsCo
 /* Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses'); */
 Route::get('reports/monthly-depreciation', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthlyDepreciation');
 Route::post('reports/monthly-depreciation', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
+/* Route::delete('reports/subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('reports.delete-subsidiary'); */
+Route::post('subsidiary', [SubsidiaryController::class, 'create'])->name('subsidiary.create');
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');
 Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'])->name('payment.customer');

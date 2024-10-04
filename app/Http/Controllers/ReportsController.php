@@ -160,6 +160,8 @@ class ReportsController extends MainController
 
         $branches = Branch::all();
         $date = explode("-", $request->sub_date);
+        $as_of = Carbon::parse($request->sub_date)->endOfMonth();
+
 
         $subsidiary = new Subsidiary();
         $branch = Branch::find($request->branch_id);
@@ -193,22 +195,24 @@ class ReportsController extends MainController
         $data = [
             'data' => $data,
             'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
-            'as_of' => isset($request->sub_date) ? $request->sub_date : null,
+            'as_of' => isset($request->sub_date) ? $as_of : now()->endOfMonth(),
             'branches' => $branches,
             'title' => 'MAC-AMS | Monthly Depreciation',
         ];
         return view('reports.sections.monthlyDepreciation', $data);
-        return response()->json([
+
+        /* return response()->json([
             'data' => $data,
             'as_of' => isset($request->sub_date) ? $request->sub_date : null,
             'message' => 'Successfully Fetched'
-        ]);
+        ]); */
     }
 
     public function postMonthlyDepreciation(Request $request)
     {
 
 
+        $as_of = Carbon::parse($request->as_of)->endOfMonth();
         $branchCode = $request->branch_code;
         $subId = Subsidiary::where('sub_code', $branchCode)->pluck('sub_id')->first();
         $subsidiary = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
@@ -231,12 +235,12 @@ class ReportsController extends MainController
         $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
         $data = $journalEntry->create([
             'journal_no' => $journalNumber,
-            'journal_date' => now()->format('Y-m-d'),
+            'journal_date' => $as_of->format('Y-m-d'),
             'branch_id' => $request->branch_id,
             'book_id' => $journalEntry::DEPRECIATION_BOOK,
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
-            'remarks' => 'Representing Month End Schedule As of ' . $request->as_of . '-' . $accountName,
+            'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
             'amount' => $request->total['total_monthly'],
         ]);
 
