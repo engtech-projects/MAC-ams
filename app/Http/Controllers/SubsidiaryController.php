@@ -10,10 +10,21 @@ use Illuminate\Http\Request;
 class SubsidiaryController extends Controller
 {
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
+        $data = $request->validate([
+            'sub_name' => 'string|required',
+            'sub_code' => 'string|required',
+            'sub_address' => 'string|required',
+            'sub_tel' => 'string',
+            'sub_acct_no' => 'string|required',
+            'sub_salvage' => 'numeric|required',
+            'sub_amount' => 'numeric|required',
+            'sub_no_depre' => 'numeric|required',
+
+        ]);
         try {
-            Subsidiary::create($request->input());
+            Subsidiary::create($data);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
