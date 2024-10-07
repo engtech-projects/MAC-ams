@@ -180,7 +180,8 @@ Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsCo
 Route::get('reports/monthly-depreciation', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthlyDepreciation');
 Route::post('reports/monthly-depreciation', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
 /* Route::delete('reports/subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('reports.delete-subsidiary'); */
-Route::post('subsidiary', [SubsidiaryController::class, 'create'])->name('subsidiary.create');
+Route::post('subsidiary', [SubsidiaryController::class, 'store'])->name('subsidiary.store');
+Route::delete('subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('subsidiary.store');
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');
 Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'])->name('payment.customer');

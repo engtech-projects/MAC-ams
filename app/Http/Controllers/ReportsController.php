@@ -241,7 +241,7 @@ class ReportsController extends MainController
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
-            'amount' => $request->total['total_monthly'],
+            'amount' => $request->total['total_monthly_amort'],
         ]);
 
         $accounts = $subsidiary->accounts;
