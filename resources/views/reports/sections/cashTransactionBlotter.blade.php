@@ -859,25 +859,27 @@
                                 rows.push(row);
                                 for (var k in entry) {
                                     var journal = entry[k];
-                                    totalCashIn += parseFloat(journal.details[0].cash_in);
-                                    totalCashOut += parseFloat(journal.details[0].cash_out);
-                                    if (i == 'cash_received') {
-                                        cashEndingBalance += parseFloat(journal.details[0].cash_in);
-                                    } else if (i == 'cash_paid') {
-                                        cashEndingBalance -= parseFloat(journal.details[0].cash_out);
-                                    }
-                                    var mrow = ['', '', '', '', '', '', '', ''];
-                                    mrow[0] = journal.journal_date;
-                                    mrow[1] = journal.journal_no;
-                                    mrow[2] = journal.branch.branch_name;
-                                    mrow[3] = journal.source;
-                                    mrow[4] = journal.cheque_date;
-                                    mrow[5] = journal.cheque_no;
-                                    mrow[6] = journal.details ? this.noZero(journal.details[0]
-                                        .cash_in) : '';
-                                    mrow[7] = journal.details ? this.noZero(journal.details[0]
-                                        .cash_out) : '';
-                                    rows.push(mrow);
+                                    journal.details.forEach(element => {
+                                        totalCashIn += parseFloat(element.cash_in);
+                                        totalCashOut += parseFloat(element.cash_out);
+                                        if (i == 'cash_received') {
+                                            cashEndingBalance += parseFloat(element.cash_in);
+                                        } else if (i == 'cash_paid') {
+                                            cashEndingBalance -= parseFloat(element.cash_out);
+                                        }
+                                        var mrow = ['', '', '', '', '', '', '', ''];
+                                        mrow[0] = journal.journal_date;
+                                        mrow[1] = journal.journal_no;
+                                        mrow[2] = journal.branch.branch_name;
+                                        mrow[3] = journal.source;
+                                        mrow[4] = journal.cheque_date;
+                                        mrow[5] = journal.cheque_no;
+                                        mrow[6] = element ? this.noZero(element
+                                            .cash_in) : '';
+                                        mrow[7] = element ? this.noZero(element
+                                            .cash_out) : '';
+                                        rows.push(mrow);
+                                    });
                                 }
                                 if (i == 'cash_paid') {
                                     rows.push(['<b>Cash Ending Balance</b>', '', '', '', '', '',
