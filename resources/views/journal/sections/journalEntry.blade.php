@@ -310,7 +310,7 @@
                                                 // echo '</pre>';
                                                 ?>
                                                 <select fieldName="subsidiary_id"
-                                                    class="select-account form-control form-control-sm editable-row-item">
+                                                    class="select-subsidiary form-control form-control-sm editable-row-item">
                                                     <option disabled value="" selected>-Select S/L-</option>
                                                     <?php
                                                     $temp = '';

@@ -26,15 +26,33 @@
         });
 
         $("#amount").on("focus", function() {
-            if ((parseFloat(this.value) - parseInt(this.value)) == 0) {
-                this.value = amountConverter(this.value)
+            let currentValue = this.value.replace(/[₱,]/g, ''); // Remove peso sign and commas
+            if (!isNaN(currentValue) && currentValue !== '') {
+                this.value = parseFloat(currentValue);          // Convert to number without formatting
             }
         });
         $("#amount").on("blur", function() {
-            if (this.value) {
-                this.value = amountConverter(this.value)
+            let currentValue = parseFloat(this.value.replace(/[₱,]/g, ''));  // Remove peso sign and commas
+            if (!isNaN(currentValue)) {                                      // Ensure it's a valid number
+                this.value = amountConverter(currentValue);                  // Format with peso sign and 2 decimals
             } else {
-                this.value = amountConverter(this.value)
+                this.value = '';                                             // Clear if input is invalid
+            }
+        });
+
+        $("#edit_amount").on("focus", function() {
+            let currentValue = this.value.replace(/[₱,]/g, ''); // Remove peso sign and commas
+            if (!isNaN(currentValue) && currentValue !== '') {
+                this.value = parseFloat(currentValue);          // Convert to number without formatting
+            }
+        });
+
+        $("#edit_amount").on("blur", function() {
+            let currentValue = parseFloat(this.value.replace(/[₱,]/g, ''));  // Remove peso sign and commas
+            if (!isNaN(currentValue)) {                                      // Ensure it's a valid number
+                this.value = amountConverter(currentValue);                  // Format with peso sign and 2 decimals
+            } else {
+                this.value = '';
             }
         });
 
@@ -337,7 +355,7 @@
             allowClear: true,
         });
 
-        $('.select-subsidary').select2({
+        $('.select-subsidiary').select2({
             placeholder: 'Select S/L',
             allowClear: true,
         });
@@ -346,47 +364,7 @@
 
         $.fn.editable.defaults.mode = 'inline';
 
-        $('.records').editable({
-            type: 'text',
-            emptytext: '',
-            showbuttons: false,
-            toggle: 'manual',
-            onblur: 'cancel',
-            inputclass: 'form-control form-control-sm block input-text',
-            display: function(value) {
-
-                $(this).text(amountConverter(value))
-            },
-            success: function () {
-                setTimeout(() => {
-                    if ($(this).attr('fieldName') == 'subsidiary_id') {
-                        if ($('#subsidiary_id').val() == '') {
-                            let amount = prompt("Please ");
-                        }
-                    }
-                    if ($(this).attr('fieldName') == 'journal_details_debit') {
-                        $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        getBalance()
-                        checkTotalAndAmount()
-                    }
-                    if ($(this).attr('fieldName') == 'journal_details_credit') {
-                        $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                            minimumFractionDigits: 2
-                        }));
-                        getBalance()
-                        checkTotalAndAmount()
-                    }
-                }, 100)
-            },
-        })
+        recordsEditable()
 
         /*          $('.editable-row-item').editable({
                     type: 'text',
@@ -417,6 +395,14 @@
         }
         $(document).on('click', '.remove-journalDetails', function(e) {
             $(this).parents('tr').remove();
+            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+            }));
+            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+            }));
+            getBalance()
+            checkTotalAndAmount()
         })
         $(document).on('submit', '#journalEntryForm', function(e) {
             e.preventDefault();
@@ -449,6 +435,9 @@
                     var field = $(v).children()
                     if ($(field[1]).find('.editable-row-item').val() == null) {
                         return alert("Account is required.");
+                    }
+                    if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3]).find('.editable-row-item').text() === "₱0.00") {
+                        return alert("Debit or credit amount is required.");
                     }
                     if ($(field[4]).find('.editable-row-item').val() == null) {
                         return alert("Subsidiary is required.");
@@ -731,9 +720,12 @@
 
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
                 var field = $(v).children()
-                /*  if ($(field[1]).find('.editable-row-item').val() == null) {
-                     return alert("Account is required.");
-                 } */
+                if ($(field[1]).find('.editable-row-item').val() == null) {
+                    return alert("Account is required.");
+                }
+                if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3]).find('.editable-row-item').text() === "₱0.00") {
+                    return alert("Debit or credit amount is required.");
+                }
                 if ($(field[4]).find('.editable-row-item').val() == null) {
                     return alert("Subsidiary is required.");
                 }
@@ -750,7 +742,7 @@
 
             var edit_balance = document.getElementById("edit_balance_debit");
             var edit_bal = edit_balance.innerText;
-            if (details.lengt < 1) {
+            if (details.length < 1) {
                 return alert("Journal details is required.")
             }
 
@@ -839,13 +831,13 @@
                             $('#edit_journal_no').val(v.journal_no)
                             $('#edit_journal_id').val(v.journal_id);
                             $('#edit_journal_date').val(v.journal_date);
-                            $('#edit_branch_id').val(v.branch_id);
-                            $('#edit_book_id').val(v.book_id);
+                            $('#edit_branch_id').val(v.branch_id).trigger('change');
+                            $('#edit_book_id').val(v.book_id).trigger('change');
                             $('#edit_source').val(v.source);
                             $('#edit_cheque_no').val(v.cheque_no);
                             $('#edit_cheque_date').val(v.cheque_date);
                             $('#edit_status').val(v.status);
-                            $('#edit_amount').val(v.amount);
+                            $('#edit_amount').val(amountConverter(v.amount));
                             $('#edit_payee').val(v.payee);
                             $('#edit_remarks').val(v.remarks);
                             $.each(v.journal_entry_details, function(kk, vv) {
@@ -855,19 +847,19 @@
 								</td>
 								<td class='editable-table-data' value="" >
 									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id} account_id" class="select-account form-control form-control-sm editable-row-item COASelect ">
-										<option value="${vv.account.account_id}" selected>${vv.account.account_name}</option>
+										<option value="${vv.account.account_id}" selected>${vv.account.account_number} - ${vv.account.account_name}</option>
 										@foreach ($chartOfAccount as $account)
-											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_name }}</option>
+											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_number }} - {{ $account->account_name }}</option>
 										@endforeach
 									</select>
 								</td>
                             </td>
-                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit"class=" editable-row-item">${parseFloat(vv.journal_details_debit)}</a> </td>
-                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item">${parseFloat(vv.journal_details_credit)}</a> </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_debit" class=" editable-row-item records">${parseFloat(vv.journal_details_debit)}</a> </td>
+                           <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item records">${parseFloat(vv.journal_details_credit)}</a> </td>
 
 
 								<td class='editable-table-data' value="" >
-									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
+									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-subsidiary form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
 										@foreach ($subsidiaries as $subsidiary)
 											<option value="{{ $subsidiary->sub_id }}">{{ $subsidiary->sub_name }}</option>
 										@endforeach
@@ -908,12 +900,24 @@
                                     maximumFractionDigits: 2
                                 }));
                         });
+                        $(document).on('click', '.remove-journalDetails', function(e) {
+                            $(this).parents('tr').remove();
+                            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                                                minimumFractionDigits: 2
+                            }));
+                            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                                                minimumFractionDigits: 2
+                            }));
+                            getBalance()
+                            checkTotalAndAmount()
+                        })
+                        recordsEditable()
                         $('.select-account').select2({
                             placeholder: 'Select',
                             allowClear: true,
                         });
 
-                        $('.select-subsidary').select2({
+                        $('.select-subsidiary').select2({
                             placeholder: 'Select S/L',
                             allowClear: true,
                         });
@@ -1140,18 +1144,22 @@
 
                         var branchColumn = '';
                         @if (Gate::allows('manager'))
-                            branchColumn = `<td>${v.branch_name}</td>`;
+                            var branch_name = v.branch_name ? v.branch_name : '';
+                            branchColumn = `<td>${branch_name}</td>`;
                         @endif
 
+                        var journal_no = v.journal_no ? v.journal_no : '';
+                        var source = v.source ? v.source : '';
+                        var formattedAmount = amountConverter(v.amount);
                         var remarks = v.remarks ? v.remarks.replace(/::/g, '<br>') : '';
 
                         var journalListTable =
                             `<tr>
 							<td class="font-weight-bold">${v.journal_date}</td>
                             <td>${v.book_details.book_code}</td>
-                            <td>${v.journal_no}</td>
-							<td>${v.source}</td>
-							<td>${v.amount}</td>
+                            <td>${journal_no}</td>
+							<td>${source}</td>
+							<td>${formattedAmount}</td>
 							<td>${remarks}</td>
                             ${branchColumn}
 							<td class="${status}"><b>${v.status.toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</b></td>
@@ -1228,7 +1236,7 @@
                                                 </a>
                                             </td>
 			<td class='editable-table-data' width="250">
-				<select fieldName="subsidiary_id" id="subsidiary_id" class="select-subsidary form-control form-control-sm editable-row-item">
+				<select fieldName="subsidiary_id" class="select-subsidiary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
 					<?php
      $temp = '';
@@ -1256,60 +1264,15 @@
 			</td>
 		</tr>`
             $('#tbl-create-journal-container').append(content);
-            $('.records').editable({
-                type: 'text',
-                emptytext: '',
-                showbuttons: false,
-                toggle: 'manual',
-                onblur: 'cancel',
-                inputclass: 'form-control form-control-sm block input-text',
-                display: function(value) {
 
-                    $(this).text(amountConverter(value))
-                },
-                success: function () {
-                    setTimeout(() => {
-                        if ($(this).attr('fieldName') == 'subsidiary_id') {
-                            // if ($('#subsidiary_id').val() == '') {
-                            //     let amount = prompt("Please ");
-                            // }
-                            if ($('#subsidiary_id').val() == '') {
-                                alert("Subsidiary is required.")
-                            }
-                            if ($('#account_id').val() == null) {
-                                alert("Account is required.")
-                            }
-                        }
-                        if ($(this).attr('fieldName') == 'journal_details_debit') {
-                            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            getBalance()
-                            checkTotalAndAmount()
-                        }
-                        if ($(this).attr('fieldName') == 'journal_details_credit') {
-                            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
-                            getBalance()
-                            checkTotalAndAmount()
-                        }
-                    }, 100)
-                },
-            })
+            recordsEditable()
 
             $('.select-account').select2({
                 placeholder: 'Select',
                 allowClear: true,
             });
 
-            $('.select-subsidary').select2({
+            $('.select-subsidiary').select2({
                 placeholder: 'Select S/L',
                 allowClear: true,
             });
@@ -1389,7 +1352,55 @@
 
                 } */
 
+        function recordsEditable() {
+            $('.records').editable({
+                type: 'text',
+                emptytext: '',
+                showbuttons: false,
+                toggle: 'manual',
+                onblur: 'cancel',
+                inputclass: 'form-control form-control-sm block input-text',
+                display: function(value) {
 
+                    $(this).text(amountConverter(value))
+                },
+                success: function () {
+                    setTimeout(() => {
+                        if ($(this).attr('fieldName') == 'subsidiary_id') {
+                            // if ($('#subsidiary_id').val() == '') {
+                            //     let amount = prompt("Please ");
+                            // }
+                            if ($('#subsidiary_id').val() == '') {
+                                alert("Subsidiary is required.")
+                            }
+                            if ($('#account_id').val() == null) {
+                                alert("Account is required.")
+                            }
+                        }
+                        if ($(this).attr('fieldName') == 'journal_details_debit') {
+                            $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+                            }));
+                            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+                            }));
+                            getBalance()
+                            checkTotalAndAmount()
+                        }
+                        if ($(this).attr('fieldName') == 'journal_details_credit') {
+                            $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+                            }));
+                            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
+                                minimumFractionDigits: 2
+                            }));
+                            getBalance()
+                            checkTotalAndAmount()
+                        }
+                    }, 100)
+                },
+            })
+        }
         function receivedPaymentVoucher() {
             $('.cheque-number').text($('#cheque_no').val());
             $('.cheque-date').text($('#cheque_date').val());

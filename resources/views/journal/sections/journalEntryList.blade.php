@@ -31,6 +31,10 @@
             float: right !important;
         }
 
+        .select2 {
+            width: 100% !important
+        }
+
         .label-sty {
             color: #344069 !important;
         }
@@ -464,9 +468,9 @@
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_branch_id">Branch</label>
                                                     <div class="input-group">
-                                                        <select name="edit_branch_id" class="form-control form-control-sm"
+                                                        <select name="edit_branch_id" class="select2 form-control form-control-sm"
                                                             id="edit_branch_id" required>
-                                                            <option value="" disabled selected>-Select Branch-
+                                                            <option value="" disabled>-Select Branch-
                                                             </option>
                                                             <option value="1">Butuan City Branch</option>
                                                             <option value="2">Nasipit Branch</option>
@@ -483,8 +487,8 @@
                                                     <label class="label-normal" for="">Book Reference</label>
                                                     <div class="input-group">
 
-                                                        <select required name="edit_book_id" class="form-control form-control-sm" id="edit_book_id">
-										<option id="edit_book_id" value="" disabled selected></option>
+                                                        <select required name="edit_book_id" class="select2 form-control form-control-sm" id="edit_book_id">
+										<option id="edit_book_id" value="" disabled></option>
 										@foreach($journalBooks as $journalBook)
 											<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
 										@endforeach
@@ -561,7 +565,7 @@
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_amount">Amount</label>
                                                     <div class="input-group">
-                                                        <input type="number"
+                                                        <input type="text"
                                                             class="form-control form-control-sm rounded-0"
                                                             name="edit_amount" id="edit_amount" step="any"
                                                             placeholder="Amount" required>
