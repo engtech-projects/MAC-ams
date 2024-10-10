@@ -410,17 +410,7 @@
             var balances = document.getElementById("balance_debit");
             var spanBal = balances.innerText;
 
-            // Check if LrefNo is null or empty after setting it
-            if ($('#LrefNo').text().trim() === '') { // Check if LrefNo is empty
-                $('#book_id').val('');
-                $('#book_id').select2({
-                    placeholder: 'Select',
-                    allowClear: true,
-                });
-                return alert('Error: No reference number generated. Please try again.');
-            } else {
-                console.log('LrefNo value set:', $('#LrefNo').text());
-            }
+
             if (parseFloat(spanBal) == 0) {
                 // alert("Debit and Credit equal")
 
@@ -705,18 +695,6 @@
                 value: amount
             })
             var _st = false;
-
-            // Check if LrefNo is null or empty after setting it
-            if ($('#LrefNo').text().trim() === '') { // Check if LrefNo is empty
-                $('#book_id').val('');
-                $('#book_id').select2({
-                    placeholder: 'Select',
-                    allowClear: true,
-                });
-                return alert('Error: No reference number generated. Please try again.');
-            } else {
-                console.log('LrefNo value set:', $('#LrefNo').text());
-            }
 
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
                 var field = $(v).children()
