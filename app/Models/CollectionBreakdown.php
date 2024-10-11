@@ -49,12 +49,15 @@ class CollectionBreakdown extends Model
         $collection = CollectionBreakdown::with(['accountOfficerCollection'])->where('collection_id', $id)->first();
         return $collection;
     }
-    public static function getCollectionBreakdownByBranch($transactionDate, $branchId)
+    public static function getCollectionBreakdownByBranch($transactionDate, $branchId = null)
     {
-        return CollectionBreakdown::where('branch_id', $branchId)
+        return CollectionBreakdown::when($branchId, function ($query, $branchId) {
+                $query->where('branch_id', $branchId);
+            })
             ->when($transactionDate, function ($query, $transactionDate) {
                 $query->where('transaction_date', $transactionDate);
-            })->orderBy('transaction_date', 'desc')
+            })
+            ->orderBy('transaction_date', 'desc')
             ->get();
     }
     public function getCollectionByTransactionDate($transactionDate, $branchId)
