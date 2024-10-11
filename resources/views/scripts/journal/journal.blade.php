@@ -718,9 +718,9 @@
             var _st = false;
 
             // Check if LrefNo is null or empty after setting it
-            if ($('#LrefNo').text().trim() === '') { // Check if LrefNo is empty
-                $('#book_id').val('');
-                $('#book_id').select2({
+            if ($('#edit_LrefNo').text().trim() === '') { // Check if LrefNo is empty
+                $('#edit_book_id').val('');
+                $('#edit_book_id').select2({
                     placeholder: 'Select',
                     allowClear: true,
                 });
