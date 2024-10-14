@@ -836,13 +836,33 @@
                            <td class='editable-table-data text-center' value="" ><a href="#" fieldName="journal_details_credit" class=" editable-row-item records">${parseFloat(vv.journal_details_credit)}</a> </td>
 
 
-								<td class='editable-table-data' value="" >
-									<select  fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-subsidiary form-control form-control-sm editable-row-item edit_subsidiary_item" value="">
-										@foreach ($subsidiaries as $subsidiary)
-											<option value="{{ $subsidiary->sub_id }}">{{ $subsidiary->sub_name }}</option>
-										@endforeach
-									</select>
-								</td>
+								<td class='editable-table-data' value="">
+                                    <select fieldName="subsidiary_id" id="subsidiary_${vv.journal_details_id}" class="select-subsidiary form-control form-control-sm editable-row-item edit_subsidiary_item">
+                                        <?php
+                                        $temp = '';
+                                        foreach ($subsidiaries as $subsidiary) {
+                                            if (is_array($subsidiary->toArray()['subsidiary_category']) && !empty($subsidiary->toArray()['subsidiary_category'])) {
+                                                // Check if this is a new category and create a new optgroup if necessary
+                                                if ($temp == '') {
+                                                    $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
+                                                    echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
+                                                } elseif ($temp != $subsidiary->toArray()['subsidiary_category']['sub_cat_name']) {
+                                                    echo '</optgroup><optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
+                                                    $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
+                                                }
+
+                                                // Add the subsidiary option to the current optgroup
+                                                echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
+                                            }
+                                        }
+
+                                        // Close the last optgroup if it exists
+                                        if ($temp != '') {
+                                            echo '</optgroup>';
+                                        }
+                                        ?>
+                                    </select>
+                                    </td>
 								<td>
 									<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
 										<span>
