@@ -259,6 +259,8 @@
             return false
         }
 
+        var selectedBranchValue = $('#branch_id').val();
+        formData.push({name:'branch_id',value:selectedBranchValue});
         formData.push({name:'total',value:totalcash_count})
         formData.push({name:'collection_ao',value:aocollection_items})
         formData.push({name:'branch_collection',value:JSON.stringify(branchcollection_items)})
@@ -339,14 +341,14 @@
         $('.branchcollection-items').each(function(index, row){
 
         let cells = $(row).find('td');
-        let branch_id = cells.eq(0).data('id');
+        let branch_id_collection = cells.eq(0).data('id');
         let totalamount = Number(cells.eq(1).text().replace(/[^0-9\.-]+/g,""))
 
         /* let aocollection_totalamount = Number(cells.eq(3).text().replace(/[^0-9\.-]+/g,"")); */
 
         items.push(
             {
-            'branch_id' : branch_id,
+            'branch_id' : branch_id_collection,
             'totalamount':totalamount
             }
         );
@@ -396,14 +398,14 @@
     $(document).on('click', '#btn-add-branch-collection', function(e){
 
         var branchcollection_amount = amountConverter($('#branchcollection_amount').val())
-        var branch_id = $('#branch_id').val();
-        if(branchcollection_amount == "" || branch_id == null) {
+        var branch_id_collection = $('#branch_id_collection').val();
+        if(branchcollection_amount == "" || branch_id_collection == null) {
             alert("All fields are required")
         }else {
-            var branch_name =  $('.select-branch option:selected').text();
+            var branch_name = $('#branch_id_collection option:selected').text();
             var markup = `
                 <tr class="branchcollection-items">
-                <td data-id="${branch_id}" >${branch_name}</td>
+                <td data-id="${branch_id_collection}" >${branch_name}</td>
                 <td id="total_amount">${branchcollection_amount}</td>
                 <td class="text-center"><button id="btn-remove-account-officer-collection" class="btn btn-xs btn-danger remove-account-officer-collection">
                         <i class="fas fa-trash fa-xs"></i>
@@ -415,7 +417,7 @@
             calculateAmount("branchcollection");
 
             $('#branchcollection_amount').val("")
-            $('#branch_id').val(null).trigger("change")
+            $('#branch_id_collection').val(null).trigger("change")
 
         }
 

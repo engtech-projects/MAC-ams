@@ -126,17 +126,23 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="row">
-                                            <div class="col-sm-3" style="margin-left:10px;">
-                                                <label for="branch">Transaction Date</label>
-                                                <div class="input-group">
-                                                    <input type="date" name="transaction_date"
-                                                        class="form-control form-control-sm" required>
-                                                </div>
-                                            </div>
-
+                                <div class="row" style="margin-left:15px;">
+                                    @if(Gate::allows(['manager']))
+                                    <div class="col-md-3">
+                                        <label for="branch">Select Branch</label>
+                                        <select name="branch_id" id="branch_id" class="select-branch form-control form-control-sm" required>
+                                            <option value="" disabled selected>Select Branch</option>
+                                            @foreach ($branches as $branch)
+                                                <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @endif
+                                    <div class="col-md-3">
+                                        <label for="branch">Transaction Date</label>
+                                        <div class="input-group">
+                                            <input type="date" name="transaction_date"
+                                                class="form-control form-control-sm" required>
                                         </div>
                                     </div>
                                 </div>
@@ -275,7 +281,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr id="footer-row">
-                                                            <td colspan="7"></td>
+                                                            <!-- <td colspan="7"></td> -->
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
@@ -309,7 +315,7 @@
                                                             <td>
                                                                 <select
                                                                     class="select-branch form-control form-control-sm rounded-0"
-                                                                    id="branch_id">
+                                                                    id="branch_id_collection">
                                                                     <option value="" disabled selected>-Select
                                                                         Branch-</option>
                                                                     @foreach ($branches as $branch)
@@ -332,7 +338,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr style="background-color: #f1f1f1;" id="branch-collection-row">
-                                                            <td colspan="7">&nbsp;</td>
+                                                            <!-- <td colspan="7">&nbsp;</td> -->
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
@@ -349,7 +355,7 @@
                                                     </tfoot>
                                                 </table>
                                                 <div class="text-right">
-                                                    <button type="submit" class="btn btn-success">Post</button>
+                                                    <button type="submit" class="btn btn-success" style="margin-bottom: 20px;">Post</button>
                                                 </div>
                                             </div>
 
@@ -377,7 +383,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="d in collectionsBreakdown">
-                                <td>@{{ d.branch_id }}</td>
+                                <td>@{{ getBranchName(d.branch_id) }}</td>
                                 <td>@{{ d.transaction_date }}</td>
                                 <td>@{{ formatCurrency(d.total) }}</td>
                                 <td>
@@ -427,7 +433,7 @@
                                             <div class="col-md-6">
                                                 <div class="col-md-12">
                                                     <h6 class="mb-4">Branch: &nbsp;&nbsp;&nbsp; <strong
-                                                            id="">@{{branch}}</strong></h6>
+                                                            id="">@{{ getBranchName(collections.branch_id) }}</strong></h6>
 
                                                 </div>
                                             </div>
@@ -714,6 +720,13 @@
                 greet: function(data) {
                     alert(data);
                 },
+                getBranchName(branchId) {
+                    if (!this.branches) {
+                        return 'N/A'; // Return 'N/A' if branches is null or undefined
+                    }
+                    const branch = this.branches.find(b => b.branch_id === branchId);
+                    return branch ? branch.branch_name : 'N/A'; // Return 'N/A' if no branch found
+                },
                 getSelectedBranch(branchId) {
                     this.filter.branch_id = branchId
                 },
@@ -736,7 +749,7 @@
                         .then(response => {
                             console.log(response.data.data)
                             this.data = response.data.data
-                            this.branch = response.data.data.branch.branch_name
+                            //this.branch = response.data.data.branch.branch_name
                             // console.log(this.data);
                             toastr.success(response.data.message);
                         }).catch(error => {
@@ -757,6 +770,7 @@
                             this.responseData = response.data;
                             this.entries = response.data['entries'];
                             this.collections = response.data['entries']['collections'];
+                            console.log("Collections Data:", this.collections);
                             this.arrangeData(response.data['entries']);
                             this.collections.total_accountofficer = 0;
                             for (var i in this.collections.account_officer_collection) {
@@ -907,6 +921,7 @@
             mounted() {
                 /*                 this.getBranchList(); */
                 this.data = @json($cash_blotter);
+                this.branches = @json($branches);
                 // console.log(this.data);
             }
         });

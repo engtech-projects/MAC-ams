@@ -8,6 +8,7 @@ use App\Models\CollectionBreakdown;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Customer;
 use App\Models\Transactions;
 use App\Models\PaymentMethod;
@@ -545,16 +546,19 @@ class ReportsController extends MainController
     public function searchCashTransactionBlotter(Request $request)
     {
         $transactionDate = $request["transaction_date"];
-        $branch = Branch::find($request->branch_id);
-        $branchId = session()->get("auth_user_branch");
-        if (isset($request->branch_id)) {
-            $branchId = $request->branch_id;
+        $branchId = null;
+        if (Gate::allows('manager')) {
+            if (isset($request->branch_id)) {
+                $branchId = $request->branch_id;
+            }
+        } else {
+            $branchId = session()->get("auth_user_branch");
         }
         $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
         $message = $collections->count() > 0 ? "Collections fetched." : "No record found.";
         return response()->json(['message' => $message, 'data' => [
             'collections' => $collections,
-            'branch' => $branch
+            'branch' => $branchId ? Branch::find($branchId) : null
         ]]);
     }
 

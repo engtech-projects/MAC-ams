@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CreateOrUpdateCollectionRequest extends FormRequest
 {
@@ -42,7 +43,11 @@ class CreateOrUpdateCollectionRequest extends FormRequest
     }
     protected function prepareForValidation()
     {
-        $this->merge(['branch_id' => session()->get('auth_user_branch')]);
+        if (Auth::user()->can('manager')) {
+            $this->merge(['branch_id' => $this->input('branch_id')]);
+        } else {
+            $this->merge(['branch_id' => session()->get('auth_user_branch')]);
+        }
     }
 
 
