@@ -18,7 +18,7 @@ class JournalBook extends Model
     const COLLECTION_DEPOSITS_BOOK = 7;
     const INTER_BRANCH_BOOKS = [9, 4];
     const CASH_RECEIPT_BOOK_BOOK = 4;
-    const CASH_RECEIVED_BOOKS = [1, 9, 4, 5];
+    const CASH_RECEIVED_BOOKS = [1, 9, 4, 5,6];
     const BOOK_CREDIT = 'credit';
     const BOOK_DEBIT = 'debit';
 
