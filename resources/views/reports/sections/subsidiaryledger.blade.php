@@ -392,16 +392,24 @@
                                             <th class="text-right">Credit</th>
                                             <th class="text-right">Balance</th>
                                         </thead>
-                                        <tbody id="generalLedgerTblContainer">
+                                            <tbody id="generalLedgerTblContainer">
                                             <tr v-if="!subsidiaryAll.length">
-                                                <td colspan="7">
-                                                    <center>No data available in table.</b>
+                                                <td colspan="10">
+                                                    <center>No data available in table.</center>
                                                 </td>
                                             </tr>
-                                            <tr v-for="ps in processedSubsidiary"
+                                            <tr v-for="ps in processedSubsidiary" 
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
-                                                <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
-                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
+                                                <td v-for="(p, i) in ps" :class="rowStyles(p, i, ps)" 
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">
+                                                    @{{ p }}
+                                                </td>
+                                                <!-- Display the button for journal_id only if journal_no exists -->
+                                                <td v-if="ps[1]"> <!-- Check if journal_no exists -->
+                                                    <button v-if="ps[9]" :value="`${ps[9]}`" class="btn btn-flat btn-xs JnalView bg-gradient-success">
+                                                        <i class="fa fa-eye"></i> View 
+                                                    </button>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -617,6 +625,7 @@
                                 data.debit != 0 ? this.formatCurrency(data.debit) : '',
                                 data.credit != 0 ? this.formatCurrency(data.credit) : '',
                                 data.balance ? this.formatCurrency(data.balance) : '0.00',
+                                data.journal_id // Include the journal_id in the array
                                 
                             ];
                             rows.push(row);
