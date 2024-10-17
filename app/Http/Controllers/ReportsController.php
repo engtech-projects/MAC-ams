@@ -864,4 +864,29 @@ class ReportsController extends MainController
 
         return view('reports.sections.incomeStatement', $data);
     }
+
+    public function getCashEndingBalance($branchId, Request $request)
+    {
+        // Validate the transaction_date
+        $request->validate([
+            'transaction_date' => 'required|date', // Validate transaction date
+        ]);
+
+        // Get validated transaction_date
+        $transactionDate = $request->input('transaction_date');
+
+        // Create an instance of journalEntry
+        $journalEntry = new journalEntry();
+
+        // Call your method from journalEntry
+        $cashEndingBalanceData = $journalEntry->getCashEndingBalanceByBranch($branchId, $transactionDate);
+
+        if ($cashEndingBalanceData) {
+            return response()->json(['cash_ending_balance' => $cashEndingBalanceData], 200);
+        } else {
+            return response()->json(['message' => 'No data found for the specified branch and date'], 404);
+        }
+    }
+
+
 }

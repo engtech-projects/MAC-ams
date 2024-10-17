@@ -139,9 +139,9 @@
                                     </div>
                                     @endif
                                     <div class="col-md-3">
-                                        <label for="branch">Transaction Date</label>
+                                        <label for="transactionDate">Transaction Date</label>
                                         <div class="input-group">
-                                            <input type="date" name="transaction_date"
+                                            <input type="date" name="transaction_date" id="transactionDate" 
                                                 class="form-control form-control-sm" required>
                                         </div>
                                     </div>
@@ -747,7 +747,7 @@
                     var url = "{{ route('reports.cashTransactionBlotter') }}"
                     axios.post(url, data)
                         .then(response => {
-                            console.log(response.data.data)
+                            // console.log(response.data.data)
                             this.data = response.data.data
                             //this.branch = response.data.data.branch.branch_name
                             // console.log(this.data);
@@ -770,7 +770,7 @@
                             this.responseData = response.data;
                             this.entries = response.data['entries'];
                             this.collections = response.data['entries']['collections'];
-                            console.log("Collections Data:", this.collections);
+                            // console.log("Collections Data:", this.collections);
                             this.arrangeData(response.data['entries']);
                             this.collections.total_accountofficer = 0;
                             for (var i in this.collections.account_officer_collection) {

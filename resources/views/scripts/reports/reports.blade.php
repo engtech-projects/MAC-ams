@@ -247,52 +247,91 @@
 
         var form = $(this);
         var formData = form.serializeArray();
-        var totalcash_count = Number($('#totalcashcount').text().replace(/[^0-9\.-]+/g,""))
-        var aocollection_items = []
-        var branchcollection_items = []
-        aocollection_items = addAoCollection()
-        branchcollection_items = addBranchCollection()
-
-
-        if(!aocollection_items) {
-            alert("Please add account officer collection")
-            return false
+        var totalcash_count = parseFloat($('#totalcashcount').text().replace(/[^0-9\.-]+/g, ""));
+        var selectedBranchValue = $('#branch_id').val();
+        var transactionDate = $('#transactionDate').val(); // Assuming there's a transaction date input field
+        
+        // Validate transaction date
+        if (!transactionDate) {
+            alert("Please select a transaction date.");
+            return false;
         }
 
-        var selectedBranchValue = $('#branch_id').val();
-        formData.push({name:'branch_id',value:selectedBranchValue});
-        formData.push({name:'total',value:totalcash_count})
-        formData.push({name:'collection_ao',value:aocollection_items})
-        formData.push({name:'branch_collection',value:JSON.stringify(branchcollection_items)})
-		var fdata = {};
-		for(var i in formData){
-			var fd = formData[i];
-			fdata[fd.name] = fd.value;
-		}
+        // Fetch cash ending balance from the ReportsController
         $.ajax({
-				type:'POST',
-				dataType: "json",
-				url:"{{route('create.collection.breakdown')}}",
-				data:fdata,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-				success:function(data) {
-                    toastr.success(data.message);
-                    $('#create-cashblotter-modal').modal('hide');
-                    $('#cash-blotter-tbl').DataTable().ajax.reload();
-                    $('#Mymodal').modal('hide')
-                    reset()
-                },
-                error:function(data){
-                    console.log(data)
-                }
-            })
+            type: 'GET',
+            url: "{{ route('reports.getCashEndingBalance', '') }}/" + selectedBranchValue,
+            data: { transaction_date: transactionDate },
+            success: function(response) {
+                var cashEndingBalance = parseFloat(response.cash_ending_balance); // Adjust based on your JSON structure
 
-    })
+                console.log("Total Cash Count:", totalcash_count);
+                console.log("Cash Ending Balance:", cashEndingBalance);
+                
+                // Compare total cash count with fetched cashEndingBalance
+                if (totalcash_count !== cashEndingBalance) {
+                    let formattedDate = new Date(transactionDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    alert("Total Cash Count does not match Cash Ending Balance of " + amountConverter(cashEndingBalance) + " as of " + formattedDate + "!");
+                    return false; // Prevent form submission
+                }
+
+                // Proceed with form submission if the values match
+                var aocollection_items = addAoCollection();
+                var branchcollection_items = addBranchCollection();
+
+                if (!aocollection_items) {
+                    alert("Please add account officer collection");
+                    return false;
+                }
+
+                formData.push({ name: 'branch_id', value: selectedBranchValue });
+                formData.push({ name: 'total', value: totalcash_count });
+                formData.push({ name: 'collection_ao', value: aocollection_items });
+                formData.push({ name: 'branch_collection', value: JSON.stringify(branchcollection_items) });
+
+                var fdata = {};
+                for (var i in formData) {
+                    var fd = formData[i];
+                    fdata[fd.name] = fd.value;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    dataType: "json",
+                    url: "{{route('create.collection.breakdown')}}",
+                    data: fdata,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(data) {
+                        toastr.success(data.message);
+                        $('#Mymodal').modal('hide');
+                        $('#cash-blotter-tbl').DataTable().ajax.reload();
+                        reset(); // Clear input fields or reset the form
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText); // Log error details
+                        alert("An error occurred: " + (xhr.responseText || "Please try again."));
+                    }
+                });
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText); // Log error details
+                alert("Failed to retrieve Cash Ending Balance. Please try again.");
+            }
+        });
+    });
+
 
     function reset() {
         $('#add-cash-blotter')[0].reset()
+        $('#branch_id').val('').trigger('change')
+        $('#remarks').val('')
+        $('#branch_id_collection').val('').trigger('change')
         $('.aocollection-items').remove()
         $('.branchcollection-items').remove()
         $('#totalbranchcollection').text(0)
@@ -505,7 +544,7 @@
             }
 
             });
-            console.log(amountConverter(totalAmount))
+            // console.log(amountConverter(totalAmount))
 
 
             $('#totalaccountofficercollection').html(amountConverter(totalAmount));

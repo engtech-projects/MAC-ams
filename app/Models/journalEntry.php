@@ -188,6 +188,46 @@ class journalEntry extends Model
         return $total;
     }
 
+    public function getCashEndingBalanceByBranch($branchId, $transactionDate)
+    {
+        // Convert the transaction date from string to a Carbon instance
+        $transactionDate = Carbon::createFromFormat('Y-m-d', $transactionDate);
+
+        // Get the beginning balance for the selected branch
+        $beginningBalance = $this->getBeginningBalance($transactionDate, $branchId);
+
+        // Get cash entries for the specific transaction date based on the branch ID
+        $entries = journalEntry::select('journal_id', 'book_id', 'status', 'cheque_no', 'cheque_date', 'journal_date', 'source', 'journal_no', 'branch_id')
+            ->whereDate('journal_date', $transactionDate) // Directly pass the date instance
+            ->posted()
+            ->where('branch_id', $branchId) // Assuming branchId is always valid and provided
+            ->with([
+                'branch' => function ($query) {
+                    $query->select('branch_id', 'branch_name');
+                },
+                'details' => function ($query) {
+                    $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')
+                        ->whereIn('account_id', [
+                            Accounts::CASH_IN_BANK_BDO_ACC,
+                            Accounts::CASH_IN_BANK_MYB_ACC,
+                            Accounts::CASH_ON_HAND_ACC,
+                            Accounts::PAYABLE_CHECK_ACC,
+                            Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC,
+                        ]);
+                }
+            ])
+            ->get();
+
+        // Calculate total cash in and cash out for the ending balance
+        $totalCashIn = $entries->sum('details.cash_in');
+        $totalCashOut = $entries->sum('details.cash_out');
+
+        // Calculate the cash ending balance
+        $cashEndingBalance = $beginningBalance + $totalCashIn - $totalCashOut;
+
+        return $cashEndingBalance;
+    }
+
     public function getCashBlotterEntries($id, $branchId)
     {
 

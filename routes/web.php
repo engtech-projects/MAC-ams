@@ -171,6 +171,7 @@ Route::post('collections', [CollectionController::class, 'store'])->name('create
 Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
 
 Route::get('reports/cashTransactionBlotter/cashblotter', [ReportsController::class, 'cashBlotterIndex'])->name('reports.cashblotter');
+Route::get('reports/cashTransactionBlotter/getCashEndingBalance/{branchId}', [ReportsController::class, 'getCashEndingBalance'])->name('reports.getCashEndingBalance');
 Route::post('reports/cashTransactionBlotter/storecashblotter', [ReportsController::class, 'storeCashBlotter'])->name('reports.storeCashBlotter');
 Route::get('reports/cashTransactionBlotter/showcashblotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.getCashBlotter');
 Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsController::class, 'editCashBlotter'])->name('reports.editCashBlotter');
