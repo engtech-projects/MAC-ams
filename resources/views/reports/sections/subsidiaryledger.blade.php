@@ -391,6 +391,7 @@
                                             <th class="text-right">Debit</th>
                                             <th class="text-right">Credit</th>
                                             <th class="text-right">Balance</th>
+                                            <th class="text-right"></th>
                                         </thead>
                                             <tbody id="generalLedgerTblContainer">
                                             <tr v-if="!subsidiaryAll.length">
@@ -400,7 +401,7 @@
                                             </tr>
                                             <tr v-for="ps in processedSubsidiary" 
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
-                                                <td v-for="(p, i) in ps" :class="rowStyles(p, i, ps)" 
+                                                <td v-for="(p, i) in ps.slice(0,9)" :class="rowStyles(p, i, ps)" 
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">
                                                     @{{ p }}
                                                 </td>
