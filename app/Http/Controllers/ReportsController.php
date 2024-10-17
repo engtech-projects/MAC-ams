@@ -881,11 +881,7 @@ class ReportsController extends MainController
         // Call your method from journalEntry
         $cashEndingBalanceData = $journalEntry->getCashEndingBalanceByBranch($branchId, $transactionDate);
 
-        if ($cashEndingBalanceData) {
-            return response()->json(['cash_ending_balance' => $cashEndingBalanceData], 200);
-        } else {
-            return response()->json(['message' => 'No data found for the specified branch and date'], 404);
-        }
+        return response()->json(['cash_ending_balance' => $cashEndingBalanceData], 200);
     }
 
 
