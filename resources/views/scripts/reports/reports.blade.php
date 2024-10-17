@@ -249,6 +249,7 @@
         var formData = form.serializeArray();
         var totalcash_count = parseFloat($('#totalcashcount').text().replace(/[^0-9\.-]+/g, ""));
         var selectedBranchValue = $('#branch_id').val();
+        var cashEndingBranch = selectedBranchValue ? selectedBranchValue : "{{ session()->get('auth_user_branch') }}" ;
         var transactionDate = $('#transactionDate').val(); // Assuming there's a transaction date input field
         
         // Validate transaction date
@@ -260,7 +261,7 @@
         // Fetch cash ending balance from the ReportsController
         $.ajax({
             type: 'GET',
-            url: "{{ route('reports.getCashEndingBalance', '') }}/" + selectedBranchValue,
+            url: "{{ route('reports.getCashEndingBalance', '') }}/" + cashEndingBranch,
             data: { transaction_date: transactionDate },
             success: function(response) {
                 var cashEndingBalance = parseFloat(response.cash_ending_balance); // Adjust based on your JSON structure
