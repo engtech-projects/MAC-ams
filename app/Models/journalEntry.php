@@ -202,9 +202,6 @@ class journalEntry extends Model
             ->posted()
             ->where('branch_id', $branchId) // Assuming branchId is always valid and provided
             ->with([
-                'branch' => function ($query) {
-                    $query->select('branch_id', 'branch_name');
-                },
                 'details' => function ($query) {
                     $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')
                         ->whereIn('account_id', [
@@ -219,8 +216,13 @@ class journalEntry extends Model
             ->get();
 
         // Calculate total cash in and cash out for the ending balance
-        $totalCashIn = $entries->sum('details.cash_in');
-        $totalCashOut = $entries->sum('details.cash_out');
+        $totalCashIn = $entries->flatMap(function ($entry) {
+            return $entry->details;
+        })->sum('cash_in');
+
+        $totalCashOut = $entries->flatMap(function ($entry) {
+            return $entry->details;
+        })->sum('cash_out');
 
         // Calculate the cash ending balance
         $cashEndingBalance = $beginningBalance + $totalCashIn - $totalCashOut;
