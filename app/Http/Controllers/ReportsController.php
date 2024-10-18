@@ -884,5 +884,19 @@ class ReportsController extends MainController
         return response()->json(['cash_ending_balance' => $cashEndingBalanceData], 200);
     }
 
+    public function getLatestCollectionBreakdown($branch_id, Request $request)
+    {
+        // Get the transaction date from the request (optional)
+        $transactionDate = $request->input('transactionDate');
 
+        // Fetch the latest collection breakdown for the specified branch
+        $latestCollection = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branch_id)
+            ->first();  // Fetch the first (latest) record for the branch
+
+        // Return the result as JSON
+        return response()->json([
+            'latest_collection' => $latestCollection ? $latestCollection : null // Return null if no record exists
+        ]);
+    }
+    
 }

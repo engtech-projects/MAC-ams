@@ -141,7 +141,7 @@
                                     <div class="col-md-3">
                                         <label for="transactionDate">Transaction Date</label>
                                         <div class="input-group">
-                                            <input type="date" name="transaction_date" id="transactionDate" 
+                                            <input type="date" name="transaction_date" id="transactionDate" disabled 
                                                 class="form-control form-control-sm" required>
                                         </div>
                                     </div>
@@ -922,8 +922,13 @@
                 /*                 this.getBranchList(); */
                 this.data = @json($cash_blotter);
                 this.branches = @json($branches);
-                // console.log(this.data);
             }
+        });
+    </script>
+    <script>
+        // Disable keyboard input for the date field
+        document.getElementById('transactionDate').addEventListener('keydown', function(e) {
+            e.preventDefault();
         });
     </script>
 @endsection

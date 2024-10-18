@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CollectionBreakdown;
 
 class CreateOrUpdateCollectionRequest extends FormRequest
 {
@@ -35,10 +36,18 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "p_5" => 'required|numeric',
             "p_1" => 'required|numeric',
             "c_25" => 'required|numeric',
-            "transaction_date" => 'required|date',
+            "transaction_date" => 'required|date|unique:collection_breakdown,transaction_date,NULL,id,branch_id,' . $this->branch_id,
             "branch_id" => 'required|numeric',
             "total" => 'required|numeric',
             "collection_ao" => "required",
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'transactionDate.required' => 'The transaction date is required.',
+            'transactionDate.date' => 'The transaction date must be a valid date.',
+            'transactionDate.unique' => 'The transaction date has already been used for this branch.',
         ];
     }
     protected function prepareForValidation()

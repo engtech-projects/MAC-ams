@@ -26,7 +26,48 @@
             $('#Mymodal').modal('show')
             reset()
             $('#title').text("Cashier's Transaction Blotter (New)")
+
+            var branchID;
+
+            if ($('#branch_id').length) {
+                $(document).on('change','#branch_id',function(){
+                    branchID = $(this).val(); // Get selected value from the dropdown
+                    fetchCollectionBreakdown(branchID);
+                });
+            } else {
+                $('#transactionDate').prop('disabled', false);
+                branchID = "{{ session()->get('auth_user_branch') }}"; // Use session value if not visible
+                fetchCollectionBreakdown(branchID);
+            }
         });
+
+        // Function to fetch collection breakdown based on branch ID
+        function fetchCollectionBreakdown(branchID) {
+            if (branchID) {
+                $.ajax({
+                    type: 'GET',
+                    url: "{{ route('reports.getLatestCollectionBreakdown', '') }}/" + branchID,
+                    success: function(response) {
+                        if (response.latest_collection) {
+                            // Get the transaction date and increment it by one day
+                            const lastTransaction = new Date(response.latest_collection.transaction_date);
+                            // console.log(lastTransaction);
+                            lastTransaction.setDate(lastTransaction.getDate() + 1);
+                            
+                            // Set the min attribute to the next day in YYYY-MM-DD format
+                            $('#transactionDate').attr("min", lastTransaction.toISOString().split('T')[0]);
+                        } else {
+                            $('#transactionDate').removeAttr("min"); // Remove the min attribute if no collection data
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                    }
+                });
+            } else {
+                $('#transactionDate').datepicker("option", "minDate", null);
+            }
+        }
 
      /*
      **********************  EDIT CASH BLOTTER **************************
@@ -194,6 +235,19 @@
     /*
      **********************  ADD CASH BLOTTER **************************
     */
+    $(document).on('change', '#branch_id', function() {
+        // Get the selected branch ID
+        const selectedBranchId = $(this).val();
+
+        // If a branch is selected (i.e., selectedBranchId is not empty or null)
+        if (selectedBranchId) {
+            // Enable the date picker (if branch is selected)
+            $('#transactionDate').prop('disabled', false);
+        } else {
+            // Disable the date picker (if no branch is selected)
+            $('#transactionDate').prop('disabled', true);
+        }
+    });
 
     $(document).on('change','#select_branch',function(){
         var branch_id   =   $(this).val()
@@ -266,8 +320,8 @@
             success: function(response) {
                 var cashEndingBalance = parseFloat(response.cash_ending_balance); // Adjust based on your JSON structure
 
-                console.log("Total Cash Count:", totalcash_count);
-                console.log("Cash Ending Balance:", cashEndingBalance);
+                // console.log("Total Cash Count:", totalcash_count);
+                // console.log("Cash Ending Balance:", cashEndingBalance);
                 
                 // Compare total cash count with fetched cashEndingBalance
                 if (totalcash_count !== cashEndingBalance) {
@@ -316,7 +370,20 @@
                     },
                     error: function(xhr) {
                         console.error(xhr.responseText); // Log error details
-                        alert("An error occurred: " + (xhr.responseText || "Please try again."));
+                        // Handle validation errors
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors; // Access validation errors
+                            var errorMessages = [];
+                            for (var field in errors) {
+                                errorMessages.push(errors[field].join(', ')); // Join messages for each field
+                            }
+                            alert("Validation errors:\n" + errorMessages.join("\n")); // Display the errors
+                            reset()
+                        } else {
+                            // Handle other errors (e.g., server errors)
+                            alert("An error occurred: " + (xhr.responseJSON.message || "Please try again."));
+                            reset()
+                        }
                     }
                 });
             },
@@ -326,7 +393,6 @@
             }
         });
     });
-
 
     function reset() {
         $('#add-cash-blotter')[0].reset()
