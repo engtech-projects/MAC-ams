@@ -385,6 +385,7 @@
                                             <th class="text-right">Debit</th>
                                             <th class="text-right">Credit</th>
                                             <th class="text-right">Balance</th>
+
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr v-if="!subsidiaryAll.entries">
@@ -442,6 +443,7 @@
                                             <th class="text-right">Debit</th>
                                             <th class="text-right">Credit</th>
                                             <th class="text-right">Balance</th>
+                                            <th class="text-right"></th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr v-if="!subsidiaryAll.entries">
@@ -461,6 +463,12 @@
                                                 <td v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
+                                                <td v-if="ps[2]"> <!-- Check if journal_no exists -->
+                                                    <button v-if="ps[2]" :value="`${ps[9]}`" class="btn btn-flat btn-sm JnalView bg-gradient-success">
+                                                        <i class="fa fa-eye"></i> View
+                                                    </button>
+                                                </td>
+
                                             </tr>
                                         </tbody>
                                     </table>
@@ -489,6 +497,11 @@
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                </td>
+                                                <td v-if="ps[1]"> <!-- Check if journal_no exists -->
+                                                    <button v-if="ps[9]" :value="`${ps[9]}`" class="btn btn-flat btn-xs JnalView bg-gradient-success">
+                                                        <i class="fa fa-eye"></i> View
+                                                    </button>
                                                 </td>
                                             </tr>
                                         </tbody>
