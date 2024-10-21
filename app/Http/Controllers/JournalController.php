@@ -62,7 +62,7 @@ class JournalController extends MainController
         $data = [
             'title' => 'MAC-AMS | Journal Entry',
             'journalBooks' => JournalBook::getBookWithJournalCount(),
-            'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
             'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get()
         ];
 
@@ -167,7 +167,7 @@ class JournalController extends MainController
         $data = [
             'title' => 'MAC-AMS | Journal Entry List',
             'journalBooks' => JournalBook::get(),
-            'subsidiaries' => Subsidiary::with(['subsidiaryCategory'])->orderBy('sub_cat_id', 'ASC')->get(),
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
             'journalEntryList' => JournalEntry::fetch('posted', $current_date->toDateString(), $current_date->toDateString()),
             'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get(),
             'default_date_start' => $current_date->toDateString()
