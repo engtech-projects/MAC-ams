@@ -583,6 +583,181 @@
                     <!-- /.Table -->
                 </div>
             </div>
+                        <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
+                aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="container-fluid ">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-4 frm-header">
+                                            <h4><b>Journal Entry (Preview)</b></h4>
+                                        </div>
+                                        <div class="col-md-4 frm-header">
+                                            <label class="label-bold label-sty" for="date">Journal Date</label>
+                                            <div class="input-group">
+                                                <label class="label-bold" id="vjournal_date"></label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 frm-header">
+                                            <label class="label-bold label-sty" for="date">Journal Reference No</label>
+                                            <div class="input-group">
+                                                <label class="label-bold" id="voucher_ref_no"></label>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-3 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="branch_id">Branch</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal text-bold" id="vjournal_branch"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="">Book
+                                                        Reference</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal" id="vjournal_book_reference"></label>
+                                                    </div>
+                                                    <input type="hidden" name="book_id" id="journalEntryBookId">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-xs-12">
+
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="source">Source</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal" id="vjournal_source"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="cheque_no">Cheque No</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal vjournal_cheque"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="cheque_no">Cheque
+                                                        Date</label>
+                                                    <div class="input-group">
+                                                        <label class="label-bold vjournal_cheque_date"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="amount">Amount</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal" style="font-size:30px;">₱ <font
+                                                                id="vjournal_amount"></font></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="payee">Payee</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal" id="vjournal_payee">Book_no</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="remarks">Remarks</label>
+                                                    <div class="input-group no-margin">
+                                                        <label class="label-normal" id="vjournal_remarks"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-bold label-sty" for="status">Status</label>
+                                                    <div class="input-group">
+                                                        <label class="label-normal" id="vjournal_status"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="co-md-12" style="height:10px;"></div>
+                                <div class="col-md-12">
+                                    <div class="co-md-12" style="height:10px;"></div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm text-center"
+                                                id="tbl-create-journal">
+                                                <thead>
+                                                    <tr class="text-center">
+                                                        <th style="width: 10%;">Account #</th>
+                                                        <th style="width: 30%;">Account Name</th>
+                                                        <th style="width: 30%;">S/L</th>
+                                                        <th style="width: 15%;">Debit</th>
+                                                        <th style="width: 15%;">Credit</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbl-create-journalview-container">
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th width="200">TOTAL</th>
+                                                        <th width="150" id="vtotal_debit">0</th>
+                                                        <th width="150" id="vtotal_credit">0</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th width="200">BALANCE</th>
+                                                        <th width="150" id="vbalance_debit">0</th>
+                                                        <th width="150" id="vcredit"></th>
+                                                    </tr>
+
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12" style="height:20px;"></div>
+
+
+                                    </div>
+                                </div>
+                                <!-- Button trigger modal -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         </div>
     </section>
