@@ -28,7 +28,7 @@ class Subsidiary extends Model
         'sub_date_post'
     ];
 
-    public function subsidiaryCategory()
+    public function subsidiary_category()
     {
         return $this->belongsTo(SubsidiaryCategory::class, 'sub_cat_id');
     }
@@ -41,9 +41,7 @@ class Subsidiary extends Model
         return $branch;
     }
 
-    public function deleteSubsidiary($id) {
-        
-    }
+    public function deleteSubsidiary($id) {}
     public function getDepreciation($categoryId, $branch, $date)
     {
 
@@ -51,7 +49,7 @@ class Subsidiary extends Model
             $query->where('sub_cat_id', $categoryId)->where('sub_per_branch', $branch->branch_code);
         })->when(isset($date['month']) && isset($date['year']), function ($query) use ($date) {
             $query->whereMonth('sub_date', $date['month'])->whereYear('sub_date', $date['year']);
-        })->whereHas('subsidiaryCategory', function ($query) {
+        })->whereHas('subsidiary_category', function ($query) {
             $query->where('sub_cat_type', 'depre');
         })->whereNotNull('sub_per_branch')->get();
         return $subsidiary;

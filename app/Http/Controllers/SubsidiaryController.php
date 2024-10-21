@@ -14,15 +14,17 @@ class SubsidiaryController extends Controller
     {
         $data = $request->validate([
             'sub_name' => 'string|required',
-            'sub_code' => 'string|required',
-            'sub_address' => 'string|required',
-            'sub_tel' => 'string',
-            'sub_acct_no' => 'string|required',
+            'sub_code' => 'string|required|max:5',
+            'sub_no_amort' => 'required',
+            'sub_date' => 'date|required',
+            'sub_cat_id' => 'integer|required',
             'sub_salvage' => 'numeric|required',
             'sub_amount' => 'numeric|required',
             'sub_no_depre' => 'numeric|required',
+            'sub_per_branch' => 'string',
 
         ]);
+
         try {
             Subsidiary::create($data);
         } catch (\Exception $e) {

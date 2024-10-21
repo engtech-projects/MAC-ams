@@ -160,12 +160,20 @@ class ReportsController extends MainController
 
 
         $branches = Branch::all();
-        $date = explode("-", $request->sub_date);
-        $as_of = Carbon::parse($request->sub_date)->endOfMonth();
+
+        if ($request->sub_date) {
+
+            $date = explode("-", $request->sub_date);
+            $as_of = Carbon::parse($request->sub_date)->endOfMonth();
+        } else {
+            $date = explode('-', now()->format('Y-m'));
+            $as_of = Carbon::parse($date[0] . '-' . $date[1])->endOfMonth();
+        }
 
 
         $subsidiary = new Subsidiary();
         $branch = Branch::find($request->branch_id);
+
         $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
 
 
@@ -179,8 +187,9 @@ class ReportsController extends MainController
             $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
             $value['branch_code'] = $branch->branch_code;
             $value['branch_id'] = $branch->branch_id;
-            $value['sub_cat_name'] = $value->subsidiaryCategory->sub_cat_name;
-            $value['sub_cat_id'] = $value->subsidiaryCategory->sub_cat_id;
+            $value['description'] = $value->subsidiary_category->description;
+            $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
+            $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
             $value['monthly_amort'] = $monthlyAmort;
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($value->sub_amount - $value->expensed);
@@ -190,7 +199,7 @@ class ReportsController extends MainController
             $value['inv'] = 0;
             $value['no'] = 0;
             return $value;
-        })->groupBy('sub_cat_name')->map(function ($value) {
+        })->groupBy('description')->map(function ($value) {
             return $value->groupBy('branch');
         });
         $data = [
@@ -202,11 +211,11 @@ class ReportsController extends MainController
         ];
         return view('reports.sections.monthlyDepreciation', $data);
 
-        /* return response()->json([
+        return response()->json([
             'data' => $data,
             'as_of' => isset($request->sub_date) ? $request->sub_date : null,
             'message' => 'Successfully Fetched'
-        ]); */
+        ]);
     }
 
     public function postMonthlyDepreciation(Request $request)
@@ -303,6 +312,7 @@ class ReportsController extends MainController
             return response()->json(['message' => 'Failed to save journal entry'], 500);
         }
     }
+
 
 
     public function subsidiaryLedgerReports(Request $request)
@@ -898,5 +908,5 @@ class ReportsController extends MainController
             'latest_collection' => $latestCollection ? $latestCollection : null // Return null if no record exists
         ]);
     }
-    
+
 }
