@@ -52,6 +52,8 @@
                                         <option value="income_minus_expense_summary">Income Minus Expense (Summary)</option>
                                         <option value="subsidiary_all_account">Subsidiary (All Account)</option>
                                         <option value="subsidiary_per_account">Subsidiary (Per Account)</option>
+                                        <option value="subsidiary-ledger-listing-report">Subsidiary (Listing)</option>
+                                        <option value="subsidiary-ledger-summary-report">Subsidiary (Summary)</option>
                                         <option value="schedule_of_account">Schedule of Account</option>
                                         <option value="subsidiary_aging_account">Subsidiary Aging / Account</option>
                                         <option value="aging_of_payables">Aging of Payables</option>
@@ -229,19 +231,20 @@
 
                     </form>
                     <form @submit.prevent="submitForm" action="">
-                        <div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'"
+                        <div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'||reportType=='subsidiary-ledger-listing-report'||reportType=='subsidiary-ledger-summary-report'"
                             class="row col-md-12 no-print">
-                            <div class="col-md-2" style="margin-right: 10px;">
+                            <div class="col-md-2 col-xs-12"
+                                v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
                                         <div class="input-group">
-                                            <select name="subsidiary_id"
+                                            <select v-model="filter.subsidiary_id" name="subsidiary_id"
                                                 class="select2 form-control form-control-sm" style="width:100%"
-                                                id="subsidiaryDD">
+                                                id="subsidiary_id">
+                                                <option value="" disabled selected>-Select Category-</option>
                                                 @foreach ($subsidiaryData as $subdata)
-                                                    <option value="{{ $subdata->sub_id }}">
-                                                        {{ $subdata->sub_code }} - {{ $subdata->sub_name }}
+                                                    <option value="{{ $subdata->sub_id }}">{{ $subdata->sub_name }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -250,30 +253,24 @@
                                 </div>
                             </div>
 
-                            
-
-                            <div v-show="reportType=='subsidiary_per_account'" class="col-md-3" >
+                            <div v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='subsidiary-ledger-summary-report'"
+                                class="col-md-3 col-xs-12" style="margin-right:64px;">
                                 <div class="box">
-                                    <div class="form-group" style="width: 100%">
-                                        <label class="label-normal" for="sub_name"> Account Title </label>
-                                        <div class="input-group" style="width: 100% !important">
-                                            <select 
-                                                name="account_id" 
-                                                class="select2 form-control form-control-sm"
-                                                id="subsidiaryFilterAccountTitle"
-                                                style="width: 100% !important;"
-                                                >
+                                    <div class="form-group">
+                                        <label class="label-normal" for="account">Account</label>
+                                        <div class="input-group">
+                                            <select v-model="filter.account_id" name="account_id"
+                                                class="form-control form-control-sm" id="gender select-account">
+                                                <option value="" disabled selected>-Select Account-</option>
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
-                                                    @if ($account->type == 'L' || $account->type == 'R')
-                                                        <option value="{{ $account->account_id }}">
-                                                            {{ $account->account_number }} - {{ $account->account_name }}
-                                                        </option>
-                                                    @endif
+                                                    <option value="{{ $account->account_id }}">
+                                                        {{ $account->account_number }} - {{ $account->account_name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
 
                             </div>
@@ -376,10 +373,7 @@
                                         </tbody>
                                     </table>
 
-
-
-                                    <table
-                                        v-if="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'"
+                                    <table v-if="reportType=='subsidiary-ledger-listing-report'"
                                         style="table-layout: fixed;" id="generalLedgerTbl" class="table">
                                         <thead>
                                             <th width="15%">Date</th>
@@ -391,25 +385,110 @@
                                             <th class="text-right">Debit</th>
                                             <th class="text-right">Credit</th>
                                             <th class="text-right">Balance</th>
-                                            <th class="text-right"></th>
                                         </thead>
-                                            <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.length">
-                                                <td colspan="10">
-                                                    <center>No data available in table.</center>
+                                        <tbody id="generalLedgerTblContainer">
+                                            <tr v-if="!subsidiaryAll.entries">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
                                                 </td>
                                             </tr>
-                                            <tr v-for="ps in processedSubsidiary" 
+
+                                            <tr v-for="ps in listing"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
-                                                <td v-for="(p, i) in ps.slice(0,9)" :class="rowStyles(p, i, ps)" 
-                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">
-                                                    @{{ p }}
+                                                {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
+                                                <td v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <table v-if="reportType=='subsidiary-ledger-summary-report'"
+                                        style="table-layout: fixed;" id="subsidiarySummaryReport" class="table">
+                                        <thead>
+                                            <th width="15%">Code</th>
+                                            <th width="25%">Reference Name</th>
+                                            <th class="text-right">Debit</th>
+                                            <th class="text-right">Credit</th>
+                                            <th class="text-right">Balance</th>
+
+
+                                        </thead>
+                                        <tbody id="generalLedgerTblContainer">
+                                            <tr v-if="!subsidiaryAll.entries">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
                                                 </td>
-                                                <!-- Display the button for journal_id only if journal_no exists -->
-                                                <td v-if="ps[1]"> <!-- Check if journal_no exists -->
-                                                    <button v-if="ps[9]" :value="`${ps[9]}`" class="btn btn-flat btn-xs JnalView bg-gradient-success">
-                                                        <i class="fa fa-eye"></i> View 
-                                                    </button>
+                                            </tr>
+
+                                            <tr v-for="ps in summary">
+                                                <td v-for="p,i in ps" :class="rowStyleSubsidiarySummary(p, i, ps)"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                    <table v-if="reportType=='subsidiary_per_account'" style="table-layout: fixed;"
+                                        id="generalLedgerTbl" class="table">
+                                        <thead>
+                                            <th width="15%">Date</th>
+                                            <th>Reference</th>
+                                            <th width="26%">Preference Name</th>
+                                            <th>Source</th>
+                                            <th>Cheque Date</th>
+                                            <th>Cheque No.</th>
+                                            <th class="text-right">Debit</th>
+                                            <th class="text-right">Credit</th>
+                                            <th class="text-right">Balance</th>
+                                        </thead>
+                                        <tbody id="generalLedgerTblContainer">
+                                            <tr v-if="!subsidiaryAll.entries">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
+                                                </td>
+                                            </tr>
+                                            {{--
+                                            <tr v-for="ps in processedSubsidiary"
+                                                :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                                <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
+                                            </tr> --}}
+                                            <tr v-for="ps in subledger"
+                                                :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                                {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
+                                                <td v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table v-if="reportType=='subsidiary_all_account'" style="table-layout: fixed;"
+                                        id="generalLedgerTbl" class="table">
+                                        <thead>
+                                            <th width="15%">Date</th>
+                                            <th>Reference</th>
+                                            <th width="26%">Preference Name</th>
+                                            <th>Source</th>
+                                            <th>Cheque Date</th>
+                                            <th>Cheque No.</th>
+                                            <th class="text-right">Debit</th>
+                                            <th class="text-right">Credit</th>
+                                            <th class="text-right">Balance</th>
+                                        </thead>
+                                        <tbody id="generalLedgerTblContainer">
+                                            <tr v-if="!subsidiaryAll.entries">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
+                                                </td>
+                                            </tr>
+
+                                            <tr v-for="ps in processedSubsidiary"
+                                                :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                                <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -491,181 +570,6 @@
                     <!-- /.Table -->
                 </div>
             </div>
-            <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
-                aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <div class="container-fluid ">
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-4 frm-header">
-                                            <h4><b>Journal Entry (Preview)</b></h4>
-                                        </div>
-                                        <div class="col-md-4 frm-header">
-                                            <label class="label-bold label-sty" for="date">Journal Date</label>
-                                            <div class="input-group">
-                                                <label class="label-bold" id="vjournal_date"></label>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4 frm-header">
-                                            <label class="label-bold label-sty" for="date">Journal Reference No</label>
-                                            <div class="input-group">
-                                                <label class="label-bold" id="voucher_ref_no"></label>
-                                            </div>
-                                        </div>
-                                        
-                                        
-                                        <div class="col-md-3 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="branch_id">Branch</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal text-bold" id="vjournal_branch"></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="">Book
-                                                        Reference</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal" id="vjournal_book_reference"></label>
-                                                    </div>
-                                                    <input type="hidden" name="book_id" id="journalEntryBookId">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-xs-12">
-                                            
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="source">Source</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal" id="vjournal_source"></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="cheque_no">Cheque No</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal vjournal_cheque"></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="cheque_no">Cheque
-                                                        Date</label>
-                                                    <div class="input-group">
-                                                        <label class="label-bold vjournal_cheque_date"></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-3 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="amount">Amount</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal" style="font-size:30px;">₱ <font
-                                                                id="vjournal_amount"></font></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="payee">Payee</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal" id="vjournal_payee">Book_no</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="remarks">Remarks</label>
-                                                    <div class="input-group no-margin">
-                                                        <label class="label-normal" id="vjournal_remarks"></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-xs-12">
-                                            <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-bold label-sty" for="status">Status</label>
-                                                    <div class="input-group">
-                                                        <label class="label-normal" id="vjournal_status"></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="co-md-12" style="height:10px;"></div>
-                                <div class="col-md-12">
-                                    <div class="co-md-12" style="height:10px;"></div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <table class="table table-bordered table-sm text-center"
-                                                id="tbl-create-journal">
-                                                <thead>
-                                                    <tr class="text-center">
-                                                        <th style="width: 10%;">Account #</th>
-                                                        <th style="width: 30%;">Account Name</th>
-                                                        <th style="width: 30%;">S/L</th>
-                                                        <th style="width: 15%;">Debit</th>
-                                                        <th style="width: 15%;">Credit</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tbl-create-journalview-container">
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th width="200">TOTAL</th>
-                                                        <th width="150" id="vtotal_debit">0</th>
-                                                        <th width="150" id="vtotal_credit">0</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th width="200">BALANCE</th>
-                                                        <th width="150" id="vbalance_debit">0</th>
-                                                        <th width="150" id="vcredit"></th>
-                                                    </tr>
-
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12" style="height:20px;"></div>
-                                    
-
-                                    </div>
-                                </div>
-                                <!-- Button trigger modal -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         </div>
     </section>
@@ -677,9 +581,9 @@
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
-                    from: '',
-                    to: '',
-                    account_id: '',
+                    from: '2024-01-01',
+                    to: '2024-02-01',
+                    account_id: 'all',
                     type: ''
                 },
                 incomeExpense: {
@@ -692,12 +596,15 @@
             },
             methods: {
                 submitForm: function() {
-                    if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {
-                        this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
-                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                    if (this.reportType == 'subsidiary_all_account' || this.reportType ==
+                        'subsidiary_per_account') {
                         this.fetchSubAll();
                     } else if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();
+                    } else if (this.reportType == 'subsidiary-ledger-listing-report') {
+                        this.fetchSubAll();
+                    } else if (this.reportType == 'subsidiary-ledger-summary-report') {
+                        this.fetchSubAll();
                     }
 
                 },
@@ -710,10 +617,17 @@
                             }
                         })
                         .then(response => {
-                            console.log(response.data.data[0]);
-                            this.subsidiaryAll = response.data.data[0];
-                            this.balance = response.data.data[1];
-                            // console.log(response.data.data);
+                            if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
+                                'subsidiary-ledger-summary-report') {
+                                this.subsidiaryAll = response.data.data;
+
+                            } else {
+                                this.subsidiaryAll = response.data.data[0];
+                                this.balance = response.data.data[1];
+                            }
+
+
+
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -750,6 +664,26 @@
                     }
                     return style;
                 },
+                rowStyleSubsidiaryListing: function(p, i, r) {
+                    var style = '';
+                    if (i >= 6) {
+                        style += 'text-right';
+                    }
+                    if (i == 0) {
+                        style += ' text-bold';
+                    }
+                    return style;
+                },
+                rowStyleSubsidiarySummary: function(p, i, r) {
+                    var style = '';
+                    if (i >= 2) {
+                        style += 'text-right';
+                    }
+                    if (i == 0) {
+                        style += ' text-bold';
+                    }
+                    return style;
+                },
                 rowStylesIncomeExpense: function(row) {
                     if (row[0].length && !row[1].length) {
                         return 'text-bold';
@@ -772,21 +706,17 @@
                 processedSubsidiary: function() {
                     var entries = {};
                     var rows = [];
-
                     if (this.subsidiaryAll) {
-                        if (this.subsidiaryAll[0]) {
-                            entries = this.subsidiaryAll[0].entries;
-                        }
-                    }
+                        entries = this.subsidiaryAll.entries;
 
+                    }
                     for (var i in entries) {
-                        console.log(entries[i]);
                         var entry = entries[i];
                         var totalCredit = 0;
                         var totalDebit = 0;
                         rows.push([entry.account_number + ' - ' + entry.account_name ? entry.account_name
                             .toUpperCase() : '' + ':', '', '', '', '', '', '', '', this.formatCurrency(
-                                this.balance)
+                                entries[i].opening_balance)
                         ]);
                         for (var d in entry.data) {
                             var data = entry.data[d];
@@ -794,17 +724,16 @@
                             totalDebit += parseFloat(data.debit);
                             var row = [data.journal_date,
                                 data.journal_no,
-                                data.branch,
+                                data.sub_name,
                                 data.source,
                                 data.cheque_date,
                                 data.cheque_no,
                                 data.debit != 0 ? this.formatCurrency(data.debit) : '',
                                 data.credit != 0 ? this.formatCurrency(data.credit) : '',
-                                data.balance ? this.formatCurrency(data.balance) : '0.00',
-                                data.journal_id // Include the journal_id in the array
-                                
+                                data.balance ? this.formatCurrency(data.balance) : '0.00'
                             ];
                             rows.push(row);
+
                             if (this.reportType == 'subsidiary_per_account') {
                                 data.payee != null ? rows.push(['', 'PAYEE: ' + data.payee]) : rows.push(['',
                                     'PAYEE: NONE'
@@ -819,6 +748,261 @@
                         ]);
                         rows.push(['', '', 'Net Movement', '', '', '', '', '', '0.00'])
                     }
+                    return rows;
+
+                },
+                subledger: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                    }
+
+                    for (var i in data) {
+                        var subsidiary = data[i];
+                        rows.push([subsidiary.sub_code + ' - ' + subsidiary.sub_name, '', '', '', '', '', '',
+                            '', this.formatCurrency(this.balance)
+                        ]);
+
+                        var entries = subsidiary.entries;
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var detailsList = entry.data;
+
+
+                            for (var h in detailsList) {
+                                var details = detailsList[h];
+                                totalCredit += parseFloat(details.credit);
+                                totalDebit += parseFloat(details.debit);
+
+                                var arr = [
+                                    details.journal_date,
+                                    details.journal_no,
+                                    details.sub_name,
+                                    details.source,
+                                    details.cheque_date,
+                                    details.cheque_no,
+                                    details.debit != 0 ? this.formatCurrency(details.debit) : '',
+                                    details.credit != 0 ? this.formatCurrency(details.credit) : '',
+                                    details.balance ? this.formatCurrency(details.balance) : '0.00'
+                                ];
+                                rows.push(arr);
+                            }
+                        }
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', '0.00'])
+                    }
+
+
+                    return rows;
+                },
+                listing: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                }
+                    for (var i in data) {
+                        var subsidiary = data[i];
+
+                        rows.push([subsidiary.sub_code + ' - ' + subsidiary.sub_name]);
+
+                        var entries = subsidiary.entries;
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var detailsList = entry.data;
+
+
+                            for (var h in detailsList) {
+                                var details = detailsList[h];
+                                totalCredit += parseFloat(details.credit);
+                                totalDebit += parseFloat(details.debit);
+
+                                var arr = [
+                                    details.journal_date,
+                                    details.journal_no,
+                                    details.sub_name,
+                                    details.source,
+                                    details.cheque_date,
+                                    details.cheque_no,
+                                    details.debit != 0 ? this.formatCurrency(details.debit) : '',
+                                    details.credit != 0 ? this.formatCurrency(details.credit) : '',
+                                    details.balance ? this.formatCurrency(details.balance) : '0.00'
+                                ];
+
+                                // Push the unique row to rows
+                                rows.push(arr);
+                            }
+                        }
+                    }
+
+                    return rows;
+                },
+                summary: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                    }
+
+
+                        var grandTotal = 0;
+                        var grandTotalCredit = 0;
+                        var grandTotalDebit = 0;
+                    for (var i in data) {
+                        var subsidiary = data[i];
+
+                        var entries = subsidiary.entries;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var detailsList = entry.data;
+                            var totalCredit = 0;
+                            var totalDebit = 0;
+                            for (var h in detailsList) {
+                                var details = detailsList[h];
+                                totalCredit += parseFloat(details.credit);
+                                totalDebit += parseFloat(details.debit);
+                            }
+                        }
+
+                        rows.push([subsidiary.sub_code, subsidiary.sub_name, this.formatCurrency(totalDebit),
+                            this.formatCurrency(totalCredit),
+                            this.formatCurrency(totalDebit - totalCredit)
+                        ]);
+                        grandTotalDebit += totalDebit;
+                        grandTotalCredit += totalCredit
+                    }
+                    rows.push(['Grand Total', '', this.formatCurrency(grandTotalDebit), this.formatCurrency(
+                            grandTotalCredit),
+                        this.formatCurrency(grandTotalDebit - grandTotalCredit)
+                    ]);
+
+                    return rows;
+                },
+                processedSubsidiaryListing: function() {
+                    var subsidiaries = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        if (this.subsidiaryAll) {
+                            subsidiaries = this.subsidiaryAll;
+                        }
+                    }
+                    for (var i in subsidiaries) {
+                        var subsidiary = subsidiaries[i];
+                        var entry = subsidiaries[i];
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+                        rows.push([subsidiary.sub_code + ' - ' + subsidiary.sub_name]);
+                        for (var d in subsidiary) {
+                            var entries = subsidiary.entries;
+                            for (k in entries) {
+                                var entry = entries[k];
+                                for (j in entry.data) {
+                                    var detail = entry.data[j];
+                                    totalCredit += parseFloat(detail.credit);
+                                    totalDebit += parseFloat(detail.debit);
+                                    var row = [detail.journal_date,
+                                        detail.journal_no,
+                                        detail.sub_name,
+                                        detail.source,
+                                        detail.cheque_date,
+                                        detail.cheque_no,
+                                        detail.debit != 0 ? this.formatCurrency(detail.debit) : '',
+                                        detail.credit != 0 ? this.formatCurrency(detail.credit) :
+                                        '',
+                                        detail.balance ? this.formatCurrency(detail.balance) :
+                                        '0.00'
+                                    ];
+                                    rows.push(row);
+                                    if (this.reportType == 'subsidiary_per_account') {
+                                        data.payee != null ? rows.push(['', 'PAYEE: ' + data.payee]) :
+                                            rows
+                                            .push([
+                                                '',
+                                                'PAYEE: NONE'
+                                            ])
+                                        rows.push(['', data.remarks ? data.remarks.toUpperCase() : ''])
+                                    }
+                                }
+
+                            }
+
+                        }
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', '0.00'])
+                    }
+                    return rows;
+                },
+                processedSubsidiarySummary: function() {
+                    var subsidiaries = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        if (this.subsidiaryAll) {
+                            subsidiaries = this.subsidiaryAll;
+                        }
+                    }
+                    var grandTotalDebit = 0;
+                    var grandTotalCredit = 0;
+                    for (var i in subsidiaries) {
+
+                        var subsidiary = subsidiaries[i];
+                        var entry = subsidiaries[i];
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+
+                        for (var d in subsidiary) {
+
+                            var entries = subsidiary.entries;
+
+                            for (k in entries) {
+                                var entry = entries[k];
+                                for (j in entry.data) {
+                                    var detail = entry.data[j];
+                                    totalCredit += parseFloat(detail.credit);
+                                    totalDebit += parseFloat(detail.debit);
+
+
+
+                                }
+
+                            }
+
+
+                        }
+
+                        rows.push([subsidiary.sub_code, subsidiary.sub_name, totalDebit, totalCredit,
+                            totalDebit - totalCredit
+                        ]);
+                        grandTotalDebit += totalDebit;
+                        grandTotalCredit += totalCredit
+                    }
+
+                    rows.push(['Grand Total', '', grandTotalDebit != 0 ? this.formatCurrency(
+                            grandTotalDebit) : '',
+                        grandTotalCredit != 0 ? this.formatCurrency(grandTotalCredit) : '',
+                        grandTotalDebit - grandTotalCredit
+                    ]);
+
                     return rows;
                 },
                 processedIncomeExpense: function() {
@@ -892,4 +1076,3 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
     @include('scripts.reports.reports')
 @endsection
-

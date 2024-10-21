@@ -329,7 +329,12 @@ class ReportsController extends MainController
             case 'subsidiary-ledger-listing-report':
 
                 $journalEntry = new journalEntry();
-                $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter);
+                /* $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter); */
+                $subsidiaryListing = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id);
+                return response()->json(['data' => $subsidiaryListing]);
+
+            case 'subsidiary-ledger-summary-report':
+                $subsidiaryListing = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id);
                 return response()->json(['data' => $subsidiaryListing]);
 
             case 'income_minus_expense':
@@ -339,7 +344,8 @@ class ReportsController extends MainController
             case 'subsidiary_all_account':
 
                 $transactions = Accounts::subsidiaryLedger($request->from, $request->to, '', $request->subsidiary_id);
-                return response()->json(['data' => $transactions]);
+                $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], null, $filter['subsidiary_id']);
+                return response()->json(['data' => $transactions, $balance]);
 
             case 'subsidiary_per_account':
                 $glAccounts = new Accounts();
@@ -908,5 +914,4 @@ class ReportsController extends MainController
             'latest_collection' => $latestCollection ? $latestCollection : null // Return null if no record exists
         ]);
     }
-
 }
