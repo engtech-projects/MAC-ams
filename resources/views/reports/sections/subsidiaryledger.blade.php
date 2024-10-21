@@ -498,7 +498,7 @@
                                                 <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
-                                                <td v-if="ps[1]"> <!-- Check if journal_no exists -->
+                                                <td v-if="ps[9]"> <!-- Check if journal_no exists -->
                                                     <button v-if="ps[9]" :value="`${ps[9]}`" class="btn btn-flat btn-xs JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
@@ -743,7 +743,8 @@
                                 data.cheque_no,
                                 data.debit != 0 ? this.formatCurrency(data.debit) : '',
                                 data.credit != 0 ? this.formatCurrency(data.credit) : '',
-                                data.balance ? this.formatCurrency(data.balance) : '0.00'
+                                data.balance ? this.formatCurrency(data.balance) : '0.00',
+                                data.journal_id
                             ];
                             rows.push(row);
 
@@ -801,7 +802,8 @@
                                     details.cheque_no,
                                     details.debit != 0 ? this.formatCurrency(details.debit) : '',
                                     details.credit != 0 ? this.formatCurrency(details.credit) : '',
-                                    details.balance ? this.formatCurrency(details.balance) : '0.00'
+                                    details.balance ? this.formatCurrency(details.balance) : '0.00',
+                                    details.journal_id
                                 ];
                                 rows.push(arr);
                             }

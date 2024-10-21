@@ -53,7 +53,7 @@
                             const lastTransaction = new Date(response.latest_collection.transaction_date);
                             // console.log(lastTransaction);
                             lastTransaction.setDate(lastTransaction.getDate() + 1);
-                            
+
                             // Set the min attribute to the next day in YYYY-MM-DD format
                             $('#transactionDate').attr("min", lastTransaction.toISOString().split('T')[0]);
                         } else {
@@ -305,7 +305,7 @@
         var selectedBranchValue = $('#branch_id').val();
         var cashEndingBranch = selectedBranchValue ? selectedBranchValue : "{{ session()->get('auth_user_branch') }}" ;
         var transactionDate = $('#transactionDate').val(); // Assuming there's a transaction date input field
-        
+
         // Validate transaction date
         if (!transactionDate) {
             alert("Please select a transaction date.");
@@ -322,7 +322,7 @@
 
                 // console.log("Total Cash Count:", totalcash_count);
                 // console.log("Cash Ending Balance:", cashEndingBalance);
-                
+
                 // Compare total cash count with fetched cashEndingBalance
                 if (totalcash_count !== cashEndingBalance) {
                     let formattedDate = new Date(transactionDate).toLocaleDateString('en-US', {
