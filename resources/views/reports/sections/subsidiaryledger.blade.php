@@ -457,10 +457,10 @@
                                                 <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
                                             </tr> --}}
-                                            <tr v-for="ps in subledger"
+                                            <tr v-for="(ps,i) in subledger"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
-                                                <td v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                <td v-if="i<=8" v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[2]"> <!-- Check if journal_no exists -->
@@ -485,6 +485,7 @@
                                             <th class="text-right">Debit</th>
                                             <th class="text-right">Credit</th>
                                             <th class="text-right">Balance</th>
+                                            <th class="text-right"></th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr v-if="!subsidiaryAll.entries">
@@ -493,9 +494,10 @@
                                                 </td>
                                             </tr>
 
-                                            <tr v-for="ps in processedSubsidiary"
+                                            <tr v-for="(ps,i) in processedSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
-                                                <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
+
+                                                <td v-if="i<=8" v-for="p,i in ps" :class="rowStyles(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[9]"> <!-- Check if journal_no exists -->
