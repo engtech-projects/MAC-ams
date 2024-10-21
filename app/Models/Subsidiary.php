@@ -15,6 +15,7 @@ class Subsidiary extends Model
     protected $fillable = [
         'sub_cat_id',
         'sub_name',
+        'sub_code',
         'sub_address',
         'sub_tel',
         'sub_acct_no',
@@ -47,9 +48,7 @@ class Subsidiary extends Model
 
         $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branch, $date) {
             $query->where('sub_cat_id', $categoryId)->where('sub_per_branch', $branch->branch_code);
-        })->when(isset($date['month']) && isset($date['year']), function ($query) use ($date) {
-            $query->whereMonth('sub_date', $date['month'])->whereYear('sub_date', $date['year']);
-        })->whereHas('subsidiary_category', function ($query) {
+        })->whereMonth('sub_date', '=', $date[1])->whereYear('sub_date', '=', $date[0])->whereHas('subsidiary_category', function ($query) {
             $query->where('sub_cat_type', 'depre');
         })->whereNotNull('sub_per_branch')->get();
         return $subsidiary;
