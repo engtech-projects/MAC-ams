@@ -769,8 +769,8 @@
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
-                    from: '2024-01-01',
-                    to: '2024-02-01',
+                    from: '',
+                    to: '',
                     account_id: 'all',
                     type: ''
                 },
