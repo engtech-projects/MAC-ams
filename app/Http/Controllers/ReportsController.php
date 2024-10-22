@@ -159,23 +159,25 @@ class ReportsController extends MainController
     {
 
 
+
         $branches = Branch::all();
 
-        if ($request->sub_date) {
+        /* if ($request->sub_date) {
 
             $date = explode("-", $request->sub_date);
             $as_of = Carbon::parse($request->sub_date)->endOfMonth();
         } else {
             $date = explode('-', now()->format('Y-m'));
             $as_of = Carbon::parse($date[0] . '-' . $date[1])->endOfMonth();
-        }
+        } */
+
+        $date = $request->sub_date;
 
 
         $subsidiary = new Subsidiary();
         $branch = Branch::find($request->branch_id);
 
         $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
-
 
         $data = $result->map(function ($value) use ($branch) {
 
@@ -205,7 +207,7 @@ class ReportsController extends MainController
         $data = [
             'data' => $data,
             'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
-            'as_of' => isset($request->sub_date) ? $as_of : now()->endOfMonth(),
+            'as_of' => $date,
             'branches' => $branches,
             'title' => 'MAC-AMS | Monthly Depreciation',
         ];
@@ -307,9 +309,26 @@ class ReportsController extends MainController
 
         try {
             $data->details()->createMany($journalDetails);
+            $this->updateMonthlyDepreciation($request->sub_ids);
             return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to save journal entry'], 500);
+        }
+    }
+
+    public function updateMonthlyDepreciation(array $sub_ids = [])
+    {
+
+        foreach ($sub_ids as $sub_id) {
+            $subsidiary = Subsidiary::find($sub_id);
+            $sub_no_amort = $subsidiary->sub_no_amort + 1;
+            $subsidiary->sub_no_amort = $sub_no_amort;
+            $subsidiary->update([
+                'sub_no_amort' => $sub_no_amort
+            ]);
+
+ 
+            
         }
     }
 

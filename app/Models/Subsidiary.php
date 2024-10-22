@@ -46,9 +46,11 @@ class Subsidiary extends Model
     public function getDepreciation($categoryId, $branch, $date)
     {
 
-        $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branch, $date) {
+        $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branch) {
             $query->where('sub_cat_id', $categoryId)->where('sub_per_branch', $branch->branch_code);
-        })->whereMonth('sub_date', '=', $date[1])->whereYear('sub_date', '=', $date[0])->whereHas('subsidiary_category', function ($query) {
+        })->when(isset($date), function ($query) use ($date) {
+            $query->whereDate('sub_date', '<=', $date);
+        })->whereHas('subsidiary_category', function ($query) {
             $query->where('sub_cat_type', 'depre');
         })->whereNotNull('sub_per_branch')->get();
         return $subsidiary;

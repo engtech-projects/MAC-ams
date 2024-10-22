@@ -91,7 +91,7 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <input type="month" id="sub_month" v-model="sub_month"
+                                                                <input type="date" id="sub_month" v-model="sub_month"
                                                                     class="form-control form-control-sm rounded-0"
                                                                     name="sub_date" id="sub_date" required>
                                                             </div>
@@ -183,7 +183,7 @@
                                                 </tr>
                                                 <?php $grandtotal = 0; ?>
                                                 @if (count($row) > 0)
-                                                    {
+                                 
                                                     @foreach ($row as $keyBranch => $dd)
                                                         <tr>
                                                             <td colspan="4">
@@ -211,12 +211,13 @@
                                                             'total_inv' => 0,
                                                         ];
                                                         ?>
+                                                        <?php $subIds = []; ?>
                                                         @foreach ($dd as $i => $val)
                                                             @if ($keyBranch === $val['branch'] && $keyCategory === $val['description'])
                                                                 <?php $category_id = $val['sub_cat_id'];
                                                                 $branch_id = $val['branch_id']; ?>
                                                                 <?php $branch_code = $val['branch_code']; ?>
-                                                                <?php $subId = $val['sub_id']; ?>
+                                                                <?php $subId = $val['sub_id']; $subIds[] = $subId; ?>
                                                                 <tr>
                                                                     <td>{{ $i += 1 }}</td>
                                                                     <td>{{ $val->sub_code . '-' . $val->sub_name }}</td>
@@ -287,6 +288,7 @@
                                                             <td>0</td>
                                                         </tr>
                                                         <?php $data = [
+                                                            'sub_ids' => $subIds,
                                                             'total' => $branchTotal,
                                                             'category_id' => $category_id,
                                                             'branch_id' => $branch_id,
@@ -327,7 +329,6 @@
 
                                                         ?>
                                                     @endforeach
-                                                    }
                                                 @endif
                                             @endforeach
                                             @if (count($data) >= 3)
@@ -335,9 +336,9 @@
                                                     <td colspan=3>ACC. TOTAL</td>
                                                     <td>{{ number_format($total['acct']['total_amount'], 2, '.') }}
                                                     </td>
-                                                    <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}
+                                                    <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}
                                                     </td>
-                                                    <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}</td>
+                                                    <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_used'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['acct']['total_expensed'], 2, '.') }}
                                                     </td>
@@ -355,9 +356,9 @@
                                                     <td colspan=3>GRAND TOTAL</td>
                                                     <td>{{ number_format($total['grand']['total_amount'], 2, '.') }}
                                                     </td>
-                                                    <td>{{ number_format($total['grand']['total_monthly'], 2, '.') }}
-                                                    </td>
                                                     <td>{{ number_format($total['grand']['total_amort'], 2, '.') }}
+                                                    </td>
+                                                    <td>{{ number_format($total['grand']['total_monthly'], 2, '.') }}
                                                     </td>
                                                     <td>{{ number_format($total['grand']['total_used'], 2, '.') }}</td>
                                                     <td>{{ number_format($total['grand']['total_expensed'], 2, '.') }}
@@ -531,6 +532,7 @@
                     return current_month;
                 },
                 post: function(data) {
+                    console.log(data);
                     axios.post(this.url, data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -548,8 +550,10 @@
                     this.subsidiary.sub_per_branch = data.sub_per_branch
                 },
                 createSubsidiary: function() {
-
-                    this.subsidiary.sub_no_amort = this.subsidiary.sub_no_depre
+                    var today = DateTime.Now.ToString("yyyy-MM-dd");
+                   // this.subsidiary.sub_no_amort = this.subsidiary.sub_no_depre
+                   this.subsidiary.sub_no_amort = 0;
+                //    this.subsidiary.sub_date = today;
                     axios.post(@json(env('APP_URL')) + '/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -572,6 +576,8 @@
                     })
                 },
                 deleteSub: function(data) {
+                    var url = @json(env('APP_URL'));
+                    console.log(url);
                     axios.delete(@json(env('APP_URL')) + '/subsidiary/' + data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
