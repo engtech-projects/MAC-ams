@@ -890,7 +890,7 @@ class ReportsController extends MainController
         $transactionDate = $request->input('transactionDate');
 
         // Fetch the latest collection breakdown for the specified branch
-        $latestCollection = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branch_id)
+        $latestCollection = CollectionBreakdown::getCollections($transactionDate, $branch_id)
             ->first();  // Fetch the first (latest) record for the branch
 
         // Return the result as JSON
