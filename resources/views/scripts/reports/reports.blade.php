@@ -331,7 +331,7 @@
                         day: 'numeric'
                     });
                     alert("Total Cash Count does not match Cash Ending Balance of " + amountConverter(cashEndingBalance) + " as of " + formattedDate + "!");
-                    return false; // Prevent form submission
+                    //return true; // Prevent form submission
                 }
 
                 // Proceed with form submission if the values match
