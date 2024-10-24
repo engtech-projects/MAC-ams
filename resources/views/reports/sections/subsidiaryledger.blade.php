@@ -239,7 +239,6 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
                                         <div class="input-group">
-                                            <select v-model="filter.subsidiary_id" name="subsidiary_id"
                                             <select name="subsidiary_id"
                                                 class="select2 form-control form-control-sm" style="width:100%"
                                                 id="subsidiaryDD">
