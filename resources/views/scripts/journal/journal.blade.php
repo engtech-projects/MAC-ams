@@ -1142,7 +1142,6 @@
                 success: function(data) {
                     $('#journalEntryDetails').DataTable().destroy();
                     $('#journalEntryDetailsContent').html('');
-                    isHaveAccessToPostUnpost();
                     $.each(data, function(k, v) {
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
@@ -1156,6 +1155,10 @@
                         @if (Gate::allows('manager'))
                             var branch_name = v.branch_name ? v.branch_name : '';
                             branchColumn = `<td>${branch_name}</td>`;
+                            var postUnpostButton =
+                                `<button id="postunpostbtn" value="${v.journal_id}" class="postunpostbtn btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>`;
+                        @else
+                            var postUnpostButton = ''; // No button if not a manager
                         @endif
 
                         var journal_no = v.journal_no ? v.journal_no : '';
@@ -1177,7 +1180,7 @@
                                 <button value="${v.journal_id}" ${cancelled} class="btn btn-flat btn-xs bg-gradient-danger jnalCancel action-buttons">Cancel</button>
                                 <button value="${v.journal_id}" class="btn btn-flat btn-xs JnalView bg-gradient-primary action-buttons">View</button>
                                 <button value="${v.journal_id}" ${disabled} class="btn btn-flat btn-xs JnalEdit bg-gradient-info action-buttons">Edit</button>
-                                <button id="postunpostbtn" value="${v.journal_id}" class="postunpostbtn btn btn-flat btn-xs ${postcolor} stStatus action-buttons">${ifpost}</button>`
+                                ${postUnpostButton}`
                         journalListTable += `</td></tr>`
                         $('#journalEntryDetailsContent').append(journalListTable)
                     });
