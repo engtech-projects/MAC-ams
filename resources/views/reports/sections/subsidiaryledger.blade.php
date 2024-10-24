@@ -240,6 +240,7 @@
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
                                         <div class="input-group">
                                             <select v-model="filter.subsidiary_id" name="subsidiary_id"
+                                            <select name="subsidiary_id"
                                                 class="select2 form-control form-control-sm" style="width:100%"
                                                 id="subsidiaryDD">
                                                 @foreach ($subsidiaryData as $subdata)
@@ -791,8 +792,9 @@
             },
             methods: {
                 submitForm: function() {
-                    if (this.reportType == 'subsidiary_all_account' || this.reportType ==
-                        'subsidiary_per_account') {
+                    if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {                        
+                        this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
+                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
                         this.fetchSubAll();
                     } else if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();
