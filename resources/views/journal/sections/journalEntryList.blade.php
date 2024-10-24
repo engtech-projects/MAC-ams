@@ -60,6 +60,16 @@
         .editable-container.editable-inline .control-group.form-group .editable-input input:not([type=radio]):not([type=checkbox]):not([type=submit]) {
             width: 100%;
         }
+
+        #journalEntryDetails {
+            table-layout: fixed;
+            width: 100%;
+        }
+        th:nth-child(6), td:nth-child(6) {
+            width: 20%;
+            overflow-wrap: break-word;
+        }
+
     </style>
     <!-- Main content -->
     <section class="content">
@@ -176,17 +186,17 @@
                             <div class="col-md-12">
                                 <table id="journalEntryDetails" class="table table-bordered">
                                     <thead>
-                                        <th>Journal Date</th>
-                                        <th>Book Code</th>
-                                        <th>Journal #</th>
-                                        <th>Source</th>
-                                        <th>Amount</th>
-                                        <th width="150">Remarks</th>
+                                        <th style="width: 10%;">Journal Date</th>
+                                        <th style="width: 10%;">Book Code</th>
+                                        <th style="width: 10%;">Journal #</th>
+                                        <th style="width: 10%;">Source</th>
+                                        <th style="width: 10%;">Amount</th>
+                                        <th>Remarks</th>
                                         @if(Gate::allows('manager'))
-                                        <th>Branch</th>
+                                        <th style="width: 10%;">Branch</th>
                                         @endif
-                                        <th>Status</th>
-                                        <th width="150">Action</th>
+                                        <th style="width: 7%;">Status</th>
+                                        <th style="width: 13%;">Action</th>
                                     </thead>
                                     <tbody id="journalEntryDetailsContent">
                                         @foreach ($journalEntryList as $journal)
