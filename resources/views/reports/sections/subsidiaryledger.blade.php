@@ -241,10 +241,10 @@
                                         <div class="input-group">
                                             <select v-model="filter.subsidiary_id" name="subsidiary_id"
                                                 class="select2 form-control form-control-sm" style="width:100%"
-                                                id="subsidiary_id">
-                                                <option value="" disabled selected>-Select Category-</option>
+                                                id="subsidiaryDD">
                                                 @foreach ($subsidiaryData as $subdata)
-                                                    <option value="{{ $subdata->sub_id }}">{{ $subdata->sub_name }}
+                                                    <option value="{{ $subdata->sub_id }}">
+                                                        {{ $subdata->sub_code }} - {{ $subdata->sub_name }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -259,14 +259,19 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="account">Account</label>
                                         <div class="input-group">
-                                            <select v-model="filter.account_id" name="account_id"
-                                                class="form-control form-control-sm" id="gender select-account">
-                                                <option value="" disabled selected>-Select Account-</option>
+                                            <select 
+                                                name="account_id" 
+                                                class="select2 form-control form-control-sm"
+                                                id="subsidiaryFilterAccountTitle"
+                                                style="width: 100% !important;"
+                                                >
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
-                                                    <option value="{{ $account->account_id }}">
-                                                        {{ $account->account_number }} - {{ $account->account_name }}
-                                                    </option>
+                                                    @if ($account->type == 'L' || $account->type == 'R')
+                                                        <option value="{{ $account->account_id }}">
+                                                            {{ $account->account_number }} - {{ $account->account_name }}
+                                                        </option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
