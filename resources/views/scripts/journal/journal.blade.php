@@ -696,6 +696,18 @@
             })
             var _st = false;
 
+            // Check if LrefNo is null or empty after setting it
+            if ($('#edit_LrefNo').text().trim() === '') { // Check if LrefNo is empty
+                $('#edit_book_id').val('');
+                $('#edit_book_id').select2({
+                    placeholder: 'Select',
+                    allowClear: true,
+                });
+                return alert('Error: No reference number generated. Please try again.');
+            } else {
+                console.log('LrefNo value set:', $('#LrefNo').text());
+            }
+
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
                 var field = $(v).children()
                 if ($(field[1]).find('.editable-row-item').val() == null) {
