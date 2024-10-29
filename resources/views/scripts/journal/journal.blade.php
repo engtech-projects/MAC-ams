@@ -410,6 +410,17 @@
             var balances = document.getElementById("balance_debit");
             var spanBal = balances.innerText;
 
+            // Check if LrefNo is null or empty after setting it
+            if ($('#LrefNo').text().trim() === '') { // Check if LrefNo is empty
+                $('#book_id').val('');
+                $('#book_id').select2({
+                    placeholder: 'Select',
+                    allowClear: true,
+                });
+                return alert('Error: No reference number generated. Please try again.');
+            } else {
+                console.log('LrefNo value set:', $('#LrefNo').text());
+            }
 
             if (parseFloat(spanBal) == 0) {
                 // alert("Debit and Credit equal")
@@ -487,8 +498,21 @@
                                     toastr.success(data.message);
                                     reload();
                                 },
-                                error: function(data) {
-                                    toastr.error('Error');
+                                error: function(jqXHR) {
+                                    // Check if it's a validation error
+                                    if (jqXHR.status === 422) {
+                                        $('#LrefNo').text('')
+                                        $('#book_id').val('');
+                                        $('#book_id').select2({
+                                            placeholder: 'Select',
+                                            allowClear: true,
+                                        });
+                                        const errors = jqXHR.responseJSON.errors;
+                                        // Display the validation error in an alert
+                                        alert(errors['journal_entry.journal_no'][0]);
+                                    } else {
+                                        toastr.error('Error');
+                                    }
                                 }
                             });
                         }
@@ -650,23 +674,6 @@
             receivedPaymentVoucher();
         });
 
-        $(document).on('change', '#edit_book_id', function(e) {
-            var bookId = this.value
-            var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
-            url = url.replace(':journalBook', bookId);
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "GET",
-                url: url,
-                dataType: "json",
-                success: function(response) {
-                    $('#edit_journal_no').val(response.data);
-                    $('#edit_LrefNo').text(response.data);
-                }
-            })
-        })
 
         $(document).on('change', '#book_id', function(e) {
             var bookId = this.value
@@ -705,7 +712,7 @@
                 });
                 return alert('Error: No reference number generated. Please try again.');
             } else {
-                console.log('LrefNo value set:', $('#LrefNo').text());
+                console.log('LrefNo value set:', $('#edit_LrefNo').text());
             }
 
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
@@ -778,8 +785,23 @@
                                     saveJournalEntryDetails(data.id, 'update')
                                     reload();
                                 },
-                                error: function(data) {
-                                    toastr.error('Error');
+                                error: function(jqXHR) {
+                                    if (jqXHR.status === 422) {
+                                        $('#edit_LrefNo').text('')
+                                        $('#edit_book_id').val('');
+                                        $('#edit_book_id').select2({
+                                            placeholder: 'Select',
+                                            allowClear: true,
+                                        });
+                                        const errors = jqXHR.responseJSON.errors;
+                                        if (errors['journal_entry.edit_journal_no']) {
+                                            alert(errors['journal_entry.edit_journal_no'][0]);
+                                        } else {
+                                            alert('An unknown validation error occurred.');
+                                        }
+                                    } else {
+                                        toastr.error('Error');
+                                    }
                                 }
                             });
                         }
@@ -796,10 +818,40 @@
 
         });
 
+        let currentJournalNo = null;
+        let isInitialSetup = false;
+
+        $(document).on('change', '#edit_book_id', function(e) {
+            if (isInitialSetup) return;
+            var bookId = this.value
+            var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
+            url = url.replace(':journalBook', bookId);
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "GET",
+                url: url,
+                dataType: "json",
+                success: function(response) {
+                    const [currentBook, currentDigit] = currentJournalNo.split('-');
+                    const [newBook, newDigit] = response.data.split('-');
+                    if (currentBook === newBook) {
+                        $('#edit_journal_no').val(currentJournalNo);
+                        $('#edit_LrefNo').text(currentJournalNo);
+                    } else {
+                        $('#edit_journal_no').val(response.data);
+                        $('#edit_LrefNo').text(response.data);
+                    }
+                }
+            })
+        })
+
         $(document).on('click', '.JnalEdit', function(e) {
             $('#journalModalEdit').modal('show');
             var id = $(this).attr('value');
             $('#tbl-create-edit-container').html('');
+            isInitialSetup = true;
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -817,6 +869,7 @@
                             var total_debit = 0;
                             var total_credit = 0;
                             var balance = 0;
+                            currentJournalNo = v.journal_no;
                             $('#edit_LrefNo').text(v.journal_no)
                             $('#edit_journal_no').val(v.journal_no)
                             $('#edit_journal_id').val(v.journal_id);
@@ -921,9 +974,10 @@
                             getBalance()
                             checkTotalAndAmount()
                         })
+                        isInitialSetup = false;
                         recordsEditable()
                         $('.select-account').select2({
-                            placeholder: 'Select',
+                            placeholder: 'Select Account',
                             allowClear: true,
                         });
 
@@ -1278,7 +1332,7 @@
             recordsEditable()
 
             $('.select-account').select2({
-                placeholder: 'Select',
+                placeholder: 'Select Account',
                 allowClear: true,
             });
 
