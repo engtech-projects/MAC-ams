@@ -32,7 +32,6 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
-
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -43,6 +42,7 @@
                                 <h4><b>Monthly Depreciation / Monthly Amortization</b></h4>
                             </div>
                             <div class="row col-md-12">
+
                                 <div class="col-md-12 col-xs-12">
                                     <div class="box">
                                         <div class="form-group">
@@ -67,7 +67,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class='col-md-3' v-if="monthlyDepreciationReportType ==''">
+                                                <div class='col-md-3' v-if="type==''">
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
@@ -107,7 +107,7 @@
                                                     <div class="form-group" style="margin-right:10px;flex:1;">
 
                                                         <div class="input-group">
-                                                            <select v-model='type' name="type" id="type"
+                                                            <select v-model="type" name="type" id="type"
                                                                 class="form-control form-control-sm rounded-0">
                                                                 <option value="">Listing</option>
                                                                 <option value="summary">Summary</option>
@@ -132,7 +132,7 @@
                 <div class="col-md-12">
 
                     <!-- Table -->
-                    <section class="content" v-if="monthlyDepreciationReportType==''">
+                    <section class="content" v-if="type==''">
                         <h1 v-text="type"> </h1>
 
                         <div class="container-fluid">
@@ -330,10 +330,10 @@
             el: '#app',
             data: {
                 showModal: true,
+                reportType: '',
                 sub_month: '',
                 monthlyAmortization: 0,
                 rate_percentage: 0,
-                reportType:'',
                 type: '',
                 filter: {
                     branch_id:'',
@@ -341,6 +341,7 @@
                     sub_cat_id: '',
                     from: '',
                     to: '',
+
                     account_id: '',
                     type: ''
                 },
@@ -366,16 +367,8 @@
             computed: {
                 monthlyDepreciationReportType: function() {
                     if (this.type == '') {
-
                         return this.type
                     }
-                    this.filter.branch_id = ''
-                    if(this.filter.sub_cat_id !='') {
-                        this.fetchSubAll();
-                    }else {
-                        alert("Select subsidiary category")
-                    }
-
                     return this.type
                 },
                 monthlyAmort: function() {
@@ -527,13 +520,6 @@
                     }
                     return rows;
 
-                },
-                branch:function() {
-                        if(this.type == 'summary') {
-                            this.filter.branch_id = '';
-                        }else {
-                            this.filter.branchid =  this.filter.branch_id
-                        }
                 }
             },
             methods: {

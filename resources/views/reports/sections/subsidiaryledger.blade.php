@@ -259,8 +259,8 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="account">Account</label>
                                         <div class="input-group">
-                                            <select 
-                                                name="account_id" 
+                                            <select
+                                                name="account_id"
                                                 class="select2 form-control form-control-sm"
                                                 id="subsidiaryFilterAccountTitle"
                                                 style="width: 100% !important;"
@@ -791,7 +791,7 @@
             },
             methods: {
                 submitForm: function() {
-                    if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {                        
+                    if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {
                         this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
                         this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
                         this.fetchSubAll();
@@ -910,6 +910,7 @@
                         var entry = entries[i];
                         var totalCredit = 0;
                         var totalDebit = 0;
+                        var netMovement = 0;
                         rows.push([entry.account_number + ' - ' + entry.account_name ? entry.account_name
                             .toUpperCase() : '' + ':', '', '', '', '', '', '', '', this.formatCurrency(
                                 entries[i].opening_balance)
@@ -938,6 +939,7 @@
                                 rows.push(['', data.remarks ? data.remarks.toUpperCase() : ''])
                             }
                         }
+                        console.log(entry.data)
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
@@ -965,13 +967,16 @@
                         var entries = subsidiary.entries;
                         var totalCredit = 0;
                         var totalDebit = 0;
+                        var netMovement = 0;
 
                         for (var d in entries) {
                             var entry = entries[d];
                             var detailsList = entry.data;
-
+                            var count = entry.data.length;
 
                             for (var h in detailsList) {
+
+
                                 var details = detailsList[h];
                                 totalCredit += parseFloat(details.credit);
                                 totalDebit += parseFloat(details.debit);
@@ -988,15 +993,19 @@
                                     details.balance ? this.formatCurrency(details.balance) : '0.00',
                                     details.journal_id
                                 ];
+                                if(count == parseInt(h)+1) {
+                                    netMovement = details.balance;
+                                }
                                 rows.push(arr);
                             }
+                            console.log(detailsList)
                         }
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', '0.00'])
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(netMovement)])
                     }
 
 
