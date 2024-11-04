@@ -35,7 +35,7 @@
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
-                    <form id="" method="get">
+                    <form @submit.prevent="submitForm" action="">
                         @csrf
                         <div class="row">
                             <div class="col-md-8 frm-header">
@@ -43,43 +43,43 @@
                             </div>
                             <div class="row col-md-12">
 
-                                <div class="col-md-9 col-xs-12">
+                                <div class="col-md-12 col-xs-12">
                                     <div class="box">
                                         <div class="form-group">
                                             <label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
                                             <div class="input-group">
-
                                                 <div class='col-md-3'>
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
                                                                 <select name="sub_cat_id"
-                                                                    class="form-control form-control-sm" id="sub_cat_id">
+                                                                    class="form-control form-control-sm"
+                                                                    v-model="filter.sub_cat_id" id="sub_cat_id">
                                                                     <option value="" disabled selected>-Select
                                                                         Category-</option>
                                                                     @foreach ($subsidiary_categories as $sub_category)
                                                                         <option value="{{ $sub_category->sub_cat_id }}">
-                                                                            {{ $sub_category->description }}</option>
+                                                                            {{ $sub_category->description }}
+                                                                        </option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-
-
-                                                <div class='col-md-3'>
+                                                <div class='col-md-3' v-if="type==''">
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <select name="branch_id"
+                                                                <select name="branch_id" v-model="filter.branch_id"
                                                                     class="form-control form-control-sm" id="branch">
                                                                     <option value="" disabled selected>-Select Branch-
                                                                     </option>
                                                                     @foreach ($branches as $branch)
                                                                         <option value="{{ $branch->branch_id }}">
                                                                             {{ $branch->branch_code }} -
-                                                                            {{ $branch->branch_name }}</option>
+                                                                            {{ $branch->branch_name }}
+                                                                        </option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
@@ -91,14 +91,31 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <input type="date" id="sub_month" v-model="sub_month"
+                                                                <input type="date" id="sub_month" v-model="filter.to"
                                                                     class="form-control form-control-sm rounded-0"
-                                                                    name="sub_date" id="sub_date" required>
+                                                                    name="to" id="sub_date" required>
+                                                                <button class='btn btn-success'>Search</button>
                                                             </div>
+
                                                         </div>
+
                                                     </div>
                                                 </div>
-                                                <button class='btn btn-success'>Search</button>
+
+                                                <div class="col-md-3">
+
+                                                    <div class="form-group" style="margin-right:10px;flex:1;">
+
+                                                        <div class="input-group">
+                                                            <select v-model="type" name="type" id="type"
+                                                                class="form-control form-control-sm rounded-0">
+                                                                <option value="">Listing</option>
+                                                                <option value="summary">Summary</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
                                             </div>
 
                                         </div>
@@ -115,7 +132,9 @@
                 <div class="col-md-12">
 
                     <!-- Table -->
-                    <section class="content">
+                    <section class="content" v-if="type==''">
+                        <h1 v-text="type"> </h1>
+
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
@@ -134,247 +153,80 @@
                                             <th>Salvage</th>
                                             <th>Rem.</th>
                                             <th>Inv.</th>
-                                            <th>No.</th>
                                             <th>Action</th>
                                         </thead>
                                         <tbody>
+                                            <tr v-if="subsidiaryAll.length <=0">
+                                                <td colspan="15">
+                                                    <b>
+                                                        <center>No data available in table.</center>
+                                                    </b>
+                                                </td>
+                                            <tr>
+                                            <tr v-for="(ps,i) in processSubsidiary"
+                                                :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                                <!-- <td><h1 v-text="subsidiaryAll"></h1</td> -->
+                                                <td v-for="p,i in ps" v-if="i<=12"
+                                                    :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                </td>
 
-                                            <?php
+                                                <td v-if="ps[2]"> <!-- Check if journal_no exists -->
+                                                    <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'>
+                                                        <i class="fa fa-trash fa-xs"></i>
+                                                    </button>
+                                                </td>
 
-                                            $total = [
-                                                'grand' => [
-                                                    'total_amount' => 0,
-                                                    'total_monthly_amort' => 0,
-                                                    'total_monthly' => 0,
-                                                    'total_no_depre' => 0,
-                                                    'total_no_amort' => 0,
-                                                    'total_amort' => 0,
-                                                    'total_used' => 0,
-                                                    'total_expensed' => 0,
-                                                    'total_unexpensed' => 0,
-                                                    'total_due_amort' => 0,
-                                                    'total_sub_salvage' => 0,
-                                                    'total_rem' => 0,
-                                                    'total_inv' => 0,
-                                                ],
-                                                'acct' => [
-                                                    'total_amount' => 0,
-                                                    'total_monthly_amort' => 0,
-                                                    'total_monthly' => 0,
-                                                    'total_no_depre' => 0,
-                                                    'total_no_amort' => 0,
-                                                    'total_amort' => 0,
-                                                    'total_used' => 0,
-                                                    'total_expensed' => 0,
-                                                    'total_unexpensed' => 0,
-                                                    'total_due_amort' => 0,
-                                                    'total_sub_salvage' => 0,
-                                                    'total_rem' => 0,
-                                                    'total_inv' => 0,
-                                                ],
-                                            ];
-                                            ?>
+                                                <td v-if="ps[0] == 'BRANCH TOTAL'">
+                                                    <button class="btn btn-primary" @click="post(ps[14])">
+                                                        Post
+                                                    </button>
+                                                    <button class="btn btn-success" data-toggle="modal"
+                                                        data-target="#createSubsidiaryModal" @click="add(ps[13][0])">
+                                                        Add
+                                                    </button>
 
-                                            @foreach ($data as $keyCategory => $row)
-                                                <tr>
-                                                    <td colspan="4">
-                                                        <h5>{{ $keyCategory }}</h5>
-                                                    </td>
-                                                </tr>
-                                                <?php $grandtotal = 0; ?>
-                                                @if (count($row) > 0)
-                                 
-                                                    @foreach ($row as $keyBranch => $dd)
-                                                        <tr>
-                                                            <td colspan="4">
-                                                                <h5>{{ $keyBranch }}</h5>
-                                                            </td>
-                                                        </tr>
+                                                </td>
 
-                                                        <?php
-                                                        $category_id = null;
-                                                        $branch_id = null;
-                                                        $branch_code = null;
-                                                        $branchTotal = [
-                                                            'total_amount' => 0,
-                                                            'total_monthly_amort' => 0,
-                                                            'total_monthly' => 0,
-                                                            'total_no_depre' => 0,
-                                                            'total_no_amort' => 0,
-                                                            'total_amort' => 0,
-                                                            'total_used' => 0,
-                                                            'total_expensed' => 0,
-                                                            'total_unexpensed' => 0,
-                                                            'total_due_amort' => 0,
-                                                            'total_sub_salvage' => 0,
-                                                            'total_rem' => 0,
-                                                            'total_inv' => 0,
-                                                        ];
-                                                        ?>
-                                                        <?php $subIds = []; ?>
-                                                        @foreach ($dd as $i => $val)
-                                                            @if ($keyBranch === $val['branch'] && $keyCategory === $val['description'])
-                                                                <?php $category_id = $val['sub_cat_id'];
-                                                                $branch_id = $val['branch_id']; ?>
-                                                                <?php $branch_code = $val['branch_code']; ?>
-                                                                <?php $subId = $val['sub_id']; $subIds[] = $subId; ?>
-                                                                <tr>
-                                                                    <td>{{ $i += 1 }}</td>
-                                                                    <td>{{ $val->sub_code . '-' . $val->sub_name }}</td>
-                                                                    <td>{{ $val->sub_date }}</td>
-                                                                    <td>{{ number_format($val->sub_amount, 2, '.', ',') }}
-                                                                    </td>
-                                                                    <td>{{ number_format($val->monthly_amort, 2, '.', ',') }}
-                                                                    </td>
-                                                                    <td>{{ number_format($val->sub_no_depre, 2, '.', ',') }}
-                                                                    </td>
+                                            </tr>
 
-                                                                    <td>{{ number_format($val->sub_no_amort, 2, '.', ',') }}
-                                                                    </td>
 
-                                                                    <td>{{ number_format($val->expensed, 2, '.', ',') }}
-                                                                    </td>
-                                                                    <td>{{ number_format($val->unexpensed, 2, '.', ',') }}
-                                                                    </td>
-                                                                    <td>{{ number_format($val->due_amort, 2, '.', ',') }}
-                                                                    </td>
-                                                                    <td>{{ number_format($val->sub_salvage, 2, '.', ',') }}
-                                                                    </td>
-                                                                    <td>{{ number_format($val->rem, 2, '.', ',') }}</td>
-                                                                    <td>{{ number_format($val->inv, 2, '.', ',') }}</td>
-                                                                    <td>{{ number_format($val->no, 2, '.', ',') }}</td>
-                                                                    <td>
-                                                                        <button class="btn btn-danger btn-xs"
-                                                                            @click='deleteSub(@json($subId))'>
-                                                                            <i class="fa fa-trash fa-xs"></i>
-                                                                        </button>
-                                                                    </td>
 
-                                                                </tr>
-                                                            @endif
-                                                            <?php
-                                                            $branchTotal['total_amount'] += $val->sub_amount;
-                                                            $branchTotal['total_monthly_amort'] += $val->monthly_amort;
-                                                            $branchTotal['total_monthly'] += $val->sub_no_depre;
-                                                            $branchTotal['total_no_amort'] += $val->sub_no_amort;
-                                                            $branchTotal['total_expensed'] += $val->expensed;
-                                                            $branchTotal['total_unexpensed'] += $val->unexpensed;
-                                                            $branchTotal['total_due_amort'] += $val->due_amort;
-                                                            $branchTotal['total_sub_salvage'] += $val->sub_salvage;
-                                                            $branchTotal['total_rem'] += $val->rem;
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
 
-                                                            ?>
-                                                        @endforeach
-                                                        <tr>
-                                                            <td colspan=3>BRANCH TOTAL</td>
-                                                            <td>{{ number_format($branchTotal['total_amount'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_monthly_amort'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_monthly'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_no_amort'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_expensed'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_unexpensed'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_due_amort'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_sub_salvage'], 2, '.') }}
-                                                            </td>
-                                                            <td>{{ number_format($branchTotal['total_rem'], 2, '.') }}</td>
-                                                            <td>0</td>
-                                                            <td>0</td>
-                                                        </tr>
-                                                        <?php $data = [
-                                                            'sub_ids' => $subIds,
-                                                            'total' => $branchTotal,
-                                                            'category_id' => $category_id,
-                                                            'branch_id' => $branch_id,
-                                                            'branch_code' => $branch_code,
-                                                            'as_of' => $as_of,
-                                                        ]; ?>
 
-                                                        <tr>
-                                                            <td colspan="2"><button class='btn btn-primary'
-                                                                    @click='post(@json($data))'>Post</button>
-                                                                <button type="button" class="btn btn-success"
-                                                                    @click='add(@json($val))'
-                                                                    data-toggle="modal" data-target="#createSubsidiaryModal"
-                                                                    data-whatever="@mdo">Add</button>
-                                                            </td>
-                                                        </tr>
-                                                        <?php
-                                                        $total['grand']['total_amount'] += $branchTotal['total_amount'];
-                                                        $total['grand']['total_amort'] += $branchTotal['total_monthly_amort'];
-                                                        $total['grand']['total_monthly'] += $branchTotal['total_monthly'];
-                                                        $total['grand']['total_expensed'] += $branchTotal['total_expensed'];
-                                                        $total['grand']['total_unexpensed'] += $branchTotal['total_unexpensed'];
-                                                        $total['grand']['total_monthly_amort'] += $branchTotal['total_monthly_amort'];
-                                                        $total['grand']['total_used'] += $branchTotal['total_no_amort'];
-                                                        $total['grand']['total_due_amort'] += $branchTotal['total_due_amort'];
-                                                        $total['grand']['total_sub_salvage'] += $branchTotal['total_sub_salvage'];
-                                                        $total['grand']['total_rem'] += $branchTotal['total_rem'];
-                                                        $total['acct']['total_amount'] += $branchTotal['total_amount'];
-                                                        $total['acct']['total_amort'] += $branchTotal['total_monthly_amort'];
-                                                        $total['acct']['total_monthly'] += $branchTotal['total_monthly'];
-                                                        $total['acct']['total_expensed'] += $branchTotal['total_expensed'];
-                                                        $total['acct']['total_unexpensed'] += $branchTotal['total_unexpensed'];
-                                                        $total['acct']['total_monthly_amort'] += $branchTotal['total_monthly_amort'];
-                                                        $total['acct']['total_used'] += $branchTotal['total_no_amort'];
-                                                        $total['acct']['total_due_amort'] += $branchTotal['total_due_amort'];
-                                                        $total['acct']['total_sub_salvage'] += $branchTotal['total_sub_salvage'];
-                                                        $total['acct']['total_rem'] += $branchTotal['total_rem'];
+                    </section>
+                    <!-- /.Table -->
 
-                                                        ?>
-                                                    @endforeach
-                                                @endif
-                                            @endforeach
-                                            @if (count($data) >= 3)
-                                                <tr>
-                                                    <td colspan=3>ACC. TOTAL</td>
-                                                    <td>{{ number_format($total['acct']['total_amount'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['acct']['total_amort'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['acct']['total_monthly'], 2, '.') }}</td>
-                                                    <td>{{ number_format($total['acct']['total_used'], 2, '.') }}</td>
-                                                    <td>{{ number_format($total['acct']['total_expensed'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['acct']['total_unexpensed'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['acct']['total_due_amort'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['acct']['total_sub_salvage'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['acct']['total_rem'], 2, '.') }}</td>
-                                                    <td>0</td>
-                                                    <td>0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan=3>GRAND TOTAL</td>
-                                                    <td>{{ number_format($total['grand']['total_amount'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['grand']['total_amort'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['grand']['total_monthly'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['grand']['total_used'], 2, '.') }}</td>
-                                                    <td>{{ number_format($total['grand']['total_expensed'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['grand']['total_unexpensed'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['grand']['total_due_amort'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['grand']['total_sub_salvage'], 2, '.') }}
-                                                    </td>
-                                                    <td>{{ number_format($total['grand']['total_rem'], 2, '.') }}</td>
-                                                    <td>0</td>
-                                                    <td>0</td>
-                                                </tr>
-                                            @endif
+                    <!-- Table -->
+                    <section class="content" v-if="type=='summary'">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-12 table-responsive">
+                                    <table style="table-layout: fixed;" id="generalLedgerTbl" class="table">
+                                        <thead>
+                                            <th>Particular</th>
+                                            <th>Amount</th>
+                                            <th>Expensed</th>
+                                        </thead>
+                                        <tbody id="generalLedgerTblContainer">
+                                            <tr v-if="subsidiaryAll.length < 1">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(ps,i) in subsidiaryMonthlyDepreciation"
+                                                :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                                <td v-if="i<=8" v-for="p,i in ps" :class="rowStyles(ps[0])"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                </td>
+                                                <td v-text="ps[2]"></td>
 
+                                            </tr>
 
                                         </tbody>
                                     </table>
@@ -482,17 +334,21 @@
                 sub_month: '',
                 monthlyAmortization: 0,
                 rate_percentage: 0,
+                type: '',
                 filter: {
+                    branch_id:'',
                     subsidiary_id: '',
+                    sub_cat_id: '',
                     from: '',
                     to: '',
-                    account_id: 'all',
+
+                    account_id: '',
                     type: ''
                 },
                 subsidiary: {
                     sub_name: '',
                     sub_code: null,
-                    sub_no_amort:0,
+                    sub_no_amort: 0,
                     sub_amount: 0,
                     sub_no_depre: 0,
                     sub_cat_id: null,
@@ -506,8 +362,15 @@
                 subsidiaryAll: [],
                 balance: 0,
                 url: "{{ route('reports.post-monthly-depreciation') }}",
+                search: "{{ route('reports.monthly-depreciation-report-search') }}"
             },
             computed: {
+                monthlyDepreciationReportType: function() {
+                    if (this.type == '') {
+                        return this.type
+                    }
+                    return this.type
+                },
                 monthlyAmort: function() {
                     this.monthlyAmortization = this.subsidiary.sub_amount / this.subsidiary.sub_no_depre;
                     return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
@@ -515,9 +378,187 @@
                 subSalvage: function() {
                     this.subsidiary.sub_salvage = (this.rate_percentage * this.subsidiary.sub_amount) / 100
                     return isNaN(this.subsidiary.sub_salvage) ? 0 : this.subsidiary.sub_salvage;
+                },
+                processSubsidiary: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+
+                    }
+                    var grandTotal = {};
+                    var accTotal = {};
+
+
+                    for (var i in data) {
+                        var branches = data[i];
+                        rows.push([i]);
+
+                        for (var j in branches) {
+                            var branch = branches[j];
+                            rows.push([j]);
+                            var no = 0;
+                            let totalAmount = 0;
+                            let total_monthly_amort = 0;
+                            let total_monthly = 0;
+                            let total_no_depre = 0;
+                            let total_no_amort = 0;
+                            let total_amort = 0;
+                            let total_used = 0;
+                            let total_expensed = 0;
+                            let total_unexpensed = 0;
+                            let total_due_amort = 0;
+                            let total_sub_salvage = 0;
+                            let total_rem = 0;
+                            let total_inv = 0;
+                            let branchTotal = [];
+                            var sub_ids = [];
+
+                            for (var k in branch) {
+                                var subsidiary = branch[k];
+                                no += 1;
+                                if (j == subsidiary.branch) {
+
+                                    sub_ids.push(subsidiary.sub_id)
+                                    rows.push([no,
+                                        subsidiary.sub_code + '-' + subsidiary.sub_name,
+                                        subsidiary.sub_date,
+                                        this.formatCurrency(subsidiary.sub_amount),
+                                        this.formatCurrency(subsidiary.monthly_amort),
+                                        subsidiary.sub_no_depre,
+                                        subsidiary.sub_no_amort,
+                                        this.formatCurrency(subsidiary.expensed),
+                                        this.formatCurrency(subsidiary.unexpensed),
+                                        subsidiary.due_amort,
+                                        this.formatCurrency(subsidiary.sub_salvage),
+                                        this.formatCurrency(subsidiary.rem),
+                                        subsidiary.inv,
+                                        subsidiary.sub_id
+
+                                    ]);
+
+                                    totalAmount += parseFloat(subsidiary.sub_amount),
+                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                    total_no_depre += parseInt(subsidiary.sub_no_depre)
+                                    total_no_amort += parseFloat(subsidiary.sub_no_amort)
+                                    total_amort += parseFloat(subsidiary.total_amort)
+                                    total_used += parseFloat(subsidiary.sub_no_amort)
+                                    total_expensed += parseFloat(subsidiary.expensed)
+                                    total_unexpensed += parseFloat(subsidiary.unexpensed)
+                                    total_due_amort += parseFloat(subsidiary.due_amort)
+                                    total_sub_salvage += parseFloat(subsidiary.sub_salvage)
+                                    total_rem += parseFloat(subsidiary.rem)
+                                    total_inv += parseFloat(subsidiary.inv)
+
+                                }
+
+
+                            }
+                            var data = {
+                                'sub_ids': sub_ids,
+                                'total': {
+                                    total_amount: totalAmount,
+                                    total_monthly_amort: total_monthly_amort,
+                                    total_no_depre: total_no_depre,
+                                    total_used: total_used,
+                                    total_expensed: total_expensed,
+                                    total_unexpensed: total_unexpensed,
+                                    total_due_amort: total_due_amort,
+                                    total_sub_salvage: total_sub_salvage,
+                                    total_rem: total_rem,
+                                    total_inv: total_inv
+                                },
+                                'category_id': branch[0].sub_cat_id,
+                                'branch_id': branch[0].branch_id,
+                                'branch_code': branch[0].branch_code,
+                                'as_of': this.filter.to,
+                            }
+                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this.formatCurrency(total_monthly_amort), total_no_depre, total_used, this
+                                .formatCurrency(total_expensed), this.formatCurrency(total_unexpensed),
+                                total_due_amort,this.formatCurrency(total_sub_salvage),
+                                this.formatCurrency(total_rem), total_inv, branch, data
+                            ]);
+
+                        }
+                    }
+
+
+                    return rows;
+                },
+                subsidiaryMonthlyDepreciation: function() {
+                    var result = this.subsidiaryAll;
+                    var rows = [];
+                    for (var i in result) {
+                        var branch = result[i];
+                        let grandTotalAmount = 0;
+                        let grandTotalExpensed = 0;
+                        for (var j in branch) {
+                            var subsidiary = branch[j];
+                            let branchTotalExpensed = 0;
+                            let branchTotalAmount = 0;
+                            for (var k in subsidiary) {
+                                branchTotalExpensed += parseFloat(subsidiary[k].expensed);
+                                branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
+                            }
+                            var result = [
+                                j,
+                                this.formatCurrency(branchTotalAmount.toFixed(2)),
+                                this.formatCurrency(branchTotalExpensed.toFixed(2))
+                            ]
+                            rows.push(result);
+                            grandTotalAmount += branchTotalAmount;
+                            grandTotalExpensed += branchTotalExpensed;
+                        }
+                        var result = [
+                            'Grand Total',
+                            this.formatCurrency(grandTotalAmount.toFixed(2)),
+                            this.formatCurrency(grandTotalExpensed.toFixed(2))
+                        ];
+
+                        rows.push(result);
+                    }
+                    return rows;
+
                 }
             },
             methods: {
+                formatCurrency: function(number) {
+                    const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                    });
+
+                    return formatter.format(number);
+                },
+                rowStyles: function(element) {
+                    var style = '';
+                    if (element === 'Grand Total') {
+                        style += 'text-bold';
+                    }
+                    return style;
+                },
+                rowStyleSubsidiaryListing: function(p, i, r) {
+                    var style = '';
+                    if (i >= 6) {
+                        style += 'text-right';
+                    }
+                    if (i == 0) {
+                        style += ' text-bold';
+                    }
+                    return style;
+                },
+                formatCurrency: function(number) {
+                    const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                    });
+
+                    return formatter.format(number);
+                },
+                submitForm: function() {
+                    this.fetchSubAll();
+                },
 
                 getDate: function() {
                     const d = new Date();
@@ -545,15 +586,16 @@
                         console.error(err)
                     })
                 },
-                add: function(data) {
-                    this.subsidiary.sub_cat_id = data.subsidiary_category.sub_cat_id;
-                    this.subsidiary.sub_per_branch = data.sub_per_branch
+                add: function(subsidiary) {
+                    this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
+                    this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
                 },
                 createSubsidiary: function() {
-                    var today = DateTime.Now.ToString("yyyy-MM-dd");
-                   // this.subsidiary.sub_no_amort = this.subsidiary.sub_no_depre
-                   this.subsidiary.sub_no_amort = 0;
-                //    this.subsidiary.sub_date = today;
+                    /* console.log(DateTime.Now.ToString("yyyy-MM-dd")); */
+                    /* var today = DateTime.Now.ToString("yyyy-MM-dd"); */
+                    // this.subsidiary.sub_no_amort = this.subsidiary.sub_no_depre
+                    this.subsidiary.sub_no_amort = 0;
+                    //    this.subsidiary.sub_date = today;
                     axios.post(@json(env('APP_URL')) + '/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -565,11 +607,11 @@
                         var errors = err.response.data.errors;
 
                         var messages = [];
-                        for( var i in errors) {
+                        for (var i in errors) {
                             var error = errors[i];
-                            for( var j in error) {
+                            for (var j in error) {
                                 var message = error[j];
-                                messages.push(message+'<br />');
+                                messages.push(message + '<br />');
                             }
                         }
                         toastr.error(messages);
@@ -592,17 +634,15 @@
 
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
-                    axios.post(this.url, this.filter, {
+
+                    axios.post(this.search, this.filter, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
                             }
                         })
                         .then(response => {
-                            console.log(response.data.data[0]);
-                            this.subsidiaryAll = response.data.data[0];
-                            this.balance = response.data.data[1];
-                            // console.log(response.data.data);
+                            this.subsidiaryAll = response.data.data;
                         })
                         .catch(error => {
                             console.error('Error:', error);

@@ -155,32 +155,21 @@ class ReportsController extends MainController
     }
 
 
-    public function monthlyDepreciation(Request $request)
+    public function search(Request $request)
     {
-
-
-
         $branches = Branch::all();
-
-        /* if ($request->sub_date) {
-
-            $date = explode("-", $request->sub_date);
-            $as_of = Carbon::parse($request->sub_date)->endOfMonth();
-        } else {
-            $date = explode('-', now()->format('Y-m'));
-            $as_of = Carbon::parse($date[0] . '-' . $date[1])->endOfMonth();
-        } */
-
-        $date = $request->sub_date;
-
+        $date = $request->to;
 
         $subsidiary = new Subsidiary();
+
+        $type = 'listing';
+        if ($request->type == 'summary') {
+            $type = $request->type;
+        }
         $branch = Branch::find($request->branch_id);
 
         $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
-
-        $data = $result->map(function ($value) use ($branch) {
-
+        $data = $result->map(function ($value) {
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
@@ -204,19 +193,72 @@ class ReportsController extends MainController
         })->groupBy('description')->map(function ($value) {
             return $value->groupBy('branch');
         });
+
         $data = [
             'data' => $data,
             'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
             'as_of' => $date,
             'branches' => $branches,
             'title' => 'MAC-AMS | Monthly Depreciation',
+            'type' => $type
+        ];
+        return response()->json($data);
+    }
+
+    public function monthlyDepreciation(Request $request)
+    {
+
+        $branches = Branch::all();
+        $date = $request->sub_date;
+
+
+        $subsidiary = new Subsidiary();
+        $branch = Branch::find($request->branch_id);
+        $type = 'listing';
+        if ($request->type == 'summary') {
+            $type = $request->type;
+        }
+        $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
+        $data = $result->map(function ($value) use ($branch) {
+            if ($value->sub_no_depre == 0) {
+                $value->sub_no_depre = 1;
+            }
+            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
+            $monthlyAmort = $value->sub_amount / $value->sub_no_depre;
+            $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
+            $value['branch_code'] = $branch->branch_code;
+            $value['branch_id'] = $branch->branch_id;
+            $value['description'] = $value->subsidiary_category->description;
+            $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
+            $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
+            $value['monthly_amort'] = $monthlyAmort;
+            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
+            $value['unexpensed'] = round($value->sub_amount - $value->expensed);
+            $value['due_amort'] = round($value->sub_no_amort, 2);
+
+            $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
+            $value['inv'] = 0;
+            $value['no'] = 0;
+            return $value;
+        })->groupBy('description')->map(function ($value) {
+            return $value->groupBy('branch');
+        });
+
+        $data = [
+            'data' => $data,
+            'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
+            'as_of' => $date,
+            'branches' => $branches,
+            'title' => 'MAC-AMS | Monthly Depreciation',
+            'type' => $type
         ];
         return view('reports.sections.monthlyDepreciation', $data);
 
         return response()->json([
             'data' => $data,
             'as_of' => isset($request->sub_date) ? $request->sub_date : null,
-            'message' => 'Successfully Fetched'
+            'message' => 'Successfully Fetched',
+            'type' => $type,
         ]);
     }
 
@@ -231,6 +273,7 @@ class ReportsController extends MainController
         $journalEntry = new JournalEntry();
 
         $accountName = null;
+
 
         if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
@@ -326,9 +369,6 @@ class ReportsController extends MainController
             $subsidiary->update([
                 'sub_no_amort' => $sub_no_amort
             ]);
-
- 
-            
         }
     }
 
