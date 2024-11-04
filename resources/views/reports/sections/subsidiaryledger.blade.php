@@ -280,31 +280,48 @@
 
                             </div>
 
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_date">From</label>
-                                        <div class="input-group">
-                                            <input v-model="filter.from" type="date"
-                                                class="form-control form-control-sm rounded-0" name="from"
-                                                id="sub_date" required>
-                                        </div>
+                            <div class="col-md-2 col-xs-12"
+                            v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="date_from">From</label>
+                                    <div class="input-group">
+                                        <input v-model="filter.from" type="date" v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'"
+                                                class=" form-control form-control-sm rounded-0" name="from"
+                                            id="sub_date" required>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="col-md-2 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_date">To</label>
-                                        <div class="input-group">
-                                            <input v-model="filter.to" type="date"
-                                                class="form-control form-control-sm rounded-0" name="to"
-                                                id="sub_date" required>
-                                        </div>
+                        <div class="col-md-2 col-xs-12"
+                            v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="date_to">To</label>
+                                    <div class="input-group">
+                                        <input v-model="filter.to" type="date"
+                                            class="form-control form-control-sm rounded-0" name="to"
+                                            id="sub_date" required>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-2 col-xs-12"
+                            v-show="reportType=='subsidiary-ledger-summary-report'">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="sub_date">As of:</label>
+                                    <div class="input-group">
+                                        <input v-model="filter.to" type="date"
+                                            class="form-control form-control-sm rounded-0" name="to"
+                                            id="sub_date" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                             <div class="col-md-2 col-xs-12">
                                 <div class="box">
@@ -800,6 +817,8 @@
                     } else if (this.reportType == 'subsidiary-ledger-listing-report') {
                         this.fetchSubAll();
                     } else if (this.reportType == 'subsidiary-ledger-summary-report') {
+                          this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
+                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
                         this.fetchSubAll();
                     }
 

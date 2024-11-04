@@ -555,9 +555,13 @@ class Accounts extends Model
                 $journalEntries->whereBetween("journal_entry.journal_date", [$from, $to]);
             }
 
+            if ($from == '' && $to != '') {
+                $journalEntries->whereDate('journal_entry.journal_date', '<=', $to);
+            }
             if ($account_id != '') {
                 $journalEntries->where('chart_of_accounts.account_id', $account_id);
             }
+
 
             $journalEntries->where('journal_entry_details.subsidiary_id', $subsidiary['sub_id']);
 

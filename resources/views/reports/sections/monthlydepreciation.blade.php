@@ -32,6 +32,7 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
+        <h1 v-text='monthlyDepreciationReportType'></h1>
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -366,9 +367,25 @@
             },
             computed: {
                 monthlyDepreciationReportType: function() {
+                    var branch = this.filter.branch_id;
                     if (this.type == '') {
+                        this.filter.branch_id = branch;
                         return this.type
+                    }else {
+                                  if(this.filter.sub_cat_id == '') {
+                        alert('select subsidiary category')
+                        return false;
+                    }else {
+                        this.filter.branch_id = '';
+                        this.fetchSubAll();
+                     }
                     }
+
+                    if(this.filter.sub_cat_id == '') {
+                        alert('select subsidiary category')
+                        return false;
+                    }
+
                     return this.type
                 },
                 monthlyAmort: function() {

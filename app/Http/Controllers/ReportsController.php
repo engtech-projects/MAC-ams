@@ -393,7 +393,7 @@ class ReportsController extends MainController
                 return response()->json(['data' => $subsidiaryListing]);
 
             case 'subsidiary-ledger-summary-report':
-                $subsidiaryListing = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id);
+                $subsidiaryListing = Accounts::subsidiaryLedger(null, $request->to, $request->account_id);
                 return response()->json(['data' => $subsidiaryListing]);
 
             case 'income_minus_expense':
