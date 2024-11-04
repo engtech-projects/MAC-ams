@@ -301,13 +301,13 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
-                                        <input type="number" v-model="rate_percentage" class="form-control"
+                                        <label for="message-text" class="col-form-label">Salvage:</label>
+                                        <input type="number" v-model="subSalvage" class="form-control"
                                             id="sub_salvage" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Salvage:</label>
-                                        <input type="text" disabled v-model="subSalvage" class="form-control"
+                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                        <input type="text" disabled v-model="rate_percentage" class="form-control"
                                             id="sub_no_depre" required>
                                     </div>
                                 </div>
@@ -393,7 +393,7 @@
                     return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
                 subSalvage: function() {
-                    this.subsidiary.sub_salvage = (this.rate_percentage * this.subsidiary.sub_amount) / 100
+                    this.subsidiary.sub_salvage = (this.sub_salvage * this.subsidiary.sub_amount) / 100
                     return isNaN(this.subsidiary.sub_salvage) ? 0 : this.subsidiary.sub_salvage;
                 },
                 processSubsidiary: function() {
@@ -448,7 +448,7 @@
                                         this.formatCurrency(subsidiary.expensed),
                                         this.formatCurrency(subsidiary.unexpensed),
                                         subsidiary.due_amort,
-                                        this.formatCurrency(subsidiary.sub_salvage),
+                                        this.formatCurrency(subsidiary.salvage),
                                         this.formatCurrency(subsidiary.rem),
                                         subsidiary.inv,
                                         subsidiary.sub_id

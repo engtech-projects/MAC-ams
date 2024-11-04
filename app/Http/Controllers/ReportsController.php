@@ -175,13 +175,17 @@ class ReportsController extends MainController
             }
             $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
             $monthlyAmort = $value->sub_amount / $value->sub_no_depre;
+
+            $salvage = round(($value->sub_amount * $value->sub_salvage) / 100, 2);
+            $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
             $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
             $value['branch_code'] = $branch->branch_code;
             $value['branch_id'] = $branch->branch_id;
             $value['description'] = $value->subsidiary_category->description;
             $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
             $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
-            $value['monthly_amort'] = $monthlyAmort;
+            $value['monthly_amort'] = $monthlySalvage;
+            $value['salvage'] = $salvage;
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($value->sub_amount - $value->expensed);
             $value['due_amort'] = round($value->sub_no_amort, 2);
@@ -189,6 +193,7 @@ class ReportsController extends MainController
             $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
             $value['inv'] = 0;
             $value['no'] = 0;
+
             return $value;
         })->groupBy('description')->map(function ($value) {
             return $value->groupBy('branch');
