@@ -73,7 +73,7 @@
                                         <div class="input-group">
                                             <input v-model="filter.from" value="{{ $requests['from'] }}" type="date"
                                                 class="form-control form-control-sm rounded-0" name="from"
-                                                id="genLedgerFrom" min="{{ $fiscalYear->start_date }}"
+                                                id="genLedgerFrom" {{-- min="{{ $fiscalYear->start_date }}" --}}
                                                 max="{{ $fiscalYear->end_date }}" required>
                                         </div>
                                     </div>
@@ -86,7 +86,7 @@
                                         <div class="input-group">
                                             <input type="date" v-model="filter.to" value="{{ $requests['to'] }}"
                                                 class="form-control form-control-sm rounded-0" name="to"
-                                                id="genLedgerTo" min="{{ $fiscalYear->start_date }}"
+                                                id="genLedgerTo" {{-- min="{{ $fiscalYear->start_date }}" --}}
                                                 max="{{ $fiscalYear->end_date }}" required>
                                         </div>
                                     </div>
@@ -214,8 +214,8 @@
                                                 <label class="label-bold" id="voucher_ref_no"></label>
                                             </div>
                                         </div>
-                                        
-                                        
+
+
                                         <div class="col-md-3 col-xs-12">
                                             <div class="box">
                                                 <div class="form-group">
@@ -239,7 +239,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-3 col-xs-12">
-                                            
+
                                         </div>
                                         <div class="col-md-2 col-xs-12">
                                             <div class="box">

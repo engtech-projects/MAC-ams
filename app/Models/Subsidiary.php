@@ -45,9 +45,10 @@ class Subsidiary extends Model
     public function deleteSubsidiary($id) {}
     public function getDepreciation($categoryId, $branch, $date)
     {
-
         $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branch) {
-            $query->where('sub_cat_id', $categoryId)->where('sub_per_branch', $branch->branch_code);
+            $query->where('sub_cat_id', $categoryId);
+        })->when(isset($branch), function ($query) use ($branch) {
+            $query->where('sub_per_branch', $branch->branch_code);
         })->when(isset($date), function ($query) use ($date) {
             $query->whereDate('sub_date', '<=', $date);
         })->whereHas('subsidiary_category', function ($query) {

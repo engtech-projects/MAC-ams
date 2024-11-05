@@ -179,8 +179,9 @@ Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsContro
 Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter');
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
 /* Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses'); */
-Route::get('reports/monthly-depreciation', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthlyDepreciation');
-Route::post('reports/monthly-depreciation', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
+Route::post('reports/monthly-depreciation-report', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthly-depreciation');
+Route::post('reports/monthly-depreciation-report-search', [ReportsController::class, 'search'])->name('reports.monthly-depreciation-report-search');
+Route::post('reports/monthly-depreciation-report-post', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
 /* Route::delete('reports/subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('reports.delete-subsidiary'); */
 Route::post('subsidiary', [SubsidiaryController::class, 'store'])->name('subsidiary.store');
 Route::delete('subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('subsidiary.delete');
