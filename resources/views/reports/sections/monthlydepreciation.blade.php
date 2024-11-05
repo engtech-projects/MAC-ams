@@ -447,7 +447,7 @@
                                         subsidiary.sub_no_amort,
                                         this.formatCurrency(subsidiary.expensed),
                                         this.formatCurrency(subsidiary.unexpensed),
-                                        subsidiary.due_amort,
+                                        this.formatCurrency( subsidiary.due_amort),
                                         this.formatCurrency(subsidiary.salvage),
                                         this.formatCurrency(subsidiary.rem),
                                         subsidiary.inv,

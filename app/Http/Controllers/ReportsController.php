@@ -189,9 +189,11 @@ class ReportsController extends MainController
             $value['salvage'] = $salvage;
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($rem * $monthlyAmort, 2);
-            $value['due_amort'] = round($value->sub_no_amort, 2);
+           
 
             $value['rem'] = $rem;
+            
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
