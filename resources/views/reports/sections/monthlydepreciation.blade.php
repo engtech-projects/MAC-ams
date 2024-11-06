@@ -514,7 +514,7 @@
                                 'branch_code': branch[0].branch_code,
                                 'as_of': this.filter.to,
                             }
-                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this.formatCurrency(total_monthly_amort), total_no_depre, total_used, this
+                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this.formatCurrency(total_monthly_amort), .this.formatCurrency(total_no_depre), total_used, this
                                 .formatCurrency(total_expensed), this.formatCurrency(total_unexpensed),
                                 this.formatCurrency(total_due_amort),this.formatCurrency(total_sub_salvage),
                                 this.formatCurrency(total_rem), total_inv, branch, data
