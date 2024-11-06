@@ -300,6 +300,17 @@
                             </div>
                             <div class="form-group">
                                 <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="message-text" class="col-form-label">Monthly Amortization</label>
+                                        <input type="text" disabled v-model="amort" class="form-control"
+                                            id="sub_acct_no" required>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Salvage:</label>
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
@@ -391,11 +402,21 @@
                 },
                 monthlyAmort: function() {
                     this.monthlyAmortization = this.subsidiary.sub_amount / this.subsidiary.sub_no_depre;
+                    if(this.subsidiary.sub_salvage >0) {
+                        this.ratePercentage/this.subsidiary.sub_no_depre;
+                    }
                     return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
+                amort: function() {
+                    var amort = (this.subsidiary.sub_amount - this.subsidiary.rate_percentage) / this.subsidiary.sub_no_depre;
+                    console.log(amort);
+                    return isNaN(amort) ? 0 : amort.toFixed(2);
+                    //return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
+                },
+
+
                 ratePercentage: function() {
                     this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * this.subsidiary.sub_amount
-                    console.log(this.subsidiary.rate_percentage);
                     return this.subsidiary.rate_percentage;
                 },
                 processSubsidiary: function() {
