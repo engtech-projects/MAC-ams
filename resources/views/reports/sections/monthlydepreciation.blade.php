@@ -302,13 +302,13 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Salvage:</label>
-                                        <input type="number" v-model="subSalvage" class="form-control"
+                                        <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                        <input type="text" disabled v-model="rate_percentage" class="form-control"
-                                            id="sub_no_depre" required>
+                                        <input type="text" v-model="ratePercentage" class="form-control"
+                                            >
                                     </div>
                                 </div>
 
@@ -355,6 +355,7 @@
                     sub_cat_id: null,
                     sub_per_branch: null,
                     sub_salvage: 0,
+                    rate_percentage:0,
                 },
                 incomeExpense: {
                     income: [],
@@ -392,9 +393,10 @@
                     this.monthlyAmortization = this.subsidiary.sub_amount / this.subsidiary.sub_no_depre;
                     return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
-                subSalvage: function() {
-                    this.subsidiary.sub_salvage = (this.sub_salvage * this.subsidiary.sub_amount) / 100
-                    return isNaN(this.subsidiary.sub_salvage) ? 0 : this.subsidiary.sub_salvage;
+                ratePercentage: function() {
+                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * this.subsidiary.sub_amount
+                    console.log(this.subsidiary.rate_percentage);
+                    return this.subsidiary.rate_percentage;
                 },
                 processSubsidiary: function() {
                     var data = {};
@@ -447,7 +449,7 @@
                                         subsidiary.sub_no_amort,
                                         this.formatCurrency(subsidiary.expensed),
                                         this.formatCurrency(subsidiary.unexpensed),
-                                        subsidiary.due_amort,
+                                        this.formatCurrency(subsidiary.due_amort),
                                         this.formatCurrency(subsidiary.salvage),
                                         this.formatCurrency(subsidiary.rem),
                                         subsidiary.inv,
@@ -493,7 +495,7 @@
                             }
                             rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this.formatCurrency(total_monthly_amort), total_no_depre, total_used, this
                                 .formatCurrency(total_expensed), this.formatCurrency(total_unexpensed),
-                                total_due_amort,this.formatCurrency(total_sub_salvage),
+                                this.formatCurrency(total_due_amort),this.formatCurrency(total_sub_salvage),
                                 this.formatCurrency(total_rem), total_inv, branch, data
                             ]);
 
