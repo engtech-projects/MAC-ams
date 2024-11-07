@@ -409,7 +409,6 @@
                 },
                 amort: function() {
                     var amort = (this.subsidiary.sub_amount - this.subsidiary.rate_percentage) / this.subsidiary.sub_no_depre;
-                    console.log(amort);
                     return isNaN(amort) ? 0 : amort.toFixed(2);
                     //return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
@@ -613,7 +612,6 @@
                     return current_month;
                 },
                 post: function(data) {
-                    console.log(data);
                     axios.post(this.url, data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -631,11 +629,7 @@
                     this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
                 },
                 createSubsidiary: function() {
-                    /* console.log(DateTime.Now.ToString("yyyy-MM-dd")); */
-                    /* var today = DateTime.Now.ToString("yyyy-MM-dd"); */
-                    // this.subsidiary.sub_no_amort = this.subsidiary.sub_no_depre
                     this.subsidiary.sub_no_amort = 0;
-                    //    this.subsidiary.sub_date = today;
                     axios.post(@json(env('APP_URL')) + '/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -659,7 +653,6 @@
                 },
                 deleteSub: function(data) {
                     var url = @json(env('APP_URL'));
-                    console.log(url);
                     axios.delete(@json(env('APP_URL')) + '/subsidiary/' + data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')

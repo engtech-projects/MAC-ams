@@ -858,7 +858,6 @@
                         })
                         .then(response => {
                             this.incomeExpense = response.data.data;
-                            // console.log(response.data.data);
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -953,7 +952,6 @@
                                 rows.push(['', data.remarks ? data.remarks.toUpperCase() : ''])
                             }
                         }
-                        console.log(entry.data)
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
@@ -1012,7 +1010,6 @@
                                 }
                                 rows.push(arr);
                             }
-                            console.log(detailsList)
                         }
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
