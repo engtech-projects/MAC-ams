@@ -239,9 +239,8 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
                                         <div class="input-group">
-                                            <select name="subsidiary_id"
-                                                class="select2 form-control form-control-sm" style="width:100%"
-                                                id="subsidiaryDD">
+                                            <select name="subsidiary_id" class="select2 form-control form-control-sm"
+                                                style="width:100%" id="subsidiaryDD">
                                                 @foreach ($subsidiaryData as $subdata)
                                                     <option value="{{ $subdata->sub_id }}">
                                                         {{ $subdata->sub_code }} - {{ $subdata->sub_name }}
@@ -259,12 +258,9 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="account">Account</label>
                                         <div class="input-group">
-                                            <select
-                                                name="account_id"
-                                                class="select2 form-control form-control-sm"
-                                                id="subsidiaryFilterAccountTitle"
-                                                style="width: 100% !important;"
-                                                >
+                                            <select name="account_id" class="select2 form-control form-control-sm"
+                                                id="subsidiaryFilterAccountTitle" {{--          v-model="filter.account_id" --}}
+                                                style="width: 100% !important;">
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
                                                     @if ($account->type == 'L' || $account->type == 'R')
@@ -281,45 +277,45 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                            v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal" for="date_from">From</label>
-                                    <div class="input-group">
-                                        <input v-model="filter.from" type="date" v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'"
+                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="date_from">From</label>
+                                        <div class="input-group">
+                                            <input v-model="filter.from" type="date"
+                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'"
                                                 class=" form-control form-control-sm rounded-0" name="from"
-                                            id="sub_date" required>
+                                                id="sub_date" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-md-2 col-xs-12"
-                            v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal" for="date_to">To</label>
-                                    <div class="input-group">
-                                        <input v-model="filter.to" type="date"
-                                            class="form-control form-control-sm rounded-0" name="to"
-                                            id="sub_date" required>
+                            <div class="col-md-2 col-xs-12"
+                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="date_to">To</label>
+                                        <div class="input-group">
+                                            <input v-model="filter.to" type="date"
+                                                class="form-control form-control-sm rounded-0" name="to"
+                                                id="sub_date" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-2 col-xs-12"
-                            v-show="reportType=='subsidiary-ledger-summary-report'">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal" for="sub_date">As of:</label>
-                                    <div class="input-group">
-                                        <input v-model="filter.to" type="date"
-                                            class="form-control form-control-sm rounded-0" name="to"
-                                            id="sub_date" required>
+                            <div class="col-md-2 col-xs-12" v-show="reportType=='subsidiary-ledger-summary-report'">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="sub_date">As of:</label>
+                                        <div class="input-group">
+                                            <input v-model="filter.to" type="date"
+                                                class="form-control form-control-sm rounded-0" name="to"
+                                                id="sub_date" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
 
 
@@ -482,11 +478,13 @@
                                             <tr v-for="(ps,i) in subledger"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
-                                                <td v-if="i<=8" v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                <td v-if="i<=8" v-for="p,i in ps"
+                                                    :class="rowStyleSubsidiaryListing(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[2]"> <!-- Check if journal_no exists -->
-                                                    <button v-if="ps[2]" :value="`${ps[9]}`" class="btn btn-flat btn-sm JnalView bg-gradient-success">
+                                                    <button v-if="ps[2]" :value="`${ps[9]}`"
+                                                        class="btn btn-flat btn-sm JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
                                                 </td>
@@ -523,7 +521,8 @@
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[9]"> <!-- Check if journal_no exists -->
-                                                    <button v-if="ps[9]" :value="`${ps[9]}`" class="btn btn-flat btn-xs JnalView bg-gradient-success">
+                                                    <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                        class="btn btn-flat btn-xs JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
                                                 </td>
@@ -607,7 +606,7 @@
                     <!-- /.Table -->
                 </div>
             </div>
-                        <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
+            <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -626,7 +625,8 @@
                                         </div>
 
                                         <div class="col-md-4 frm-header">
-                                            <label class="label-bold label-sty" for="date">Journal Reference No</label>
+                                            <label class="label-bold label-sty" for="date">Journal Reference
+                                                No</label>
                                             <div class="input-group">
                                                 <label class="label-bold" id="voucher_ref_no"></label>
                                             </div>
@@ -638,7 +638,8 @@
                                                 <div class="form-group">
                                                     <label class="label-bold label-sty" for="branch_id">Branch</label>
                                                     <div class="input-group">
-                                                        <label class="label-normal text-bold" id="vjournal_branch"></label>
+                                                        <label class="label-normal text-bold"
+                                                            id="vjournal_branch"></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -774,14 +775,14 @@
                                     <div class="col-md-12" style="height:20px;"></div>
 
 
-                                    </div>
                                 </div>
-                                <!-- Button trigger modal -->
                             </div>
+                            <!-- Button trigger modal -->
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
         </div>
     </section>
@@ -808,17 +809,11 @@
             },
             methods: {
                 submitForm: function() {
-                    if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {
-                        this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
-                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
-                        this.fetchSubAll();
-                    } else if (this.reportType == 'income_minus_expense') {
+                    this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
+                    this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                    if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();
-                    } else if (this.reportType == 'subsidiary-ledger-listing-report') {
-                        this.fetchSubAll();
-                    } else if (this.reportType == 'subsidiary-ledger-summary-report') {
-                          this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
-                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                    } else {
                         this.fetchSubAll();
                     }
 
@@ -1012,7 +1007,7 @@
                                     details.balance ? this.formatCurrency(details.balance) : '0.00',
                                     details.journal_id
                                 ];
-                                if(count == parseInt(h)+1) {
+                                if (count == parseInt(h) + 1) {
                                     netMovement = details.balance;
                                 }
                                 rows.push(arr);
@@ -1024,7 +1019,8 @@
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(netMovement)])
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
+                            netMovement)])
                     }
 
 
@@ -1036,7 +1032,7 @@
 
                     if (this.subsidiaryAll) {
                         data = this.subsidiaryAll;
-                }
+                    }
                     for (var i in data) {
                         var subsidiary = data[i];
 
@@ -1085,9 +1081,9 @@
                     }
 
 
-                        var grandTotal = 0;
-                        var grandTotalCredit = 0;
-                        var grandTotalDebit = 0;
+                    var grandTotal = 0;
+                    var grandTotalCredit = 0;
+                    var grandTotalDebit = 0;
                     for (var i in data) {
                         var subsidiary = data[i];
 
