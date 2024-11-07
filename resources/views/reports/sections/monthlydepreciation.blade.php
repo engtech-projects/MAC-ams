@@ -36,7 +36,7 @@
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
-                    <form @submit.prevent="submitForm" action="">
+                    <form @submit.prevent="submitForm">
                         @csrf
                         <div class="row">
                             <div class="col-md-8 frm-header">
@@ -514,7 +514,7 @@
                                 'branch_code': branch[0].branch_code,
                                 'as_of': this.filter.to,
                             }
-                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this.formatCurrency(total_monthly_amort), .this.formatCurrency(total_no_depre), total_used, this
+                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this.formatCurrency(total_monthly_amort), this.formatCurrency(total_no_depre), total_used, this
                                 .formatCurrency(total_expensed), this.formatCurrency(total_unexpensed),
                                 this.formatCurrency(total_due_amort),this.formatCurrency(total_sub_salvage),
                                 this.formatCurrency(total_rem), total_inv, branch, data
@@ -674,7 +674,6 @@
 
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
-
                     axios.post(this.search, this.filter, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
