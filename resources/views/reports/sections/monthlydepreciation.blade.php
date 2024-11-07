@@ -318,8 +318,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                        <input type="text" v-model="ratePercentage" class="form-control"
-                                            >
+                                        <input type="text" v-model="ratePercentage" class="form-control">
                                     </div>
                                 </div>
 
@@ -348,7 +347,7 @@
                 rate_percentage: 0,
                 type: '',
                 filter: {
-                    branch_id:'',
+                    branch_id: '',
                     subsidiary_id: '',
                     sub_cat_id: '',
                     from: '',
@@ -366,7 +365,7 @@
                     sub_cat_id: null,
                     sub_per_branch: null,
                     sub_salvage: 0,
-                    rate_percentage:0,
+                    rate_percentage: 0,
                 },
                 incomeExpense: {
                     income: [],
@@ -375,7 +374,7 @@
                 subsidiaryAll: [],
                 balance: 0,
                 url: "{{ route('reports.post-monthly-depreciation') }}",
-                search: "{{ route('reports.monthly-depreciation-report-search') }}"
+                search: "{{ route('reports.monthly-depreciation-report-search') }}",
             },
             computed: {
                 monthlyDepreciationReportType: function() {
@@ -383,17 +382,17 @@
                     if (this.type == '') {
                         this.filter.branch_id = branch;
                         return this.type
-                    }else {
-                                  if(this.filter.sub_cat_id == '') {
-                        alert('select subsidiary category')
-                        return false;
-                    }else {
-                        this.filter.branch_id = '';
-                        this.fetchSubAll();
-                     }
+                    } else {
+                        if (this.filter.sub_cat_id == '') {
+                            alert('select subsidiary category')
+                            return false;
+                        } else {
+                            this.filter.branch_id = '';
+                            this.fetchSubAll();
+                        }
                     }
 
-                    if(this.filter.sub_cat_id == '') {
+                    if (this.filter.sub_cat_id == '') {
                         alert('select subsidiary category')
                         return false;
                     }
@@ -402,20 +401,22 @@
                 },
                 monthlyAmort: function() {
                     this.monthlyAmortization = this.subsidiary.sub_amount / this.subsidiary.sub_no_depre;
-                    if(this.subsidiary.sub_salvage >0) {
-                        this.ratePercentage/this.subsidiary.sub_no_depre;
+                    if (this.subsidiary.sub_salvage > 0) {
+                        this.ratePercentage / this.subsidiary.sub_no_depre;
                     }
                     return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
                 amort: function() {
-                    var amort = (this.subsidiary.sub_amount - this.subsidiary.rate_percentage) / this.subsidiary.sub_no_depre;
+                    var amort = (this.subsidiary.sub_amount - this.subsidiary.rate_percentage) / this.subsidiary
+                        .sub_no_depre;
                     return isNaN(amort) ? 0 : amort.toFixed(2);
                     //return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
 
 
                 ratePercentage: function() {
-                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * this.subsidiary.sub_amount
+                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * this.subsidiary
+                        .sub_amount
                     return this.subsidiary.rate_percentage;
                 },
                 processSubsidiary: function() {
@@ -513,9 +514,12 @@
                                 'branch_code': branch[0].branch_code,
                                 'as_of': this.filter.to,
                             }
-                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this.formatCurrency(total_monthly_amort), this.formatCurrency(total_no_depre), total_used, this
+                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this
+                                .formatCurrency(total_monthly_amort), this.formatCurrency(
+                                    total_no_depre), total_used, this
                                 .formatCurrency(total_expensed), this.formatCurrency(total_unexpensed),
-                                this.formatCurrency(total_due_amort),this.formatCurrency(total_sub_salvage),
+                                this.formatCurrency(total_due_amort), this.formatCurrency(
+                                    total_sub_salvage),
                                 this.formatCurrency(total_rem), total_inv, branch, data
                             ]);
 
@@ -587,14 +591,6 @@
                     }
                     return style;
                 },
-                formatCurrency: function(number) {
-                    const formatter = new Intl.NumberFormat('en-US', {
-                        style: 'decimal',
-                        minimumFractionDigits: 2,
-                    });
-
-                    return formatter.format(number);
-                },
                 submitForm: function() {
                     this.fetchSubAll();
                 },
@@ -630,7 +626,7 @@
                 },
                 createSubsidiary: function() {
                     this.subsidiary.sub_no_amort = 0;
-                    axios.post(@json(env('APP_URL')) + '/subsidiary', this.subsidiary, {
+                    axios.post('/MAC-ams/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -653,7 +649,7 @@
                 },
                 deleteSub: function(data) {
                     var url = @json(env('APP_URL'));
-                    axios.delete(@json(env('APP_URL')) + '/subsidiary/' + data, {
+                    axios.delete( '/MAC-ams/subsidiary/' + data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -682,6 +678,7 @@
                 },
 
             },
+
         });
     </script>
 @endsection
