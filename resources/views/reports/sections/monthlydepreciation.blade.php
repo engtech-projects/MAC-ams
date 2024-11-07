@@ -487,7 +487,7 @@
                                     total_expensed += parseFloat(subsidiary.expensed)
                                     total_unexpensed += parseFloat(subsidiary.unexpensed)
                                     total_due_amort += parseFloat(subsidiary.due_amort)
-                                    total_sub_salvage += parseFloat(subsidiary.sub_salvage)
+                                    total_sub_salvage += parseFloat(subsidiary.salvage)
                                     total_rem += parseFloat(subsidiary.rem)
                                     total_inv += parseFloat(subsidiary.inv)
 
@@ -514,13 +514,17 @@
                                 'branch_code': branch[0].branch_code,
                                 'as_of': this.filter.to,
                             }
-                            rows.push(['BRANCH TOTAL', '', '', this.formatCurrency(totalAmount), this
-                                .formatCurrency(total_monthly_amort), this.formatCurrency(
-                                    total_no_depre), total_used, this
-                                .formatCurrency(total_expensed), this.formatCurrency(total_unexpensed),
-                                this.formatCurrency(total_due_amort), this.formatCurrency(
-                                    total_sub_salvage),
-                                this.formatCurrency(total_rem), total_inv, branch, data
+                            rows.push(['BRANCH TOTAL', '', '',
+                                this.formatCurrency(totalAmount),
+                                this.formatCurrency(total_monthly_amort),
+                                this.formatCurrency(total_no_depre),
+                                total_used,
+                                this.formatCurrency(total_expensed),
+                                this.formatCurrency(total_unexpensed),
+                                this.formatCurrency(total_due_amort),
+                                this.formatCurrency(total_sub_salvage),
+                                this.formatCurrency(total_rem),
+                                total_inv, branch, data
                             ]);
 
                         }
@@ -649,7 +653,7 @@
                 },
                 deleteSub: function(data) {
                     var url = @json(env('APP_URL'));
-                    axios.delete( '/MAC-ams/subsidiary/' + data, {
+                    axios.delete('/MAC-ams/subsidiary/' + data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
