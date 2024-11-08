@@ -176,6 +176,11 @@
                                                     <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'>
                                                         <i class="fa fa-trash fa-xs"></i>
                                                     </button>
+
+                                                    <button class="btn btn-warning btn-xs" data-toggle="modal"
+                                                        data-target="#createSubsidiaryModal" @click='processEdit(ps)'>
+                                                        <i class="fa fa-pen fa-xs text-white"></i>
+                                                    </button>
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'">
@@ -245,7 +250,8 @@
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Add Subsidiary</h5>
+                        <h5 class="modal-title" id="exampleModalLabel"
+                            v-text="isEdit ? 'Edit Subsidiary' : 'Add Subsidiary' "></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -258,6 +264,7 @@
                                         <label for="recipient-name" class="col-form-label">Particular Name: </label>
                                         <input type="text" v-model="subsidiary.sub_name" class="form-control"
                                             id="sub_name" required>
+                                        <input v-if="isEdit" type="hidden" name="_method" value="PUT">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Inventory Number: </label>
@@ -327,7 +334,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button @click="createSubsidiary()" type="submit" class="btn btn-primary">Save</button>
+                        <button @click="processAction()" type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </div>
             </div>
@@ -346,12 +353,14 @@
                 monthlyAmortization: 0,
                 rate_percentage: 0,
                 type: '',
+                isEdit: false,
+                subId: null,
                 filter: {
-                    branch_id: '',
+                    branch_id: 1,
                     subsidiary_id: '',
-                    sub_cat_id: '',
+                    sub_cat_id: 49,
                     from: '',
-                    to: '',
+                    to: '2024-11-24',
 
                     account_id: '',
                     type: ''
@@ -474,7 +483,11 @@
                                         this.formatCurrency(subsidiary.salvage),
                                         this.formatCurrency(subsidiary.rem),
                                         subsidiary.inv,
-                                        subsidiary.sub_id
+                                        subsidiary.sub_id,
+                                        subsidiary.sub_salvage,
+                                        subsidiary.sub_code,
+                                        subsidiary.sub_cat_id,
+                                        subsidiary.sub_per_branch
 
                                     ]);
 
@@ -628,15 +641,64 @@
                     this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
                     this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
                 },
+                processAction: function() {
+                    if (!this.isEdit) {
+                        this.createSubsidiary();
+                    } else {
+                        this.editSubsidiary(this.subId);
+                    }
+                },
+                processEdit: function(sub) {
+                    this.isEdit = true;
+                    this.subId = sub[13];
+                    this.monthlyAmortization = sub[4];
+                    this.subsidiary.sub_date = sub[2];
+                    this.subsidiary.sub_cat_id = sub[16];
+                    this.subsidiary.sub_per_branch = sub[17];
+                    this.subsidiary.sub_name = sub[1];
+                    this.subsidiary.sub_code = sub[15];
+                    this.subsidiary.sub_no_amort = sub[3];
+                    this.subsidiary.sub_amount = parseInt(sub[4]);
+                    this.subsidiary.sub_salvage = parseInt(sub[14]);
+                    this.subsidiary.sub_rate_percentage = sub[6];
+                    this.subsidiary.sub_date_of_depreciation = sub[7];
+                    this.subsidiary.sub_no_depre = sub[5];
+
+                },
                 createSubsidiary: function() {
+                    this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+                        }
+                    }).then(response => {
+                        toastr.success(response.data.message);
+                        this.subsidiary = {};
+                    }).catch(err => {
+                        var errors = err.response.data.errors;
+                        var messages = [];
+                        for (var i in errors) {
+                            var error = errors[i];
+                            for (var j in error) {
+                                var message = error[j];
+                                messages.push(message + '<br />');
+                            }
+                        }
+                        toastr.error(messages);
+                    })
+                },
+                editSubsidiary: function(subId) {
+                    this.isEdit = true;
+                    this.subsidiary.sub_no_amort = 0;
+                    axios.post('/MAC-ams/subsidiary/'+subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        this.subsidiary = {};
                     }).catch(err => {
                         var errors = err.response.data.errors;
 

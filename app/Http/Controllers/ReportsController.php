@@ -174,7 +174,7 @@ class ReportsController extends MainController
                 $value->sub_no_depre = 1;
             }
             $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
-            
+
             $salvage = round(($value->sub_amount * $value->sub_salvage) / 100, 2);
             $monthlyAmort = round(($value->sub_amount - $salvage) / $value->sub_no_depre, 2);
             // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
@@ -189,10 +189,10 @@ class ReportsController extends MainController
             $value['salvage'] = $salvage;
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($rem * $monthlyAmort, 2);
-           
+
 
             $value['rem'] = $rem;
-            
+
             $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
@@ -216,7 +216,7 @@ class ReportsController extends MainController
     public function monthlyDepreciation(Request $request)
     {
 
-        $branches = Branch::all();
+        /* $branches = Branch::all();
         $date = $request->sub_date;
 
 
@@ -247,6 +247,59 @@ class ReportsController extends MainController
             $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
             $value['inv'] = 0;
             $value['no'] = 0;
+            return $value;
+        })->groupBy('description')->map(function ($value) {
+            return $value->groupBy('branch');
+        });
+
+        $data = [
+            'data' => $data,
+            'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
+            'as_of' => $date,
+            'branches' => $branches,
+            'title' => 'MAC-AMS | Monthly Depreciation',
+            'type' => $type
+        ]; */
+
+        $branches = Branch::all();
+        $date = $request->to;
+
+        $subsidiary = new Subsidiary();
+
+        $type = 'listing';
+        if ($request->type == 'summary') {
+            $type = $request->type;
+        }
+
+        $result = $subsidiary->getDepreciation($request->sub_cat_id, null, $date);
+        $data = $result->map(function ($value) {
+            if ($value->sub_no_depre == 0) {
+                $value->sub_no_depre = 1;
+            }
+            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
+
+            $salvage = round(($value->sub_amount * $value->sub_salvage) / 100, 2);
+            $monthlyAmort = round(($value->sub_amount - $salvage) / $value->sub_no_depre, 2);
+            // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
+            $rem = round($value->sub_no_depre - $value->sub_no_amort, 2);
+            $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
+            $value['branch_code'] = $branch->branch_code;
+            $value['branch_id'] = $branch->branch_id;
+            $value['description'] = $value->subsidiary_category->description;
+            $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
+            $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
+            $value['monthly_amort'] = $monthlyAmort;
+            $value['salvage'] = $salvage;
+            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
+            $value['unexpensed'] = round($rem * $monthlyAmort, 2);
+
+
+            $value['rem'] = $rem;
+
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
+            $value['inv'] = 0;
+            $value['no'] = 0;
+
             return $value;
         })->groupBy('description')->map(function ($value) {
             return $value->groupBy('branch');
@@ -306,6 +359,7 @@ class ReportsController extends MainController
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
             'amount' => $request->total['total_monthly_amort'],
         ]);
+
 
         $accounts = $subsidiary->accounts;
 

@@ -185,6 +185,7 @@ Route::post('reports/monthly-depreciation-report-post', [ReportsController::clas
 /* Route::delete('reports/subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('reports.delete-subsidiary'); */
 Route::post('subsidiary', [SubsidiaryController::class, 'store'])->name('subsidiary.store');
 Route::delete('subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('subsidiary.delete');
+Route::post('subsidiary/{subsidiary}', [SubsidiaryController::class, 'update'])->name('subsidiary.update');
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');
 Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'])->name('payment.customer');
