@@ -442,6 +442,19 @@
 
                     for (var i in data) {
                         var branches = data[i];
+                        let gTotalAmount = 0;
+                        let gTotalMonthlyAmort = 0;
+                        let gTotalMonthly = 0;
+                        let gTotalNoDepre = 0;
+                        let gTotalNoAmort = 0;
+                        let gTotalAmort = 0;
+                        let gTotalUsed = 0;
+                        let gTotalExpensed = 0;
+                        let gTotalUnexpensed = 0;
+                        let gTotalDueAmort = 0;
+                        let gTotalSubSalvage = 0;
+                        let gTotalRem = 0;
+                        let gTotalInv = 0;
                         rows.push([i]);
 
                         for (var j in branches) {
@@ -508,6 +521,17 @@
 
 
                             }
+                            gTotalAmount+=totalAmount;
+                            gTotalMonthly+=total_monthly_amort;
+                            gTotalNoDepre+=total_no_depre
+                            gTotalNoAmort+=total_no_amort
+                            gTotalUsed+=total_used
+                            gTotalExpensed+=total_expensed
+                            gTotalUnexpensed+=total_unexpensed
+                            gTotalDueAmort+=total_due_amort
+                            gTotalSubSalvage+=total_sub_salvage
+                            gTotalRem+=total_rem
+                            gTotalInv+=total_inv
                             var data = {
                                 'sub_ids': sub_ids,
                                 'total': {
@@ -529,7 +553,7 @@
                             }
                             rows.push(['BRANCH TOTAL', '', '',
                                 this.formatCurrency(totalAmount),
-                                this.formatCurrency(total_monthly_amort),
+                                this.formatCurrency(gTotalMonthly),
                                 this.formatCurrency(total_no_depre),
                                 total_used,
                                 this.formatCurrency(total_expensed),
@@ -541,6 +565,18 @@
                             ]);
 
                         }
+                        rows.push(['GRAND TOTAL', '', '',
+                                this.formatCurrency(gTotalAmount),
+                                this.formatCurrency(gTotalMonthlyAmort),
+                                this.formatCurrency(gTotalNoDepre),
+                                gTotalUsed,
+                                this.formatCurrency(gTotalExpensed),
+                                this.formatCurrency(gTotalUnexpensed),
+                                this.formatCurrency(gTotalDueAmort),
+                                this.formatCurrency(gTotalSubSalvage),
+                                this.formatCurrency(gTotalRem),
+                                gTotalInv, branch, data
+                            ]);
                     }
 
 
