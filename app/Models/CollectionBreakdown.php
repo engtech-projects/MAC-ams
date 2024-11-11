@@ -51,11 +51,44 @@ class CollectionBreakdown extends Model
     }
     public static function getCollectionBreakdownByBranch($transactionDate, $branchId = null)
     {
+        // Fetch collection breakdowns
+        $collections = CollectionBreakdown::when($branchId, function ($query, $branchId) {
+                $query->where('branch_id', $branchId);
+            })
+            ->when($transactionDate, function ($query, $transactionDate) {
+                $query->where('transaction_date', $transactionDate);
+            }, function ($query) {
+                // If no transaction date is provided, filter from 2024-01-01 onwards
+                $query->where('transaction_date', '>=', '2024-01-01');
+            })
+            ->orderBy('transaction_date', 'desc')
+            ->get();
+
+        // Loop through each collection and append the cash ending balance
+        foreach ($collections as $collection) {
+            // Assuming journalEntry is a class with getCashEndingBalanceByBranch method
+            
+            $journalEntry = new journalEntry();
+
+            // Retrieve cash ending balance by branch and transaction date
+            $cashEndingBalance = $journalEntry->getCashEndingBalanceByBranch($collection->branch_id, $collection->transaction_date);
+
+            // Append the cash ending balance to the collection object
+            $collection->cash_ending_balance = $cashEndingBalance;
+        }
+
+        return $collections;
+    }
+    public static function getCollections($transactionDate, $branchId = null)
+    {
         return CollectionBreakdown::when($branchId, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })
             ->when($transactionDate, function ($query, $transactionDate) {
                 $query->where('transaction_date', $transactionDate);
+            }, function ($query) {
+                // If no transaction date is provided, filter from 2024-01-01 onwards
+                $query->where('transaction_date', '>=', '2024-01-01');
             })
             ->orderBy('transaction_date', 'desc')
             ->get();
