@@ -415,8 +415,8 @@ class ReportsController extends MainController
 
         try {
             $data->details()->createMany($journalDetails);
-            $this->updateMonthlyDepreciation($request->sub_ids);
-            return response()->json(['message' => 'Successfully posted.']);
+            $sub = $this->updateMonthlyDepreciation($request->sub_ids);
+            return response()->json(['message' => 'Successfully posted.', 'data' => $sub]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to save journal entry'], 500);
         }
@@ -425,6 +425,7 @@ class ReportsController extends MainController
     public function updateMonthlyDepreciation(array $sub_ids = [])
     {
 
+        $sub = [];
         foreach ($sub_ids as $sub_id) {
             $subsidiary = Subsidiary::find($sub_id);
             $sub_no_amort = $subsidiary->sub_no_amort < $subsidiary->sub_no_depre ? $subsidiary->sub_no_amort + 1 : $subsidiary->sub_no_depre;
@@ -432,7 +433,9 @@ class ReportsController extends MainController
             $subsidiary->update([
                 'sub_no_amort' => $sub_no_amort
             ]);
+            $sub[] = $subsidiary;
         }
+        return $sub;
     }
 
 

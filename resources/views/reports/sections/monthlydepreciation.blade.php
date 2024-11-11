@@ -355,12 +355,13 @@
                 type: '',
                 isEdit: false,
                 subId: null,
+                newSub:null,
                 filter: {
-                    branch_id: 1,
+                    branch_id: '',
                     subsidiary_id: '',
-                    sub_cat_id: 49,
+                    sub_cat_id: '',
                     from: '',
-                    to: '2024-11-24',
+                    to: '',
 
                     account_id: '',
                     type: ''
@@ -478,6 +479,7 @@
                             var sub_ids = [];
 
                             for (var k in branch) {
+
                                 var subsidiary = branch[k];
                                 no += 1;
                                 if (j == subsidiary.branch) {
@@ -668,7 +670,8 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-
+                        this.newSub = response.data.data;
+                        window.reload();
                     }).catch(err => {
                         console.error(err)
                     })
