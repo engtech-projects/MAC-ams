@@ -336,11 +336,11 @@ class ReportsController extends MainController
         $accountName = null;
 
 
-        if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
+        if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
-        } elseif ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
+        } elseif ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
-        } else if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+        } else if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
@@ -377,19 +377,20 @@ class ReportsController extends MainController
             ];
 
 
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
                 $details['journal_details_debit'] = $account->account_number == 5185 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
                 $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_DEPRE) {
+
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
                     $details['journal_details_debit'] = $request->total['total_monthly_amort'];
                     $details['journal_details_credit'] = 0.0;
@@ -487,7 +488,7 @@ class ReportsController extends MainController
         if ($request->sub_id == '') {
             $sub = new Subsidiary;
             $sub->sub_id = $request->sub_id;
-            $sub->sub_cat_id = $request->sub_cat_id;
+            $sub->sub_id = $request->sub_cat_id;
             $sub->sub_name = $request->sub_name;
             $sub->sub_address = $request->sub_address;
             $sub->sub_tel = $request->sub_tel;
