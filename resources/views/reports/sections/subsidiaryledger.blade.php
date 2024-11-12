@@ -791,13 +791,13 @@
         new Vue({
             el: '#app',
             data: {
-                balance:'',
+                balance: '',
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
-                    branch_id:'',
-                    from: '',
-                    to: '',
+                    branch_id: '',
+                    from: '2024-06-25',
+                    to: '2024-06-28',
                     account_id: 'all',
                     type: ''
                 },
@@ -973,11 +973,13 @@
                         data = this.subsidiaryAll;
                     }
 
+                    let currentBalance = this.balance;;
 
                     for (var i in data) {
                         var result = data[i];
-                        rows.push([result.branch_name, '', '', '', '', '', '', '','']);
-                        rows.push([result.account_name, '', '', '', '', '', '', '',this.formatCurrency(this.balance)]);
+                        rows.push([result.branch_name, '', '', '', '', '', '', '', '']);
+                        rows.push([result.account_name, '', '', '', '', '', '', '', this.formatCurrency(this
+                            .balance)]);
 
                         var entries = result.entries;
                         var totalCredit = 0;
@@ -987,8 +989,14 @@
                         for (var d in entries) {
                             var entry = entries[d];
                             var count = entries.length;
-                            totalCredit += parseFloat(entry.credit);
-                            totalDebit += parseFloat(entry.debit);
+                            const sCredit = entry.credit;
+                            const sDebit = entry.debit;
+                            const credit = parseFloat(sCredit.replace(/,/g, ""));
+                            const debit = parseFloat(sDebit.replace(/,/g, ""));
+                            totalCredit += credit
+                            totalDebit += debit;
+                            currentBalance +=debit;
+                            currentBalance -=credit
 
                             var arr = [
                                 entry.journal_date,
@@ -999,9 +1007,10 @@
                                 entry.cheque_no,
                                 entry.debit,
                                 entry.credit,
-                                entry.current_balance,
+                                this.formatCurrency(currentBalance),
                                 entry.journal_id
                             ];
+
                             rows.push(arr);
 
                         }
