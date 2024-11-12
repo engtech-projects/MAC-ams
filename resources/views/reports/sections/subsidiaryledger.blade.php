@@ -791,6 +791,7 @@
         new Vue({
             el: '#app',
             data: {
+                balance:'',
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
@@ -831,6 +832,7 @@
                             if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
                                 'subsidiary-ledger-summary-report') {
                                 this.subsidiaryAll = response.data.data;
+                                this.balance = response.data.balance;
 
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
@@ -970,10 +972,12 @@
                     if (this.subsidiaryAll) {
                         data = this.subsidiaryAll;
                     }
+
+
                     for (var i in data) {
                         var result = data[i];
                         rows.push([result.branch_name, '', '', '', '', '', '', '','']);
-                        rows.push([result.account_name, '', '', '', '', '', '', '',result.balance]);
+                        rows.push([result.account_name, '', '', '', '', '', '', '',this.formatCurrency(this.balance)]);
 
                         var entries = result.entries;
                         var totalCredit = 0;
