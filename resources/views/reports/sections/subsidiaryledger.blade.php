@@ -794,6 +794,7 @@
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
+                    branch_id:'',
                     from: '',
                     to: '',
                     account_id: 'all',

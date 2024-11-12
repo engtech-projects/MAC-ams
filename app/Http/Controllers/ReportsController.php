@@ -193,7 +193,7 @@ class ReportsController extends MainController
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -296,7 +296,7 @@ class ReportsController extends MainController
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -336,11 +336,11 @@ class ReportsController extends MainController
         $accountName = null;
 
 
-        if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
+        if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
-        } elseif ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
+        } elseif ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
-        } else if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
+        } else if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
@@ -377,20 +377,19 @@ class ReportsController extends MainController
             ];
 
 
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
                 $details['journal_details_debit'] = $account->account_number == 5185 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
                 $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
             }
-
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::DEPRE) {
+            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_DEPRE) {
                 if ($account->account_number == 5285) {
                     $details['journal_details_debit'] = $request->total['total_monthly_amort'];
                     $details['journal_details_credit'] = 0.0;
@@ -415,8 +414,8 @@ class ReportsController extends MainController
 
         try {
             $data->details()->createMany($journalDetails);
-            $sub = $this->updateMonthlyDepreciation($request->sub_ids);
-            return response()->json(['message' => 'Successfully posted.', 'data' => $sub]);
+            $this->updateMonthlyDepreciation($request->sub_ids);
+            return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to save journal entry'], 500);
         }
@@ -425,17 +424,14 @@ class ReportsController extends MainController
     public function updateMonthlyDepreciation(array $sub_ids = [])
     {
 
-        $sub = [];
         foreach ($sub_ids as $sub_id) {
             $subsidiary = Subsidiary::find($sub_id);
-            $sub_no_amort = $subsidiary->sub_no_amort < $subsidiary->sub_no_depre ? $subsidiary->sub_no_amort + 1 : $subsidiary->sub_no_depre;
+            $sub_no_amort = $subsidiary->sub_no_amort + 1;
             $subsidiary->sub_no_amort = $sub_no_amort;
             $subsidiary->update([
                 'sub_no_amort' => $sub_no_amort
             ]);
-            $sub[] = $subsidiary;
         }
-        return $sub;
     }
 
 
@@ -491,7 +487,7 @@ class ReportsController extends MainController
         if ($request->sub_id == '') {
             $sub = new Subsidiary;
             $sub->sub_id = $request->sub_id;
-            $sub->sub_id = $request->sub_cat_id;
+            $sub->sub_cat_id = $request->sub_cat_id;
             $sub->sub_name = $request->sub_name;
             $sub->sub_address = $request->sub_address;
             $sub->sub_tel = $request->sub_tel;

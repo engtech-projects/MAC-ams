@@ -163,7 +163,8 @@
                                                         <center>No data available in table.</center>
                                                     </b>
                                                 </td>
-                                                <td v-if="filter.sub_cat_id">
+                                                <td
+                                                    v-if="filter.sub_cat_id && filter.branch_id && subsidiaryAll.length ==0 ">
                                                     <button class="btn btn-success" data-toggle="modal"
                                                         data-target="#createSubsidiaryModal"
                                                         @click="add(filter.sub_cat_id)">
@@ -368,7 +369,6 @@
                     sub_cat_id: '',
                     from: '',
                     to: '',
-
                     account_id: '',
                     type: ''
                 },
@@ -683,8 +683,23 @@
                     })
                 },
                 add: function(subsidiary) {
-                    this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
-                    this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
+                    this.subsidiary.sub_cat_id = !Number.isInteger(subsidiary) ? subsidiary.sub_cat_id :
+                        this.filter.sub_cat_id;
+                    let isObject = subsidiary.constructor === Object;
+                    if (isObject) {
+                        this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
+                        this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
+                    } else {
+                        if (this.subsidiary.branch_id) {
+                            this.subsidiary.sub_cat_id = this.filter.sub_cat_id
+                            this.subsidiary.branch_id = this.filter.branch_id
+                        } else {
+                            this.showModal = false;
+                            alert("Please select a branch.")
+                            return false;
+                        }
+                    }
+
                 },
                 processAction: function() {
                     if (!this.isEdit) {
