@@ -464,7 +464,7 @@
                                             <th class="text-right"></th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            <tr v-if="subsidiaryAll.length == 0">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
@@ -475,7 +475,7 @@
                                                 <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
                                             </tr> --}}
-                                            <tr v-for="(ps,i) in subledger"
+                                            <tr v-for="(ps,i) in subsidiaryLedger"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
                                                 <td v-if="i<=8" v-for="p,i in ps"
@@ -961,6 +961,56 @@
                     }
                     return rows;
 
+                },
+                subsidiaryLedger: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                    }
+                    for (var i in data) {
+                        var result = data[i];
+                        rows.push([result.branch_name, '', '', '', '', '', '', '','']);
+                        rows.push([result.account_name, '', '', '', '', '', '', '',result.balance]);
+
+                        var entries = result.entries;
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+                        var netMovement = 0;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var count = entries.length;
+                            totalCredit += parseFloat(entry.credit);
+                            totalDebit += parseFloat(entry.debit);
+
+                            var arr = [
+                                entry.journal_date,
+                                entry.journal_no,
+                                entry.sub_name,
+                                entry.source,
+                                entry.cheque_date,
+                                entry.cheque_no,
+                                entry.debit,
+                                entry.credit,
+                                entry.current_balance,
+                                entry.journal_id
+                            ];
+                            rows.push(arr);
+
+                        }
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
+                            netMovement)])
+                    }
+
+
+                    return rows;
                 },
                 subledger: function() {
                     var data = {};
