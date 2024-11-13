@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\Subsidiary;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -22,11 +23,15 @@ class SubsidiaryController extends Controller
             'sub_salvage' => 'numeric|required',
             'sub_amount' => 'numeric|required',
             'sub_no_depre' => 'numeric|required',
-            'sub_per_branch' => 'string',
+            'sub_per_branch' => 'nullable',
+            'branch_id' => 'nullable',
 
         ]);
 
         try {
+            if ($data['branch_id']) {
+                $data['sub_per_branch'] = Branch::where('branch_id', $data['branch_id'])->pluck('branch_code')->first();
+            }
             Subsidiary::create($data);
         } catch (\Exception $e) {
             return response()->json([
@@ -38,7 +43,7 @@ class SubsidiaryController extends Controller
         ], JsonResponse::HTTP_CREATED);
     }
 
-    public function update(Subsidiary $subsidiary,Request $request)
+    public function update(Subsidiary $subsidiary, Request $request)
     {
         $data = $request->validate([
             'sub_name' => 'string|required',

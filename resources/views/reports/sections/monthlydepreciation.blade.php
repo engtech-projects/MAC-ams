@@ -163,6 +163,14 @@
                                                         <center>No data available in table.</center>
                                                     </b>
                                                 </td>
+                                                <td
+                                                    v-if="filter.sub_cat_id && filter.branch_id && subsidiaryAll.length ==0 ">
+                                                    <button class="btn btn-success" data-toggle="modal"
+                                                        data-target="#createSubsidiaryModal"
+                                                        @click="add(filter.sub_cat_id)">
+                                                        Add
+                                                    </button>
+                                                </td>
                                             <tr>
                                             <tr v-for="(ps,i) in processSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -193,7 +201,6 @@
                                                     </button>
 
                                                 </td>
-
                                             </tr>
 
 
@@ -355,13 +362,13 @@
                 type: '',
                 isEdit: false,
                 subId: null,
+                newSub: null,
                 filter: {
-                    branch_id: 1,
+                    branch_id: '',
                     subsidiary_id: '',
-                    sub_cat_id: 49,
+                    sub_cat_id: '',
                     from: '',
-                    to: '2024-11-24',
-
+                    to: '',
                     account_id: '',
                     type: ''
                 },
@@ -478,6 +485,7 @@
                             var sub_ids = [];
 
                             for (var k in branch) {
+
                                 var subsidiary = branch[k];
                                 no += 1;
                                 if (j == subsidiary.branch) {
@@ -521,17 +529,17 @@
 
 
                             }
-                            gTotalAmount+=totalAmount;
-                            gTotalMonthly+=total_monthly_amort;
-                            gTotalNoDepre+=total_no_depre
-                            gTotalNoAmort+=total_no_amort
-                            gTotalUsed+=total_used
-                            gTotalExpensed+=total_expensed
-                            gTotalUnexpensed+=total_unexpensed
-                            gTotalDueAmort+=total_due_amort
-                            gTotalSubSalvage+=total_sub_salvage
-                            gTotalRem+=total_rem
-                            gTotalInv+=total_inv
+                            gTotalAmount += totalAmount;
+                            gTotalMonthly += total_monthly_amort;
+                            gTotalNoDepre += total_no_depre
+                            gTotalNoAmort += total_no_amort
+                            gTotalUsed += total_used
+                            gTotalExpensed += total_expensed
+                            gTotalUnexpensed += total_unexpensed
+                            gTotalDueAmort += total_due_amort
+                            gTotalSubSalvage += total_sub_salvage
+                            gTotalRem += total_rem
+                            gTotalInv += total_inv
                             var data = {
                                 'sub_ids': sub_ids,
                                 'total': {
@@ -566,17 +574,17 @@
 
                         }
                         rows.push(['GRAND TOTAL', '', '',
-                                this.formatCurrency(gTotalAmount),
-                                this.formatCurrency(gTotalMonthlyAmort),
-                                this.formatCurrency(gTotalNoDepre),
-                                gTotalUsed,
-                                this.formatCurrency(gTotalExpensed),
-                                this.formatCurrency(gTotalUnexpensed),
-                                this.formatCurrency(gTotalDueAmort),
-                                this.formatCurrency(gTotalSubSalvage),
-                                this.formatCurrency(gTotalRem),
-                                gTotalInv, branch, data
-                            ]);
+                            this.formatCurrency(gTotalAmount),
+                            this.formatCurrency(gTotalMonthlyAmort),
+                            this.formatCurrency(gTotalNoDepre),
+                            gTotalUsed,
+                            this.formatCurrency(gTotalExpensed),
+                            this.formatCurrency(gTotalUnexpensed),
+                            this.formatCurrency(gTotalDueAmort),
+                            this.formatCurrency(gTotalSubSalvage),
+                            this.formatCurrency(gTotalRem),
+                            gTotalInv, branch, data
+                        ]);
                     }
 
 
@@ -668,14 +676,30 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-
+                        this.newSub = response.data.data;
+                        window.reload();
                     }).catch(err => {
                         console.error(err)
                     })
                 },
                 add: function(subsidiary) {
-                    this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
-                    this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
+                    this.subsidiary.sub_cat_id = !Number.isInteger(subsidiary) ? subsidiary.sub_cat_id :
+                        this.filter.sub_cat_id;
+                    let isObject = subsidiary.constructor === Object;
+                    if (isObject) {
+                        this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
+                        this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
+                    } else {
+                        if (this.subsidiary.branch_id) {
+                            this.subsidiary.sub_cat_id = this.filter.sub_cat_id
+                            this.subsidiary.branch_id = this.filter.branch_id
+                        } else {
+                            this.showModal = false;
+                            alert("Please select a branch.")
+                            return false;
+                        }
+                    }
+
                 },
                 processAction: function() {
                     if (!this.isEdit) {
@@ -706,7 +730,8 @@
                     this.subsidiary.sub_no_amort = 0;
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
                         headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
@@ -727,7 +752,7 @@
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
                     this.subsidiary.sub_no_amort = 0;
-                    axios.post('/MAC-ams/subsidiary/'+subId, this.subsidiary, {
+                    axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content

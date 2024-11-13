@@ -193,7 +193,7 @@ class ReportsController extends MainController
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -296,7 +296,7 @@ class ReportsController extends MainController
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -426,7 +426,7 @@ class ReportsController extends MainController
 
         foreach ($sub_ids as $sub_id) {
             $subsidiary = Subsidiary::find($sub_id);
-            $sub_no_amort = $subsidiary->sub_no_amort < $subsidiary->sub_no_depre ? $subsidiary->sub_no_amort + 1 : $subsidiary->sub_no_depre;
+            $sub_no_amort = $subsidiary->sub_no_amort + 1;
             $subsidiary->sub_no_amort = $sub_no_amort;
             $subsidiary->update([
                 'sub_no_amort' => $sub_no_amort
@@ -472,10 +472,10 @@ class ReportsController extends MainController
                 $glAccounts = new Accounts();
                 $transactions = $glAccounts->ledger([$filter['from'], $filter['to']], $filter['account_id'], $filter['subsidiary_id']);
 
-                $ss = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
+                //$transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
                 $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
 
-                return response()->json(['data' => [$ss, $balance]]);
+                return response()->json(['data' => [$transactions, $balance]]);
 
 
             case 'subsidiary-ledger':
@@ -596,7 +596,7 @@ class ReportsController extends MainController
         $to = $request->to ? $request->to : $accounting->default_end;
         $account_id = !$request->account_id ? 3 : $request->account_id;
 
-        $transactions = $glAccounts->ledger([$from, $to], $account_id);
+        $transactions = $glAccounts->ledger([$from,$to ], $account_id);
         $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
 
         $data = [
@@ -606,6 +606,7 @@ class ReportsController extends MainController
             'fiscalYear' => $accounting,
             'transactions' => $transactions,
         ];
+
 
         return view('reports.sections.generalledger', $data);
     }
