@@ -1128,6 +1128,17 @@
             });
         })
 
+        $('#s_status').change(function () {
+            if ($('#s_status').val() === "unposted") {
+                $('#s_from').val('').prop('required', false);
+                $('#s_to').val('').prop('required', false);
+            } else {
+                var currentDate = new Date().toISOString().split('T')[0];
+                $('#s_from').val(currentDate).prop('required', true);
+                $('#s_to').val(currentDate).prop('required', true);
+            }
+        });
+
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
             var s_data = $(this).serialize();

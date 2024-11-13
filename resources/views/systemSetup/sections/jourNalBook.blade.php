@@ -10,7 +10,7 @@
 				<div class="form-group">
 					<label class="label-normal" for="book_code">Book Code</label>
 					<div class="input-group">
-						<branches></branches>
+						<input type="text" class="form-control form-control-sm rounded-0" name="book_code" id="book_code"  placeholder="Book Code" required>
 					</div>
 				</div>
 			</div>
@@ -32,7 +32,7 @@
 				<div class="form-group">
 					<label class="label-normal" for="book_src">Book Source</label>
 					<div class="input-group">
-						<input type="text" class="form-control form-control-sm rounded-0" name="book_src" id="book_src"  placeholder="Book Source" required>
+						<input type="text" class="form-control form-control-sm rounded-0" name="book_src" id="book_src"  placeholder="Book Source">
 					</div>
 				</div>
 			</div>
@@ -43,7 +43,7 @@
 				<div class="form-group">
 					<label class="label-normal" for="book_ref">Book Reference</label>
 					<div class="input-group">
-						<input type="text" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference" required>
+						<input type="text" class="form-control form-control-sm rounded-0" name="book_ref" id="book_ref"  placeholder="Book Reference">
 					</div>
 				</div>
 			</div>
@@ -53,7 +53,7 @@
 				<div class="form-group">
 					<label class="label-normal" for="book_head">Book Head</label>
 					<div class="input-group">
-						<input type="text" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Print Voucher" required>
+						<input type="text" class="form-control form-control-sm rounded-0" name="book_head" id="book_head"  placeholder="Book Head">
 					</div>
 				</div>
 			</div>
@@ -63,16 +63,16 @@
 				<div class="form-group">
 					<label class="label-normal" for="printVoucher">Book Flag</label>
 					<div class="input-group">
-						<input type="text" class="form-control form-control-sm rounded-0" name="book_flag" id="book_flag"  placeholder="Book Flag" required>
+						<input type="text" class="form-control form-control-sm rounded-0" name="book_flag" id="book_flag"  placeholder="Book Flag">
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="col-md-4" style="padding-bottom:10px;">
+		<div class="col-md-9 col-xs-12"></div>
+		<div class="col-md-3" style="padding-bottom:20px;">
 				<div class="box">
-					<label class="label-normal" for="">&nbsp;</label>
 					<div class="input-group">
-						<input type="submit"  class="btn btn-success form-control-sm form-control" value="UPDATE / SAVE">
+						<input type="submit" id="submitBtn" class="btn btn-success form-control" value="SAVE">
 					</div>
 				</div>
 		</div>

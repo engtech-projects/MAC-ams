@@ -76,9 +76,10 @@ class journalEntry extends Model
         }
         if ($from != '' && $to != '') {
             $query->whereBetween('journal_date', [$from, $to]);
-            if ($journal_no != '') {
-                $query->orWhere('journal_no', $journal_no);
-            }
+        } elseif ($from != '') {
+            $query->where('journal_date', '>=', $from);
+        } elseif ($to != '') {
+            $query->where('journal_date', '<=', $to);
         }
         if ($book_id != '') {
             $query->where('book_id', $book_id);

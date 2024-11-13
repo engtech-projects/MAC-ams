@@ -1044,11 +1044,11 @@
 				data:dataSerialize,
 				success:function(data) {
 					if(data.message === 'save'){
-						toastr.success('Successfully Create');
+						toastr.success('Successfully Created');
 					}else if(data.message === 'update'){
 						subsidiaryTbl.row($("a[value ='"+data.sub_id+"']").parents('tr'))
 							.remove().draw();
-						toastr.success('Successfully Update');
+						toastr.success('Successfully Updated');
 					}
 					if(data.message == 'save' || data.message == 'update')
 					{

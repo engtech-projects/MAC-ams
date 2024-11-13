@@ -439,6 +439,7 @@ class ReportsController extends MainController
     public function subsidiaryLedgerReports(Request $request)
     {
         $filter = $request->input();
+        $filter['type'] = $filter['type'] ?? 'subsidiary-ledger';
         $data = [
             'subsidiaryData' => Subsidiary::get(),
             'sub_categories' => SubsidiaryCategory::get(),
