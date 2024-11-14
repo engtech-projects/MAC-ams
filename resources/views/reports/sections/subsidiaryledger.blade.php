@@ -991,13 +991,10 @@
                             var count = entries.length;
                             const credit = parseFloat(entry.credit.replace(/,/g, ""));
                             const debit = parseFloat(entry.debit.replace(/,/g, ""));
-                            console.log(currentBalance)
                             totalCredit += credit
                             totalDebit += debit;
                             currentBalance += debit;
                             currentBalance -= credit;
-
-                            console.log(currentBalance);
 
                             var arr = [
                                 entry.journal_date,
