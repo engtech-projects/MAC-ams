@@ -991,8 +991,8 @@
                             var count = entries.length;
                             const sCredit = entry.credit;
                             const sDebit = entry.debit;
-                            const credit = parseFloat(sCredit.replace(/,/g, ""));
-                            const debit = parseFloat(sDebit.replace(/,/g, ""));
+                            const credit = parseFloat(sCredit.replace(/,/g, "")).toFixed(2);
+                            const debit = parseFloat(sDebit.replace(/,/g, "")).toFixed(2);
                             totalCredit += credit
                             totalDebit += debit;
                             currentBalance +=debit;
