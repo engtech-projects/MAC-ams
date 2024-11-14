@@ -836,7 +836,8 @@
 
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
-                                this.balance = parseFloat(response.data.data[1].replace(/,/g, ""));
+                                let bal = response.data.data[1];
+                                this.balance = parseFloat(bal);
                             }
 
 
