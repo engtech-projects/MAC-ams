@@ -832,7 +832,7 @@
                             if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
                                 'subsidiary-ledger-summary-report') {
                                 this.subsidiaryAll = response.data.data;
-                                this.balance = parseFloat(response.data.balance.replace(/,/g, ""));
+                                this.balance = response.data.balance;
 
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
