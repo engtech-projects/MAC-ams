@@ -164,7 +164,7 @@
                                                     </b>
                                                 </td>
                                                 <td
-                                                    v-if="filter.sub_cat_id && filter.branch_id && subsidiaryAll.length ==0 ">
+                                                    v-if="filter.sub_cat_id && filter.branch_id && filter.to && subsidiaryAll.length ==0 ">
                                                     <button class="btn btn-success" data-toggle="modal"
                                                         data-target="#createSubsidiaryModal"
                                                         @click="add(filter.sub_cat_id)">
@@ -382,6 +382,7 @@
                     sub_per_branch: null,
                     sub_salvage: 0,
                     rate_percentage: 0,
+                    branch_id:'',
                 },
                 incomeExpense: {
                     income: [],
@@ -690,7 +691,7 @@
                         this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
                         this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
                     } else {
-                        if (this.subsidiary.branch_id) {
+                        if (this.filter.branch_id != '') {
                             this.subsidiary.sub_cat_id = this.filter.sub_cat_id
                             this.subsidiary.branch_id = this.filter.branch_id
                         } else {
@@ -736,6 +737,7 @@
                     }).then(response => {
                         toastr.success(response.data.message);
                         this.subsidiary = {};
+                        window.reload();
                     }).catch(err => {
                         var errors = err.response.data.errors;
                         var messages = [];
