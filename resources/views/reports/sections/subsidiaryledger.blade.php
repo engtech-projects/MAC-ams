@@ -796,8 +796,8 @@
                 filter: {
                     subsidiary_id: '',
                     branch_id: '',
-                    from: '2024-01-01',
-                    to: '2024-06-28',
+                    from: '', //'2024-01-01',
+                    to: '', //'2024-06-28',
                     account_id: 'all',
                     type: ''
                 },
@@ -1018,7 +1018,7 @@
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(arr[8])])
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(arr[8].replace(/,/g, "")))])
                     }
 
 
