@@ -796,8 +796,8 @@
                 filter: {
                     subsidiary_id: '',
                     branch_id: '',
-                    from: '', //2024-06-25
-                    to: '', //2024-06-28
+                    from: '2024-01-01',
+                    to: '2024-06-28',
                     account_id: 'all',
                     type: ''
                 },
@@ -832,11 +832,11 @@
                             if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
                                 'subsidiary-ledger-summary-report') {
                                 this.subsidiaryAll = response.data.data;
-                                this.balance = response.data.balance;
+                                this.balance = parseFloat(response.data.balance.replace(/,/g, ""));
 
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
-                                this.balance = response.data.data[1];
+                                this.balance = parseFloat(response.data.data[1].replace(/,/g, ""));
                             }
 
 
@@ -989,14 +989,15 @@
                         for (var d in entries) {
                             var entry = entries[d];
                             var count = entries.length;
-                            const sCredit = entry.credit;
-                            const sDebit = entry.debit;
-                            const credit = parseFloat(sCredit.replace(/,/g, "")).toFixed(2);
-                            const debit = parseFloat(sDebit.replace(/,/g, "")).toFixed(2);
+                            const credit = parseFloat(entry.credit.replace(/,/g, ""));
+                            const debit = parseFloat(entry.debit.replace(/,/g, ""));
+                            console.log(currentBalance)
                             totalCredit += credit
                             totalDebit += debit;
-                            currentBalance +=debit;
-                            currentBalance -=credit
+                            currentBalance += debit;
+                            currentBalance -= credit;
+
+                            console.log(currentBalance);
 
                             var arr = [
                                 entry.journal_date,
@@ -1020,7 +1021,7 @@
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(arr[8].replace(/,/g, "")))])
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(arr[8])])
                     }
 
 
