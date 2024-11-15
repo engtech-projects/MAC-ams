@@ -796,8 +796,8 @@
                 filter: {
                     subsidiary_id: '',
                     branch_id: '',
-                    from: '2024-06-25',
-                    to: '2024-06-28',
+                    from: '', //'2024-01-01',
+                    to: '', //'2024-06-28',
                     account_id: 'all',
                     type: ''
                 },
@@ -836,7 +836,8 @@
 
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
-                                this.balance = response.data.data[1];
+                                let bal = response.data.data[1];
+                                this.balance = parseFloat(bal);
                             }
 
 
@@ -989,14 +990,12 @@
                         for (var d in entries) {
                             var entry = entries[d];
                             var count = entries.length;
-                            const sCredit = entry.credit;
-                            const sDebit = entry.debit;
-                            const credit = parseFloat(sCredit.replace(/,/g, ""));
-                            const debit = parseFloat(sDebit.replace(/,/g, ""));
+                            const credit = parseFloat(entry.credit.replace(/,/g, ""));
+                            const debit = parseFloat(entry.debit.replace(/,/g, ""));
                             totalCredit += credit
                             totalDebit += debit;
-                            currentBalance +=debit;
-                            currentBalance -=credit
+                            currentBalance += debit;
+                            currentBalance -= credit;
 
                             var arr = [
                                 entry.journal_date,
@@ -1014,13 +1013,13 @@
                             rows.push(arr);
 
                         }
+
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
-                            netMovement)])
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(arr[8].replace(/,/g, "")))])
                     }
 
 
