@@ -1183,7 +1183,7 @@
         })
 
         $('#s_status').change(function () {
-            if ($('#s_status').val() === "unposted") {
+            if (["unposted", "cancelled"].includes($('#s_status').val())) {
                 $('#s_from').val('').prop('required', false);
                 $('#s_to').val('').prop('required', false);
             } else {
