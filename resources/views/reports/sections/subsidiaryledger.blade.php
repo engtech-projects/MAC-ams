@@ -787,12 +787,11 @@
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog"
-                aria-labelledby="journalModalEdit" aria-hidden="true">
+            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit" aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="container-fluid ">
+                            <div class="container-fluid">
                                 <div class="col-md-12">
                                     <form id="journalEntryFormEdit" method="POST">
                                         @csrf
@@ -964,11 +963,11 @@
                                         <button id="edit_btn_submit" style="display:none;"> UPDATE</button>
                                     </form>
                                 </div>
-                                <div class="co-md-12" style="height:10px;"></div>
+                                <div class="co-md-12" style="height:10px"></div>
                                 <div class="col-md-12">
                                     <div class="col-md-12 text-right">
-                                        <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item"><i
-                                                class="fa fa-plus"></i> Add Details </button>
+                                        <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item">
+                                            <i class="fa fa-plus"></i>Add Details </button>
                                     </div>
                                     <div class="co-md-12" style="height:10px;"></div>
                                     <div class="row">

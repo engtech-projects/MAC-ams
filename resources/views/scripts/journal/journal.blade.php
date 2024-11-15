@@ -822,7 +822,6 @@
                             $('#edit_cheque_no').val(v.cheque_no);
                             $('#edit_cheque_date').val(v.cheque_date);
                             $('#edit_status').val(v.status);
-                            console.log(v.status);
                             $('#edit_amount').val(amountConverter(v.amount));
                             $('#edit_payee').val(v.payee);
                             $('#edit_remarks').val(v.remarks);
