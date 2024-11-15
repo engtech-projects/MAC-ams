@@ -606,6 +606,8 @@ class ReportsController extends MainController
             'chartOfAccount' => $accounts,
             'requests' => ['from' => $from, 'to' => $to, 'account_id' => $account_id],
             'fiscalYear' => $accounting,
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
+            'journalBooks' => JournalBook::get(),
             'transactions' => $transactions,
         ];
 
