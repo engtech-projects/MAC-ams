@@ -48,9 +48,7 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="book_ref">Account Name</label>
                                         <div class="input-group">
-
-                                            <select name="account_id" class="form-control form-control-sm"
-                                                id="select-account" value="" required>
+                                            <select name="account_id" class="select2 form-control form-control-sm" id="select-account" value="" required>
                                                 <!-- <option value="all" selected>-All-</option> -->
                                                 @foreach ($chartOfAccount as $data)
                                                     @if (request('account_id') == $data->account_id)
@@ -145,12 +143,16 @@
                                         <td class="text-right">{{ $entry['debit'] }}</td>
                                         <td class="text-right">{{ $entry['credit'] }}</td>
                                         <td class="text-right">{{ $entry['current_balance'] }}</td>
-                                        <td><button value="{{ $entry['journal_id'] }}"
-                                                class="btn btn-flat btn-xs JnalView bg-gradient-success"><i
-                                                    class="fa fa-eye"></i>View</button>
-                                            <button value="{{ $entry['journal_id'] }}"
-                                                class="btn btn-flat btn-xs JnalEdit bg-gradient-warning"><i
-                                                    class="fa fa-pen"></i>Edit</button>
+                                        <td>
+                                            <div class="row">
+                                                <button value="{{ $entry['journal_id'] }}"
+                                                    class="btn btn-flat btn-sm JnalView bg-gradient-success"><i
+                                                        class="fa fa-eye"></i>View</button>
+                                                <button value="{{ $entry['journal_id'] }}"
+                                                    class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white"><i
+                                                        class="fa fa-pen text-white"></i>Edit</button>
+                                            </div>
+
                                         </td>
                                     </tr>
 
@@ -540,7 +542,7 @@
                                                             <input type="text"
                                                                 class="form-control form-control-sm rounded-0"
                                                                 name="edit_remarks" id="edit_remarks"
-                                                                placeholder="Remarks" required>
+                                                                placeholder="Remarks">
                                                         </div>
                                                     </div>
                                                 </div>
