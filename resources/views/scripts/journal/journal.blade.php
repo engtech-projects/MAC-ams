@@ -350,7 +350,7 @@
             allowClear: true,
         });
 
-        $('.select-account').select2({
+        $('.select-accounts').select2({
             placeholder: 'Select Account',
             allowClear: true,
         });
@@ -587,8 +587,7 @@
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find(
-                '.JnalEdit'); // Find the edit button within the same row
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
             var cancelButton = $(this).closest('tr').find(
                 '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
@@ -610,7 +609,7 @@
                             statusElement.html('<b>Cancelled</b>');
                             statusElement.removeClass('text-success').addClass('text-danger');
                             cancelButton.prop('disabled', true); // Disable the cancel button
-                            editButton.prop('disabled', false); // Disable the edit button
+                            //editButton.prop('disabled', false); // Disable the edit button
                             stStatusButton.removeClass('bg-gradient-danger').addClass(
                                 'bg-gradient-success');
                             stStatusButton.text('Post');
@@ -625,8 +624,7 @@
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find(
-                '.JnalEdit'); // Find the edit button within the same row
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
             var cancelButton = $(this).closest('tr').find(
                 '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this); // Store reference to the clicked button
@@ -650,18 +648,16 @@
                             'Unpost'); // Change the text content of the clicked button
                         stStatusButton.removeClass('bg-gradient-success').addClass(
                             'bg-gradient-danger'); // Change button background color
-                        editButton.prop('disabled', true); // Disable the edit button
-                        cancelButton.prop('disabled', false); // Enable the cancel button
+                        //editButton.prop('disabled', true); // Disable the edit button
+                        //cancelButton.prop('disabled', false); // Enable the cancel button
                     } else if (data.message == 'unposted') {
                         toastr.success('Journal entry has been unposted');
                         statusElement.html('<b>Unposted</b>');
                         statusElement.removeClass('text-success').addClass('text-danger');
-                        stStatusButton.text(
-                            'Post'); // Change the text content of the clicked button
-                        stStatusButton.removeClass('bg-gradient-danger').addClass(
-                            'bg-gradient-success'); // Change button background color
-                        editButton.prop('disabled', false); // Enable the edit button
-                        cancelButton.prop('disabled', false); // Enable the cancel button
+                        stStatusButton.text('Post'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
+                        //editButton.prop('disabled', false); // Enable the edit button
+                        //cancelButton.prop('disabled', false); // Enable the cancel button
                     }
                 },
                 error: function(data) {
@@ -815,7 +811,6 @@
             } else {
                 alert("Unable to save, debit and credit is not equal")
             }
-
         });
 
         let currentJournalNo = null;
@@ -1143,8 +1138,7 @@
                                         .addClass(
                                             'bg-gradient-danger'
                                         ); // Change button background color
-                                    editButton.prop('disabled',
-                                        true); // Disable the edit button
+                                    //editButton.prop('disabled',true); // Disable the edit button
                                     cancelButton.prop('disabled',
                                         false); // Enable the cancel button
                                 }
@@ -1281,15 +1275,6 @@
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
-            // $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
-            //     if ($('#subsidiary_id').val() == '') {
-            //         alert("Subsidiary is required.")
-            //     }
-            //     if ($('#account_id').val() == null) {
-            //         alert("Account is required.")
-            //     }
-
-            // })
             var content = `<tr class='editable-table-row'>
 			<td class="acctnu" value="">
 				<a href="#" class="editable-row-item journal_details_account_no"></a>

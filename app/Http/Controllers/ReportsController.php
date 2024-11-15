@@ -442,10 +442,12 @@ class ReportsController extends MainController
         $filter['type'] = $filter['type'] ?? 'subsidiary-ledger';
         $data = [
             'subsidiaryData' => Subsidiary::get(),
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'MAC-AMS | Subsidiary Ledger',
-            'subsidiaryLedgerList' => '',
+            'journalBooks' => JournalBook::get(),
             'accounts' => Accounts::all(),
+            'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get(),
         ];
         switch ($filter["type"]) {
             case 'subsidiary-ledger-listing-report':
@@ -605,6 +607,8 @@ class ReportsController extends MainController
             'chartOfAccount' => $accounts,
             'requests' => ['from' => $from, 'to' => $to, 'account_id' => $account_id],
             'fiscalYear' => $accounting,
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
+            'journalBooks' => JournalBook::get(),
             'transactions' => $transactions,
         ];
 

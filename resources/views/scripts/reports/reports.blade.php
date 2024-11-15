@@ -993,8 +993,7 @@
                                         .addClass(
                                             'bg-gradient-danger'
                                         ); // Change button background color
-                                    editButton.prop('disabled',
-                                        true); // Disable the edit button
+                                    //editButton.prop('disabled',true); // Disable the edit button
                                     cancelButton.prop('disabled',
                                         false); // Enable the cancel button
                                 }

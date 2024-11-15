@@ -487,6 +487,11 @@
                                                         class="btn btn-flat btn-sm JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
+
+                                                    <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                        class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
+                                                        <i class="fa fa-pen text-white"></i> Edit
+                                                    </button>
                                                 </td>
 
                                             </tr>
@@ -782,6 +787,238 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div class="col-md-12">
+                                    <form id="journalEntryFormEdit" method="POST">
+                                        @csrf
+                                        <input type="hidden" class="form-control form-control-sm rounded-0"
+                                            name="edit_journal_id" id="edit_journal_id" placeholder="">
+                                        <div class="row">
+                                            <div class="col-md-8 frm-header">
+                                                <h4><b>Journal Entry (Edit)</b></h4>
+                                            </div>
+                                            <div class="col-md-4 frm-header">
+                                                <label class="label-normal" for="date">Journal Date</label>
+                                                <div class="input-group">
+                                                    <input type="date" class="form-control form-control-sm rounded-0"
+                                                        name="edit_journal_date" id="edit_journal_date"
+                                                        placeholder="Journal Date" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_branch_id">Branch</label>
+                                                        <div class="input-group">
+                                                            <select name="edit_branch_id"
+                                                                class="select2 form-control form-control-sm"
+                                                                id="edit_branch_id" required>
+                                                                <option value="" disabled>-Select Branch-
+                                                                </option>
+                                                                <option value="1">Butuan City Branch</option>
+                                                                <option value="2">Nasipit Branch</option>
+                                                                <option value="3">Gingoog Branch</option>
+                                                                <option value="4">Head Office</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="">Book Reference</label>
+                                                        <div class="input-group">
+
+                                                            <select required name="edit_book_id"
+                                                                class="select2 form-control form-control-sm"
+                                                                id="edit_book_id">
+                                                                <option id="edit_book_id" value="" disabled>
+                                                                </option>
+                                                                @foreach ($journalBooks as $journalBook)
+                                                                    <option value="{{ $journalBook->book_id }}"
+                                                                        _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
+                                                                        book-src="{{ $journalBook->book_src }}">
+                                                                        {{ $journalBook->book_code }} -
+                                                                        {{ $journalBook->book_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="">Reference No.</label>
+                                                        <div class="input-group">
+                                                            <input type="hidden" name="edit_journal_no"
+                                                                id="edit_journal_no">
+                                                            <label class="label-normal" id="edit_LrefNo"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_source">Source</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_source" id="edit_source" placeholder="Source"
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_cheque_no">Cheque No</label>
+                                                        <div class="input-group">
+                                                            <input type="Text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_cheque_no" id="edit_cheque_no"
+                                                                placeholder="Cheque No">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_cheque_date">Cheque
+                                                            Date</label>
+                                                        <div class="input-group">
+                                                            <input type="date"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_cheque_date" id="edit_cheque_date"
+                                                                placeholder="Cheque Date">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_status">Status</label>
+                                                        <div class="input-group">
+                                                            <select name="edit_status"
+                                                                class="form-control form-control-sm" id="edit_status"
+                                                                required>
+                                                                <option value="unposted" selected>Unposted</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_amount">Amount</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_amount" id="edit_amount" step="any"
+                                                                placeholder="Amount" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_payee">Payee</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_payee" id="edit_payee" placeholder="Payee"
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_remarks">Remarks (<font
+                                                                style="color:red;">Separate with double colon (::) for the
+                                                                next
+                                                                remarks</font>)</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_remarks" id="edit_remarks"
+                                                                placeholder="Remarks" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button id="edit_btn_submit" style="display:none;"> UPDATE</button>
+                                    </form>
+                                </div>
+                                <div class="co-md-12" style="height:10px"></div>
+                                <div class="col-md-12">
+                                    <div class="col-md-12 text-right">
+                                        <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item">
+                                            <i class="fa fa-plus"></i>Add Details </button>
+                                    </div>
+                                    <div class="co-md-12" style="height:10px;"></div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm text-center"
+                                                id="tbl-create-journal-container" style="table-layout: fixed;">
+                                                <thead>
+                                                    <tr class="text-center">
+                                                        <th style="width: 10%;">Account #</th>
+                                                        <th style="width: 30%;">Account Name</th>
+                                                        <th style="width: 15%;">Debit</th>
+                                                        <th style="width: 15%;">Credit</th>
+                                                        <th style="width: 30%;">S/L</th>
+                                                        <th style="width: 5%;">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbl-create-edit-container">
+
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="text-center">
+                                                        <th></th>
+                                                        <th>TOTAL</th>
+                                                        <th width="150">₱<span id="edit_total_debit">0.00</span></th>
+                                                        <th width="150">₱<span id="edit_total_credit">0.00</span></th>
+                                                        <th></th>
+                                                        <th class="text-right" width="50"></th>
+                                                    </tr>
+                                                    <tr class="text-center">
+                                                        <th></th>
+                                                        <th>BALANCE</th>
+                                                        <th>₱<span id="edit_balance_debit">0.00</span></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th class="text-right" width="50"></th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 text-right">
+                                    <button class="btn btn-flat btn-sm bg-gradient-success"
+                                        onclick="$('#edit_btn_submit').click()"> UPDATE JOURNAL</button>
+                                </div>
+                                <!-- Button trigger modal -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         </div>
         </div>
@@ -796,8 +1033,8 @@
                 filter: {
                     subsidiary_id: '',
                     branch_id: '',
-                    from: '', //'2024-01-01',
-                    to: '', //'2024-06-28',
+                    from: '2024-01-01',
+                    to: '2024-06-28',
                     account_id: 'all',
                     type: ''
                 },
@@ -1019,7 +1256,8 @@
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(arr[8].replace(/,/g, "")))])
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(
+                            arr[8].replace(/,/g, "")))])
                     }
 
 
@@ -1357,4 +1595,5 @@
 @section('footer-scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
     @include('scripts.reports.reports')
+    @include('scripts.journal.journal')
 @endsection
