@@ -354,6 +354,10 @@
             placeholder: 'Select Account',
             allowClear: true,
         });
+        $('.select-account').select2({
+            placeholder: 'Select Account',
+            allowClear: true,
+        });
 
         $('.select-subsidiary').select2({
             placeholder: 'Select S/L',
