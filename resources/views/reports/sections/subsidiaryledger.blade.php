@@ -487,11 +487,12 @@
                                                         class="btn btn-flat btn-sm JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
-
+                                                    @if(Gate::allows('manager'))
                                                     <button v-if="ps[9]" :value="`${ps[9]}`"
                                                         class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
                                                         <i class="fa fa-pen text-white"></i> Edit
                                                     </button>
+                                                    @endif
                                                 </td>
 
                                             </tr>
@@ -836,7 +837,8 @@
 
                                                             <select required name="edit_book_id"
                                                                 class="select2 form-control form-control-sm"
-                                                                id="edit_book_id">
+                                                                id="edit_book_id"
+                                                                style="width: 150px;">
                                                                 <option id="edit_book_id" value="" disabled>
                                                                 </option>
                                                                 @foreach ($journalBooks as $journalBook)
@@ -908,10 +910,9 @@
                                                     <div class="form-group">
                                                         <label class="label-normal" for="edit_status">Status</label>
                                                         <div class="input-group">
-                                                            <select name="edit_status"
-                                                                class="form-control form-control-sm" id="edit_status"
-                                                                required>
-                                                                <option value="unposted" selected>Unposted</option>
+                                                            <select name="edit_status" class="form-control form-control-sm" id="edit_status" required>
+                                                                <option value="unposted">Unposted</option>
+                                                                <option value="posted" selected>Posted</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -937,8 +938,8 @@
                                                         <div class="input-group">
                                                             <input type="text"
                                                                 class="form-control form-control-sm rounded-0"
-                                                                name="edit_payee" id="edit_payee" placeholder="Payee"
-                                                                required>
+                                                                name="edit_payee" id="edit_payee" placeholder="Payee">
+                                                                
                                                         </div>
                                                     </div>
                                                 </div>
