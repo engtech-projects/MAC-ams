@@ -35,6 +35,7 @@ class CollectionBreakdown extends Model
         "transaction_date",
         "branch_id",
         "total",
+        'status'
     ];
 
 
@@ -53,8 +54,8 @@ class CollectionBreakdown extends Model
     {
         // Fetch collection breakdowns
         $collections = CollectionBreakdown::when($branchId, function ($query, $branchId) {
-                $query->where('branch_id', $branchId);
-            })
+            $query->where('branch_id', $branchId);
+        })
             ->when($transactionDate, function ($query, $transactionDate) {
                 $query->where('transaction_date', $transactionDate);
             }, function ($query) {
@@ -67,7 +68,7 @@ class CollectionBreakdown extends Model
         // Loop through each collection and append the cash ending balance
         foreach ($collections as $collection) {
             // Assuming journalEntry is a class with getCashEndingBalanceByBranch method
-            
+
             $journalEntry = new journalEntry();
 
             // Retrieve cash ending balance by branch and transaction date
@@ -82,8 +83,8 @@ class CollectionBreakdown extends Model
     public static function getCollections($transactionDate, $branchId = null)
     {
         return CollectionBreakdown::when($branchId, function ($query, $branchId) {
-                $query->where('branch_id', $branchId);
-            })
+            $query->where('branch_id', $branchId);
+        })
             ->when($transactionDate, function ($query, $transactionDate) {
                 $query->where('transaction_date', $transactionDate);
             }, function ($query) {

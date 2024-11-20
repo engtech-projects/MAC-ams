@@ -193,7 +193,7 @@ class ReportsController extends MainController
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -296,7 +296,7 @@ class ReportsController extends MainController
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -599,7 +599,7 @@ class ReportsController extends MainController
         $to = $request->to ? $request->to : $accounting->default_end;
         $account_id = !$request->account_id ? 3 : $request->account_id;
 
-        $transactions = $glAccounts->ledger([$from,$to ], $account_id);
+        $transactions = $glAccounts->ledger([$from, $to], $account_id);
         $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
 
         $data = [
@@ -684,6 +684,18 @@ class ReportsController extends MainController
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
         return view('reports.sections.cashTransactionBlotter', $data);
+    }
+
+    public function updateCollectionBreakdown(Request $request, CollectionBreakdown $collectionBreakdown)
+    {
+        try {
+            $collectionBreakdown->update($request->input());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
+        return response()->json(['message' => 'Successfully updated.']);
     }
 
     public function searchCashTransactionBlotter(Request $request)

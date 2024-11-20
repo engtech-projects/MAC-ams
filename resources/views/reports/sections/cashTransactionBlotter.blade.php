@@ -141,7 +141,7 @@
                                     <div class="col-md-3">
                                         <label for="transactionDate">Transaction Date</label>
                                         <div class="input-group">
-                                            <input type="date" name="transaction_date" id="transactionDate" disabled 
+                                            <input type="date" name="transaction_date" id="transactionDate" disabled
                                                 class="form-control form-control-sm" required>
                                         </div>
                                     </div>
@@ -380,6 +380,7 @@
                             <th>Transaction Date</th>
                             <th>Cash Ending Balance</th>
                             <th>Total Branch Collection</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </thead>
                         <tbody>
@@ -388,6 +389,7 @@
                                 <td>@{{ d.transaction_date }}</td>
                                 <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
                                 <td>@{{ formatCurrency(d.total) }}</td>
+                                <td>@{{ d.status }}</td>
                                 <td>
                                     <button @click="showCashBlotter(d.collection_id, d.branch_id)"
                                         class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye"
@@ -396,6 +398,8 @@
                                             class="fas fa-xs fa-download download-cashblotter"></i></button>
                                     <button class="mr-1 btn btn-xs btn-default"><i
                                             class="fas fa-xs fa-print print-cashblotter"></i></button>
+                                            <button class="mr-1 btn btn-xs btn-primary" @click='processPost(d)'>Post</button>
+                                            <button class="mr-1 btn btn-xs btn-warning" @click='processUnpost(d)'>Unpost</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -714,13 +718,48 @@
                     coci_received: [],
                     coci_encashment: [],
                 },
+                collectionBreakdown:{},
                 collections: {
                     transaction_date: ''
                 },
+                statusUpdate:false,
             },
             methods: {
                 greet: function(data) {
                     alert(data);
+                },
+                processPost:function(collectionBreakdown) {
+                    this.collectionBreakdown = collectionBreakdown;
+                    this.collectionBreakdown.status = "Posted";
+                    this.updateCollectionBreakdown();
+                },
+                processUnpost:function(collectionBreakdown) {
+                    this.collectionBreakdown = collectionBreakdown;
+                    this.collectionBreakdown.status = "Unposted";
+                    this.updateCollectionBreakdown();
+                },
+                updateCollectionBreakdown: function() {
+
+                    axios.post('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this.collectionBreakdown, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        toastr.success(response.data.message);
+                    }).catch(err => {
+                        console.error(err);
+                       // var errors = err.response.data.errors;
+                       // var messages = [];
+                       // for (var i in errors) {
+                       //     var error = errors[i];
+                       //     for (var j in error) {
+                       //         var message = error[j];
+                       //         messages.push(message + '<br />');
+                       //     }
+                       // }
+                        //toastr.error(messages);
+                    })
                 },
                 getBranchName(branchId) {
                     if (!this.branches) {
