@@ -939,7 +939,7 @@
                                                             <input type="text"
                                                                 class="form-control form-control-sm rounded-0"
                                                                 name="edit_payee" id="edit_payee" placeholder="Payee">
-                                                                
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1050,7 +1050,7 @@
             methods: {
                 submitForm: function() {
                     this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
-                    this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
                     if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();
                     } else {

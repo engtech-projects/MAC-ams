@@ -10,11 +10,9 @@ class BranchCollection extends Model
     use HasFactory;
 
     protected $table = "branch_collection";
-    protected $primaryKey = "branchcollection_id";
 
     protected $fillable = [
+        'collection_id',
         'total_amount',
-        'cashblotter_id',
-        'sub_id'
     ];
 }

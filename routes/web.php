@@ -15,6 +15,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\CollectionBreakdownController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\SubsidiaryController;
 use App\Http\Controllers\JournalBookController;
@@ -162,6 +163,8 @@ Route::get('reports/cashPosition', [ReportsController::class, 'cashPosition'])->
 Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTransactionBlotter'])->name('reports.cashTransactionBlotter');
 Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'searchCashTransactionBlotter'])->name('reports.searchTransactionBlotter');
 Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
+
+Route::resource('collection-breakdown', CollectionBreakdownController::class);
 
 Route::post('collection-breakdown/{collectionBreakdown}', [ReportsController::class, 'updateCollectionBreakdown']);
 

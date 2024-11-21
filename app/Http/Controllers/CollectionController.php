@@ -16,7 +16,8 @@ class CollectionController extends Controller
     {
         $collection = new CollectionBreakdown();
         try {
-            $collection->createCollection($request->validated());
+            $collection = $collection->createCollection($request->validated());
+            $collection->branch_collection()->create($request->branch_collection);
         } catch (\Exception $exception) {
             return new JsonResponse(["message" => $exception->getMessage()]);
         }
@@ -26,7 +27,6 @@ class CollectionController extends Controller
     public function destroy(CollectionBreakdown $collection)
     {
         $collection->delete();
-        return response()->json(["message"=> "Collection successfully deleted.","data" => $collection]);
+        return response()->json(["message" => "Collection successfully deleted.", "data" => $collection]);
     }
-
 }

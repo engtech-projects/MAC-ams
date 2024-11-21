@@ -382,7 +382,7 @@
                     sub_per_branch: null,
                     sub_salvage: 0,
                     rate_percentage: 0,
-                    branch_id:'',
+                    branch_id: '',
                 },
                 incomeExpense: {
                     income: [],

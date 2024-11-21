@@ -25,6 +25,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
      */
     public function rules()
     {
+        dd($this);
         return [
             "p_1000" => 'required|numeric',
             "p_500" => 'required|numeric',

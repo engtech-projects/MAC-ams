@@ -44,6 +44,11 @@ class CollectionBreakdown extends Model
         return $this->hasMany(AccountOfficerCollection::class, 'collection_id');
     }
 
+    public function branch_collection()
+    {
+        return $this->hasMany(BranchCollection::class, 'collection_id');
+    }
+
 
     public static function getCollectionById($id)
     {

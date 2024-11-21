@@ -40,6 +40,24 @@
                 fetchCollectionBreakdown(branchID);
             }
         });
+        $('#edit-cashblotter').click(function(){
+            $('#Mymodal').modal('show')
+            reset()
+            $('#title').text("Cashier's Transaction Blotter (New)")
+
+            var branchID;
+
+            if ($('#branch_id').length) {
+                $(document).on('change','#branch_id',function(){
+                    branchID = $(this).val(); // Get selected value from the dropdown
+                    fetchCollectionBreakdown(branchID);
+                });
+            } else {
+                $('#transactionDate').prop('disabled', false);
+                branchID = "{{ session()->get('auth_user_branch') }}"; // Use session value if not visible
+                fetchCollectionBreakdown(branchID);
+            }
+        });
 
         // Function to fetch collection breakdown based on branch ID
         function fetchCollectionBreakdown(branchID) {
