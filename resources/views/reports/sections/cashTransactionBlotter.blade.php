@@ -104,7 +104,8 @@
                         </div>
 
                         @if (Gate::allows(['accounting-staff']) || Gate::allows(['manager']))
-                            <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6' : '2' }}">
+                            <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6' : '2' }}"
+                                @click="processCreateCollection()">
                                 <div class="mt-4 text-right">
                                     <button type="button" class="btn btn-primary" data-toggle="modal"
                                         data-target="#Mymodal">New
@@ -124,29 +125,27 @@
 
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
-                        <form id="add-cash-blotter">
-                            @csrf
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-md-12 frm-header" style="padding:10px;">
-                                        <h4 id="title"><b></b></h4>
-                                    </div>
-                                </div>
 
-                                <div class="row" style="margin-left:15px;">
-                                    @if (Gate::allows(['manager']))
-                                        <div class="col-md-3">
-                                            <label for="branch">Select Branch</label>
-                                            <select name="branch_id" v-model="collectionBreakdown.branch_id"
-                                                class="select2 form-control form-control-sm" style="width:100%"
-                                                id="branchID">
-                                                @foreach ($branches as $branch)
-                                                    <option value="{{ $branch->branch_id }}">
-                                                        {{ $branch->branch_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            {{-- <select name="branch_id" id="branch_id" v-model="branch"
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12 frm-header" style="padding:10px;">
+                                    <h4 id="title"><b></b></h4>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-left:15px;">
+                                @if (Gate::allows(['manager']))
+                                    <div class="col-md-3">
+                                        <label for="branch">Select Branch</label>
+                                        <select name="branch_id" v-model="collectionBreakdown.branch_id"
+                                            class="select2 form-control form-control-sm" style="width:100%" id="branchID">
+                                            @foreach ($branches as $branch)
+                                                <option value="{{ $branch->branch_id }}">
+                                                    {{ $branch->branch_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        {{-- <select name="branch_id" id="branch_id" v-model="branch"
                                                 class="select2 form-control form-control-sm" required>
                                                 <option value="" disabled selected v-text="branch"></option>
                                                 @foreach ($branches as $branch)
@@ -154,342 +153,465 @@
                                                     </option>
                                                 @endforeach
                                             </select> --}}
-                                        </div>
-                                    @endif
-                                    <div class="col-md-3">
-                                        <label for="transactionDate">Transaction Date</label>
-                                        <div class="input-group">
-                                            <input type="date" name="transaction_date"
-                                                v-model="collectionBreakdown.transaction_date" id="transactionDate"
-                                                class="form-control form-control-sm" required>
-                                        </div>
+                                    </div>
+                                @endif
+                                <div class="col-md-3">
+                                    <label for="transactionDate">Transaction Date</label>
+                                    <div class="input-group">
+                                        <input type="date" name="transaction_date"
+                                            v-model="collectionBreakdown.transaction_date"
+                                            class="form-control form-control-sm">
                                     </div>
                                 </div>
+                            </div>
 
 
-                                <div class="container pl-4">
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <div class="row">
-                                                <form>
-                                                    <table class="table table-sm cash-breakdown-tbl">
-                                                        <thead>
-                                                            <th class="table-header">Cash Breakdown</th>
-                                                            <th class="table-header">Pcs.</th>
-                                                            <th class="table-header">Total Amount</th>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱1000.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_1000" name="p_1000"
-                                                                        id="onethousand"
-                                                                        class="form-control form-control-sm pcs" required>
-                                                                </td>
-                                                                <td id="onethousandtotalamount" class="total">
-                                                                    <h6 v-text="total.p_1000"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱500.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_500" name="p_500"
-                                                                        id="fivehundred"
-                                                                        class="form-control form-control-sm pcs" required>
-                                                                </td>
-                                                                <td id="fivehundredtotalamount" class="total">
-                                                                    <h6 v-text="total.p_500"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱200.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_200" name="p_200"
-                                                                        id="twohundred" class="form-control form-control-sm"
-                                                                        required></td>
-                                                                <td id="twohundredtotalamount" class="total">
-                                                                    <h6 v-text="total.p_200"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱100.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_100" name="p_100"
-                                                                        id="onehundred"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="onehundredtotalamount" class="total">
-                                                                    <h6 v-text="total.p_100"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱50.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_50" name="p_50"
-                                                                        id="fifty"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="fiftytotalamount" class="total">
-                                                                    <h6 v-text="total.p_50"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱20.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_20" name="p_20"
-                                                                        id="twenty"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="twentytotalamount" class="total">
-                                                                    <h6 v-text="total.p_20"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱10.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_10" name="p_10"
-                                                                        id="ten"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="tentotalamount" class="total">
-                                                                    <h6 v-text="total.p_10"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱5.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_5" name="p_5"
-                                                                        id="five"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="fivetotalamount" class="total">
-                                                                    <h6 v-text="total.p_5"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱1.00</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.p_1" name="p_1"
-                                                                        id="one"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="onetotalamount" class="total">
-                                                                    <h6 v-text="total.p_1"></h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱0.25</td>
-                                                                <td><input type="number"
-                                                                        v-model="collectionBreakdown.c_25" name="c_25"
-                                                                        id="centavo"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="centavototalamount" class="total">
-                                                                    <h6 v-text="total.c_25"></h6>
-                                                                </td>
-                                                            </tr>
+                            <div class="container pl-4">
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="row">
 
-                                                        </tbody>
-                                                        <tfoot>
-                                                            <tr>
-                                                                <td colspan="3">
-                                                                    <p>Total Cash Count</p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
+                                            <table class="table table-sm cash-breakdown-tbl">
+                                                <thead>
+                                                    <th class="table-header">Cash Breakdown</th>
+                                                    <th class="table-header">Pcs.</th>
+                                                    <th class="table-header">Total Amount</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱1000.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_1000"
+                                                                name="p_1000" id="onethousand"
+                                                                class="form-control form-control-sm pcs" required>
+                                                        </td>
+                                                        <td id="onethousandtotalamount" class="total">
+                                                            <h6 v-text="total.p_1000"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱500.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_500"
+                                                                name="p_500" id="fivehundred"
+                                                                class="form-control form-control-sm pcs" required>
+                                                        </td>
+                                                        <td id="fivehundredtotalamount" class="total">
+                                                            <h6 v-text="total.p_500"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱200.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_200"
+                                                                name="p_200" id="twohundred"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="twohundredtotalamount" class="total">
+                                                            <h6 v-text="total.p_200"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱100.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_100"
+                                                                name="p_100" id="onehundred"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="onehundredtotalamount" class="total">
+                                                            <h6 v-text="total.p_100"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱50.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_50"
+                                                                name="p_50" id="fifty"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="fiftytotalamount" class="total">
+                                                            <h6 v-text="total.p_50"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱20.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_20"
+                                                                name="p_20" id="twenty"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="twentytotalamount" class="total">
+                                                            <h6 v-text="total.p_20"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱10.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_10"
+                                                                name="p_10" id="ten"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="tentotalamount" class="total">
+                                                            <h6 v-text="total.p_10"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱5.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_5"
+                                                                name="p_5" id="five"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="fivetotalamount" class="total">
+                                                            <h6 v-text="total.p_5"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱1.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_1"
+                                                                name="p_1" id="one"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="onetotalamount" class="total">
+                                                            <h6 v-text="total.p_1"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱0.25</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.c_25"
+                                                                name="c_25" id="centavo"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="centavototalamount" class="total">
+                                                            <h6 v-text="total.c_25"></h6>
+                                                        </td>
+                                                    </tr>
 
-                                                                <td class="text-right bg-primary" colspan="3"
-                                                                    id="totalcashcount"
-                                                                    v-text="collectionBreakdown.total"><b></b></td>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
-
-                                                </form>
-                                            </div>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            Total
+                                                        </td>
+                                                        <td class="text-right" colspan="2" id="totalcashcount"
+                                                            v-text="collectionBreakdown.total">
+                                                            <b></b>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
                                         </div>
+                                    </div>
 
-                                        <div class="col-md-6">
-                                            <div class="col-md-12 col-sm-12">
+                                    <div class="col-md-6">
+                                        <div class="col-md-12 col-sm-12">
 
-                                                <table class="table table-bordered table-sm"
-                                                    id="account-officer-table-collection">
-                                                    <thead class="table-header">
-                                                        <tr>
-                                                            <th width="200">Account Officer</th>
-                                                            <th>Remarks</th>
-                                                            <th>Total Amount</th>
-                                                            <th></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-if="isEdit">
-                                                            <td>
-                                                                <input type="text" class="form-control form-control-sm"
-                                                                    id="accountofficer_id">
-                                                            </td>
-                                                            <td>
-                                                                <input type="text" id="remarks"
-                                                                    class="form-control form-control-sm rounded-0"
-                                                                    name="remarks" form="frm-add-account-officer-details"
-                                                                    placeholder="Remarks">
-                                                            </td>
-                                                            <td>
-                                                                <input type="number"
-                                                                    class="form-control form-control-sm rounded-0 text-right"
-                                                                    id="total_amount" placeholder="0.00">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="button"
-                                                                    id="btn-add-account-officer-collection"
-                                                                    class="btn btn-xs btn-primary add-accounting-officer">
-                                                                    <i class="fas fa-plus fa-xs"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr v-if="isEdit"
-                                                            v-for="officerCollection in collectionBreakdown.account_officer_collection">
-                                                            <td>
-                                                                <h6 v-text="officerCollection.representative"></h6>
-                                                            </td>
-                                                            <td>
-                                                                <h6 v-text="officerCollection.note"></h6>
+                                            <table class="table table-bordered table-sm"
+                                                id="account-officer-table-collection">
+                                                <thead class="table-header">
+                                                    <tr>
+                                                        <th width="200">Account Officer</th>
+                                                        <th>Remarks</th>
+                                                        <th>Total Amount</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-if="isEdit">
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                id="accountofficer_id">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" id="remarks"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="remarks" form="frm-add-account-officer-details"
+                                                                placeholder="Remarks">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="total_amount" placeholder="0.00">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-primary"
+                                                                @click="addAccountOfficerCollection()">
+                                                                <i class="fas fa-plus fa-xs"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="isEdit"
+                                                        v-for="officerCollection in collectionBreakdown.account_officer_collections">
+                                                        <td>
+                                                            <h6 v-text="officerCollection.representative"></h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="officerCollection.note"></h6>
 
-                                                            </td>
-                                                            <td>
-                                                                <h6 v-text="officerCollection.total"></h6>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                {{-- <button type="button"
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="officerCollection.total"></h6>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{-- <button type="button"
                                                                     id="btn-add-account-officer-collection"
                                                                     class="btn btn-xs btn-danger add-accounting-officer">
                                                                     <i class="fas fa-trash fa-xs"></i>
                                                                 </button> --}}
-                                                                <button class="btn btn-xs btn-danger">
-                                                                    <i class="fas fa-trash fa-xs"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr v-if="!isEdit">
-                                                            <td>
-                                                                <input type="text" class="form-control form-control-sm"
-                                                                    id="accountofficer_id">
-                                                            </td>
-                                                            <td>
-                                                                <input type="text" id="remarks"
-                                                                    class="form-control form-control-sm rounded-0"
-                                                                    name="remarks" form="frm-add-account-officer-details"
-                                                                    placeholder="Remarks">
-                                                            </td>
-                                                            <td>
-                                                                <input type="number"
-                                                                    class="form-control form-control-sm rounded-0 text-right"
-                                                                    id="total_amount" placeholder="0.00">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="button"
-                                                                    id="btn-add-account-officer-collection"
-                                                                    class="btn btn-xs btn-primary add-accounting-officer">
-                                                                    <i class="fas fa-plus fa-xs"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
+                                                            <button class="btn btn-xs btn-danger"
+                                                                @click="removeAccountOfficerCollection(officerCollection)">
+                                                                <i class="fas fa-trash fa-xs"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="!isEdit">
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                v-model="officer_collection.representative"
+                                                                id="accountofficer_id">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" id="remarks"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                v-model="officer_collection.note" name="remarks"
+                                                                form="frm-add-account-officer-details"
+                                                                placeholder="Remarks">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" v-model="officer_collection.total"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="total_amount" placeholder="0.00">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-primary"
+                                                                @click="addAccountOfficerCollection()">
+                                                                <i class="fas fa-plus fa-xs"></i>
+                                                            </button>
 
-                                                        <tr id="footer-row">
-                                                            <!-- <td colspan="7"></td> -->
-                                                        </tr>
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <td colspan="4">
-                                                                <p>Total A/O Collection</p>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="!isEdit"
+                                                        v-for="officerCollection in collectionBreakdown.account_officer_collections">
+                                                        <td>
+                                                            <h6 v-text="officerCollection.representative"></h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="officerCollection.note"></h6>
 
-                                                            <td class="text-right bg-primary" colspan="4"
-                                                                id="totalaccountofficercollection"><b>0</b></td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="officerCollection.total"></h6>
+                                                        </td>
+                                                        <td class="text-center">
 
+                                                            <button class="btn btn-xs btn-danger">
+                                                                <i class="fas fa-trash fa-xs"
+                                                                    @click="removeAccountOfficerCollection(officerCollection)"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
 
-                                            </div>
+                                                    <tr id="footer-row">
+                                                        <!-- <td colspan="7"></td> -->
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            total
+                                                        </td>
+                                                        <td class="text-right" colspan="3"
+                                                            id="totalaccountofficercollection"><b>0</b></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
 
-                                            <div class="col-md-12">
-                                                <table class="table table-bordered table-sm" id="account-officer-table">
-                                                    <thead class="table-header">
-                                                        <tr>
-                                                            <th width="200">Branch Collection</th>
-                                                            <th>Total Amount</th>
-                                                            <th></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <select
-                                                                    class="select-branch form-control form-control-sm rounded-0"
-                                                                    id="branch_id_collection">
-                                                                    <option value="" disabled selected>-Select
-                                                                        Branch-</option>
-                                                                    @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch->branch_id }}">
-                                                                            {{ $branch->branch_name }}</option>
-                                                                    @endforeach
-
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <input type="text"
-                                                                    class="form-control form-control-sm rounded-0 text-right"
-                                                                    id="branchcollection_amount" placeholder="0.00">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="button" class="btn btn-xs btn-primary" id="btn-add-branch-collection">
-                                                                    <i class="fas fa-plus fa-xs"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr v-if="isEdit"
-                                                            v-for="branchCollection in collectionBreakdown.branch_collections">
-                                                            <td>
-                                                                <h6 v-text="branchCollection.branch_id"></h6>
-                                                            </td>
-                                                            <td>
-                                                                <h6 v-text="branchCollection.total_amount"></h6>
-
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button class="btn btn-xs btn-danger">
-                                                                    <i class="fas fa-trash fa-xs"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr style="background-color: #f1f1f1;" id="branch-collection-row">
-                                                            <!-- <td colspan="7">&nbsp;</td> -->
-                                                        </tr>
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <td colspan="4">
-                                                                <p>Total Branch Collection</p>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-
-                                                            <td class="text-right bg-primary" colspan="4"
-                                                                id="totalbranchcollection"><b>0</b></td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
-                                                <div class="text-right">
-                                                    <button type="button" @click="createNewCollectionBreakdown()"
-                                                        class="btn btn-success" style="margin-bottom: 20px;">Post</button>
-                                                </div>
-                                            </div>
 
                                         </div>
+
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm" id="account-officer-table">
+                                                <thead class="table-header">
+                                                    <tr>
+                                                        <th width="200">Branch Collection</th>
+                                                        <th>Total Amount</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <select
+                                                                class="select-branch form-control form-control-sm rounded-0"
+                                                                id="branch_id_collection">
+                                                                <option value="" disabled selected>-Select
+                                                                    Branch-</option>
+                                                                @foreach ($branches as $branch)
+                                                                    <option value="{{ $branch->branch_id }}">
+                                                                        {{ $branch->branch_name }}</option>
+                                                                @endforeach
+
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" v-model="branch_collection.total_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="branchcollection_amount" placeholder="0.00">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-primary"
+                                                                @click="addBranchCollection()">
+                                                                <i class="fas fa-plus fa-xs"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="isEdit"
+                                                        v-for="branchCollection in collectionBreakdown.branch_collections">
+                                                        <td>
+                                                            <h6 v-text="branchCollection.branch.branch_name"
+                                                                value="branchCollection.branch.branch_id"></h6>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <h6 v-text="branchCollection.total_amount"></h6>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-danger">
+                                                                <i class="fas fa-trash fa-xs"
+                                                                    @click="removeBranchCollection(branchCollection)"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr v-if="!isEdit"
+                                                        v-for="branchCollection in collectionBreakdown.branch_collections">
+                                                        <td>
+                                                            <h6 v-text="branchCollection.branch.branch_name"></h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="branchCollection.total"></h6>
+
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-danger">
+                                                                <i class="fas fa-trash fa-xs"
+                                                                    @click="removeBranchCollection(branchCollection)"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr style="background-color: #f1f1f1;" id="branch-collection-row">
+                                                        <!-- <td colspan="7">&nbsp;</td> -->
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            total
+                                                        </td>
+                                                        <td class="text-right" colspan="3" id="totalbranchcollection">
+                                                            <b>0</b>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+
+                                        </div>
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm" id="account-officer-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="2"> Other Payment</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-if="!isEdit"
+                                                        v-for="branchCollection in collectionBreakdown.branch_collections">
+                                                        <td>
+                                                            <h6 v-text="branchCollection.branch_id"></h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="branchCollection.total_amount"></h6>
+
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-danger">
+                                                                <i class="fas fa-trash fa-xs"
+                                                                    @click="removeBranchCollection(branchCollection)"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr style="background-color: #f1f1f1;" id="branch-collection-row">
+                                                        <!-- <td colspan="7">&nbsp;</td> -->
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <p>CASH</p>
+                                                        </td>
+                                                        <td class="text-bold text-right"
+                                                            v-text="collectionBreakdown.other_payment.cash_amount">
+
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+
+                                                        <td>
+                                                            <p>CHECK</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.check_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"v
+                                                                placeholder="0.00">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <p>POS</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.pos_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                placeholder="0.00">
+
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+
+                                                        <td>
+                                                            <p>MEMO</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.memo_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                placeholder="0.00">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            INTERBRANCH
+                                                        </td>
+                                                        <td>
+                                                        <td class="text-bold text-right"
+                                                            v-text="collectionBreakdown.other_payment.cash_amount">
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            total
+                                                        </td>
+                                                        <td class="text-right" colspan="3" id="totalbranchcollection">
+                                                            <b>0</b>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="text-right">
+                                                <button type="button" v-text="isEdit ? 'Save' : 'Post'"
+                                                    @click="processCreateOrUpdate()" class="btn btn-success"
+                                                    style="margin-bottom: 20px;"></button>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
-
                             </div>
 
-
+                        </div>
 
                     </div>
                 </div>
@@ -698,7 +820,7 @@
                                                     <th>Total Amount</th>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="officer in collections.account_officer_collection">
+                                                    <tr v-for="officer in collections.account_officer_collections">
                                                         <td>@{{ officer.representative }} ; @{{ officer.note }}</td>
                                                         <td>@{{ formatCurrency(officer.total) }}</td>
                                                     </tr>
@@ -795,7 +917,7 @@
                 branches: null,
                 branch: null,
                 filter: {
-                    transaction_date: null,
+                    transaction_date: '2024-11-30',
                     branch_id: null,
                 },
                 isEdit: false,
@@ -813,25 +935,42 @@
                     coci_received: [],
                     coci_encashment: [],
                 },
+                officer_collection: {
+                    representative: '',
+                    note: '',
+                    total: 0,
+                },
+                branch_collection: {
+                    total_amount: 0,
+                    branch_id: null,
+                    branch: ''
+                },
                 collectionBreakdown: {
                     total: 0,
                     collection_id: 0,
                     branch_id: null,
                     transaction_date: "",
-                    p_1000: 34,
-                    p_500: 1,
+                    p_1000: 0, //34,
+                    p_500: 0, //1,
                     p_200: 0,
-                    p_100: 1,
+                    p_100: 0, //1,
                     p_50: 0,
                     p_20: 0,
                     p_10: 0,
                     p_5: 0,
-                    p_1: 4,
+                    p_1: 0, //4,
                     c_25: 0,
                     total: 0,
                     flag: "",
-                    account_officer_collection: [],
+                    account_officer_collections: [],
                     branch_collections: [],
+                    other_payment: {
+                        cash_amount: 0,
+                        check_amount: 0,
+                        pos_amount: 0,
+                        memo_amount: 0,
+                        interbranch_amount: 0
+                    }
                 },
                 total: {
                     grandTotal: 0,
@@ -863,31 +1002,43 @@
 
                     return formatter.format(amount)
                 },
-                addBranchCollection(collection) {
+                addBranchCollection() {
                     if ($('#branch_id_collection').val() == "") {
                         alert("Please add branch");
                     } else {
                         this.collectionBreakdown.branch_collections.push({
-                            collection_id: "",
-                            branch_id: "",
-                            total_amount: "",
+                            branch: {
+                                branch_id: $('#branch_id_collection').val(),
+                                branch_name: $('#branch_id_collection option:selected').text(),
+                            },
+                            total: this.branch_collection.total_amount
                         });
                     }
                 },
-                addAccountOfficerCollection: function(collection) {
+                addAccountOfficerCollection: function() {
                     if ($('#remarks').val() == "") {
                         alert("Please add account officer collection");
                     } else {
-                        this.collectionBreakdown.account_officer_collection.push({
-                            representative: "",
-                            note: "",
-                            total: 0
+                        this.collectionBreakdown.account_officer_collections.push({
+                            representative: this.officer_collection.representative,
+                            note: this.officer_collection.note,
+                            total: this.officer_collection.total
                         });
                     }
 
+
+
+                },
+                processCreateOrUpdate: function() {
+                    if (this.isEdit) {
+                        this.updateCollectionBreakdown();
+                    } else {
+                        this.createNewCollectionBreakdown();
+                    }
                 },
                 createNewCollectionBreakdown: function() {
-                    this.collectionBreakdown.account_officer_collection = [];
+                    var total = parseFloat(Number($('#totalcashcount').text().replace(/[^0-9\.-]+/g, "")))
+                    this.collectionBreakdown.total = total;
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -899,19 +1050,21 @@
                         console.error(err);
                     })
                 },
-                removeBranchCollection: function() {
-
-                },
-                removeAccountOfficerCollection: function(accountOfficerCollection) {
+                removeBranchCollection: function(collection) {
                     const isEqual = (obj1, obj2) =>
                         Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.account_officer_collection.filter(element => !
-                        isEqual(element, accountOfficerCollection));
-                    this.collectionBreakdown.account_officer_collection = updatedArray;
-
+                    const updatedArray = this.collectionBreakdown.branch_collections.filter(element => !
+                        isEqual(element, collection));
+                    this.collectionBreakdown.branch_collections = updatedArray;
                 },
-                greet: function(data) {
-                    alert(data);
+                removeAccountOfficerCollection: function(collection) {
+                    const isEqual = (obj1, obj2) =>
+                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
+                    const updatedArray = this.collectionBreakdown.account_officer_collections.filter(element =>
+                        !
+                        isEqual(element, collection));
+                    this.collectionBreakdown.account_officer_collections = updatedArray;
+
                 },
                 processPost: function(collectionBreakdown) {
                     this.collectionBreakdown = collectionBreakdown;
@@ -934,22 +1087,8 @@
                 },
                 editCollectionBreakdown: function(collectionBreakdown) {
                     this.isEdit = true;
-                    this.collectionBreakdown.account_officer_collection = collectionBreakdown
-                        .account_officer_collection
-                    this.collectionBreakdown.total = this.amountConverter(collectionBreakdown.total);
                     this.calculateCashCount(collectionBreakdown)
                     this.branch = $('#branchID').find(':selected').val()
-                    /* axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
-                        headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                .content
-                        }
-                    }).then(function(response) {
-                        this.collectionBreakdown.p_1000 = response.data.data.collection.p_1000;
-                    }).catch(error => {
-                        console.error('Error:', error);
-                    }) */
-
                     axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -975,6 +1114,17 @@
                     }).catch(err => {
                         toastr.success(err);
                     })
+                },
+                processCreateCollection: function() {
+                    this.isEdit = false;
+                    this.collectionBreakdown = {}
+                    this.collectionBreakdown.other_payment = {
+                        cash_amount: 0,
+                        check_amount: 0,
+                        pos_amount: 0,
+                        memo_amount: 0,
+                        interbranch_amount: 0
+                    }
                 },
                 processUnpost: function(collectionBreakdown) {
                     this.collectionBreakdown = collectionBreakdown;
@@ -1055,9 +1205,9 @@
                             // console.log("Collections Data:", this.collections);
                             this.arrangeData(response.data['entries']);
                             this.collections.total_accountofficer = 0;
-                            for (var i in this.collections.account_officer_collection) {
+                            for (var i in this.collections.account_officer_collections) {
                                 this.collections.total_accountofficer += parseFloat(this.collections
-                                    .account_officer_collection[i].total);
+                                    .account_officer_collections[i].total);
                             }
                         })
                         .catch(error => {

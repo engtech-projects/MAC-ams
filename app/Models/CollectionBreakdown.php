@@ -35,24 +35,31 @@ class CollectionBreakdown extends Model
         "transaction_date",
         "branch_id",
         "total",
-        'status'
+        'status',
+        "flag"
     ];
 
 
-    public function accountOfficerCollection()
+    public function account_officer_collections()
     {
         return $this->hasMany(AccountOfficerCollection::class, 'collection_id');
     }
 
-    public function branch_collection()
+    public function branch_collections()
     {
-        return $this->hasMany(BranchCollection::class, 'collection_id');
+
+        return $this->hasMany(BranchCollection::class,'collection_id');
+    }
+
+    public function other_payment()
+    {
+        return $this->belongsTo(OtherPayment::class,'collection_id','collection_id');
     }
 
 
     public static function getCollectionById($id)
     {
-        $collection = CollectionBreakdown::with(['accountOfficerCollection'])->where('collection_id', $id)->first();
+        $collection = CollectionBreakdown::with(['account_officer_collections','branch_collections.branch','other_payment'])->where('collection_id', $id)->first();
         return $collection;
     }
     public static function getCollectionBreakdownByBranch($transactionDate, $branchId = null)
@@ -111,15 +118,17 @@ class CollectionBreakdown extends Model
 
     public function createCollection(array $attributes)
     {
-        $collection_ao = collect($attributes["collection_ao"])->map(function ($value) {
+        $collection_ao = collect($attributes["account_officer_collection"])->map(function ($value) {
             $value["flag"] = CollectionBreakdown::COLLECTION_FLAG;
             $value["grp"] = CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER;
-
             return $value;
         })->values();
 
         return DB::transaction(function () use ($attributes, $collection_ao) {
-            self::create($attributes)->accountOfficerCollection()->createMany($collection_ao);
+            $collection = self::create($attributes);
+            $collection->account_officer_collections()->createMany($collection_ao);
+            $collection->branch_collections()->createMany($attributes['branch_collections']);
+            $collection->other_payment()->create($attributes['other_payment']);
         });
     }
 

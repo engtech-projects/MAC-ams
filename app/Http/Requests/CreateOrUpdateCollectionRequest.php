@@ -25,7 +25,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
      */
     public function rules()
     {
-        dd($this);
+
         return [
             "p_1000" => 'required|numeric',
             "p_500" => 'required|numeric',
@@ -37,10 +37,14 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "p_5" => 'required|numeric',
             "p_1" => 'required|numeric',
             "c_25" => 'required|numeric',
-            "transaction_date" => 'required|date|unique:collection_breakdown,transaction_date,NULL,id,branch_id,' . $this->branch_id,
+            /*  "transaction_date" => 'required|date|unique:collection_breakdown,transaction_date,NULL,id,branch_id,' . $this->branch_id, */
+            "transaction_date" => 'required|date',
             "branch_id" => 'required|numeric',
-            "total" => 'required|numeric',
-            "collection_ao" => "required",
+            "total" => 'numeric',
+            "account_officer_collections" => "required|array",
+            "branch_collections" => "required|array",
+            "other_payment" => "required",
+            "other_payment" => "required",
         ];
     }
     public function messages()
@@ -53,12 +57,11 @@ class CreateOrUpdateCollectionRequest extends FormRequest
     }
     protected function prepareForValidation()
     {
+        $this->merge(['flag' => CollectionBreakdown::COLLECTION_FLAG]);
         if (Auth::user()->can('manager')) {
             $this->merge(['branch_id' => $this->input('branch_id')]);
         } else {
             $this->merge(['branch_id' => session()->get('auth_user_branch')]);
         }
     }
-
-
 }

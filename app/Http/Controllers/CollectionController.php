@@ -14,14 +14,15 @@ class CollectionController extends Controller
 
     public function store(CreateOrUpdateCollectionRequest $request)
     {
-        $collection = new CollectionBreakdown();
+       /*  $collection = new CollectionBreakdown();
         try {
             $collection = $collection->createCollection($request->validated());
             $collection->branch_collection()->create($request->branch_collection);
+            $collection->other_payment()->create($request->other_payment);
         } catch (\Exception $exception) {
             return new JsonResponse(["message" => $exception->getMessage()]);
         }
-        return new JsonResponse(["message" => "Collection successfully saved."]);
+        return new JsonResponse(["message" => "Collection successfully saved."]); */
     }
 
     public function destroy(CollectionBreakdown $collection)

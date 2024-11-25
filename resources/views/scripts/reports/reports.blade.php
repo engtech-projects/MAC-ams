@@ -22,7 +22,7 @@
 
 
 
-        $('#create-cashblotter').click(function(){
+       /*  $('#create-cashblotter').click(function(){
             $('#Mymodal').modal('show')
             reset()
             $('#title').text("Cashier's Transaction Blotter (New)")
@@ -57,7 +57,7 @@
                 branchID = "{{ session()->get('auth_user_branch') }}"; // Use session value if not visible
                 fetchCollectionBreakdown(branchID);
             }
-        });
+        }); */
 
         // Function to fetch collection breakdown based on branch ID
         function fetchCollectionBreakdown(branchID) {
@@ -314,7 +314,7 @@
     })
 
 
-    $(document).on('submit','#add-cash-blotter',function(e){
+    /* $(document).on('submit','#add-cash-blotter',function(e){
         e.preventDefault()
 
         var form = $(this);
@@ -410,7 +410,7 @@
                 alert("Failed to retrieve Cash Ending Balance. Please try again.");
             }
         });
-    });
+    }); */
 
     function reset() {
         $('#add-cash-blotter')[0].reset()
