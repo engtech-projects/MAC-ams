@@ -909,7 +909,7 @@
                 branches: null,
                 branch: null,
                 filter: {
-                    transaction_date: '2024-11-30',
+                    transaction_date: "", //'2024-11-30',
                     branch_id: null,
                 },
                 isEdit: false,
