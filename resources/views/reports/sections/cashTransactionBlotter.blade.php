@@ -376,7 +376,7 @@
                                                     </tr>
                                                     <tr v-if="!isEdit"
                                                         v-for="officerCollection in collectionBreakdown.account_officer_collections">
-                                                        <td>
+                                                        <td v-text='officerCollection.representative'>
                                                             <h6 v-text="officerCollection.representative"></h6>
                                                         </td>
                                                         <td>
@@ -1117,14 +1117,7 @@
                 },
                 processCreateCollection: function() {
                     this.isEdit = false;
-                    this.collectionBreakdown = {}
-                    this.collectionBreakdown.other_payment = {
-                        cash_amount: 0,
-                        check_amount: 0,
-                        pos_amount: 0,
-                        memo_amount: 0,
-                        interbranch_amount: 0
-                    }
+                    console.log(this.collectionBreakdown.account_officer_collections)
                 },
                 processUnpost: function(collectionBreakdown) {
                     this.collectionBreakdown = collectionBreakdown;
