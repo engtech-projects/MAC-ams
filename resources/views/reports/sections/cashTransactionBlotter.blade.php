@@ -626,6 +626,7 @@
                             <th>Transaction Date</th>
                             <th>Cash Ending Balance</th>
                             <th>Total Branch Collection</th>
+                            <th>Total Missing Collect</th>
                             <th>Status</th>
                             <th>Action</th>
                         </thead>
@@ -635,6 +636,7 @@
                                 <td>@{{ d.transaction_date }}</td>
                                 <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
                                 <td>@{{ formatCurrency(d.total) }}</td>
+                                <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
                                 <td>@{{ d.status }}</td>
                                 <td>
                                     <button @click="showCashBlotter(d.collection_id, d.branch_id)"
