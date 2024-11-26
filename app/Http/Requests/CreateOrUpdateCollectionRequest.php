@@ -37,8 +37,8 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "p_5" => 'required|numeric',
             "p_1" => 'required|numeric',
             "c_25" => 'required|numeric',
-            /*  "transaction_date" => 'required|date|unique:collection_breakdown,transaction_date,NULL,id,branch_id,' . $this->branch_id, */
-            "transaction_date" => 'required|date',
+            "transaction_date" => 'required|date|unique:collection_breakdown,transaction_date,NULL,id,branch_id,' . $this->branch_id,
+            //"transaction_date" => 'required|date',
             "branch_id" => 'required|numeric',
             "total" => 'numeric',
             "account_officer_collections" => "required|array",

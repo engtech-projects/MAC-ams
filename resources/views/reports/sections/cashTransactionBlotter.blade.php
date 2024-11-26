@@ -80,6 +80,7 @@
                     <div class="row">
                         <div class="col-md-12 frm-header">
                             <h4><b>Cashier's Transaction Blotter</b></h4>
+
                         </div>
                     </div>
                     <div class="row">
@@ -170,6 +171,7 @@
                                 <div class="row mt-3">
                                     <div class="col-md-6">
                                         <div class="row">
+                                            <h1 id='totalcashcount' v-text='collectionBreakdown.total'></h1>
 
                                             <table class="table table-sm cash-breakdown-tbl">
                                                 <thead>
@@ -278,8 +280,7 @@
                                                             Total
                                                         </td>
                                                         <td class="text-right" colspan="2" id="totalcashcount"
-                                                            v-text="collectionBreakdown.total">
-                                                            <b></b>
+                                                            v-text="totalCash">
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -384,7 +385,7 @@
 
                                                         </td>
                                                         <td>
-                                                            <h6 v-text="officerCollection.total"></h6>
+                                                            <h6 class="text-right" v-text="officerCollection.total"></h6>
                                                         </td>
                                                         <td class="text-center">
 
@@ -405,7 +406,7 @@
                                                             total
                                                         </td>
                                                         <td class="text-right" colspan="3"
-                                                            id="totalaccountofficercollection"><b>0</b></td>
+                                                            id="totalaccountofficercollection" v-text='aoCollectionTotal'></td>
                                                     </tr>
                                                 </tfoot>
                                             </table>
@@ -472,7 +473,7 @@
                                                             <h6 v-text="branchCollection.branch.branch_name"></h6>
                                                         </td>
                                                         <td>
-                                                            <h6 v-text="branchCollection.total"></h6>
+                                                            <h6 class="text-right" v-text="branchCollection.total"></h6>
 
                                                         </td>
                                                         <td class="text-center">
@@ -492,8 +493,7 @@
                                                         <td class="text-uppercase">
                                                             total
                                                         </td>
-                                                        <td class="text-right" colspan="3" id="totalbranchcollection">
-                                                            <b>0</b>
+                                                        <td class="text-right" colspan="3" id="totalbranchcollection" v-text="branchCollectionTotal">
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -503,9 +503,9 @@
                                         <div class="col-md-12">
                                             <table class="table table-bordered table-sm" id="account-officer-table">
                                                 <thead>
-                                                    <tr>
+
                                                         <th colspan="2"> Other Payment</th>
-                                                    </tr>
+
                                                 </thead>
                                                 <tbody>
                                                     <tr v-if="!isEdit"
@@ -517,12 +517,6 @@
                                                             <h6 v-text="branchCollection.total_amount"></h6>
 
                                                         </td>
-                                                        <td class="text-center">
-                                                            <button class="btn btn-xs btn-danger">
-                                                                <i class="fas fa-trash fa-xs"
-                                                                    @click="removeBranchCollection(branchCollection)"></i>
-                                                            </button>
-                                                        </td>
                                                     </tr>
 
                                                     <tr style="background-color: #f1f1f1;" id="branch-collection-row">
@@ -533,9 +527,7 @@
                                                         <td>
                                                             <p>CASH</p>
                                                         </td>
-                                                        <td class="text-bold text-right"
-                                                            v-text="collectionBreakdown.other_payment.cash_amount">
-
+                                                        <td class="text-right" v-text='totalCash'>
                                                         </td>
 
                                                     </tr>
@@ -581,9 +573,7 @@
                                                         <td>
                                                             INTERBRANCH
                                                         </td>
-                                                        <td>
-                                                        <td class="text-bold text-right"
-                                                            v-text="collectionBreakdown.other_payment.cash_amount">
+                                                        <td class="text-right" v-text='branchCollectionTotal'>
                                                         </td>
                                                     </tr>
                                                     <tr class="bg-primary">
@@ -1039,8 +1029,10 @@
                     }
                 },
                 createNewCollectionBreakdown: function() {
-                    var total = parseFloat(Number($('#totalcashcount').text().replace(/[^0-9\.-]+/g, "")))
-                    this.collectionBreakdown.total = total;
+                    var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.interbranch_amount =  parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.total = totalCash
+                    this.collectionBreakdown.other_payment.cash_amount = totalCash
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1277,6 +1269,47 @@
             computed: {
                 collectionsBreakdown: function() {
                     return this.data.collections
+                },
+                totalCash:function() {
+                    var total = parseFloat(this.collectionBreakdown.p_1000*1000)
+                    +parseFloat(this.collectionBreakdown.p_500*500)
+                    +parseFloat(this.collectionBreakdown.p_200*200)
+                    +parseFloat(this.collectionBreakdown.p_100*100)
+                    +parseFloat(this.collectionBreakdown.p_50*100)
+                    +parseFloat(this.collectionBreakdown.p_20*20)
+                    +parseFloat(this.collectionBreakdown.p_10*10)
+                    +parseFloat(this.collectionBreakdown.p_5*5)
+                    +parseFloat(this.collectionBreakdown.p_1*1)
+                    +parseFloat(this.collectionBreakdown.c_25*25);
+                    return this.amountConverter(total);
+                },
+                aoCollectionTotal: function() {
+                    var aoCollection = this.collectionBreakdown.account_officer_collections;
+                    var total = 0;
+                    if(aoCollection.length > 0) {
+                        for(var i in aoCollection) {
+                            total += parseFloat(aoCollection[i].total);
+                        }
+                    }
+                    return this.amountConverter(total);
+                },
+                otherPaymentTotal:function() {
+                    var otherPayment = this.collectionBreakdown.other_payment;
+                    let total = 0;
+                    if(otherPayment) {
+                        total = otherPayment.cash_amount+otherPayment.check_amount+otherPayment.memo_amount+otherPayment.pos_amount+otherPayment.interbranch_amount
+                    }
+                    return this.amountConverter(total);
+                },
+                branchCollectionTotal:function() {
+                    var branchCollection = this.collectionBreakdown.branch_collections;
+                    var total = 0;
+                     if(branchCollection.length > 0) {
+                        for(var i in branchCollection) {
+                            total += parseFloat(branchCollection[i].total);
+                        }
+                    }
+                    return this.amountConverter(total);
                 },
                 filteredCashBlotter: function() {
                     var rows = [];
