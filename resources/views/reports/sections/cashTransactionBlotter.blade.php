@@ -1119,6 +1119,10 @@
                     this.updateCollectionBreakdown();
                 },
                 updateCollectionBreakdown: function() {
+                    var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.interbranch_amount =  parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.total = totalCash
+                    this.collectionBreakdown.other_payment.cash_amount = totalCash
 
                     axios.post('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
