@@ -1030,6 +1030,7 @@
                         this.createValidation()
                         if(this.isValid) {
                             this.createNewCollectionBreakdown();
+
                         }
                     }
                 },
@@ -1061,7 +1062,7 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        this.collectionBreakdown = {}
+                        this.resetForm();
                     }).catch(err => {
                         toastr.error(response.data.message);
                     })
@@ -1072,6 +1073,30 @@
                     const updatedArray = this.collectionBreakdown.branch_collections.filter(element => !
                         isEqual(element, collection));
                     this.collectionBreakdown.branch_collections = updatedArray;
+                },
+                resetForm:function() {
+                       this.collectionBreakdown.collection_id = null,
+                       this.collectionBreakdown.branch_id = null;
+                       this.collectionBreakdown.transaction_date = '';
+                       this.collectionBreakdown.p_1000 = 0;
+                       this.collectionBreakdown.p_500= 0;
+                       this.collectionBreakdown.p_200 = 0;
+                       this.collectionBreakdown.p_100 = 0;
+                       this.collectionBreakdown.p_50 = 0;
+                       this.collectionBreakdown.p_20= 0;
+                       this.collectionBreakdown.p_10 = 0;
+                       this.collectionBreakdown.p_5 = 0;
+                       this.collectionBreakdown.p_1 = 0;
+                       this.collectionBreakdown.c_25 = 0;
+                       this.collectionBreakdown.branch_collections = [];
+                       this.collectionBreakdown.account_officer_collections = [];
+                       this.collectionBreakdown.other_payment = {
+                            cash_amount: 0,
+                            check_amount: 0,
+                            pos_amount: 0,
+                            memo_amount: 0,
+                            interbranch_amount: 0
+                        }
                 },
                 removeAccountOfficerCollection: function(collection) {
                     const isEqual = (obj1, obj2) =>
@@ -1133,7 +1158,7 @@
                 },
                 processCreateCollection: function() {
                     this.isEdit = false;
-                    console.log(this.collectionBreakdown.account_officer_collections)
+
                 },
                 processUnpost: function(collectionBreakdown) {
                     this.collectionBreakdown = collectionBreakdown;
