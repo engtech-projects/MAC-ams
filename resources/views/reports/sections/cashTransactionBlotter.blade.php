@@ -809,7 +809,7 @@
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Account Officer</th>
-                                                    <th>Total Amount</th>
+                                                    <th>Amount</th>
                                                 </thead>
                                                 <tbody>
                                                     <tr v-for="officer in collections.account_officer_collections">
@@ -827,7 +827,7 @@
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th class="text-uppercase text-bold">Other Payments</th>
-                                                    <th>Total Amount</th>
+                                                    <th>Amount</th>
                                                 </thead>
                                                 <tbody class="text-uppercase">
                                                     <tr>
@@ -861,7 +861,7 @@
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Interbranch</th>
-                                                    <th>Total Amount</th>
+                                                    <th>Amount</th>
                                                 </thead>
                                                 <tbody class="text-uppercase">
                                                     <tr v-for="bc in collections.branch_collections">
@@ -1215,16 +1215,6 @@
                         toastr.success(response.data.message);
                     }).catch(err => {
                         console.error(err);
-                        // var errors = err.response.data.errors;
-                        // var messages = [];
-                        // for (var i in errors) {
-                        //     var error = errors[i];
-                        //     for (var j in error) {
-                        //         var message = error[j];
-                        //         messages.push(message + '<br />');
-                        //     }
-                        // }
-                        //toastr.error(messages);
                     })
                 },
                 getBranchName(branchId) {
@@ -1270,11 +1260,9 @@
                             }
                         }) // Replace with your API endpoint
                         .then(response => {
-                            // console.log(response);
                             this.responseData = response.data;
                             this.entries = response.data['entries'];
                             this.collections = response.data['entries']['collections'];
-                            // console.log("Collections Data:", this.collections);
                             this.arrangeData(response.data['entries']);
                             this.collections.total_accountofficer = 0;
                             for (var i in this.collections.account_officer_collections) {
@@ -1294,12 +1282,8 @@
                                 this.entries[i] = data[k];
                             }
                         }
-                        // if(i == 'collections'){
-                        // 	this.collections = entry;
-                        // 	console.log(this.collections);
-                        // }
                     }
-                    // console.log(this.entries);
+
                 },
                 upperWords: function(inputString) {
                     var stringWithSpaces = inputString.replace(/_/g, ' ');
@@ -1359,7 +1343,6 @@
                 },
                 otherPayment: function() {
                     var collections = this.collections;
-                    console.log(collections);
                     if (collections.other_payment) {
                         var otherPayment = collections.other_payment;
                         return {
