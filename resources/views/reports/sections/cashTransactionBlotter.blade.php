@@ -171,7 +171,6 @@
                                 <div class="row mt-3">
                                     <div class="col-md-6">
                                         <div class="row">
-                                            <h1 id='totalcashcount' v-text='collectionBreakdown.total'></h1>
 
                                             <table class="table table-sm cash-breakdown-tbl">
                                                 <thead>
@@ -539,7 +538,8 @@
                                                         <td class="text-right">
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.check_amount"
-                                                                class="form-control form-control-sm rounded-0 text-right"v
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                required
                                                                 placeholder="0.00">
                                                         </td>
                                                     </tr>
@@ -552,6 +552,7 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.pos_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
+                                                                required
                                                                 placeholder="0.00">
 
                                                         </td>
@@ -566,6 +567,7 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.memo_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
+                                                                required
                                                                 placeholder="0.00">
                                                         </td>
                                                     </tr>
@@ -580,8 +582,7 @@
                                                         <td class="text-uppercase">
                                                             total
                                                         </td>
-                                                        <td class="text-right" colspan="3" id="totalbranchcollection">
-                                                            <b>0</b>
+                                                        <td class="text-right" colspan="3" v-text="otherPaymentTotal">
                                                         </td>
                                                     </tr>
 
@@ -964,6 +965,7 @@
                         interbranch_amount: 0
                     }
                 },
+                isValid:true,
                 total: {
                     grandTotal: 0,
                     p_1000: 0,
@@ -1025,8 +1027,27 @@
                     if (this.isEdit) {
                         this.updateCollectionBreakdown();
                     } else {
-                        this.createNewCollectionBreakdown();
+                        this.createValidation()
+                        if(this.isValid) {
+                            this.createNewCollectionBreakdown();
+                        }
                     }
+                },
+                createValidation:function() {
+                    if(this.collectionBreakdown.other_payment.pos_amount === '') {
+                        alert('POS amount is required.')
+                        this.isValid = false;
+                    } else if(this.collectionBreakdown.other_payment.memo_amount === '') {
+                        alert('MEMO amount is required.')
+                        this.isValid = false;
+                    }else if(this.collectionBreakdown.other_payment.check_amount === '') {
+                        alert('CHECK amount is required.')
+                        this.isValid = false;
+                    }else {
+                        this.isValid = true;
+                    }
+
+
                 },
                 createNewCollectionBreakdown: function() {
                     var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
@@ -1039,9 +1060,10 @@
                                 .content
                         }
                     }).then(response => {
-                        console.log(response.data)
+                        toastr.success(response.data.message);
+                        this.collectionBreakdown = {}
                     }).catch(err => {
-                        console.error(err);
+                        toastr.error(response.data.message);
                     })
                 },
                 removeBranchCollection: function(collection) {
@@ -1285,6 +1307,7 @@
                     +parseFloat(this.collectionBreakdown.p_5*5)
                     +parseFloat(this.collectionBreakdown.p_1*1)
                     +parseFloat(this.collectionBreakdown.c_25*25);
+                    this.collectionBreakdown.other_payment.cash_amount = total;
                     return this.amountConverter(total);
                 },
                 aoCollectionTotal: function() {
@@ -1301,7 +1324,11 @@
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
                     if(otherPayment) {
-                        total = otherPayment.cash_amount+otherPayment.check_amount+otherPayment.memo_amount+otherPayment.pos_amount+otherPayment.interbranch_amount
+                        total += parseFloat(otherPayment.cash_amount)
+                        +parseFloat(otherPayment.check_amount)
+                        +parseFloat(otherPayment.memo_amount)
+                        +parseFloat(otherPayment.pos_amount)
+                        +parseFloat(otherPayment.interbranch_amount)
                     }
                     return this.amountConverter(total);
                 },
@@ -1313,6 +1340,7 @@
                             total += parseFloat(branchCollection[i].total);
                         }
                     }
+                    this.collectionBreakdown.other_payment.interbranch_amount = total;
                     return this.amountConverter(total);
                 },
                 filteredCashBlotter: function() {
