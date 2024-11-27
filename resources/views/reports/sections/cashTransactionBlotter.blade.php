@@ -526,7 +526,7 @@
                                                         <td>
                                                             <p>CASH</p>
                                                         </td>
-                                                        <td class="text-right" v-text='totalCash'>
+                                                        <td class="text-right" v-text='aoCollectionTotal'>
                                                         </td>
 
                                                     </tr>
@@ -1054,7 +1054,7 @@
                     var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.other_payment.interbranch_amount =  parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.total = totalCash
-                    this.collectionBreakdown.other_payment.cash_amount = totalCash
+                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
