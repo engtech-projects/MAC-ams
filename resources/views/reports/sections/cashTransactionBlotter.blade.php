@@ -405,7 +405,8 @@
                                                             total
                                                         </td>
                                                         <td class="text-right" colspan="3"
-                                                            id="totalaccountofficercollection" v-text='aoCollectionTotal'></td>
+                                                            id="totalaccountofficercollection" v-text='aoCollectionTotal'>
+                                                        </td>
                                                     </tr>
                                                 </tfoot>
                                             </table>
@@ -492,7 +493,8 @@
                                                         <td class="text-uppercase">
                                                             total
                                                         </td>
-                                                        <td class="text-right" colspan="3" id="totalbranchcollection" v-text="branchCollectionTotal">
+                                                        <td class="text-right" colspan="3" id="totalbranchcollection"
+                                                            v-text="branchCollectionTotal">
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -503,7 +505,7 @@
                                             <table class="table table-bordered table-sm" id="account-officer-table">
                                                 <thead>
 
-                                                        <th colspan="2"> Other Payment</th>
+                                                    <th colspan="2"> Other Payment</th>
 
                                                 </thead>
                                                 <tbody>
@@ -539,8 +541,7 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.check_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                required
-                                                                placeholder="0.00">
+                                                                required placeholder="0.00">
                                                         </td>
                                                     </tr>
 
@@ -552,8 +553,7 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.pos_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                required
-                                                                placeholder="0.00">
+                                                                required placeholder="0.00">
 
                                                         </td>
                                                     </tr>
@@ -567,8 +567,7 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.memo_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                required
-                                                                placeholder="0.00">
+                                                                required placeholder="0.00">
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -825,30 +824,54 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <th class="text-uppercase text-bold">Other Payments</th>
+                                                    <th>Total Amount</th>
+                                                </thead>
+                                                <tbody class="text-uppercase">
+                                                    <tr>
+                                                        <td>Cash</td>
+                                                        <td v-text="otherPayment.cash_amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>check</td>
+                                                        <td v-text="otherPayment.check_amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>pos</td>
+                                                        <td v-text="otherPayment.pos_amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>memo</td>
+                                                        <td v-text="otherPayment.memo_amount"></td>
+                                                    </tr>
+
+
+                                                    <tr
+                                                        style="border-top:4px dashed black;border-bottom:4px dashed black;">
+                                                        <td><strong>TOTAL</strong></td>
+                                                        <td v-text="otherPayment.total"><strong></strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
                                         </div>
                                         <div class="col-md-4">
                                             <table class="table table-striped">
                                                 <thead>
-                                                    <th>Other Cash Received</th>
+                                                    <th>Interbranch</th>
                                                     <th>Total Amount</th>
                                                 </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
+                                                <tbody class="text-uppercase">
+                                                    <tr v-for="bc in collections.branch_collections">
+                                                        <td class="text-bold" v-text="bc.branch.branch_name"></td>
+                                                        <td v-text="bc.total_amount"></td>
                                                     </tr>
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
-                                                        <td><strong>TOTAL CASH OTHERS</strong></td>
-                                                        <td><strong>0.00</strong></td>
+                                                        <td><strong>TOTAL</strong></td>
+                                                        <td><strong>@{{ total_interbranch_collection }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -938,6 +961,14 @@
                     branch_id: null,
                     branch: ''
                 },
+                other_payment: {
+                    cash_amount: 0,
+                    check_amount: 0,
+                    pos_amount: 0,
+                    memo_amount: 0,
+                    interbranch_amount: 0,
+                    total: 0
+                },
                 collectionBreakdown: {
                     total: 0,
                     collection_id: 0,
@@ -965,7 +996,7 @@
                         interbranch_amount: 0
                     }
                 },
-                isValid:true,
+                isValid: true,
                 total: {
                     grandTotal: 0,
                     p_1000: 0,
@@ -1028,23 +1059,23 @@
                         this.updateCollectionBreakdown();
                     } else {
                         this.createValidation()
-                        if(this.isValid) {
+                        if (this.isValid) {
                             this.createNewCollectionBreakdown();
 
                         }
                     }
                 },
-                createValidation:function() {
-                    if(this.collectionBreakdown.other_payment.pos_amount === '') {
+                createValidation: function() {
+                    if (this.collectionBreakdown.other_payment.pos_amount === '') {
                         alert('POS amount is required.')
                         this.isValid = false;
-                    } else if(this.collectionBreakdown.other_payment.memo_amount === '') {
+                    } else if (this.collectionBreakdown.other_payment.memo_amount === '') {
                         alert('MEMO amount is required.')
                         this.isValid = false;
-                    }else if(this.collectionBreakdown.other_payment.check_amount === '') {
+                    } else if (this.collectionBreakdown.other_payment.check_amount === '') {
                         alert('CHECK amount is required.')
                         this.isValid = false;
-                    }else {
+                    } else {
                         this.isValid = true;
                     }
 
@@ -1052,9 +1083,11 @@
                 },
                 createNewCollectionBreakdown: function() {
                     var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.other_payment.interbranch_amount =  parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
+                        .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.total = totalCash
-                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.branchCollectionTotal
+                        .replace(/[^0-9\.-]+/g, ""));
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1074,29 +1107,29 @@
                         isEqual(element, collection));
                     this.collectionBreakdown.branch_collections = updatedArray;
                 },
-                resetForm:function() {
-                       this.collectionBreakdown.collection_id = null,
-                       this.collectionBreakdown.branch_id = null;
-                       this.collectionBreakdown.transaction_date = '';
-                       this.collectionBreakdown.p_1000 = 0;
-                       this.collectionBreakdown.p_500= 0;
-                       this.collectionBreakdown.p_200 = 0;
-                       this.collectionBreakdown.p_100 = 0;
-                       this.collectionBreakdown.p_50 = 0;
-                       this.collectionBreakdown.p_20= 0;
-                       this.collectionBreakdown.p_10 = 0;
-                       this.collectionBreakdown.p_5 = 0;
-                       this.collectionBreakdown.p_1 = 0;
-                       this.collectionBreakdown.c_25 = 0;
-                       this.collectionBreakdown.branch_collections = [];
-                       this.collectionBreakdown.account_officer_collections = [];
-                       this.collectionBreakdown.other_payment = {
-                            cash_amount: 0,
-                            check_amount: 0,
-                            pos_amount: 0,
-                            memo_amount: 0,
-                            interbranch_amount: 0
-                        }
+                resetForm: function() {
+                    this.collectionBreakdown.collection_id = null,
+                        this.collectionBreakdown.branch_id = null;
+                    this.collectionBreakdown.transaction_date = '';
+                    this.collectionBreakdown.p_1000 = 0;
+                    this.collectionBreakdown.p_500 = 0;
+                    this.collectionBreakdown.p_200 = 0;
+                    this.collectionBreakdown.p_100 = 0;
+                    this.collectionBreakdown.p_50 = 0;
+                    this.collectionBreakdown.p_20 = 0;
+                    this.collectionBreakdown.p_10 = 0;
+                    this.collectionBreakdown.p_5 = 0;
+                    this.collectionBreakdown.p_1 = 0;
+                    this.collectionBreakdown.c_25 = 0;
+                    this.collectionBreakdown.branch_collections = [];
+                    this.collectionBreakdown.account_officer_collections = [];
+                    this.collectionBreakdown.other_payment = {
+                        cash_amount: 0,
+                        check_amount: 0,
+                        pos_amount: 0,
+                        memo_amount: 0,
+                        interbranch_amount: 0
+                    }
                 },
                 removeAccountOfficerCollection: function(collection) {
                     const isEqual = (obj1, obj2) =>
@@ -1167,7 +1200,8 @@
                 },
                 updateCollectionBreakdown: function() {
                     var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.other_payment.interbranch_amount =  parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
+                        .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.total = totalCash
                     this.collectionBreakdown.other_payment.cash_amount = totalCash
 
@@ -1318,49 +1352,73 @@
                 }
             },
             computed: {
+                total_interbranch_collection: function() {
+                    return this.collections.branch_collections ? this.collections.branch_collections.reduce((
+                            sum, item) => sum + item.total_amount,
+                        0) : 0;
+                },
+                otherPayment: function() {
+                    var collections = this.collections;
+                    console.log(collections);
+                    if (collections.other_payment) {
+                        var otherPayment = collections.other_payment;
+                        return {
+                            cash_amount: this.formatCurrency(otherPayment.cash_amount),
+                            check_amount: this.formatCurrency(otherPayment.check_amount),
+                            memo_amount: this.formatCurrency(otherPayment.memo_amount),
+                            pos_amount: this.formatCurrency(otherPayment.pos_amount),
+                            interbranch_amount: this.formatCurrency(otherPayment.interbranch_amount),
+                            total: this.formatCurrency(otherPayment.cash_amount + otherPayment.check_amount +
+                                otherPayment.memo_amount + otherPayment.pos_amount)
+                        };
+                    }
+
+                    return this.other_payment;
+
+                },
                 collectionsBreakdown: function() {
                     return this.data.collections
                 },
-                totalCash:function() {
-                    var total = parseFloat(this.collectionBreakdown.p_1000*1000)
-                    +parseFloat(this.collectionBreakdown.p_500*500)
-                    +parseFloat(this.collectionBreakdown.p_200*200)
-                    +parseFloat(this.collectionBreakdown.p_100*100)
-                    +parseFloat(this.collectionBreakdown.p_50*100)
-                    +parseFloat(this.collectionBreakdown.p_20*20)
-                    +parseFloat(this.collectionBreakdown.p_10*10)
-                    +parseFloat(this.collectionBreakdown.p_5*5)
-                    +parseFloat(this.collectionBreakdown.p_1*1)
-                    +parseFloat(this.collectionBreakdown.c_25*25);
+                totalCash: function() {
+                    var total = parseFloat(this.collectionBreakdown.p_1000 * 1000) +
+                        parseFloat(this.collectionBreakdown.p_500 * 500) +
+                        parseFloat(this.collectionBreakdown.p_200 * 200) +
+                        parseFloat(this.collectionBreakdown.p_100 * 100) +
+                        parseFloat(this.collectionBreakdown.p_50 * 100) +
+                        parseFloat(this.collectionBreakdown.p_20 * 20) +
+                        parseFloat(this.collectionBreakdown.p_10 * 10) +
+                        parseFloat(this.collectionBreakdown.p_5 * 5) +
+                        parseFloat(this.collectionBreakdown.p_1 * 1) +
+                        parseFloat(this.collectionBreakdown.c_25 * 25);
                     return this.amountConverter(total);
                 },
                 aoCollectionTotal: function() {
                     var aoCollection = this.collectionBreakdown.account_officer_collections;
                     var total = 0;
-                    if(aoCollection.length > 0) {
-                        for(var i in aoCollection) {
+                    if (aoCollection.length > 0) {
+                        for (var i in aoCollection) {
                             total += parseFloat(aoCollection[i].total);
                         }
                     }
                     return this.amountConverter(total);
                 },
-                otherPaymentTotal:function() {
+                otherPaymentTotal: function() {
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
-                    if(otherPayment) {
-                        total += parseFloat(otherPayment.cash_amount)
-                        +parseFloat(otherPayment.check_amount)
-                        +parseFloat(otherPayment.memo_amount)
-                        +parseFloat(otherPayment.pos_amount)
-                        +parseFloat(otherPayment.interbranch_amount)
+                    if (otherPayment) {
+                        total += parseFloat(otherPayment.cash_amount) +
+                            parseFloat(otherPayment.check_amount) +
+                            parseFloat(otherPayment.memo_amount) +
+                            parseFloat(otherPayment.pos_amount) +
+                            parseFloat(otherPayment.interbranch_amount)
                     }
                     return this.amountConverter(total);
                 },
-                branchCollectionTotal:function() {
+                branchCollectionTotal: function() {
                     var branchCollection = this.collectionBreakdown.branch_collections;
                     var total = 0;
-                     if(branchCollection.length > 0) {
-                        for(var i in branchCollection) {
+                    if (branchCollection.length > 0) {
+                        for (var i in branchCollection) {
                             total += parseFloat(branchCollection[i].total);
                         }
                     }
