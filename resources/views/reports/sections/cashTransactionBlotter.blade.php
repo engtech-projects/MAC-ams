@@ -1332,7 +1332,6 @@
                     +parseFloat(this.collectionBreakdown.p_5*5)
                     +parseFloat(this.collectionBreakdown.p_1*1)
                     +parseFloat(this.collectionBreakdown.c_25*25);
-                    this.collectionBreakdown.other_payment.cash_amount = total;
                     return this.amountConverter(total);
                 },
                 aoCollectionTotal: function() {
