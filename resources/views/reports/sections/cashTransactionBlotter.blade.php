@@ -304,18 +304,21 @@
                                                     <tr v-if="isEdit">
                                                         <td>
                                                             <input type="text" class="form-control form-control-sm"
-                                                                id="accountofficer_id">
+                                                                id="accountofficer_id"
+                                                                v-model="officer_collection.representative">
                                                         </td>
                                                         <td>
                                                             <input type="text" id="remarks"
                                                                 class="form-control form-control-sm rounded-0"
-                                                                name="remarks" form="frm-add-account-officer-details"
+                                                                v-model="officer_collection.remarks" name="remarks"
+                                                                form="frm-add-account-officer-details"
                                                                 placeholder="Remarks">
                                                         </td>
                                                         <td>
                                                             <input type="number"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                id="total_amount" placeholder="0.00">
+                                                                id="total_amount" placeholder="0.00"
+                                                                v-model="officer_collection.total">
                                                         </td>
                                                         <td class="text-center">
                                                             <button class="btn btn-xs btn-primary"
@@ -1036,7 +1039,7 @@
                                 branch_id: $('#branch_id_collection').val(),
                                 branch_name: $('#branch_id_collection option:selected').text(),
                             },
-                            total: this.branch_collection.total_amount
+                            total_amount: this.branch_collection.total_amount
                         });
                     }
                 },
@@ -1044,6 +1047,7 @@
                     if ($('#remarks').val() == "") {
                         alert("Please add account officer collection");
                     } else {
+                        console.log(this.officer_collection);
                         this.collectionBreakdown.account_officer_collections.push({
                             representative: this.officer_collection.representative,
                             note: this.officer_collection.note,
@@ -1402,7 +1406,7 @@
                     var total = 0;
                     if (branchCollection.length > 0) {
                         for (var i in branchCollection) {
-                            total += parseFloat(branchCollection[i].total);
+                            total += parseFloat(branchCollection[i].total_amount);
                         }
                     }
                     this.collectionBreakdown.other_payment.interbranch_amount = total;
