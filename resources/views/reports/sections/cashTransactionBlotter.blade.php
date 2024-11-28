@@ -310,7 +310,7 @@
                                                         <td>
                                                             <input type="text" id="remarks"
                                                                 class="form-control form-control-sm rounded-0"
-                                                                v-model="officer_collection.remarks" name="remarks"
+                                                                v-model="officer_collection.note" name="remarks"
                                                                 form="frm-add-account-officer-details"
                                                                 placeholder="Remarks">
                                                         </td>

@@ -26,8 +26,6 @@ class CreateOrUpdateCollectionRequest extends FormRequest
      */
     public function rules()
     {
-
-
         return [
             "p_1000" => 'required|numeric',
             "p_500" => 'required|numeric',
@@ -39,13 +37,11 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "p_5" => 'required|numeric',
             "p_1" => 'required|numeric',
             "c_25" => 'required|numeric',
-            /* "transaction_date" => 'required|date_format:Y-m-d H:i:s|unique:collection_breakdown,transaction_date,NULL,id,' . $this->branch_id, */
             'transaction_date' => [
                 'required',
                 'date',
-                Rule::unique('collection_breakdown', 'transaction_date')->ignore($this->branch_id,'branch_id'),
+                Rule::unique('collection_breakdown', 'transaction_date')->where('branch_id', $this->branch_id)->ignore($this->collection_id,'collection_id'),
             ],
-            //"transaction_date" => 'required|date',
             "branch_id" => 'required|numeric',
             "total" => 'numeric',
             "account_officer_collections" => "required|array",
