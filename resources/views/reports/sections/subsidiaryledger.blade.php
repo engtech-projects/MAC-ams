@@ -294,32 +294,31 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2 col-xs-12"
-                            v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal" for="date_to">To</label>
-                                    <div class="input-group">
-                                        <input v-model="filter.to" type="date"
-                                            class="form-control form-control-sm rounded-0" name="to"
-                                            id="sub_date" required>
+                            <div class="col-md-2 col-xs-12"
+                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="date_to">To</label>
+                                        <div class="input-group">
+                                            <input v-model="filter.to" type="date"
+                                                class="form-control form-control-sm rounded-0" name="to"
+                                                id="sub_date" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-2 col-xs-12"
-                            v-show="reportType=='subsidiary-ledger-summary-report'">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal" for="sub_date">As of:</label>
-                                    <div class="input-group">
-                                        <input v-model="filter.to" type="date"
-                                            class="form-control form-control-sm rounded-0" name="to"
-                                            id="sub_date" required>
+                            <div class="col-md-2 col-xs-12" v-show="reportType=='subsidiary-ledger-summary-report'">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="sub_date">As of:</label>
+                                        <div class="input-group">
+                                            <input v-model="filter.asof" type="date"
+                                                class="form-control form-control-sm rounded-0" name="to"
+                                                id="sub_date" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
 
 
@@ -793,8 +792,10 @@
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
+                    branch_id: '',
                     from: '',
                     to: '',
+                    asof:new Date().toISOString().split('T')[0],
                     account_id: 'all',
                     type: ''
                 },
@@ -807,6 +808,15 @@
                 url: "{{ route('reports.subsidiary-ledger') }}",
             },
             methods: {
+
+                getCurrentDate() {
+                    const date = new Date();
+                    const year = date.getFullYear();
+                    const month = ("0" + (date.getMonth() + 1)).slice(-2); // Ensure month is two digits
+                    const day = ("0" + date.getDate()).slice(-2); // Ensure day is two digits
+                    return `${year}-${month}-${day}`; // Return in 'yyyy-mm-dd' format
+                },
+
                 submitForm: function() {
                     if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {
                         this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
