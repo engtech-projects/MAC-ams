@@ -1061,6 +1061,7 @@
                 processCreateOrUpdate: function() {
                     if (this.isEdit) {
                         this.updateCollectionBreakdown();
+
                     } else {
                         this.createValidation()
                         if (this.isValid) {
@@ -1217,6 +1218,7 @@
                             }
                         }).then(response => {
                         toastr.success(response.data.message);
+                        window.location.reload();
                     }).catch(err => {
                         console.error(err);
                     })

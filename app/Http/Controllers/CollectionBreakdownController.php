@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrUpdateCollectionRequest;
+use App\Models\AccountOfficerCollection;
 use App\Models\BranchCollection;
 use App\Models\CollectionBreakdown;
 use App\Models\journalEntry;
+use App\Models\OtherPayment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -51,20 +53,56 @@ class CollectionBreakdownController extends Controller
     public function update(CreateOrUpdateCollectionRequest $request, CollectionBreakdown $collectionBreakdown)
     {
         $data = $request->validated();
+
         try {
             $collectionBreakdown->update($data);
-            foreach ($data["branch_collections"] as $bc) {
-                $BranchCollection = BranchCollection::find($bc["id"])->update([
-                    "total_amount" => $bc["total_amount"],
-                    "branch_id" => $bc["branch"]["branch_id"],
+            foreach ($data["account_officer_collections"] as $aco) {
 
-                ]);
-                if (!$BranchCollection) {
-                    BranchCollection::create([
-                        "total_amount" => $bc["total_amount"],
-                        "branch_id" => $bc["branch_id"]
+                if (isset($aco['collection_ao_id'])) {
+                    AccountOfficerCollection::find($aco["collection_ao_id"])->update([
+                        "representative" => $aco["representative"],
+                        "note" => $aco["note"],
+                        "total" => $aco["total"],
+                        "grp" => $aco["grp"],
+                        "collection_id" => $aco["collection_id"],
+
+                    ]);
+                } else {
+                    AccountOfficerCollection::create([
+                        "representative" => $aco["representative"],
+                        "collection_id" => $collectionBreakdown->collection_id,
+                        "grp" => CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER,
+                        "note" => $aco["note"],
+                        "total" => $aco["total"],
                     ]);
                 }
+            }
+            foreach ($data["branch_collections"] as $bc) {
+                if (isset($bc["id"])) {
+                    BranchCollection::find($bc["id"])->update([
+                        "total_amount" => $bc["total_amount"],
+                        "branch_id" => $bc["branch"]["branch_id"],
+
+                    ]);
+                } else {
+                    BranchCollection::create([
+                        "collection_id" => $collectionBreakdown->collection_id,
+                        "total_amount" => $bc["total_amount"],
+                        "branch_id" => $bc["branch"]["branch_id"],
+                    ]);
+                }
+            }
+            if (isset($data["other_payment"])) {
+                $op = $data["other_payment"];
+                OtherPayment::find($op["id"])->update([
+                    "cash_amount" => $op["cash_amount"],
+                    "check_amount" => $op["check_amount"],
+                    "memo_amount" => $op["memo_amount"],
+                    "pos_amount" => $op["pos_amount"],
+                    "interbranch_amount" => $op["interbranch_amount"],
+                    "collection_id" => $collectionBreakdown->collection_id,
+                ]);
+
             }
         } catch (\Exception $e) {
             return response()->json([
