@@ -984,6 +984,10 @@
                             placeholder: 'Select S/L',
                             allowClear: true,
                         });
+
+                        $('#journalModalEdit').on('hidden.bs.modal', function () {
+                            location.reload(); // Reload the page
+                        });
                     }
                 },
                 error: function() {
