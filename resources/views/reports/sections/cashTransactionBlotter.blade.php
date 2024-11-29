@@ -1106,11 +1106,26 @@
                     })
                 },
                 removeBranchCollection: function(collection) {
+                    if (this.isEdit) {
+                        axios.delete('/MAC-ams/branch-collection/' + collection.id, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+
+                            this.collectionBreakdown.branch_collections = updatedArray;
+                        }).catch(err => {
+                            toastr.error(err.data.message);
+                        })
+                    }
                     const isEqual = (obj1, obj2) =>
                         Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.branch_collections.filter(element => !
+                    const updatedArray = this.collectionBreakdown.branch_collections.filter(
+                        element => !
                         isEqual(element, collection));
-                    this.collectionBreakdown.branch_collections = updatedArray;
+
                 },
                 resetForm: function() {
                     this.collectionBreakdown.collection_id = null,
@@ -1137,12 +1152,28 @@
                     }
                 },
                 removeAccountOfficerCollection: function(collection) {
+                    if (this.isEdit) {
+                        axios.delete('/MAC-ams/account-officer-collection/' + collection.collection_ao_id, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+
+                        }).catch(err => {
+                            toastr.error(err.data.message);
+                        })
+                    }
                     const isEqual = (obj1, obj2) =>
                         Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.account_officer_collections.filter(element =>
-                        !
-                        isEqual(element, collection));
+                    const updatedArray = this.collectionBreakdown.account_officer_collections
+                        .filter(element =>
+                            !
+                            isEqual(element, collection));
                     this.collectionBreakdown.account_officer_collections = updatedArray;
+
+
 
                 },
                 processPost: function(collectionBreakdown) {

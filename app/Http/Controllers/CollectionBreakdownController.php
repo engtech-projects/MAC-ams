@@ -102,7 +102,6 @@ class CollectionBreakdownController extends Controller
                     "interbranch_amount" => $op["interbranch_amount"],
                     "collection_id" => $collectionBreakdown->collection_id,
                 ]);
-
             }
         } catch (\Exception $e) {
             return response()->json([
@@ -110,6 +109,24 @@ class CollectionBreakdownController extends Controller
             ]);
         }
         return response()->json(['message' => 'Successfully updated.']);
+    }
+    public function deleteAccountOffficerCollection(AccountOfficerCollection $accountOfficerCollection)
+    {
+        try {
+            $accountOfficerCollection->delete();
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()]);
+        }
+        return response()->json(['message' => 'Successfully removed.']);
+    }
+    public function deleteBranchCollection(BranchCollection $branchCollection)
+    {
+        try {
+            $branchCollection->delete();
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()]);
+        }
+        return response()->json(['message' => 'Successfully removed.']);
     }
     public function destroy(CollectionBreakdown $collectionBreakdown)
     {
