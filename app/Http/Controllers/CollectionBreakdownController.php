@@ -11,6 +11,7 @@ use App\Models\journalEntry;
 use App\Models\OtherPayment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CollectionBreakdownController extends Controller
 {
@@ -27,25 +28,26 @@ class CollectionBreakdownController extends Controller
     }
     public function store(CreateOrUpdateCollectionRequest $request)
     {
-
-
         $attributes = $request->validated();
         $collection_ao = collect($attributes["account_officer_collections"])->map(function ($value) {
             $value["grp"] = CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER;
             return $value;
         })->values();
         try {
+            DB::beginTransaction();
             $collection = CollectionBreakdown::create($attributes);
             $attributes['other_payment']['collection_id'] = $collection->collection_id;
             $collection->other_payment()->create($attributes['other_payment']);
             $collection->account_officer_collections()->createMany($collection_ao);
             foreach ($attributes['branch_collections'] as $bc) {
                 $collection->branch_collections()->create([
-                    "total_amount" => $bc["total"],
+                    "total_amount" => $bc["total_amount"],
                     "branch_id" => $bc["branch"]["branch_id"],
                 ]);
             }
+            DB::commit();
         } catch (\Exception $exception) {
+            DB::rollBack();
             return new JsonResponse(["message" => $exception->getMessage()]);
         }
         return new JsonResponse(["message" => "Collection successfully saved."]);

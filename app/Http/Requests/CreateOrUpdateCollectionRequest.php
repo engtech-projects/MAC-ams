@@ -40,7 +40,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             'transaction_date' => [
                 'required',
                 'date',
-                Rule::unique('collection_breakdown', 'transaction_date')->where('branch_id', $this->branch_id)->ignore($this->collection_id,'collection_id'),
+                Rule::unique('collection_breakdown', 'transaction_date')->where('branch_id', $this->branch_id)->ignore($this->collection_id, 'collection_id'),
             ],
             "branch_id" => 'required|numeric',
             "total" => 'numeric',
@@ -60,6 +60,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
     }
     protected function prepareForValidation()
     {
+        $this->merge(['status' => 'unposted']);
         $this->merge(['flag' => CollectionBreakdown::COLLECTION_FLAG]);
         if (Auth::user()->can('manager')) {
             $this->merge(['branch_id' => $this->input('branch_id')]);
