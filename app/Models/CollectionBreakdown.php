@@ -48,24 +48,24 @@ class CollectionBreakdown extends Model
     public function branch_collections()
     {
 
-        return $this->hasMany(BranchCollection::class,'collection_id');
+        return $this->hasMany(BranchCollection::class, 'collection_id');
     }
 
     public function other_payment()
     {
-        return $this->belongsTo(OtherPayment::class,'collection_id','collection_id');
+        return $this->belongsTo(OtherPayment::class, 'collection_id', 'collection_id');
     }
 
 
     public static function getCollectionById($id)
     {
-        $collection = CollectionBreakdown::with(['account_officer_collections','branch_collections.branch','other_payment'])->where('collection_id', $id)->first();
+        $collection = CollectionBreakdown::with(['account_officer_collections', 'branch_collections.branch', 'other_payment'])->where('collection_id', $id)->first();
         return $collection;
     }
     public static function getCollectionBreakdownByBranch($transactionDate, $branchId = null)
     {
         // Fetch collection breakdowns
-        $collections = CollectionBreakdown::when($branchId, function ($query, $branchId) {
+        $collections = CollectionBreakdown::with(['account_officer_collections', 'branch_collections.branch', 'other_payment'])->when($branchId, function ($query, $branchId) {
             $query->where('branch_id', $branchId);
         })
             ->when($transactionDate, function ($query, $transactionDate) {

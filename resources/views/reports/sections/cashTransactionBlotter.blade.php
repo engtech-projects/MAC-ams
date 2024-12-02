@@ -512,21 +512,6 @@
 
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-if="!isEdit"
-                                                        v-for="branchCollection in collectionBreakdown.branch_collections">
-                                                        <td>
-                                                            <h6 v-text="branchCollection.branch_id"></h6>
-                                                        </td>
-                                                        <td>
-                                                            <h6 v-text="branchCollection.total_amount"></h6>
-
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr style="background-color: #f1f1f1;" id="branch-collection-row">
-                                                        <!-- <td colspan="7">&nbsp;</td> -->
-                                                    </tr>
-
                                                     <tr>
                                                         <td>
                                                             <p>CASH</p>
@@ -651,8 +636,8 @@
                                     <button class="mr-1 btn btn-xs btn-default">
                                         <i class="fas fa-xs fa-print print-cashblotter"></i>
                                     </button>
-                                    <button class="mr-1 btn btn-xs btn-primary" @click='processPost(d)'>Post</button>
-                                    <button class="mr-1 btn btn-xs btn-warning" @click='processUnpost(d)'>Unpost</button>
+                                    <button class="mr-1 btn btn-xs btn-primary" @click="updateStatus(d,'posted')">Post</button>
+                                    <button class="mr-1 btn btn-xs btn-warning" @click="updateStatus(d,'unposted')">Unpost</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -940,6 +925,7 @@
                     branch_id: null,
                 },
                 isEdit: false,
+                isUpdateStatus:false,
                 result: {},
                 entries: {
                     begining_balance: {},
@@ -1175,11 +1161,7 @@
 
 
                 },
-                processPost: function(collectionBreakdown) {
-                    this.collectionBreakdown = collectionBreakdown;
-                    this.collectionBreakdown.status = "Posted";
-                    this.updateCollectionBreakdown();
-                },
+
                 calculateCashCount: function(collectionBreakdown) {
                     this.total.p_1000 = collectionBreakdown.p_1000 * 1000;
                     this.total.p_500 = collectionBreakdown.p_500 * 500
@@ -1230,17 +1212,22 @@
                     this.isEdit = false;
 
                 },
-                processUnpost: function(collectionBreakdown) {
+                updateStatus:function(collectionBreakdown,status) {
+                    console.log(collectionBreakdown);
                     this.collectionBreakdown = collectionBreakdown;
-                    this.collectionBreakdown.status = "Unposted";
+                    this.collectionBreakdown.status = status
                     this.updateCollectionBreakdown();
                 },
+
                 updateCollectionBreakdown: function() {
-                    var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
-                        .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.total = totalCash
-                    this.collectionBreakdown.other_payment.cash_amount = totalCash
+                    console.log(this.isUpdateStatus);
+                    if(!this.isUpdateStatus) {
+                        var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
+                            .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.total = totalCash
+                        this.collectionBreakdown.other_payment.cash_amount = totalCash
+                    }
 
                     axios.post('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
@@ -1250,6 +1237,7 @@
                             }
                         }).then(response => {
                         toastr.success(response.data.message);
+                        this.isUpdateStatus = false;
                         window.location.reload();
                     }).catch(err => {
                         console.error(err);
@@ -1428,7 +1416,7 @@
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
                     if (otherPayment) {
-                        total += parseFloat(otherPayment.cash_amount) +
+                        total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
                             parseFloat(otherPayment.check_amount) +
                             parseFloat(otherPayment.memo_amount) +
                             parseFloat(otherPayment.pos_amount) +
