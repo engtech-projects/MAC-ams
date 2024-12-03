@@ -87,10 +87,10 @@
 				success: function(data) {
 					if(data == 'create'){
 						$('#searchBarUser').val();
-						toastr.success('Successfully Create');
+						toastr.success('Successfully Created');
 						reset();
 					}else if(data == 'update'){
-						toastr.success('Successfully Update');
+						toastr.success('Successfully Updated');
 						reset();
 					}
 				},
@@ -112,9 +112,9 @@
 					if(result.status != "book_code_duplicate")
 					{
 						if(result.status == 'create'){
-							toastr.success('Successfully Create');
+							toastr.success('Successfully Created');
 						}else if(result.status == 'update'){
-							toastr.success('Successfully Update');
+							toastr.success('Successfully Updated');
 							journalBookTbl.row($("button[value ='"+result.book_id+"']").parents('tr'))
 								.remove().draw();
 								$('#bookId').val('');
@@ -124,7 +124,7 @@
 						if(result.status == 'create' || result.status == 'update')
 						{
 							journalBookTbl.row.add([
-								$('#book_code').val(),
+								`<strong>${$('#book_code').val()}</strong>`,
 								$('#book_name').val(),
 								$('#book_src').val(),
 								$('#book_ref').val(),
@@ -140,9 +140,10 @@
 								</div>`
 							]).draw().node();
 							$('#bookJournalForm')[0].reset();
+							$('#submitBtn').val('SAVE');
 						}
 					}else{
-						toastr.error('Code Duplicate Can\'t Create or Update');
+						toastr.error('Book code already exists. Please enter a unique code.');
 					}
 					
 				},
@@ -161,9 +162,9 @@
 				dataType: "json",
 				success: function(result) {
 					if(result.status == 'create'){
-						toastr.success('Successfully Create');
+						toastr.success('Successfully Created');
 					}else if(result.status == 'update'){
-						toastr.success('Successfully Update');
+						toastr.success('Successfully Updated');
 						categoryFileTbl.row($("button[value ='"+result.sub_cat_id+"']").parents('tr'))
 							.remove().draw();
 							$('#catId').val('');
@@ -263,6 +264,8 @@
 							$('#book_ref').val(data[0].book_ref);
 							$('#book_flag').val(data[0].book_flag);
 							$('#book_head').val(data[0].book_head);
+
+							$('#submitBtn').val('UPDATE');
 						}
 					},
 					error: function() {
@@ -271,7 +274,7 @@
 				});
 			}else if(type === 'delete')
 			{
-				if (confirm("Are You Sure want to delete this Book ?")) {
+				if (confirm("Are you sure you want to delete this Journal Book?")) {
 					$.ajax({
 						type: "GET",
 						url: "{{ route('SystemSetupController.journalBook.deleteBook')}}",
@@ -279,7 +282,7 @@
 						dataType: "json",
 						success: function(data) {
 							if(data){
-								toastr.success('Book Successfully Remove');
+								toastr.success('Book Successfully Removed');
 								journalBookTbl.row($("button[value ='"+id+"']").parents('tr'))
 								.remove().draw();
 							}

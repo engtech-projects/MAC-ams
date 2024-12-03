@@ -239,9 +239,8 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
                                         <div class="input-group">
-                                            <select name="subsidiary_id"
-                                                class="select2 form-control form-control-sm" style="width:100%"
-                                                id="subsidiaryDD">
+                                            <select name="subsidiary_id" class="select2 form-control form-control-sm"
+                                                style="width:100%" id="subsidiaryDD">
                                                 @foreach ($subsidiaryData as $subdata)
                                                     <option value="{{ $subdata->sub_id }}">
                                                         {{ $subdata->sub_code }} - {{ $subdata->sub_name }}
@@ -259,12 +258,9 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="account">Account</label>
                                         <div class="input-group">
-                                            <select
-                                                name="account_id"
-                                                class="select2 form-control form-control-sm"
-                                                id="subsidiaryFilterAccountTitle"
-                                                style="width: 100% !important;"
-                                                >
+                                            <select name="account_id" class="select2 form-control form-control-sm"
+                                                id="subsidiaryFilterAccountTitle" {{--          v-model="filter.account_id" --}}
+                                                style="width: 100% !important;">
                                                 <option value="all">All Accounts</option>
                                                 @foreach ($accounts as $account)
                                                     @if ($account->type == 'L' || $account->type == 'R')
@@ -281,18 +277,19 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                            v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal" for="date_from">From</label>
-                                    <div class="input-group">
-                                        <input v-model="filter.from" type="date" v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'"
+                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                <div class="box">
+                                    <div class="form-group">
+                                        <label class="label-normal" for="date_from">From</label>
+                                        <div class="input-group">
+                                            <input v-model="filter.from" type="date"
+                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'"
                                                 class=" form-control form-control-sm rounded-0" name="from"
-                                            id="sub_date" required>
+                                                id="sub_date" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
                             <div class="col-md-2 col-xs-12"
                                 v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
@@ -467,7 +464,7 @@
                                             <th class="text-right"></th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            <tr v-if="subsidiaryAll.length == 0">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
@@ -478,16 +475,24 @@
                                                 <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
                                             </tr> --}}
-                                            <tr v-for="(ps,i) in subledger"
+                                            <tr v-for="(ps,i) in subsidiaryLedger"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
-                                                <td v-if="i<=8" v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                <td v-if="i<=8" v-for="p,i in ps"
+                                                    :class="rowStyleSubsidiaryListing(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[2]"> <!-- Check if journal_no exists -->
-                                                    <button v-if="ps[2]" :value="`${ps[9]}`" class="btn btn-flat btn-sm JnalView bg-gradient-success">
+                                                    <button v-if="ps[2]" :value="`${ps[9]}`"
+                                                        class="btn btn-flat btn-sm JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
+                                                    @if(Gate::allows('manager'))
+                                                    <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                        class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
+                                                        <i class="fa fa-pen text-white"></i> Edit
+                                                    </button>
+                                                    @endif
                                                 </td>
 
                                             </tr>
@@ -522,7 +527,8 @@
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[9]"> <!-- Check if journal_no exists -->
-                                                    <button v-if="ps[9]" :value="`${ps[9]}`" class="btn btn-flat btn-xs JnalView bg-gradient-success">
+                                                    <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                        class="btn btn-flat btn-xs JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
                                                 </td>
@@ -606,7 +612,7 @@
                     <!-- /.Table -->
                 </div>
             </div>
-                        <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
+            <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
@@ -625,7 +631,8 @@
                                         </div>
 
                                         <div class="col-md-4 frm-header">
-                                            <label class="label-bold label-sty" for="date">Journal Reference No</label>
+                                            <label class="label-bold label-sty" for="date">Journal Reference
+                                                No</label>
                                             <div class="input-group">
                                                 <label class="label-bold" id="voucher_ref_no"></label>
                                             </div>
@@ -637,7 +644,8 @@
                                                 <div class="form-group">
                                                     <label class="label-bold label-sty" for="branch_id">Branch</label>
                                                     <div class="input-group">
-                                                        <label class="label-normal text-bold" id="vjournal_branch"></label>
+                                                        <label class="label-normal text-bold"
+                                                            id="vjournal_branch"></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -773,7 +781,238 @@
                                     <div class="col-md-12" style="height:20px;"></div>
 
 
+                                </div>
+                            </div>
+                            <!-- Button trigger modal -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div class="col-md-12">
+                                    <form id="journalEntryFormEdit" method="POST">
+                                        @csrf
+                                        <input type="hidden" class="form-control form-control-sm rounded-0"
+                                            name="edit_journal_id" id="edit_journal_id" placeholder="">
+                                        <div class="row">
+                                            <div class="col-md-8 frm-header">
+                                                <h4><b>Journal Entry (Edit)</b></h4>
+                                            </div>
+                                            <div class="col-md-4 frm-header">
+                                                <label class="label-normal" for="date">Journal Date</label>
+                                                <div class="input-group">
+                                                    <input type="date" class="form-control form-control-sm rounded-0"
+                                                        name="edit_journal_date" id="edit_journal_date"
+                                                        placeholder="Journal Date" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_branch_id">Branch</label>
+                                                        <div class="input-group">
+                                                            <select name="edit_branch_id"
+                                                                class="select2 form-control form-control-sm"
+                                                                id="edit_branch_id" required>
+                                                                <option value="" disabled>-Select Branch-
+                                                                </option>
+                                                                <option value="1">Butuan City Branch</option>
+                                                                <option value="2">Nasipit Branch</option>
+                                                                <option value="3">Gingoog Branch</option>
+                                                                <option value="4">Head Office</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="">Book Reference</label>
+                                                        <div class="input-group">
+
+                                                            <select required name="edit_book_id"
+                                                                class="select2 form-control form-control-sm"
+                                                                id="edit_book_id"
+                                                                style="width: 150px;">
+                                                                <option id="edit_book_id" value="" disabled>
+                                                                </option>
+                                                                @foreach ($journalBooks as $journalBook)
+                                                                    <option value="{{ $journalBook->book_id }}"
+                                                                        _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
+                                                                        book-src="{{ $journalBook->book_src }}">
+                                                                        {{ $journalBook->book_code }} -
+                                                                        {{ $journalBook->book_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="">Reference No.</label>
+                                                        <div class="input-group">
+                                                            <input type="hidden" name="edit_journal_no"
+                                                                id="edit_journal_no">
+                                                            <label class="label-normal" id="edit_LrefNo"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_source">Source</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_source" id="edit_source" placeholder="Source"
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_cheque_no">Cheque No</label>
+                                                        <div class="input-group">
+                                                            <input type="Text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_cheque_no" id="edit_cheque_no"
+                                                                placeholder="Cheque No">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_cheque_date">Cheque
+                                                            Date</label>
+                                                        <div class="input-group">
+                                                            <input type="date"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_cheque_date" id="edit_cheque_date"
+                                                                placeholder="Cheque Date">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_status">Status</label>
+                                                        <div class="input-group">
+                                                            <select name="edit_status" class="form-control form-control-sm" id="edit_status" required>
+                                                                <option value="unposted">Unposted</option>
+                                                                <option value="posted" selected>Posted</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_amount">Amount</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_amount" id="edit_amount" step="any"
+                                                                placeholder="Amount" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_payee">Payee</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_payee" id="edit_payee" placeholder="Payee">
+                                                                
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-xs-12">
+                                                <div class="box">
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_remarks">Remarks (<font
+                                                                style="color:red;">Separate with double colon (::) for the
+                                                                next
+                                                                remarks</font>)</label>
+                                                        <div class="input-group">
+                                                            <input type="text"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                name="edit_remarks" id="edit_remarks"
+                                                                placeholder="Remarks" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button id="edit_btn_submit" style="display:none;"> UPDATE</button>
+                                    </form>
+                                </div>
+                                <div class="co-md-12" style="height:10px"></div>
+                                <div class="col-md-12">
+                                    <div class="col-md-12 text-right">
+                                        <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item">
+                                            <i class="fa fa-plus"></i>Add Details </button>
                                     </div>
+                                    <div class="co-md-12" style="height:10px;"></div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm text-center"
+                                                id="tbl-create-journal-container" style="table-layout: fixed;">
+                                                <thead>
+                                                    <tr class="text-center">
+                                                        <th style="width: 10%;">Account #</th>
+                                                        <th style="width: 30%;">Account Name</th>
+                                                        <th style="width: 15%;">Debit</th>
+                                                        <th style="width: 15%;">Credit</th>
+                                                        <th style="width: 30%;">S/L</th>
+                                                        <th style="width: 5%;">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbl-create-edit-container">
+
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="text-center">
+                                                        <th></th>
+                                                        <th>TOTAL</th>
+                                                        <th width="150">₱<span id="edit_total_debit">0.00</span></th>
+                                                        <th width="150">₱<span id="edit_total_credit">0.00</span></th>
+                                                        <th></th>
+                                                        <th class="text-right" width="50"></th>
+                                                    </tr>
+                                                    <tr class="text-center">
+                                                        <th></th>
+                                                        <th>BALANCE</th>
+                                                        <th>₱<span id="edit_balance_debit">0.00</span></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <th class="text-right" width="50"></th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 text-right">
+                                    <button class="btn btn-flat btn-sm bg-gradient-success"
+                                        onclick="$('#edit_btn_submit').click()"> UPDATE JOURNAL</button>
                                 </div>
                                 <!-- Button trigger modal -->
                             </div>
@@ -783,12 +1022,14 @@
             </div>
         </div>
         </div>
+        </div>
     </section>
     <!-- /.content -->
     <script>
         new Vue({
             el: '#app',
             data: {
+                balance: '',
                 reportType: '',
                 filter: {
                     subsidiary_id: '',
@@ -818,17 +1059,11 @@
                 },
 
                 submitForm: function() {
-                    if (this.reportType == 'subsidiary_all_account' || this.reportType == 'subsidiary_per_account') {
-                        this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
-                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
-                        this.fetchSubAll();
-                    } else if (this.reportType == 'income_minus_expense') {
+                    this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
+                    this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                    if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();
-                    } else if (this.reportType == 'subsidiary-ledger-listing-report') {
-                        this.fetchSubAll();
-                    } else if (this.reportType == 'subsidiary-ledger-summary-report') {
-                          this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
-                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                    } else {
                         this.fetchSubAll();
                     }
 
@@ -845,10 +1080,12 @@
                             if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
                                 'subsidiary-ledger-summary-report') {
                                 this.subsidiaryAll = response.data.data;
+                                this.balance = response.data.balance;
 
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
-                                this.balance = response.data.data[1];
+                                let bal = response.data.data[1];
+                                this.balance = parseFloat(bal);
                             }
 
 
@@ -873,7 +1110,6 @@
                         })
                         .then(response => {
                             this.incomeExpense = response.data.data;
-                            // console.log(response.data.data);
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -968,7 +1204,6 @@
                                 rows.push(['', data.remarks ? data.remarks.toUpperCase() : ''])
                             }
                         }
-                        console.log(entry.data)
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
@@ -978,6 +1213,66 @@
                     }
                     return rows;
 
+                },
+                subsidiaryLedger: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                    }
+
+                    let currentBalance = this.balance;;
+
+                    for (var i in data) {
+                        var result = data[i];
+                        rows.push([result.branch_name, '', '', '', '', '', '', '', '']);
+                        rows.push([result.account_name, '', '', '', '', '', '', '', this.formatCurrency(this
+                            .balance)]);
+
+                        var entries = result.entries;
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+                        var netMovement = 0;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var count = entries.length;
+                            const credit = parseFloat(entry.credit.replace(/,/g, ""));
+                            const debit = parseFloat(entry.debit.replace(/,/g, ""));
+                            totalCredit += credit
+                            totalDebit += debit;
+                            currentBalance += debit;
+                            currentBalance -= credit;
+
+                            var arr = [
+                                entry.journal_date,
+                                entry.journal_no,
+                                entry.sub_name,
+                                entry.source,
+                                entry.cheque_date,
+                                entry.cheque_no,
+                                entry.debit,
+                                entry.credit,
+                                this.formatCurrency(currentBalance),
+                                entry.journal_id
+                            ];
+
+                            rows.push(arr);
+
+                        }
+
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(
+                            arr[8].replace(/,/g, "")))])
+                    }
+
+
+                    return rows;
                 },
                 subledger: function() {
                     var data = {};
@@ -1022,19 +1317,19 @@
                                     details.balance ? this.formatCurrency(details.balance) : '0.00',
                                     details.journal_id
                                 ];
-                                if(count == parseInt(h)+1) {
+                                if (count == parseInt(h) + 1) {
                                     netMovement = details.balance;
                                 }
                                 rows.push(arr);
                             }
-                            console.log(detailsList)
                         }
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(netMovement)])
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
+                            netMovement)])
                     }
 
 
@@ -1046,7 +1341,7 @@
 
                     if (this.subsidiaryAll) {
                         data = this.subsidiaryAll;
-                }
+                    }
                     for (var i in data) {
                         var subsidiary = data[i];
 
@@ -1095,9 +1390,9 @@
                     }
 
 
-                        var grandTotal = 0;
-                        var grandTotalCredit = 0;
-                        var grandTotalDebit = 0;
+                    var grandTotal = 0;
+                    var grandTotalCredit = 0;
+                    var grandTotalDebit = 0;
                     for (var i in data) {
                         var subsidiary = data[i];
 
@@ -1311,4 +1606,5 @@
 @section('footer-scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
     @include('scripts.reports.reports')
+    @include('scripts.journal.journal')
 @endsection

@@ -12,10 +12,10 @@ class SubsidiaryCategory extends Model
     protected $table = 'subsidiary_category';
     protected $primaryKey = 'sub_cat_id';
 
-    const CAT_INSUR = 15;
-    const CAT_SUPPLY = 47;
-    const CAT_AMORT = 45;
-    const CAT_DEPRE = 44;
+    const INSUR = 'INSUR';
+    const SUPPLY = 'SUPLY';
+    const AMORT = 'AMORT';
+    const DEPRE = 'DEPRE';
 
     protected $fillable = [
         'sub_cat_name',
@@ -28,7 +28,8 @@ class SubsidiaryCategory extends Model
         return $this->belongsToMany(Accounts::class, 'subsidiary_category_accounts', 'sub_cat_id', 'account_id');
     }
 
-    public function subsidiaries() {
-        return $this->hasMany(Subsidiary::class,'sub_cat_id');
+    public function subsidiaries()
+    {
+        return $this->hasMany(Subsidiary::class, 'sub_cat_id');
     }
 }

@@ -96,18 +96,18 @@ class SystemSetupController extends MainController
     {
         $book_id = $request->bookId;
         $journ = new JournalBook;
-        $status = $journ->checkBookCode($request->book_code, $request->book_id);
+        $status = $journ->checkBookCode($request->book_code, $book_id);
 
 
-        if ($book_id == '') {
+        if (empty($book_id)) {
             if (!$status) {
                 $book = new JournalBook;
                 $book->book_code = $request->book_code;
                 $book->book_name = $request->book_name;
                 $book->book_src = $request->book_src;
                 $book->book_ref = $request->book_ref;
-                $book->book_flag = $request->book_head;
-                $book->book_head = $request->book_flag;
+                $book->book_head = $request->book_head;
+                $book->book_flag = $request->book_flag;
                 $book->save();
                 return json_encode(['status' => 'create', 'book_id' => $book->book_id]);
             } else {
@@ -120,8 +120,8 @@ class SystemSetupController extends MainController
                 $book->book_name = $request->book_name;
                 $book->book_src = $request->book_src;
                 $book->book_ref = $request->book_ref;
-                $book->book_flag = $request->book_head;
-                $book->book_head = $request->book_flag;
+                $book->book_head = $request->book_head;
+                $book->book_flag = $request->book_flag;
                 $book->save();
                 return json_encode(['status' => 'update', 'book_id' => $book->book_id]);
             } else {

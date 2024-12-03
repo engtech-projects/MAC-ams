@@ -138,7 +138,7 @@ Route::get('sales/invoice', [SalesController::class, 'invoice'])->name('sales.in
 //reports
 Route::get('reports/subsidiaryledger', [ReportsController::class, 'subsidiaryLedger'])->name('reports.subsidiaryledger');
 
-Route::post('reports/subsidiary-ledger', [ReportsController::class, 'subsidiaryLedgerReports'])->name('reports.subsidiary-ledger');
+Route::match(['get', 'post'], 'reports/subsidiary-ledger', [ReportsController::class, 'subsidiaryLedgerReports'])->name('reports.subsidiary-ledger');
 Route::get('reports/subsidiary-ledger-listing', [ReportsController::class, 'subsidiaryListing'])->name('reports.subsidiary.listing');
 
 
@@ -163,6 +163,8 @@ Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTra
 Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'searchCashTransactionBlotter'])->name('reports.searchTransactionBlotter');
 Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
 
+Route::post('collection-breakdown/{collectionBreakdown}', [ReportsController::class, 'updateCollectionBreakdown']);
+
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
 Route::post('reports/bank-reconciliation', [ReportsController::class, 'bankReconciliation'])->name('reports.bank.reconciliation');
@@ -179,12 +181,13 @@ Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsContro
 Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter');
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
 /* Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses'); */
-Route::post('reports/monthly-depreciation-report', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthly-depreciation');
+Route::match(['get', 'post'], 'reports/monthly-depreciation-report', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthly-depreciation');
 Route::post('reports/monthly-depreciation-report-search', [ReportsController::class, 'search'])->name('reports.monthly-depreciation-report-search');
 Route::post('reports/monthly-depreciation-report-post', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
 /* Route::delete('reports/subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('reports.delete-subsidiary'); */
 Route::post('subsidiary', [SubsidiaryController::class, 'store'])->name('subsidiary.store');
 Route::delete('subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('subsidiary.delete');
+Route::post('subsidiary/{subsidiary}', [SubsidiaryController::class, 'update'])->name('subsidiary.update');
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');
 Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'])->name('payment.customer');

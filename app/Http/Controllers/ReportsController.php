@@ -174,7 +174,7 @@ class ReportsController extends MainController
                 $value->sub_no_depre = 1;
             }
             $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
-            
+
             $salvage = round(($value->sub_amount * $value->sub_salvage) / 100, 2);
             $monthlyAmort = round(($value->sub_amount - $salvage) / $value->sub_no_depre, 2);
             // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
@@ -189,11 +189,11 @@ class ReportsController extends MainController
             $value['salvage'] = $salvage;
             $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
             $value['unexpensed'] = round($rem * $monthlyAmort, 2);
-           
+
 
             $value['rem'] = $rem;
-            
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort,2) : 0;
+
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -216,7 +216,7 @@ class ReportsController extends MainController
     public function monthlyDepreciation(Request $request)
     {
 
-        $branches = Branch::all();
+        /* $branches = Branch::all();
         $date = $request->sub_date;
 
 
@@ -247,6 +247,59 @@ class ReportsController extends MainController
             $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
             $value['inv'] = 0;
             $value['no'] = 0;
+            return $value;
+        })->groupBy('description')->map(function ($value) {
+            return $value->groupBy('branch');
+        });
+
+        $data = [
+            'data' => $data,
+            'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
+            'as_of' => $date,
+            'branches' => $branches,
+            'title' => 'MAC-AMS | Monthly Depreciation',
+            'type' => $type
+        ]; */
+
+        $branches = Branch::all();
+        $date = $request->to;
+
+        $subsidiary = new Subsidiary();
+
+        $type = 'listing';
+        if ($request->type == 'summary') {
+            $type = $request->type;
+        }
+
+        $result = $subsidiary->getDepreciation($request->sub_cat_id, null, $date);
+        $data = $result->map(function ($value) {
+            if ($value->sub_no_depre == 0) {
+                $value->sub_no_depre = 1;
+            }
+            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
+
+            $salvage = round(($value->sub_amount * $value->sub_salvage) / 100, 2);
+            $monthlyAmort = round(($value->sub_amount - $salvage) / $value->sub_no_depre, 2);
+            // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
+            $rem = round($value->sub_no_depre - $value->sub_no_amort, 2);
+            $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
+            $value['branch_code'] = $branch->branch_code;
+            $value['branch_id'] = $branch->branch_id;
+            $value['description'] = $value->subsidiary_category->description;
+            $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
+            $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
+            $value['monthly_amort'] = $monthlyAmort;
+            $value['salvage'] = $salvage;
+            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
+            $value['unexpensed'] = round($rem * $monthlyAmort, 2);
+
+
+            $value['rem'] = $rem;
+
+            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
+            $value['inv'] = 0;
+            $value['no'] = 0;
+
             return $value;
         })->groupBy('description')->map(function ($value) {
             return $value->groupBy('branch');
@@ -306,6 +359,7 @@ class ReportsController extends MainController
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
             'amount' => $request->total['total_monthly_amort'],
         ]);
+
 
         $accounts = $subsidiary->accounts;
 
@@ -385,12 +439,15 @@ class ReportsController extends MainController
     public function subsidiaryLedgerReports(Request $request)
     {
         $filter = $request->input();
+        $filter['type'] = $filter['type'] ?? 'subsidiary-ledger';
         $data = [
             'subsidiaryData' => Subsidiary::get(),
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'MAC-AMS | Subsidiary Ledger',
-            'subsidiaryLedgerList' => '',
+            'journalBooks' => JournalBook::get(),
             'accounts' => Accounts::all(),
+            'chartOfAccount' => Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get(),
         ];
         switch ($filter["type"]) {
             case 'subsidiary-ledger-listing-report':
@@ -418,10 +475,10 @@ class ReportsController extends MainController
                 $glAccounts = new Accounts();
                 $transactions = $glAccounts->ledger([$filter['from'], $filter['to']], $filter['account_id'], $filter['subsidiary_id']);
 
-                $ss = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
+                //$transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
                 $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
 
-                return response()->json(['data' => [$ss, $balance]]);
+                return response()->json(['data' => [$transactions, $balance]]);
 
 
             case 'subsidiary-ledger':
@@ -550,8 +607,11 @@ class ReportsController extends MainController
             'chartOfAccount' => $accounts,
             'requests' => ['from' => $from, 'to' => $to, 'account_id' => $account_id],
             'fiscalYear' => $accounting,
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
+            'journalBooks' => JournalBook::get(),
             'transactions' => $transactions,
         ];
+
 
         return view('reports.sections.generalledger', $data);
     }
@@ -624,6 +684,18 @@ class ReportsController extends MainController
             'account_officers' => AccountOfficer::fetchAccountOfficer(),
         ];
         return view('reports.sections.cashTransactionBlotter', $data);
+    }
+
+    public function updateCollectionBreakdown(Request $request, CollectionBreakdown $collectionBreakdown)
+    {
+        try {
+            $collectionBreakdown->update($request->input());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
+        return response()->json(['message' => 'Successfully updated.']);
     }
 
     public function searchCashTransactionBlotter(Request $request)
@@ -973,7 +1045,7 @@ class ReportsController extends MainController
         $transactionDate = $request->input('transactionDate');
 
         // Fetch the latest collection breakdown for the specified branch
-        $latestCollection = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branch_id)
+        $latestCollection = CollectionBreakdown::getCollections($transactionDate, $branch_id)
             ->first();  // Fetch the first (latest) record for the branch
 
         // Return the result as JSON

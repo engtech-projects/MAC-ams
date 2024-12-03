@@ -9,6 +9,7 @@ use Session;
 use DB;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use App\Models\AccountType;
 use App\Models\Accounts;
 use App\Models\Supplier;
@@ -71,6 +72,16 @@ class JournalController extends MainController
 
     public function saveJournalEntry(journalEntry $journalEntry, Request $request)
     {
+        // Define custom validation messages
+        $customMessages = [
+            'journal_entry.journal_no.unique' => 'The reference number has already been taken.',
+        ];
+
+        // Validate the request data
+        $request->validate([
+            'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
+        ], $customMessages);
+
         try {
             $journalEntry = $journalEntry->createJournalEntry($request->input());
         } catch (Exception $e) {
@@ -99,28 +110,55 @@ class JournalController extends MainController
     }
     public function JournalEntryEdit(Request $request)
     {
-        $journal = JournalEntry::find($request->journal_entry['edit_journal_id']);
+        // Define custom validation messages
+        $customMessages = [
+            'journal_entry.edit_journal_no.unique' => 'The reference number has already been taken.',
+            'journal_entry.edit_journal_no.required' => 'The reference number is required.',
+        ];
 
-        DB::transaction(function () use ($request, $journal) {
-            $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
-            $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
-            $journal->journal_no = $request->journal_entry['edit_journal_no'];
-            $journal->journal_date = $request->journal_entry['edit_journal_date'];
-            $journal->branch_id = $request->journal_entry['edit_branch_id'];
-            $journal->book_id = $request->journal_entry['edit_book_id'];
-            $journal->source = $request->journal_entry['edit_source'];
-            $journal->cheque_no = $request->journal_entry['edit_cheque_no'];
-            $journal->cheque_date = $request->journal_entry['edit_cheque_date'];
-            $journal->amount = $amount;
-            $journal->status = $request->journal_entry['edit_status'];
-            $journal->payee = $request->journal_entry['edit_payee'];
-            $journal->remarks = $request->journal_entry['edit_remarks'];
-            $journal->save();
-            $journal->details()->delete();
-            $journal->details()->createMany($request->details);
-        });
-        $journal->refresh();
-        return json_encode(['message' => 'Journal Entry updated successfully.', 'id' => $journal->journal_id]);
+        // Validate the request data
+        $request->validate([
+            'journal_entry.edit_journal_no' => [
+                'required',
+                Rule::unique('journal_entry', 'journal_no')->ignore($request->journal_entry['edit_journal_id'], 'journal_id')
+            ],
+        ], $customMessages);
+
+        // Retrieve the existing journal entry
+        $journalEntry = JournalEntry::findOrFail($request->journal_entry['edit_journal_id']);
+
+        try {
+            // Update the journal entry with the provided data
+            DB::transaction(function () use ($request, $journalEntry) {
+                $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
+                $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
+
+                $journalEntry->update([
+                    'journal_no' => $request->journal_entry['edit_journal_no'],
+                    'journal_date' => $request->journal_entry['edit_journal_date'],
+                    'branch_id' => $request->journal_entry['edit_branch_id'],
+                    'book_id' => $request->journal_entry['edit_book_id'],
+                    'source' => $request->journal_entry['edit_source'],
+                    'cheque_no' => $request->journal_entry['edit_cheque_no'],
+                    'cheque_date' => $request->journal_entry['edit_cheque_date'],
+                    'amount' => $amount,
+                    'status' => $request->journal_entry['edit_status'],
+                    'payee' => $request->journal_entry['edit_payee'],
+                    'remarks' => $request->journal_entry['edit_remarks'],
+                ]);
+
+                // Update journal entry details
+                $journalEntry->details()->delete();
+                $journalEntry->details()->createMany($request->details);
+            });
+
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+
+        return response()->json([
+            'message' => 'Journal Entry updated successfully.',
+        ], 200);
     }
 
     public function JournalEntryPostUnpost(Request $request)

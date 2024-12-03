@@ -71,13 +71,15 @@ class JournalBook extends Model
         return $query->whereIn('book_id', self::CASH_PAID_BOOK);
     }
 
-    public function checkBookCode($code, $id)
+    public function checkBookCode($code, $id = null)
     {
-        $data = $this->where('book_code', $code)->Where('book_id', $id)->get();
-        if (count($data) > 0) {
-            return true;
+        $query = $this->where('book_code', $code);
+        if($id){
+            $query->where('book_id', '!=', $id);
         }
-        return false;
+        $data = $query->get();
+        
+        return $data->isNotEmpty();
     }
 
     public function journalEntries()

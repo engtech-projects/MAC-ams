@@ -350,6 +350,10 @@
             allowClear: true,
         });
 
+        $('.select-accounts').select2({
+            placeholder: 'Select Account',
+            allowClear: true,
+        });
         $('.select-account').select2({
             placeholder: 'Select Account',
             allowClear: true,
@@ -410,6 +414,17 @@
             var balances = document.getElementById("balance_debit");
             var spanBal = balances.innerText;
 
+            // Check if LrefNo is null or empty after setting it
+            if ($('#LrefNo').text().trim() === '') { // Check if LrefNo is empty
+                $('#book_id').val('');
+                $('#book_id').select2({
+                    placeholder: 'Select',
+                    allowClear: true,
+                });
+                return alert('Error: No reference number generated. Please try again.');
+            } else {
+                console.log('LrefNo value set:', $('#LrefNo').text());
+            }
 
             if (parseFloat(spanBal) == 0) {
                 // alert("Debit and Credit equal")
@@ -487,8 +502,21 @@
                                     toastr.success(data.message);
                                     reload();
                                 },
-                                error: function(data) {
-                                    toastr.error('Error');
+                                error: function(jqXHR) {
+                                    // Check if it's a validation error
+                                    if (jqXHR.status === 422) {
+                                        $('#LrefNo').text('')
+                                        $('#book_id').val('');
+                                        $('#book_id').select2({
+                                            placeholder: 'Select',
+                                            allowClear: true,
+                                        });
+                                        const errors = jqXHR.responseJSON.errors;
+                                        // Display the validation error in an alert
+                                        alert(errors['journal_entry.journal_no'][0]);
+                                    } else {
+                                        toastr.error('Error');
+                                    }
                                 }
                             });
                         }
@@ -563,8 +591,7 @@
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find(
-                '.JnalEdit'); // Find the edit button within the same row
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
             var cancelButton = $(this).closest('tr').find(
                 '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
@@ -586,7 +613,7 @@
                             statusElement.html('<b>Cancelled</b>');
                             statusElement.removeClass('text-success').addClass('text-danger');
                             cancelButton.prop('disabled', true); // Disable the cancel button
-                            editButton.prop('disabled', false); // Disable the edit button
+                            //editButton.prop('disabled', false); // Disable the edit button
                             stStatusButton.removeClass('bg-gradient-danger').addClass(
                                 'bg-gradient-success');
                             stStatusButton.text('Post');
@@ -601,8 +628,7 @@
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find(
-                '.JnalEdit'); // Find the edit button within the same row
+            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
             var cancelButton = $(this).closest('tr').find(
                 '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this); // Store reference to the clicked button
@@ -632,13 +658,12 @@
                         toastr.success('Journal entry has been unposted');
                         statusElement.html('<b>Unposted</b>');
                         statusElement.removeClass('text-success').addClass('text-danger');
-                        stStatusButton.text(
-                            'Post'); // Change the text content of the clicked button
-                        stStatusButton.removeClass('bg-gradient-danger').addClass(
-                            'bg-gradient-success'); // Change button background color
+                        stStatusButton.text('Post'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
                         editButton.prop('disabled', false); // Enable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     }
+                    // $('#journalEntryDetails').DataTable().ajax.reload(null, false);
                 },
                 error: function(data) {
                     toastr.error('Error occurred');
@@ -650,23 +675,6 @@
             receivedPaymentVoucher();
         });
 
-        $(document).on('change', '#edit_book_id', function(e) {
-            var bookId = this.value
-            var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
-            url = url.replace(':journalBook', bookId);
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                type: "GET",
-                url: url,
-                dataType: "json",
-                success: function(response) {
-                    $('#edit_journal_no').val(response.data);
-                    $('#edit_LrefNo').text(response.data);
-                }
-            })
-        })
 
         $(document).on('change', '#book_id', function(e) {
             var bookId = this.value
@@ -705,7 +713,7 @@
                 });
                 return alert('Error: No reference number generated. Please try again.');
             } else {
-                console.log('LrefNo value set:', $('#LrefNo').text());
+                console.log('LrefNo value set:', $('#edit_LrefNo').text());
             }
 
             $.each($('#tbl-create-edit-container').find('tr'), function(k, v) {
@@ -778,8 +786,23 @@
                                     saveJournalEntryDetails(data.id, 'update')
                                     reload();
                                 },
-                                error: function(data) {
-                                    toastr.error('Error');
+                                error: function(jqXHR) {
+                                    if (jqXHR.status === 422) {
+                                        $('#edit_LrefNo').text('')
+                                        $('#edit_book_id').val('');
+                                        $('#edit_book_id').select2({
+                                            placeholder: 'Select',
+                                            allowClear: true,
+                                        });
+                                        const errors = jqXHR.responseJSON.errors;
+                                        if (errors['journal_entry.edit_journal_no']) {
+                                            alert(errors['journal_entry.edit_journal_no'][0]);
+                                        } else {
+                                            alert('An unknown validation error occurred.');
+                                        }
+                                    } else {
+                                        toastr.error('Error');
+                                    }
                                 }
                             });
                         }
@@ -793,13 +816,42 @@
             } else {
                 alert("Unable to save, debit and credit is not equal")
             }
-
         });
+
+        let currentJournalNo = null;
+        let isInitialSetup = false;
+
+        $(document).on('change', '#edit_book_id', function(e) {
+            if (isInitialSetup) return;
+            var bookId = this.value
+            var url = '{{ route('journal.generateJournalNumber', ':journalBook') }}';
+            url = url.replace(':journalBook', bookId);
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "GET",
+                url: url,
+                dataType: "json",
+                success: function(response) {
+                    const [currentBook, currentDigit] = currentJournalNo.split('-');
+                    const [newBook, newDigit] = response.data.split('-');
+                    if (currentBook === newBook) {
+                        $('#edit_journal_no').val(currentJournalNo);
+                        $('#edit_LrefNo').text(currentJournalNo);
+                    } else {
+                        $('#edit_journal_no').val(response.data);
+                        $('#edit_LrefNo').text(response.data);
+                    }
+                }
+            })
+        })
 
         $(document).on('click', '.JnalEdit', function(e) {
             $('#journalModalEdit').modal('show');
             var id = $(this).attr('value');
             $('#tbl-create-edit-container').html('');
+            isInitialSetup = true;
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -817,6 +869,7 @@
                             var total_debit = 0;
                             var total_credit = 0;
                             var balance = 0;
+                            currentJournalNo = v.journal_no;
                             $('#edit_LrefNo').text(v.journal_no)
                             $('#edit_journal_no').val(v.journal_no)
                             $('#edit_journal_id').val(v.journal_id);
@@ -921,15 +974,20 @@
                             getBalance()
                             checkTotalAndAmount()
                         })
+                        isInitialSetup = false;
                         recordsEditable()
                         $('.select-account').select2({
-                            placeholder: 'Select',
+                            placeholder: 'Select Account',
                             allowClear: true,
                         });
 
                         $('.select-subsidiary').select2({
                             placeholder: 'Select S/L',
                             allowClear: true,
+                        });
+
+                        $('#journalModalEdit').on('hidden.bs.modal', function () {
+                            location.reload(); // Reload the page
                         });
                     }
                 },
@@ -1089,8 +1147,7 @@
                                         .addClass(
                                             'bg-gradient-danger'
                                         ); // Change button background color
-                                    editButton.prop('disabled',
-                                        true); // Disable the edit button
+                                    //editButton.prop('disabled',true); // Disable the edit button
                                     cancelButton.prop('disabled',
                                         false); // Enable the cancel button
                                 }
@@ -1127,6 +1184,17 @@
                 }
             });
         })
+
+        $('#s_status').change(function () {
+            if (["unposted", "cancelled"].includes($('#s_status').val())) {
+                $('#s_from').val('').prop('required', false);
+                $('#s_to').val('').prop('required', false);
+            } else {
+                var currentDate = new Date().toISOString().split('T')[0];
+                $('#s_from').val(currentDate).prop('required', true);
+                $('#s_to').val(currentDate).prop('required', true);
+            }
+        });
 
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
@@ -1216,15 +1284,6 @@
 
         $(document).on('click', '#add_item', function(e) {
             e.preventDefault();
-            // $(document).on('DOMSubtreeModified', 'a[fieldName="subsidiary_id"]', function() {
-            //     if ($('#subsidiary_id').val() == '') {
-            //         alert("Subsidiary is required.")
-            //     }
-            //     if ($('#account_id').val() == null) {
-            //         alert("Account is required.")
-            //     }
-
-            // })
             var content = `<tr class='editable-table-row'>
 			<td class="acctnu" value="">
 				<a href="#" class="editable-row-item journal_details_account_no"></a>
@@ -1281,7 +1340,7 @@
             recordsEditable()
 
             $('.select-account').select2({
-                placeholder: 'Select',
+                placeholder: 'Select Account',
                 allowClear: true,
             });
 

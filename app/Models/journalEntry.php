@@ -76,9 +76,10 @@ class journalEntry extends Model
         }
         if ($from != '' && $to != '') {
             $query->whereBetween('journal_date', [$from, $to]);
-            if ($journal_no != '') {
-                $query->orWhere('journal_no', $journal_no);
-            }
+        } elseif ($from != '') {
+            $query->where('journal_date', '>=', $from);
+        } elseif ($to != '') {
+            $query->where('journal_date', '<=', $to);
         }
         if ($book_id != '') {
             $query->where('book_id', $book_id);
@@ -205,11 +206,11 @@ class journalEntry extends Model
                 'details' => function ($query) {
                     $query->select('journal_id', 'account_id', 'journal_details_debit AS cash_in', 'journal_details_credit AS cash_out')
                         ->whereIn('account_id', [
-                            Accounts::CASH_IN_BANK_BDO_ACC,
-                            Accounts::CASH_IN_BANK_MYB_ACC,
+                            // Accounts::CASH_IN_BANK_BDO_ACC,
+                            // Accounts::CASH_IN_BANK_MYB_ACC,
                             Accounts::CASH_ON_HAND_ACC,
-                            Accounts::PAYABLE_CHECK_ACC,
-                            Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC,
+                            // Accounts::PAYABLE_CHECK_ACC,
+                            // Accounts::DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC,
                         ]);
                 }
             ])

@@ -36,9 +36,5 @@ class CashBlotter extends Model
             ->where('cash_blotter.cashblotter_id', '=', $cashblotter_id)
             ->first();
         return $branch;
-
     }
-
-
-
 }
