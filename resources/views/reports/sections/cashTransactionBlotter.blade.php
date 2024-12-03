@@ -476,7 +476,7 @@
                                                             <h6 v-text="branchCollection.branch.branch_name"></h6>
                                                         </td>
                                                         <td>
-                                                            <h6 class="text-right" v-text="branchCollection.total"></h6>
+                                                            <h6 class="text-right" v-text="branchCollection.total_amount"></h6>
 
                                                         </td>
                                                         <td class="text-center">

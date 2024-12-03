@@ -35,7 +35,7 @@ class CollectionBreakdown extends Model
         "transaction_date",
         "branch_id",
         "total",
-        'status',
+        "status",
         "flag"
     ];
 

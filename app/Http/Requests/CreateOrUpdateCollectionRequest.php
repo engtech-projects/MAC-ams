@@ -48,6 +48,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "branch_collections" => "required|array",
             "other_payment" => "required",
             "other_payment" => "required",
+            "status" => 'string',
         ];
     }
     public function messages()
