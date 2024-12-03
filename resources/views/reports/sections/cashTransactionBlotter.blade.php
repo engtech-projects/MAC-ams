@@ -1079,6 +1079,7 @@
                         .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
                         .replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1393,12 +1394,12 @@
                         parseFloat(this.collectionBreakdown.p_500 * 500) +
                         parseFloat(this.collectionBreakdown.p_200 * 200) +
                         parseFloat(this.collectionBreakdown.p_100 * 100) +
-                        parseFloat(this.collectionBreakdown.p_50 * 100) +
+                        parseFloat(this.collectionBreakdown.p_50 * 50) +
                         parseFloat(this.collectionBreakdown.p_20 * 20) +
                         parseFloat(this.collectionBreakdown.p_10 * 10) +
                         parseFloat(this.collectionBreakdown.p_5 * 5) +
                         parseFloat(this.collectionBreakdown.p_1 * 1) +
-                        parseFloat(this.collectionBreakdown.c_25 * 25);
+                        parseFloat(this.collectionBreakdown.c_25 * 0.25);
                     return this.amountConverter(total);
                 },
                 aoCollectionTotal: function() {
