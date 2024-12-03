@@ -26,6 +26,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
             "p_1000" => 'required|numeric',
             "p_500" => 'required|numeric',
@@ -61,7 +62,9 @@ class CreateOrUpdateCollectionRequest extends FormRequest
     }
     protected function prepareForValidation()
     {
-        $this->merge(['status' => 'unposted']);
+        if(!$this->route('collectionBreakdown')) {
+            $this->merge(['status' => 'unposted']);
+        }
         $this->merge(['flag' => CollectionBreakdown::COLLECTION_FLAG]);
         if (Auth::user()->can('manager')) {
             $this->merge(['branch_id' => $this->input('branch_id')]);

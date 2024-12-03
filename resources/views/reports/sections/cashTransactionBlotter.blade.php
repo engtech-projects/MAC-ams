@@ -1214,7 +1214,7 @@
 
                 },
                 updateStatus:function(collectionBreakdown,status) {
-                    console.log(collectionBreakdown);
+                    console.log(status);
                     this.collectionBreakdown = collectionBreakdown;
                     this.collectionBreakdown.status = status
                     this.updateCollectionBreakdown();
@@ -1239,7 +1239,7 @@
                         }).then(response => {
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
-                        window.location.reload();
+                        /* window.location.reload(); */
                     }).catch(err => {
                         console.error(err);
                     })
