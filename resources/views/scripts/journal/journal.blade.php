@@ -784,7 +784,8 @@
                                 success: function(data) {
                                     toastr.success(data.message);
                                     saveJournalEntryDetails(data.id, 'update')
-                                    reload();
+                                    $('#journalModalEdit').modal('hide');
+                                    $('#SearchJournalForm').submit();
                                 },
                                 error: function(jqXHR) {
                                     if (jqXHR.status === 422) {
@@ -984,10 +985,6 @@
                         $('.select-subsidiary').select2({
                             placeholder: 'Select S/L',
                             allowClear: true,
-                        });
-
-                        $('#journalModalEdit').on('hidden.bs.modal', function () {
-                            location.reload(); // Reload the page
                         });
                     }
                 },
@@ -1253,7 +1250,44 @@
                         $('#journalEntryDetailsContent').append(journalListTable)
                     });
 
-                    $('#journalEntryDetails').DataTable();
+                     @if (Gate::allows('manager'))
+                     $('#journalEntryDetails').DataTable({
+                            columnDefs: [
+                                { width: '10%', targets: 0 },  // Set width for column 0
+                                { width: '10%', targets: 1 },  // Set width for column 1
+                                { width: '10%', targets: 2 },   // Set width for column 2
+                                { width: '10%', targets: 3 },   // Set width for column 2
+                                { width: '10%', targets: 4 },   // Set width for column 2
+                                { width: '10%', targets: 5 },   // Set width for column 2
+                                { width: '10%', targets: 6 },   // Set width for column 2
+                                { width: '7%', targets: 7 },   // Set width for column 2
+                                { width: '13%', targets: 8 },   // Set width for column 2
+
+                            ],
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            tableLayout: 'fixed'  // Ensure fixed layout to maintain column width
+                        });
+                    @else
+                      $('#journalEntryDetails').DataTable({
+                            columnDefs: [
+                                { width: '10%', targets: 0 },  // Set width for column 0
+                                { width: '10%', targets: 1 },  // Set width for column 1
+                                { width: '10%', targets: 2 },   // Set width for column 2
+                                { width: '10%', targets: 3 },   // Set width for column 2
+                                { width: '10%', targets: 4 },   // Set width for column 2
+                                { width: '10%', targets: 5 },   // Set width for column 2
+                                { width: '7%', targets: 6 },   // Set width for column 2
+                                { width: '13%', targets: 7 },   // Set width for column 2
+
+                            ],
+                            paging: true,
+                            searching: true,
+                            ordering: true,
+                            tableLayout: 'fixed'  // Ensure fixed layout to maintain column width
+                        });
+                    @endif
                 },
                 error: function(data) {
                     toastr.error('Error');
