@@ -309,7 +309,7 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_date">As of:</label>
                                         <div class="input-group">
-                                            <input v-model="filter.to" type="date"
+                                            <input v-model="filter.asof" type="date"
                                                 class="form-control form-control-sm rounded-0" name="to"
                                                 id="sub_date" required>
                                         </div>
@@ -1034,8 +1034,9 @@
                 filter: {
                     subsidiary_id: '',
                     branch_id: '',
-                    from: '2024-01-01',
-                    to: '2024-06-28',
+                    from: '',
+                    to: '',
+                    asof:new Date().toISOString().split('T')[0],
                     account_id: 'all',
                     type: ''
                 },
@@ -1048,6 +1049,15 @@
                 url: "{{ route('reports.subsidiary-ledger') }}",
             },
             methods: {
+
+                getCurrentDate() {
+                    const date = new Date();
+                    const year = date.getFullYear();
+                    const month = ("0" + (date.getMonth() + 1)).slice(-2); // Ensure month is two digits
+                    const day = ("0" + date.getDate()).slice(-2); // Ensure day is two digits
+                    return `${year}-${month}-${day}`; // Return in 'yyyy-mm-dd' format
+                },
+
                 submitForm: function() {
                     this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
                         this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()

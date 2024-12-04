@@ -652,17 +652,18 @@
                             'Unpost'); // Change the text content of the clicked button
                         stStatusButton.removeClass('bg-gradient-success').addClass(
                             'bg-gradient-danger'); // Change button background color
-                        //editButton.prop('disabled', true); // Disable the edit button
-                        //cancelButton.prop('disabled', false); // Enable the cancel button
+                        editButton.prop('disabled', true); // Disable the edit button
+                        cancelButton.prop('disabled', false); // Enable the cancel button
                     } else if (data.message == 'unposted') {
                         toastr.success('Journal entry has been unposted');
                         statusElement.html('<b>Unposted</b>');
                         statusElement.removeClass('text-success').addClass('text-danger');
                         stStatusButton.text('Post'); // Change the text content of the clicked button
                         stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
-                        //editButton.prop('disabled', false); // Enable the edit button
-                        //cancelButton.prop('disabled', false); // Enable the cancel button
+                        editButton.prop('disabled', false); // Enable the edit button
+                        cancelButton.prop('disabled', false); // Enable the cancel button
                     }
+                    // $('#journalEntryDetails').DataTable().ajax.reload(null, false);
                 },
                 error: function(data) {
                     toastr.error('Error occurred');
@@ -983,6 +984,10 @@
                         $('.select-subsidiary').select2({
                             placeholder: 'Select S/L',
                             allowClear: true,
+                        });
+
+                        $('#journalModalEdit').on('hidden.bs.modal', function () {
+                            location.reload(); // Reload the page
                         });
                     }
                 },
