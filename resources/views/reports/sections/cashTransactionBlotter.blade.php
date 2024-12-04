@@ -834,6 +834,10 @@
                                                         <td>memo</td>
                                                         <td v-text="otherPayment.memo_amount"></td>
                                                     </tr>
+                                                    <tr>
+                                                        <td>interbranch</td>
+                                                        <td v-text="otherPayment.interbranch_amount"></td>
+                                                    </tr>
 
 
                                                     <tr
@@ -1227,7 +1231,7 @@
                         this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
                             .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                         this.collectionBreakdown.total = totalCash
-                        this.collectionBreakdown.other_payment.cash_amount = totalCash
+                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     }
 
                     axios.post('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
@@ -1379,7 +1383,7 @@
                             pos_amount: this.formatCurrency(otherPayment.pos_amount),
                             interbranch_amount: this.formatCurrency(otherPayment.interbranch_amount),
                             total: this.formatCurrency(otherPayment.cash_amount + otherPayment.check_amount +
-                                otherPayment.memo_amount + otherPayment.pos_amount)
+                                otherPayment.memo_amount + otherPayment.pos_amount+otherPayment.interbranch_amount),
                         };
                     }
 
