@@ -9,12 +9,16 @@ class BranchCollection extends Model
 {
     use HasFactory;
 
-    protected $table = "branch_collection";
-    protected $primaryKey = "branchcollection_id";
+    protected $table = "branch_collections";
 
     protected $fillable = [
+        'collection_id',
         'total_amount',
-        'cashblotter_id',
-        'sub_id'
+        'branch_id'
     ];
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id', 'branch_id');
+    }
 }

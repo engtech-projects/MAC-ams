@@ -15,6 +15,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\CollectionBreakdownController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\SubsidiaryController;
 use App\Http\Controllers\JournalBookController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\SystemSetupController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\GeneralSettingsController;
 use App\Http\Controllers\ProductsServicesController;
+use App\Models\CollectionBreakdown;
 
 /*
 |--------------------------------------------------------------------------
@@ -163,13 +165,18 @@ Route::get('reports/cashTransactionBlotter', [ReportsController::class, 'cashTra
 Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'searchCashTransactionBlotter'])->name('reports.searchTransactionBlotter');
 Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
 
-Route::post('collection-breakdown/{collectionBreakdown}', [ReportsController::class, 'updateCollectionBreakdown']);
+Route::resource('collection-breakdown', CollectionBreakdownController::class);
+Route::delete('branch-collection/{branchCollection}', [CollectionBreakdownController::class, 'deleteBranchCollection']);
+Route::delete('account-officer-collection/{accountOfficerCollection}', [CollectionBreakdownController::class, 'deleteAccountOffficerCollection']);
+
+Route::post('collection-breakdown/{collectionBreakdown}', [CollectionBreakdownController::class, 'update']);
 
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
 Route::post('reports/bank-reconciliation', [ReportsController::class, 'bankReconciliation'])->name('reports.bank.reconciliation');
 
-Route::post('collections', [CollectionController::class, 'store'])->name('create.collection.breakdown');
+Route::post('collections', [CollectionBreakdownController::class, 'store'])->name('create.collection.breakdown');
+Route::post('collections/{collection}', [CollectionBreakdownController::class, 'update'])->name('update.collection.breakdown');
 Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
 
 Route::get('reports/cashTransactionBlotter/cashblotter', [ReportsController::class, 'cashBlotterIndex'])->name('reports.cashblotter');
