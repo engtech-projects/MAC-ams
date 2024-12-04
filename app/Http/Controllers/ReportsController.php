@@ -442,7 +442,7 @@ class ReportsController extends MainController
         $filter['type'] = $filter['type'] ?? 'subsidiary-ledger';
         $data = [
             'subsidiaryData' => Subsidiary::get(),
-            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_code', 'ASC')->get(),
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->get(),
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'MAC-AMS | Subsidiary Ledger',
             'journalBooks' => JournalBook::get(),
