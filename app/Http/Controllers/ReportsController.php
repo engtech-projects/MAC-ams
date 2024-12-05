@@ -426,11 +426,10 @@ class ReportsController extends MainController
 
         foreach ($sub_ids as $sub_id) {
             $subsidiary = Subsidiary::find($sub_id);
-            $sub_no_amort = $subsidiary->sub_no_amort + 1;
-            $subsidiary->sub_no_amort = $sub_no_amort;
-            $subsidiary->update([
-                'sub_no_amort' => $sub_no_amort
-            ]);
+            if ($subsidiary->sub_no_depre > $subsidiary->sub_no_amort) {
+                $subsidiary->sub_no_amort = $subsidiary->sub_no_amort + 1;
+            }
+            $subsidiary->update();
         }
     }
 
