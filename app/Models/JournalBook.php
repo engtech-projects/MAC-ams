@@ -49,7 +49,9 @@ class JournalBook extends Model
 
     public function generateJournalNumber()
     {
-        $entry = $this->journalEntries()->whereNotNull('journal_no')->orderBy('journal_id', 'desc')->first();
+        // $maxJournalNo = journalEntry::where('book_id', $this->book_id)->addSelect(DB::raw("MAX(CAST(SUBSTRING(journal_no, LOCATE('-', journal_no)+1) AS UNSIGNED)) as max_journal_no"))->first()->max_journal_no;
+        // return $this->book_code . '-' . sprintf('%006s', $maxJournalNo + 1);
+        $entry = $this->journalEntries()->whereNotNull('journal_no')->orderBy('journal_no', 'desc')->first();
 
         if ($entry) {
             $series = explode('-', $entry->journal_no);

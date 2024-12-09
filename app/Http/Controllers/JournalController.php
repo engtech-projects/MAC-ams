@@ -73,14 +73,14 @@ class JournalController extends MainController
     public function saveJournalEntry(journalEntry $journalEntry, Request $request)
     {
         // Define custom validation messages
-        $customMessages = [
-            'journal_entry.journal_no.unique' => 'The reference number has already been taken.',
-        ];
+        // $customMessages = [
+        //     'journal_entry.journal_no.unique' => 'The reference number has already been taken.',
+        // ];
 
-        // Validate the request data
-        $request->validate([
-            'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
-        ], $customMessages);
+        // // Validate the request data
+        // $request->validate([
+        //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
+        // ], $customMessages);
 
         try {
             $journalEntry = $journalEntry->createJournalEntry($request->input());
