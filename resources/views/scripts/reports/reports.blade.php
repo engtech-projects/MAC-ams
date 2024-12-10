@@ -743,7 +743,7 @@
             var five = Number($('#fivetotalamount').text().replace(/[^0-9\.-]+/g,""))
             var one = Number($('#onetotalamount').text().replace(/[^0-9\.-]+/g,""))
             var centavo = parseFloat(Number($('#centavototalamount').text().replace(/[^0-9\.-]+/g,"")))
-            var total = onethousand+fivehundred+twohundred+onehundred+fifty+twenty+ten+five+one+centavo
+        var total = onethousand+fivehundred+twohundred+onehundred+fifty+twenty+ten+five+one+centavo
             $('#totalcashcount').text(amountConverter(total))
         }
 

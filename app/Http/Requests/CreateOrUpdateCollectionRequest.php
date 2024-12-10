@@ -45,10 +45,9 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             ],
             "branch_id" => 'required|numeric',
             "total" => 'numeric',
-            "account_officer_collections" => "required|array",
-            "branch_collections" => "required|array",
-            "other_payment" => "required",
-            "other_payment" => "required",
+            "account_officer_collections" => "array",
+            "branch_collections" => "array",
+            "other_payment" => "nullable",
             "status" => 'string',
         ];
     }
