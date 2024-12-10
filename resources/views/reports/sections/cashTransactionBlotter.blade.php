@@ -122,7 +122,7 @@
 
 
             <div class="modal fade bd-example-modal-lg" id="Mymodal" tabindex="-1" role="dialog"
-                aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
 
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
