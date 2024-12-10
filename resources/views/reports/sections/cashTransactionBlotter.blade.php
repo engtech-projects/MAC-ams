@@ -476,7 +476,8 @@
                                                             <h6 v-text="branchCollection.branch.branch_name"></h6>
                                                         </td>
                                                         <td>
-                                                            <h6 class="text-right" v-text="branchCollection.total_amount"></h6>
+                                                            <h6 class="text-right" v-text="branchCollection.total_amount">
+                                                            </h6>
 
                                                         </td>
                                                         <td class="text-center">
@@ -577,73 +578,86 @@
 
                                             </table>
                                         </div>
-                                        <div class="col-md-12">
-                                            <div class="text-right">
-                                                <button type="button" v-text="isEdit ? 'Save' : 'Post'"
-                                                    @click="processCreateOrUpdate()" class="btn btn-success"
-                                                    style="margin-bottom: 20px;"></button>
-                                            </div>
+                                        <div class="text-right">
+
+                                            <button type="button"
+                                                @click="resetForm()" class="btn btn-warning"
+                                                style="margin-bottom: 20px;">
+                                                Cancel
+                                            </button>
+
+                                            <button type="button" v-text="isEdit ? 'Save' : 'Post'"
+                                                @click="processCreateOrUpdate()" class="btn btn-success"
+                                                style="margin-bottom: 20px;"></button>
                                         </div>
+
+
+
 
                                     </div>
                                 </div>
+
                             </div>
-
                         </div>
-
                     </div>
+
                 </div>
+
             </div>
+        </div>
+        </div>
 
 
-            <div class="row">
-                <div class="col-md-12 mt-5">
-                    <table id="cash-blotter-tbls" class="table table-sm table-bordered">
-                        <thead>
-                            <th>Branch</th>
-                            <th>Transaction Date</th>
-                            <th>Cash Ending Balance</th>
-                            <th>Total Branch Collection</th>
-                            <th>Total Missing Collect</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </thead>
-                        <tbody>
-                            <tr v-for="d in collectionsBreakdown">
-                                <td>@{{ getBranchName(d.branch_id) }}</td>
-                                <td>@{{ d.transaction_date }}</td>
-                                <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
-                                <td>@{{ formatCurrency(d.total) }}</td>
-                                <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
-                                <td>@{{ d.status }}</td>
-                                <td>
-                                    <button @click="showCashBlotter(d.collection_id, d.branch_id)"
-                                        class="mr-1 btn btn-xs btn-success">
-                                        <i class="fas fa-xs fa-eye" data-toggle="modal"
-                                            data-target="#cashBlotterPreviewModal"></i>
-                                    </button>
-                                    <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
-                                        <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
-                                    </button>
-                                    <button @click="deleteCollectionBreakdown(d.collection_id, d.branch_id)"
-                                        class="mr-1 btn btn-xs btn-danger">
-                                        <i class="fas fa-xs fa-trash"></i>
-                                    </button>
+        <div class="row">
+            <div class="col-md-12 mt-5">
+                <table id="cash-blotter-tbls" class="table table-sm table-bordered">
+                    <thead>
+                        <th>Branch</th>
+                        <th>Transaction Date</th>
+                        <th>Cash Ending Balance</th>
+                        <th>Total Branch Collection</th>
+                        <th>Total Missing Collect</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <tr v-for="d in collectionsBreakdown">
+                            <td>@{{ getBranchName(d.branch_id) }}</td>
+                            <td>@{{ d.transaction_date }}</td>
+                            <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
+                            <td>@{{ formatCurrency(d.total) }}</td>
+                            <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
+                            <td>@{{ d.status }}</td>
+                            <td>
+                                <button @click="showCashBlotter(d.collection_id, d.branch_id)"
+                                    class="mr-1 btn btn-xs btn-success">
+                                    <i class="fas fa-xs fa-eye" data-toggle="modal"
+                                        data-target="#cashBlotterPreviewModal"></i>
+                                </button>
+                                <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
+                                    <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
+                                </button>
+                                <button @click="deleteCollectionBreakdown(d.collection_id, d.branch_id)"
+                                    class="mr-1 btn btn-xs btn-danger">
+                                    <i class="fas fa-xs fa-trash"></i>
+                                </button>
 
-                                    <button class="mr-1 btn btn-xs btn-primary">
-                                        <i class="fas fa-xs fa-download download-cashblotter"></i>
-                                    </button>
-                                    <button class="mr-1 btn btn-xs btn-default">
-                                        <i class="fas fa-xs fa-print print-cashblotter"></i>
-                                    </button>
-                                    <button class="mr-1 btn btn-xs btn-primary" @click="updateStatus(d,'posted')">Post</button>
-                                    <button class="mr-1 btn btn-xs btn-warning" @click="updateStatus(d,'unposted')">Unpost</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                <button class="mr-1 btn btn-xs btn-primary">
+                                    <i class="fas fa-xs fa-download download-cashblotter"></i>
+                                </button>
+                                <button class="mr-1 btn btn-xs btn-default">
+                                    <i class="fas fa-xs fa-print print-cashblotter"></i>
+                                </button>
+                                <button class="mr-1 btn btn-xs btn-primary"
+                                    @click="updateStatus(d,'posted')">Post</button>
+                                <button class="mr-1 btn btn-xs btn-warning"
+                                    @click="updateStatus(d,'unposted')">Unpost</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
         </div>
         <div class="modal fade" id="cashBlotterPreviewModal" tabindex="2" role="dialog"
             aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
@@ -929,7 +943,7 @@
                     branch_id: null,
                 },
                 isEdit: false,
-                isUpdateStatus:false,
+                isUpdateStatus: false,
                 result: {},
                 entries: {
                     begining_balance: {},
@@ -1083,7 +1097,7 @@
                         .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
                         .replace(/[^0-9\.-]+/g, ""));
-                        this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1091,6 +1105,7 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        window.location.reload();
                     }).catch(err => {
                         toastr.error(err.data.message);
                     })
@@ -1217,7 +1232,7 @@
                     this.isEdit = false;
 
                 },
-                updateStatus:function(collectionBreakdown,status) {
+                updateStatus: function(collectionBreakdown, status) {
                     console.log(status);
                     this.collectionBreakdown = collectionBreakdown;
                     this.collectionBreakdown.status = status
@@ -1226,12 +1241,13 @@
 
                 updateCollectionBreakdown: function() {
                     console.log(this.isUpdateStatus);
-                    if(!this.isUpdateStatus) {
+                    if (!this.isUpdateStatus) {
                         var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                         this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
                             .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                         this.collectionBreakdown.total = totalCash
-                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
+                            .replace(/[^0-9\.-]+/g, ""));
                     }
 
                     axios.post('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
@@ -1383,7 +1399,8 @@
                             pos_amount: this.formatCurrency(otherPayment.pos_amount),
                             interbranch_amount: this.formatCurrency(otherPayment.interbranch_amount),
                             total: this.formatCurrency(otherPayment.cash_amount + otherPayment.check_amount +
-                                otherPayment.memo_amount + otherPayment.pos_amount+otherPayment.interbranch_amount),
+                                otherPayment.memo_amount + otherPayment.pos_amount + otherPayment
+                                .interbranch_amount),
                         };
                     }
 
