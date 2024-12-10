@@ -110,19 +110,19 @@ class JournalController extends MainController
     }
     public function JournalEntryEdit(Request $request)
     {
-        // Define custom validation messages
-        $customMessages = [
-            'journal_entry.edit_journal_no.unique' => 'The reference number has already been taken.',
-            'journal_entry.edit_journal_no.required' => 'The reference number is required.',
-        ];
+        // // Define custom validation messages
+        // $customMessages = [
+        //     'journal_entry.edit_journal_no.unique' => 'The reference number has already been taken.',
+        //     'journal_entry.edit_journal_no.required' => 'The reference number is required.',
+        // ];
 
-        // Validate the request data
-        $request->validate([
-            'journal_entry.edit_journal_no' => [
-                'required',
-                Rule::unique('journal_entry', 'journal_no')->ignore($request->journal_entry['edit_journal_id'], 'journal_id')
-            ],
-        ], $customMessages);
+        // // Validate the request data
+        // $request->validate([
+        //     'journal_entry.edit_journal_no' => [
+        //         'required',
+        //         Rule::unique('journal_entry', 'journal_no')->ignore($request->journal_entry['edit_journal_id'], 'journal_id')
+        //     ],
+        // ], $customMessages);
 
         // Retrieve the existing journal entry
         $journalEntry = JournalEntry::findOrFail($request->journal_entry['edit_journal_id']);
