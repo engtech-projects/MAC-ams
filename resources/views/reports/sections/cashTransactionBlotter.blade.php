@@ -1054,7 +1054,7 @@
                         this.updateCollectionBreakdown();
 
                     } else {
-                        this.createValidation()
+                        // this.createValidation()
                         if (this.isValid) {
                             this.createNewCollectionBreakdown();
 
