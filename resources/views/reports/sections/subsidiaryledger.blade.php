@@ -277,13 +277,13 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_from">From</label>
                                         <div class="input-group">
                                             <input v-model="filter.from" type="date"
-                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'"
+                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'"
                                                 class=" form-control form-control-sm rounded-0" name="from"
                                                 id="sub_date" required>
                                         </div>
@@ -292,7 +292,7 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_to">To</label>
@@ -487,11 +487,11 @@
                                                         class="btn btn-flat btn-sm JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
-                                                    @if(Gate::allows('manager'))
-                                                    <button v-if="ps[9]" :value="`${ps[9]}`"
-                                                        class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
-                                                        <i class="fa fa-pen text-white"></i> Edit
-                                                    </button>
+                                                    @if (Gate::allows('manager'))
+                                                        <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                            class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
+                                                            <i class="fa fa-pen text-white"></i> Edit
+                                                        </button>
                                                     @endif
                                                 </td>
 
@@ -551,12 +551,13 @@
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr
-                                                v-if="!processedIncomeExpense.income.length&&!processedIncomeExpense.expense.length">
+                                                v-if="processedIncomeExpense.income.length < 1&& processedIncomeExpense.expense.length < 1">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length">
+
+                                            <tr v-if="processedIncomeExpense.income.length > 0">
                                                 <td><b>REVENUE</b></td>
                                                 <td></td>
                                                 <td></td>
@@ -570,7 +571,8 @@
                                                 v-for="i in processedIncomeExpense.income">
                                                 <td v-for="j in i">@{{ j }}</td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length">
+                                            <tr>
+                                            <tr v-if="processedIncomeExpense.income.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -580,7 +582,7 @@
                                                 <td>0.00</td>
                                                 <td></td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length">
+                                            <tr v-if="processedIncomeExpense.income.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -590,7 +592,8 @@
                                                 <td></td>
                                                 <td>0.00</td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.expense.length">
+
+                                            <tr v-if="processedIncomeExpense.expense.length > 0">
                                                 <td><b>EXPENSE</b></td>
                                                 <td></td>
                                                 <td></td>
@@ -788,7 +791,8 @@
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit" aria-hidden="true">
+            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog"
+                aria-labelledby="journalModalEdit" aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-body">
@@ -837,8 +841,7 @@
 
                                                             <select required name="edit_book_id"
                                                                 class="select2 form-control form-control-sm"
-                                                                id="edit_book_id"
-                                                                style="width: 150px;">
+                                                                id="edit_book_id" style="width: 150px;">
                                                                 <option id="edit_book_id" value="" disabled>
                                                                 </option>
                                                                 @foreach ($journalBooks as $journalBook)
@@ -910,7 +913,9 @@
                                                     <div class="form-group">
                                                         <label class="label-normal" for="edit_status">Status</label>
                                                         <div class="input-group">
-                                                            <select name="edit_status" class="form-control form-control-sm" id="edit_status" required>
+                                                            <select name="edit_status"
+                                                                class="form-control form-control-sm" id="edit_status"
+                                                                required>
                                                                 <option value="unposted">Unposted</option>
                                                                 <option value="posted" selected>Posted</option>
                                                             </select>
@@ -1036,7 +1041,7 @@
                     branch_id: '',
                     from: '',
                     to: '',
-                    asof:new Date().toISOString().split('T')[0],
+                    asof: new Date().toISOString().split('T')[0],
                     account_id: 'all',
                     type: ''
                 },
@@ -1060,7 +1065,7 @@
 
                 submitForm: function() {
                     this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
-                        this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                    this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
                     if (this.reportType == 'income_minus_expense') {
                         this.fetchIncomeExpense();
                     } else {
@@ -1541,53 +1546,57 @@
                         income: [],
                         expense: []
                     }
-                    this.incomeExpense.income.forEach(income => {
-                        result.income.push([income.account_name, '', '', '', '', '', '', ''])
-                        var totalAmount = 0;
-                        income.entries.forEach(entry => {
-                            var row = [];
-                            var amount = entry.credit == 0 ? entry.debit : entry.credit;
-                            totalAmount += parseFloat(amount);
-                            row.push(entry.journal_date);
-                            row.push(entry.journal_no);
-                            row.push(entry.subsidiary_name);
-                            row.push(entry.source);
-                            row.push(entry.cheque_date);
-                            row.push(entry.cheque_no);
-                            row.push(this.formatCurrency(amount));
-                            row.push('0.00');
-                            result.income.push(row);
+                    if (this.incomeExpense.income) {
+                        this.incomeExpense.income.forEach(income => {
+                            result.income.push([income.account_name, '', '', '', '', '', '', ''])
+                            var totalAmount = 0;
+                            income.entries.forEach(entry => {
+                                var row = [];
+                                var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                totalAmount += parseFloat(amount);
+                                row.push(entry.journal_date);
+                                row.push(entry.journal_no);
+                                row.push(entry.subsidiary_name);
+                                row.push(entry.source);
+                                row.push(entry.cheque_date);
+                                row.push(entry.cheque_no);
+                                row.push(this.formatCurrency(amount));
+                                row.push('0.00');
+                                result.income.push(row);
+                            });
+                            if (income.entries.length) {
+                                result.income.push(['', '', '', '', '', '', this.formatCurrency(
+                                    totalAmount), ''])
+                                result.income.push(['', '', '', '', '', '', '', '0.00'])
+                            }
                         });
-                        if (income.entries.length) {
-                            result.income.push(['', '', '', '', '', '', this.formatCurrency(
-                                totalAmount), ''])
-                            result.income.push(['', '', '', '', '', '', '', '0.00'])
-                        }
-                    });
-                    this.incomeExpense.expense.forEach(expense => {
-                        result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
-                        var totalAmount = 0;
-                        expense.entries.forEach(entry => {
-                            var row = [];
-                            var amount = entry.credit == 0 ? entry.debit : entry.credit;
-                            totalAmount += parseFloat(amount);
-                            row.push(entry.journal_date);
-                            row.push(entry.journal_no);
-                            row.push(entry.subsidiary_name);
-                            row.push(entry.source);
-                            row.push(entry.cheque_date);
-                            row.push(entry.cheque_no);
-                            row.push(this.formatCurrency(amount));
-                            row.push('0.00');
-                            result.expense.push(row);
-                        });
-                        if (expense.entries.length) {
-                            result.expense.push(['', '', '', '', '', '', this.formatCurrency(
-                                totalAmount), ''])
-                            result.expense.push(['', '', '', '', '', '', '', '0.00'])
-                        }
+                    }
+                    if (this.incomeExpense.expense) {
+                        this.incomeExpense.expense.forEach(expense => {
+                            result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
+                            var totalAmount = 0;
+                            expense.entries.forEach(entry => {
+                                var row = [];
+                                var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                totalAmount += parseFloat(amount);
+                                row.push(entry.journal_date);
+                                row.push(entry.journal_no);
+                                row.push(entry.subsidiary_name);
+                                row.push(entry.source);
+                                row.push(entry.cheque_date);
+                                row.push(entry.cheque_no);
+                                row.push(this.formatCurrency(amount));
+                                row.push('0.00');
+                                result.expense.push(row);
+                            });
+                            if (expense.entries.length) {
+                                result.expense.push(['', '', '', '', '', '', this.formatCurrency(
+                                    totalAmount), ''])
+                                result.expense.push(['', '', '', '', '', '', '', '0.00'])
+                            }
 
-                    });
+                        });
+                    }
                     return result;
                 }
             },
