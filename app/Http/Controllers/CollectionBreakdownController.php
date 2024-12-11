@@ -33,7 +33,7 @@ class CollectionBreakdownController extends Controller
             $value["grp"] = CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER;
             return $value;
         })->values();
-        $unposted = CollectionBreakdown::where(['status' => CollectionBreakdown::UNPOSTED_STATUS, 'branch_id' => $attributes['branch_id']])->first();
+        $unposted = CollectionBreakdown::where(['status' => CollectionBreakdown::UNPOSTED_STATUS, 'branch_id' => $attributes['branch_id']])->orderBy('collection_id','DESC')->first();
         if ($unposted) {
             return new JsonResponse(["message" => "Failed to save transaction. There is transaction that need to post."], 400);
         } else {

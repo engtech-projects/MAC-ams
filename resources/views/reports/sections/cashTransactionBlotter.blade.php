@@ -586,10 +586,10 @@
                                         </div>
                                         <div class="text-right">
 
-                                            <button type="button" @click="resetForm()" class="btn btn-warning"
+    {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
                                                 style="margin-bottom: 20px;">
                                                 Cancel
-                                            </button>
+                                            </button> --}}
 
                                             <button type="button"
                                                 @click="processCreateOrUpdate()" class="btn btn-success"
@@ -1071,7 +1071,7 @@
                         this.updateCollectionBreakdown();
 
                     } else {
-                        // this.createValidation()
+                        this.createValidation()
                         if (this.isValid) {
                             this.createNewCollectionBreakdown();
 
@@ -1108,6 +1108,7 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        this.resetForm();
                     }).catch(err => {
                         toastr.error(err.response.data.message);
 
@@ -1204,6 +1205,7 @@
                 editCollectionBreakdown: function(collectionBreakdown) {
                     this.isEdit = true;
                     this.calculateCashCount(collectionBreakdown)
+                    console.log(collectionBreakdown);
                     this.branch = $('#branchID').find(':selected').val()
                     axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
                             headers: {
@@ -1243,7 +1245,6 @@
                 },
 
                 updateCollectionBreakdown: function() {
-                    console.log(this.isUpdateStatus);
                     if (!this.isUpdateStatus) {
                         var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                         this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
