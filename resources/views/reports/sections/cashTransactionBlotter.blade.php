@@ -125,8 +125,14 @@
                 aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
 
                 <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
 
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create Transaction</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
                         <div class="container">
                             <div class="row">
                                 <div class="col-md-12 frm-header" style="padding:10px;">
@@ -580,8 +586,7 @@
                                         </div>
                                         <div class="text-right">
 
-                                            <button type="button"
-                                                @click="resetForm()" class="btn btn-warning"
+                                            <button type="button" @click="resetForm()" class="btn btn-warning"
                                                 style="margin-bottom: 20px;">
                                                 Cancel
                                             </button>
@@ -604,60 +609,58 @@
                 </div>
 
             </div>
-        </div>
-        </div>
 
 
-        <div class="row">
-            <div class="col-md-12 mt-5">
-                <table id="cash-blotter-tbls" class="table table-sm table-bordered">
-                    <thead>
-                        <th>Branch</th>
-                        <th>Transaction Date</th>
-                        <th>Cash Ending Balance</th>
-                        <th>Total Branch Collection</th>
-                        <th>Total Missing Collect</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </thead>
-                    <tbody>
-                        <tr v-for="d in collectionsBreakdown">
-                            <td>@{{ getBranchName(d.branch_id) }}</td>
-                            <td>@{{ d.transaction_date }}</td>
-                            <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
-                            <td>@{{ formatCurrency(d.total) }}</td>
-                            <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
-                            <td>@{{ d.status }}</td>
-                            <td>
-                                <button @click="showCashBlotter(d.collection_id, d.branch_id)"
-                                    class="mr-1 btn btn-xs btn-success">
-                                    <i class="fas fa-xs fa-eye" data-toggle="modal"
-                                        data-target="#cashBlotterPreviewModal"></i>
-                                </button>
-                                <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
-                                    <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
-                                </button>
-                                <button @click="deleteCollectionBreakdown(d.collection_id, d.branch_id)"
-                                    class="mr-1 btn btn-xs btn-danger">
-                                    <i class="fas fa-xs fa-trash"></i>
-                                </button>
+            <div class="row">
+                <div class="col-md-12 mt-5">
+                    <table id="cash-blotter-tbls" class="table table-sm table-bordered">
+                        <thead>
+                            <th>Branch</th>
+                            <th>Transaction Date</th>
+                            <th>Cash Ending Balance</th>
+                            <th>Total Branch Collection</th>
+                            <th>Total Missing Collect</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="d in collectionsBreakdown">
+                                <td>@{{ getBranchName(d.branch_id) }}</td>
+                                <td>@{{ d.transaction_date }}</td>
+                                <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
+                                <td>@{{ formatCurrency(d.total) }}</td>
+                                <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
+                                <td>@{{ d.status }}</td>
+                                <td>
+                                    <button @click="showCashBlotter(d.collection_id, d.branch_id)"
+                                        class="mr-1 btn btn-xs btn-success">
+                                        <i class="fas fa-xs fa-eye" data-toggle="modal"
+                                            data-target="#cashBlotterPreviewModal"></i>
+                                    </button>
+                                    <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
+                                        <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
+                                    </button>
+                                    <button @click="deleteCollectionBreakdown(d.collection_id, d.branch_id)"
+                                        class="mr-1 btn btn-xs btn-danger">
+                                        <i class="fas fa-xs fa-trash"></i>
+                                    </button>
 
-                                <button class="mr-1 btn btn-xs btn-primary">
-                                    <i class="fas fa-xs fa-download download-cashblotter"></i>
-                                </button>
-                                <button class="mr-1 btn btn-xs btn-default">
-                                    <i class="fas fa-xs fa-print print-cashblotter"></i>
-                                </button>
-                                <button class="mr-1 btn btn-xs btn-primary"
-                                    @click="updateStatus(d,'posted')">Post</button>
-                                <button class="mr-1 btn btn-xs btn-warning"
-                                    @click="updateStatus(d,'unposted')">Unpost</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                    <button class="mr-1 btn btn-xs btn-primary">
+                                        <i class="fas fa-xs fa-download download-cashblotter"></i>
+                                    </button>
+                                    <button class="mr-1 btn btn-xs btn-default">
+                                        <i class="fas fa-xs fa-print print-cashblotter"></i>
+                                    </button>
+                                    <button class="mr-1 btn btn-xs btn-primary"
+                                        @click="updateStatus(d,'posted')">Post</button>
+                                    <button class="mr-1 btn btn-xs btn-warning"
+                                        @click="updateStatus(d,'unposted')">Unpost</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
         </div>
         <div class="modal fade" id="cashBlotterPreviewModal" tabindex="2" role="dialog"
             aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
