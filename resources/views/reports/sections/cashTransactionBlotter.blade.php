@@ -591,9 +591,9 @@
                                                 Cancel
                                             </button>
 
-                                            <button type="button" v-text="isEdit ? 'Save' : 'Post'"
+                                            <button type="button"
                                                 @click="processCreateOrUpdate()" class="btn btn-success"
-                                                style="margin-bottom: 20px;"></button>
+                                                style="margin-bottom: 20px;"> Save</button>
                                         </div>
 
 
