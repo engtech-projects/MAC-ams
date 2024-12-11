@@ -619,7 +619,7 @@
                             <th>Transaction Date</th>
                             <th>Cash Ending Balance</th>
                             <th>Total Branch Collection</th>
-                            <th>Total Missing Collect</th>
+                            <th> Difference (+/-) </th>
                             <th>Status</th>
                             <th>Action</th>
                         </thead>
@@ -1108,9 +1108,9 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        window.location.reload();
                     }).catch(err => {
-                        toastr.error(err.data.message);
+                        toastr.error(err.response.data.message);
+
                     })
                 },
                 removeBranchCollection: function(collection) {
