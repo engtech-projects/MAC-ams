@@ -534,7 +534,7 @@
                                                         </td>
                                                         <td class="text-right">
                                                             <input type="number"
-                                                                v-model="collectionBreakdown.other_payment.check_amount"
+                                                                :v-model="collectionBreakdown.other_payment?.check_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
                                                         </td>
@@ -546,7 +546,7 @@
                                                         </td>
                                                         <td class="text-right">
                                                             <input type="number"
-                                                                v-model="collectionBreakdown.other_payment.pos_amount"
+                                                                :v-model="collectionBreakdown.other_payment?.pos_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
 
@@ -560,7 +560,7 @@
                                                         </td>
                                                         <td class="text-right">
                                                             <input type="number"
-                                                                v-model="collectionBreakdown.other_payment.memo_amount"
+                                                                :v-model="collectionBreakdown.other_payment?.memo_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
                                                         </td>
@@ -586,14 +586,13 @@
                                         </div>
                                         <div class="text-right">
 
-    {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
+                                            {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
                                                 style="margin-bottom: 20px;">
                                                 Cancel
                                             </button> --}}
 
-                                            <button type="button"
-                                                @click="processCreateOrUpdate()" class="btn btn-success"
-                                                style="margin-bottom: 20px;"> Save</button>
+                                            <button type="button" @click="processCreateOrUpdate()"
+                                                class="btn btn-success" style="margin-bottom: 20px;"> Save</button>
                                         </div>
 
 
@@ -841,7 +840,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>check</td>
-                                                        <td v-text="otherPayment.check_amount"></td>
+                                                        <td v-text="otherPayment"></td>
                                                     </tr>
                                                     <tr>
                                                         <td>pos</td>
@@ -1205,16 +1204,25 @@
                 editCollectionBreakdown: function(collectionBreakdown) {
                     this.isEdit = true;
                     this.calculateCashCount(collectionBreakdown)
-                    console.log(collectionBreakdown);
+                    this.collectionBreakdown = collectionBreakdown;
                     this.branch = $('#branchID').find(':selected').val()
                     axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
                             }
-                        })
-                        .then(response => {
-                            this.collectionBreakdown = response.data.data.collections;
+                        }).then(response => {
+                            var cb = response.data.data.collections;
+                            if (!cb.other_payment) {
+                                cb.other_payment = {
+                                    cash_amount: 0,
+                                    check_amount: 0,
+                                    pos_amount: 0,
+                                    memo_amount: 0,
+                                    interbranch_amount: 0
+                                }
+                            }
+                            this.collectionBreakdown = cb;
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -1253,19 +1261,17 @@
                         this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
                             .replace(/[^0-9\.-]+/g, ""));
                     }
-
-                    axios.post('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
+                    axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
                             }
-                        }).then(response => {
+                    }).then(response => {
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
-                        /* window.location.reload(); */
                     }).catch(err => {
-                        console.error(err);
+                        toastr.error(err.response.data.message);
                     })
                 },
                 getBranchName(branchId) {
@@ -1453,12 +1459,15 @@
                 branchCollectionTotal: function() {
                     var branchCollection = this.collectionBreakdown.branch_collections;
                     var total = 0;
-                    if (branchCollection.length > 0) {
-                        for (var i in branchCollection) {
-                            total += parseFloat(branchCollection[i].total_amount);
+                    if (this.collectionBreakdown.other_payment) {
+                        if (branchCollection.length > 0) {
+                            for (var i in branchCollection) {
+                                total += parseFloat(branchCollection[i].total_amount);
+                            }
+
                         }
                     }
-                    this.collectionBreakdown.other_payment.interbranch_amount = total;
+
                     return this.amountConverter(total);
                 },
                 filteredCashBlotter: function() {
