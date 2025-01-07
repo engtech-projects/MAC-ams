@@ -33,29 +33,34 @@ class CollectionBreakdownController extends Controller
             $value["grp"] = CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER;
             return $value;
         })->values();
-        try {
-            DB::beginTransaction();
-            $collection = CollectionBreakdown::create($attributes);
-            $attributes['other_payment']['collection_id'] = $collection->collection_id;
-            $collection->other_payment()->create($attributes['other_payment']);
-            $collection->account_officer_collections()->createMany($collection_ao);
-            foreach ($attributes['branch_collections'] as $bc) {
-                $collection->branch_collections()->create([
-                    "total_amount" => $bc["total_amount"],
-                    "branch_id" => $bc["branch"]["branch_id"],
-                ]);
+        $unposted = CollectionBreakdown::where(['status' => CollectionBreakdown::UNPOSTED_STATUS, 'branch_id' => $attributes['branch_id']])->orderBy('collection_id', 'DESC')->first();
+        if ($unposted) {
+            return new JsonResponse(["message" => "Failed to save transaction. There is transaction that need to post."], 400);
+        } else {
+            try {
+                DB::beginTransaction();
+                $collection = CollectionBreakdown::create($attributes);
+                $attributes['other_payment']['collection_id'] = $collection->collection_id;
+                $collection->other_payment()->create($attributes['other_payment']);
+                $collection->account_officer_collections()->createMany($collection_ao);
+                foreach ($attributes['branch_collections'] as $bc) {
+                    $collection->branch_collections()->create([
+                        "total_amount" => $bc["total_amount"],
+                        "branch_id" => $bc["branch"]["branch_id"],
+                    ]);
+                }
+                DB::commit();
+            } catch (\Exception $exception) {
+                DB::rollBack();
+                return new JsonResponse(["message" => $exception->getMessage()]);
             }
-            DB::commit();
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return new JsonResponse(["message" => $exception->getMessage()]);
         }
+
         return new JsonResponse(["message" => "Collection successfully saved."]);
     }
     public function update(CreateOrUpdateCollectionRequest $request, CollectionBreakdown $collectionBreakdown)
     {
         $data = $request->validated();
-
         try {
             $collectionBreakdown->update($data);
             foreach ($data["account_officer_collections"] as $aco) {
@@ -80,30 +85,35 @@ class CollectionBreakdownController extends Controller
                 }
             }
             foreach ($data["branch_collections"] as $bc) {
-                if (isset($bc["id"])) {
-                    BranchCollection::find($bc["id"])->update([
-                        "total_amount" => $bc["total_amount"],
-                        "branch_id" => $bc["branch"]["branch_id"],
+                if ($bc) {
+                    if (isset($bc["id"])) {
+                        BranchCollection::find($bc["id"])->update([
+                            "total_amount" => $bc["total_amount"],
+                            "branch_id" => $bc["branch"]["branch_id"],
 
-                    ]);
-                } else {
-                    BranchCollection::create([
-                        "collection_id" => $collectionBreakdown->collection_id,
-                        "total_amount" => $bc["total_amount"],
-                        "branch_id" => $bc["branch"]["branch_id"],
-                    ]);
+                        ]);
+                    } else {
+                        BranchCollection::create([
+                            "collection_id" => $collectionBreakdown->collection_id,
+                            "total_amount" => $bc["total_amount"],
+                            "branch_id" => $bc["branch"]["branch_id"],
+                        ]);
+                    }
                 }
             }
             if (isset($data["other_payment"])) {
                 $op = $data["other_payment"];
-                OtherPayment::find($op["id"])->update([
-                    "cash_amount" => $op["cash_amount"],
-                    "check_amount" => $op["check_amount"],
-                    "memo_amount" => $op["memo_amount"],
-                    "pos_amount" => $op["pos_amount"],
-                    "interbranch_amount" => $op["interbranch_amount"],
-                    "collection_id" => $collectionBreakdown->collection_id,
-                ]);
+                if(isset($op['id'])) {
+                    OtherPayment::find($op["id"])->update([
+                        "cash_amount" => $op["cash_amount"],
+                        "check_amount" => $op["check_amount"],
+                        "memo_amount" => $op["memo_amount"],
+                        "pos_amount" => $op["pos_amount"],
+                        "interbranch_amount" => $op["interbranch_amount"],
+                        "collection_id" => $collectionBreakdown->collection_id,
+                    ]);
+                }
+
             }
         } catch (\Exception $e) {
             return response()->json([

@@ -169,7 +169,7 @@ Route::resource('collection-breakdown', CollectionBreakdownController::class);
 Route::delete('branch-collection/{branchCollection}', [CollectionBreakdownController::class, 'deleteBranchCollection']);
 Route::delete('account-officer-collection/{accountOfficerCollection}', [CollectionBreakdownController::class, 'deleteAccountOffficerCollection']);
 
-Route::post('collection-breakdown/{collectionBreakdown}', [CollectionBreakdownController::class, 'update']);
+/* Route::post('collection-breakdown/{collectionBreakdown}', [CollectionBreakdownController::class, 'update']); */
 
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');

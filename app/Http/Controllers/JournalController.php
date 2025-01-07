@@ -73,10 +73,14 @@ class JournalController extends MainController
     public function saveJournalEntry(journalEntry $journalEntry, Request $request)
     {
         // // Define custom validation messages
-        // $customMessages = [
-        //     'journal_entry.journal_no.unique' => 'The reference number has already been taken.',
-        // ];
+        // // $customMessages = [
+        // //     'journal_entry.journal_no.unique' => 'The reference number has already been taken.',
+        // // ];
 
+        // // Validate the request data
+        // $request->validate([
+        //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
+        // ], $customMessages);
         // // Validate the request data
         // $request->validate([
         //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
@@ -116,6 +120,13 @@ class JournalController extends MainController
         //     'journal_entry.edit_journal_no.required' => 'The reference number is required.',
         // ];
 
+        // // Validate the request data
+        // $request->validate([
+        //     'journal_entry.edit_journal_no' => [
+        //         'required',
+        //         Rule::unique('journal_entry', 'journal_no')->ignore($request->journal_entry['edit_journal_id'], 'journal_id')
+        //     ],
+        // ], $customMessages);
         // // Validate the request data
         // $request->validate([
         //     'journal_entry.edit_journal_no' => [
