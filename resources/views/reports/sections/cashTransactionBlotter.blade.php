@@ -840,7 +840,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>check</td>
-                                                        <td v-text="otherPayment"></td>
+                                                        <td v-text="otherPayment.check_amount"></td>
                                                     </tr>
                                                     <tr>
                                                         <td>pos</td>
@@ -1094,6 +1094,7 @@
 
                 },
                 createNewCollectionBreakdown: function() {
+                    this.collectionBreakdown.status = 'unposted';
                     var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
                         .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
@@ -1246,7 +1247,7 @@
 
                 },
                 updateStatus: function(collectionBreakdown, status) {
-                    console.log(status);
+                    this.isUpdateStatus = true;
                     this.collectionBreakdown = collectionBreakdown;
                     this.collectionBreakdown.status = status
                     this.updateCollectionBreakdown();

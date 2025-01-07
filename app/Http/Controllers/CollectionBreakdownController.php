@@ -61,7 +61,6 @@ class CollectionBreakdownController extends Controller
     public function update(CreateOrUpdateCollectionRequest $request, CollectionBreakdown $collectionBreakdown)
     {
         $data = $request->validated();
-
         try {
             $collectionBreakdown->update($data);
             foreach ($data["account_officer_collections"] as $aco) {

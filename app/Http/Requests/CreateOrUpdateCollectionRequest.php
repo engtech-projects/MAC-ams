@@ -62,7 +62,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
     protected function prepareForValidation()
     {
         if(!$this->route('collectionBreakdown')) {
-            $this->merge(['status' => 'unposted']);
+            //$this->merge(['status' => 'unposted']);
         }
         $this->merge(['flag' => CollectionBreakdown::COLLECTION_FLAG]);
         if (Auth::user()->can('manager')) {
