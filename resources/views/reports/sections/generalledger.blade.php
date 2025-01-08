@@ -71,7 +71,7 @@
                                         <div class="input-group">
                                             <input v-model="filter.from" value="{{ $requests['from'] }}" type="date"
                                                 class="form-control form-control-sm rounded-0" name="from"
-                                                id="genLedgerFrom" {{-- min="{{ $fiscalYear->start_date }}" --}} max="{{ $fiscalYear->end_date }}"
+                                                id="genLedgerFrom" 
                                                 required>
                                         </div>
                                     </div>
@@ -84,7 +84,7 @@
                                         <div class="input-group">
                                             <input type="date" v-model="filter.to" value="{{ $requests['to'] }}"
                                                 class="form-control form-control-sm rounded-0" name="to"
-                                                id="genLedgerTo" {{-- min="{{ $fiscalYear->start_date }}" --}} max="{{ $fiscalYear->end_date }}"
+                                                id="genLedgerTo" 
                                                 required>
                                         </div>
                                     </div>
