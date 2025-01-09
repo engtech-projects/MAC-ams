@@ -24,6 +24,16 @@ class CollectionBreakdownController extends Controller
     {
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($collectionBreakdown->collection_id, $collectionBreakdown->branch_id);
+        $otherPayment = $collectionBreakdown->other_payment;
+        if(!$otherPayment) {
+            $cashTransactionsEntries['collections']['other_payment'] = [
+                'cash_amount' => 0,
+                'check_amount' => 0,
+                'memo_amount' => 0,
+                'pos_amount' => 0,
+                'interbranch_amount' => 0,
+            ];
+        }
         return response()->json(['data' => $cashTransactionsEntries]);
     }
     public function store(CreateOrUpdateCollectionRequest $request)

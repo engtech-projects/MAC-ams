@@ -534,7 +534,7 @@
                                                         </td>
                                                         <td class="text-right">
                                                             <input type="number"
-                                                                :v-model="collectionBreakdown.other_payment?.check_amount"
+                                                                v-model="collectionBreakdown.other_payment.check_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
                                                         </td>
@@ -546,7 +546,7 @@
                                                         </td>
                                                         <td class="text-right">
                                                             <input type="number"
-                                                                :v-model="collectionBreakdown.other_payment?.pos_amount"
+                                                                v-model="collectionBreakdown.other_payment.pos_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
 
@@ -560,7 +560,7 @@
                                                         </td>
                                                         <td class="text-right">
                                                             <input type="number"
-                                                                :v-model="collectionBreakdown.other_payment?.memo_amount"
+                                                                v-model="collectionBreakdown.other_payment.memo_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
                                                         </td>
