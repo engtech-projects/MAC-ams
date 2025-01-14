@@ -260,7 +260,6 @@ class ReportsController extends MainController
             'title' => 'MAC-AMS | Monthly Depreciation',
             'type' => $type
         ]; */
-
         $branches = Branch::all();
         $date = $request->to;
 
@@ -272,6 +271,7 @@ class ReportsController extends MainController
         }
 
         $result = $subsidiary->getDepreciation($request->sub_cat_id, null, $date);
+
         $data = $result->map(function ($value) {
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
@@ -330,6 +330,8 @@ class ReportsController extends MainController
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
         $branchCode = $request->branch_code;
         $subId = Subsidiary::where('sub_code', $branchCode)->pluck('sub_id')->first();
+        $subAccounts = Subsidiary::where('sub_code', $branchCode)->with(['subsidiary_accounts'])->get();
+        dd($subAccounts);
         $subsidiary = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
         $journalEntry = new JournalEntry();
 
@@ -362,6 +364,7 @@ class ReportsController extends MainController
 
 
         $accounts = $subsidiary->accounts;
+
 
         $journalDetails = [];
 
