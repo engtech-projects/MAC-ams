@@ -331,18 +331,18 @@ class ReportsController extends MainController
         $branchCode = $request->branch_code;
         $subId = Subsidiary::where('sub_code', $branchCode)->pluck('sub_id')->first();
         $subAccounts = Subsidiary::where('sub_code', $branchCode)->with(['subsidiary_accounts'])->get();
-        dd($subAccounts);
-        $subsidiary = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
+
+        $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
         $journalEntry = new JournalEntry();
 
         $accountName = null;
+        $subIds = $request->sub_ids;
 
-
-        if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
+        if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
-        } elseif ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
+        } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
-        } else if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
+        } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
@@ -351,6 +351,17 @@ class ReportsController extends MainController
         $series = explode('-', $lastEntry);
         $lastSeries = (int) $series[1] + 1;
         $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
+
+        $subAccounts = [];
+        foreach ($subIds as $subId) {
+            $subsidiary = Subsidiary::where('sub_id', $subId)->first();
+            if ($subsidiary) {
+                $subAccounts[] = $subsidiary->subsidiary_accounts->pluck('account_id')->toArray();
+            }
+        }
+        dd($subAccounts);
+
+
         $data = $journalEntry->create([
             'journal_no' => $journalNumber,
             'journal_date' => $as_of->format('Y-m-d'),
@@ -363,12 +374,10 @@ class ReportsController extends MainController
         ]);
 
 
-        $accounts = $subsidiary->accounts;
-
 
         $journalDetails = [];
 
-        foreach ($accounts as $account) {
+        foreach ($subsidiaryCategory->accounts as $account) {
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
@@ -380,19 +389,19 @@ class ReportsController extends MainController
             ];
 
 
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
                 $details['journal_details_debit'] = $account->account_number == 5185 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
                 $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_code === SubsidiaryCategory::DEPRE) {
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
                     $details['journal_details_debit'] = $request->total['total_monthly_amort'];
                     $details['journal_details_credit'] = 0.0;
