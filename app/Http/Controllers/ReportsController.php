@@ -354,13 +354,11 @@ class ReportsController extends MainController
 
         $subAccounts = [];
         foreach ($subIds as $subId) {
-            $subsidiary = Subsidiary::where('sub_id', $subId)->first();
+            $subsidiary = Subsidiary::whereHas('subsidiary_accounts')->find($subId);
             if ($subsidiary) {
                 $subAccounts[] = $subsidiary->subsidiary_accounts->pluck('account_id')->toArray();
             }
         }
-        dd($subAccounts);
-
 
         $data = $journalEntry->create([
             'journal_no' => $journalNumber,
@@ -377,6 +375,23 @@ class ReportsController extends MainController
 
         $journalDetails = [];
 
+        foreach ($subAccounts as $subAccount) {
+            foreach ($subAccount as $accountId) {
+                $account = Accounts::find($accountId);
+                $journalDetails[] = [
+                    'account_id' => $account->account_id,
+                    'journal_details_title' => $account->account_name,
+                    'subsidiary_id' => $subId,
+                    'status' => JournalEntry::STATUS_POSTED,
+                    'journal_details_account_no' => $account->account_number,
+                    'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
+                    'journal_details_debit' => $request->total['total_monthly_amort'],
+                    'journal_details_credit' => 0
+
+                ];
+            }
+        }
+
         foreach ($subsidiaryCategory->accounts as $account) {
             $details = [
                 'account_id' => $account->account_id,
@@ -387,7 +402,6 @@ class ReportsController extends MainController
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
 
             ];
-
 
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_monthly_amort'] : 0;
@@ -429,7 +443,7 @@ class ReportsController extends MainController
             $this->updateMonthlyDepreciation($request->sub_ids);
             return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to save journal entry'], 500);
+            return response()->json(['message' => "Posting unsuccessful"], 500);
         }
     }
 
