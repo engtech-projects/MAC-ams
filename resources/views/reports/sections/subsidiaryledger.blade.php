@@ -406,11 +406,11 @@
 
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            {{-- <tr v-if="!subsidiaryAll.entries">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
 
                                             <tr v-for="ps in listing"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -434,11 +434,11 @@
 
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            {{-- <tr v-if="!subsidiaryAll.entries">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
 
                                             <tr v-for="ps in summary">
                                                 <td v-for="p,i in ps" :class="rowStyleSubsidiarySummary(p, i, ps)"
@@ -464,11 +464,11 @@
                                             <th class="text-right"></th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="subsidiaryAll.length == 0">
+                                            {{-- <tr v-if="subsidiaryAll.length == 0">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
                                             {{--
                                             <tr v-for="ps in processedSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -478,11 +478,13 @@
                                             <tr v-for="(ps,i) in subsidiaryLedger"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
+
                                                 <td v-if="i<=8" v-for="p,i in ps"
                                                     :class="rowStyleSubsidiaryListing(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[2]"> <!-- Check if journal_no exists -->
+                                                    
                                                     <button v-if="ps[2]" :value="`${ps[9]}`"
                                                         class="btn btn-flat btn-sm JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
@@ -513,12 +515,13 @@
                                             <th class="text-right">Balance</th>
                                             <th class="text-right"></th>
                                         </thead>
+
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            {{-- <tr v-if="!subsidiaryAll.entries">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
 
                                             <tr v-for="(ps,i) in processedSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -1085,6 +1088,7 @@
                             if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
                                 'subsidiary-ledger-summary-report') {
                                 this.subsidiaryAll = response.data.data;
+
                                 this.balance = response.data.balance;
 
                             } else {
@@ -1227,7 +1231,9 @@
                         data = this.subsidiaryAll;
                     }
 
-                    let currentBalance = this.balance;;
+
+                    let currentBalance = this.balance;
+
 
                     for (var i in data) {
                         var result = data[i];
@@ -1267,13 +1273,19 @@
 
                         }
 
+
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(
-                            arr[8].replace(/,/g, "")))])
+                        if (arr) {
+                            rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
+                                parseFloat(
+                                    arr[8].replace(/,/g, "")))])
+
+                        }
+
                     }
 
 
