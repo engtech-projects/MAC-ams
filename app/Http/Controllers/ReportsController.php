@@ -473,9 +473,31 @@ class ReportsController extends MainController
             case 'subsidiary_per_account':
                 $glAccounts = new Accounts();
                 $transactions = $glAccounts->ledger([$filter['from'], $filter['to']], $filter['account_id'], $filter['subsidiary_id']);
+                $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
+
+                $account = Accounts::join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
+                    ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
+                    ->where('account_id', $filter['account_id'])
+                    ->first();
+
+                if (count($transactions) == 0) {
+                    $transactions[$account->account_id] = [
+                        'account_category' => $account->accountType->accountCategory->account_category,
+                        'account_type' => $account->accountType->account_type,
+                        'account_number' => $account->account_number,
+                        'account_name' => $account->account_name,
+                        'branch_name' => $account->branch_name,
+                        'balance' => number_format($balance, 2),
+                        'current_balance' => 0,
+                        'total_debit' => 0,
+                        'total_credit' => 0,
+                        'to_increase' => $account->to_increase,
+                        'entries' => []
+                    ];
+                }
 
                 //$transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
-                $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
+
 
                 return response()->json(['data' => [$transactions, $balance]]);
 
