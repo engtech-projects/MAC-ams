@@ -77,7 +77,7 @@
                                 0]);
                         } else {
                             $('#transactionDate').removeAttr(
-                            "min"); // Remove the min attribute if no collection data
+                                "min"); // Remove the min attribute if no collection data
                         }
                     },
                     error: function(xhr, status, error) {
@@ -755,6 +755,7 @@
             const formatter = new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'PHP',
+                minimumFractionDigits: 0
 
             });
 
@@ -1113,8 +1114,8 @@
         function formatAmount(amount) {
             let number = Number(amount)
             let formattedNumber = number.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
             });
             return formattedNumber
         }

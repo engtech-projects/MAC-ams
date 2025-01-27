@@ -393,23 +393,63 @@
                                                         </td>
                                                     </tr>
                                                     <tr v-if="!isEdit"
-                                                        v-for="officerCollection in collectionBreakdown.account_officer_collections">
-                                                        <td v-text='officerCollection.representative'>
-                                                            <h6 v-text="officerCollection.representative"></h6>
+                                                        v-for="(officerCollection,i) in collectionBreakdown.account_officer_collections">
+                                                        <td>
+                                                            <div v-if="officerCollection.isEditing">
+                                                                <input type="text" class="form-control form-control-sm"
+                                                                    v-model="officerCollection.representative"
+                                                                    id="accountofficer_representative">
+
+                                                            </div>
+                                                            <div v-else>
+                                                                <h6 v-text="officerCollection.representative"></h6>
+                                                            </div>
                                                         </td>
                                                         <td>
-                                                            <h6 v-text="officerCollection.note"></h6>
+                                                            <div v-if="officerCollection.isEditing">
+                                                                <input type="text" class="form-control form-control-sm"
+                                                                    v-model="officerCollection.note"
+                                                                    id="accountofficer_note">
+
+                                                            </div>
+                                                            <div v-else>
+                                                                <h6 v-text="officerCollection.note"></h6>
+                                                            </div>
 
                                                         </td>
                                                         <td>
-                                                            <h6 class="text-right" v-text="officerCollection.total"></h6>
+                                                            <div v-if="officerCollection.isEditing">
+                                                                <input type="text" class="form-control form-control-sm"
+                                                                    v-model="officerCollection.total"
+                                                                    id="accountofficer_total">
+
+                                                            </div>
+                                                            <div v-else>
+                                                                <h6 v-text="officerCollection.total"></h6>
+                                                            </div>
                                                         </td>
                                                         <td class="text-center">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <button v-if="!isEditing"
+                                                                        class="btn btn-xs btn-success"
+                                                                        @click="editOfficerCollection(i)">
+                                                                        <i class="fas fa-pen fa-xs"></i>
+                                                                    </button>
 
-                                                            <button class="btn btn-xs btn-danger">
-                                                                <i class="fas fa-trash fa-xs"
-                                                                    @click="removeAccountOfficerCollection(officerCollection)"></i>
-                                                            </button>
+                                                                    <button v-else class="btn btn-xs btn-success"
+                                                                        @click="saveOfficerCollection(i)">
+                                                                        <i class="fas fa-save fa-xs"></i>
+                                                                    </button>
+
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <button class="btn btn-xs btn-danger">
+                                                                        <i class="fas fa-trash fa-xs"
+                                                                            @click="addAccountOfficerCollection()"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         </td>
                                                     </tr>
 
@@ -954,6 +994,7 @@
                     branch_id: null,
                 },
                 isEdit: false,
+                isEditing: false,
                 isUpdateStatus: false,
                 result: {},
                 entries: {
@@ -1069,15 +1110,29 @@
                     if ($('#remarks').val() == "") {
                         alert("Please add account officer collection");
                     } else {
-                        this.collectionBreakdown.account_officer_collections = [{
+                        this.collectionBreakdown.account_officer_collections.push({
                             representative: this.officer_collection.representative,
                             note: this.officer_collection.note,
-                            total: this.officer_collection.total
-                        }];
+                            total: this.officer_collection.total,
+                            isEditing: false
+                        });
+
+                        this.officer_collection.total = 0;
+                        this.officer_collection.representative = '';
+                        this.officer_collection.note = '';
                     }
 
 
 
+                },
+                editOfficerCollection: function(index) {
+                    this.collectionBreakdown.account_officer_collections[index].isEditing = true;
+                    this.isEditing = true;
+
+                },
+                saveOfficerCollection: function(index) {
+                    this.collectionBreakdown.account_officer_collections[index].isEditing = false;
+                    this.isEditing = false;
                 },
                 processCreateOrUpdate: function() {
                     if (this.isEdit) {
