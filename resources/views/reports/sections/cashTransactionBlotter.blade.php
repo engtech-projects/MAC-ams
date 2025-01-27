@@ -446,7 +446,7 @@
                                                                 <div class="col-md-6">
                                                                     <button class="btn btn-xs btn-danger">
                                                                         <i class="fas fa-trash fa-xs"
-                                                                            @click="addAccountOfficerCollection()"></i>
+                                                                            @click="removeAccountOfficerCollection(officerCollection)"></i>
                                                                     </button>
                                                                 </div>
                                                             </div>
