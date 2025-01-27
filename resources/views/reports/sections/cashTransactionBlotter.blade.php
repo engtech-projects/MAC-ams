@@ -188,6 +188,7 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱1000.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_1000"
+                                                                ref="p_1000" @keydown.enter="nextTextField('p_500')"
                                                                 name="p_1000" id="onethousand"
                                                                 class="form-control form-control-sm pcs" required>
                                                         </td>
@@ -198,7 +199,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱500.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_500"
-                                                                name="p_500" id="fivehundred"
+                                                                name="p_500" ref="p_500" id="fivehundred"
+                                                                @keydown.enter="nextTextField('p_200')"
                                                                 class="form-control form-control-sm pcs" required>
                                                         </td>
                                                         <td id="fivehundredtotalamount" class="total">
@@ -208,7 +210,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱200.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_200"
-                                                                name="p_200" id="twohundred"
+                                                                name="p_200" ref="p_200" id="twohundred"
+                                                                @keydown.enter="nextTextField('p_100')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="twohundredtotalamount" class="total">
                                                             <h6 v-text="total.p_200"></h6>
@@ -217,7 +220,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱100.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_100"
-                                                                name="p_100" id="onehundred"
+                                                                name="p_100" ref="p_100" id="onehundred"
+                                                                @keydown.enter="nextTextField('p_50')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="onehundredtotalamount" class="total">
                                                             <h6 v-text="total.p_100"></h6>
@@ -226,7 +230,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱50.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_50"
-                                                                name="p_50" id="fifty"
+                                                                name="p_50" ref="p_50" id="fifty"
+                                                                @keydown.enter="nextTextField('p_20')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="fiftytotalamount" class="total">
                                                             <h6 v-text="total.p_50"></h6>
@@ -235,7 +240,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱20.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_20"
-                                                                name="p_20" id="twenty"
+                                                                name="p_20" id="twenty" ref="p_20"
+                                                                @keydown.enter="nextTextField('p_10')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="twentytotalamount" class="total">
                                                             <h6 v-text="total.p_20"></h6>
@@ -244,7 +250,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱10.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_10"
-                                                                name="p_10" id="ten"
+                                                                name="p_10" id="ten" ref="p_10"
+                                                                @keydown.enter="nextTextField('p_5')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="tentotalamount" class="total">
                                                             <h6 v-text="total.p_10"></h6>
@@ -253,7 +260,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱5.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_5"
-                                                                name="p_5" id="five"
+                                                                name="p_5" id="five" ref="p_5"
+                                                                @keydown.enter="nextTextField('p_1')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="fivetotalamount" class="total">
                                                             <h6 v-text="total.p_5"></h6>
@@ -262,7 +270,8 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱1.00</td>
                                                         <td><input type="number" v-model="collectionBreakdown.p_1"
-                                                                name="p_1" id="one"
+                                                                name="p_1" id="one" ref="p_1"
+                                                                @keydown.enter="nextTextField('c_25')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="onetotalamount" class="total">
                                                             <h6 v-text="total.p_1"></h6>
@@ -271,7 +280,7 @@
                                                     <tr class="cash-breakdown">
                                                         <td>₱0.25</td>
                                                         <td><input type="number" v-model="collectionBreakdown.c_25"
-                                                                name="c_25" id="centavo"
+                                                                name="c_25" id="centavo" ref="c_25"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="centavototalamount" class="total">
                                                             <h6 v-text="total.c_25"></h6>
@@ -983,17 +992,17 @@
                     collection_id: 0,
                     branch_id: null,
                     transaction_date: "",
-                    p_1000: 0, //34,
-                    p_500: 0, //1,
-                    p_200: 0,
-                    p_100: 0, //1,
-                    p_50: 0,
-                    p_20: 0,
-                    p_10: 0,
-                    p_5: 0,
-                    p_1: 0, //4,
-                    c_25: 0,
-                    total: 0,
+                    p_1000: null, //34,
+                    p_500: null, //1,
+                    p_200: null,
+                    p_100: null, //1,
+                    p_50: null,
+                    p_20: null,
+                    p_10: null,
+                    p_5: null,
+                    p_1: null, //4,
+                    c_25: null,
+                    total: null,
                     flag: "",
                     account_officer_collections: [],
                     branch_collections: [],
@@ -1028,6 +1037,12 @@
                 statusUpdate: false,
             },
             methods: {
+                nextTextField: function(textField) {
+                    const nextInput = this.$refs[textField]
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                },
                 amountConverter: function(amount) {
                     const formatter = new Intl.NumberFormat('en-US', {
                         style: 'currency',
@@ -1054,12 +1069,11 @@
                     if ($('#remarks').val() == "") {
                         alert("Please add account officer collection");
                     } else {
-                        console.log(this.officer_collection);
-                        this.collectionBreakdown.account_officer_collections.push({
+                        this.collectionBreakdown.account_officer_collections = [{
                             representative: this.officer_collection.representative,
                             note: this.officer_collection.note,
                             total: this.officer_collection.total
-                        });
+                        }];
                     }
 
 
@@ -1108,7 +1122,8 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        this.resetForm();
+                        window.location.reload();
+                        //  this.resetForm();
                     }).catch(err => {
                         toastr.error(err.response.data.message);
 
@@ -1268,7 +1283,7 @@
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
                             }
-                    }).then(response => {
+                        }).then(response => {
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
                     }).catch(err => {
