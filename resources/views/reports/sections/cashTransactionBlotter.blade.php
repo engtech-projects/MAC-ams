@@ -625,6 +625,8 @@
                                                     <td class="text-right">
                                                         <input type="number"
                                                             v-model="collectionBreakdown.other_payment.check_amount"
+                                                            @keydown.enter="nextTextField('pos_amount')"
+                                                            ref="check_amount"
                                                             class="form-control form-control-sm rounded-0 text-right"
                                                             required placeholder="0.00">
                                                     </td>
@@ -637,8 +639,8 @@
                                                     <td class="text-right">
                                                         <input type="number"
                                                             v-model="collectionBreakdown.other_payment.pos_amount"
-                                                            class="form-control form-control-sm rounded-0 text-right"
-                                                            required placeholder="0.00">
+                                                            ref="pos_amount" @keydown.enter="nextTextField('memo_amount')"
+                                                            class="form-control form-control-sm rounded-0 text-right">
 
                                                     </td>
                                                 </tr>
@@ -651,8 +653,8 @@
                                                     <td class="text-right">
                                                         <input type="number"
                                                             v-model="collectionBreakdown.other_payment.memo_amount"
-                                                            class="form-control form-control-sm rounded-0 text-right"
-                                                            required placeholder="0.00">
+                                                            ref="memo_amount" @keydown.enter="nextTextField('p_10')"
+                                                            class="form-control form-control-sm rounded-0 text-right">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -1062,11 +1064,11 @@
                     branch: ''
                 },
                 other_payment: {
-                    cash_amount: 0,
-                    check_amount: 0,
-                    pos_amount: 0,
-                    memo_amount: 0,
-                    interbranch_amount: 0,
+                    cash_amount: null,
+                    check_amount: null,
+                    pos_amount: null,
+                    memo_amount: null,
+                    interbranch_amount: null,
                     total: 0
                 },
                 collectionBreakdown: {
@@ -1089,8 +1091,8 @@
                     account_officer_collections: [],
                     branch_collections: [],
                     other_payment: {
-                        cash_amount: 0,
-                        check_amount: 0,
+                        cash_amount: null,
+                        check_amount: null,
                         pos_amount: 0,
                         memo_amount: 0,
                         interbranch_amount: 0,
@@ -1586,11 +1588,13 @@
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
                     if (otherPayment) {
+
                         total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
                             parseFloat(otherPayment.check_amount) +
                             parseFloat(otherPayment.memo_amount) +
                             parseFloat(otherPayment.pos_amount) +
                             parseFloat(otherPayment.interbranch_amount)
+                        console.log(parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")));
                     }
                     return this.amountConverter(total);
                 },
