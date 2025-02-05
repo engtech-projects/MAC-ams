@@ -792,7 +792,7 @@ class ReportsController extends MainController
         $cashblotter = new CashBlotter();
         $cashblotter->transaction_date = $request['transaction_date'];
         $cashblotter->total_collection = $request['totalcash_count'];
-        $cashblotter->branch_id = $request['branch_id'];
+        $cashblotter->$cashblotter->branch_id = $request['branch_id'];
         $cashblotter->save();
 
 
@@ -800,6 +800,7 @@ class ReportsController extends MainController
 
         $ao_collection = json_decode($request['ao_collection']);
         $branch_collection = json_decode($request['branch_collection']);
+        $pos_collections = json_decode($request['pos_collections']);
         $this->storeAoCollection($cashblotter_id, $ao_collection);
         $this->storeBranchCollection($cashblotter_id, $branch_collection);
         $this->storeCashBreakdown($cashblotter_id, $request);

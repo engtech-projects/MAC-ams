@@ -46,6 +46,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "branch_id" => 'required|numeric',
             "total" => 'numeric',
             "account_officer_collections" => "array",
+            "pos_collections" => "array",
             "branch_collections" => "array",
             "other_payment" => "nullable",
             "status" => 'string',
@@ -61,7 +62,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
     }
     protected function prepareForValidation()
     {
-        if(!$this->route('collectionBreakdown')) {
+        if (!$this->route('collectionBreakdown')) {
             //$this->merge(['status' => 'unposted']);
         }
         $this->merge(['flag' => CollectionBreakdown::COLLECTION_FLAG]);
