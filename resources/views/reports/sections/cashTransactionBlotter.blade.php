@@ -352,7 +352,8 @@
 
                                                         </td>
                                                         <td>
-                                                            <h6 v-text="officerCollection.total"></h6>
+                                                            <h6 v-text="officerCollection.total">@{{ formatCurrency }}
+                                                            </h6>
                                                         </td>
                                                         <td class="text-center">
                                                             {{-- <button type="button"
@@ -1225,17 +1226,17 @@
                 },
                 isValid: true,
                 total: {
-                    grandTotal: 0,
-                    p_1000: 0,
-                    p_500: 0,
-                    p_200: 0,
-                    p_100: 0,
-                    p_50: 0,
-                    p_20: 0,
-                    p_10: 0,
-                    p_5: 0,
-                    p_1: 0,
-                    c_25: 0,
+                    grandTotal: null,
+                    p_1000: null,
+                    p_500: null,
+                    p_200: null,
+                    p_100: null,
+                    p_50: null,
+                    p_20: null,
+                    p_10: null,
+                    p_5: null,
+                    p_1: null,
+                    c_25: null,
                 },
                 accountOfficers: [],
 
@@ -1266,12 +1267,13 @@
                         alert("Please add branch");
                     } else {
                         var branch = $('#branch_id_collection option:selected').text().trim();
+                        var total = this.amountConverter(this.branch_collection.total_amount);
                         this.collectionBreakdown.branch_collections.push({
                             branch: {
                                 branch_id: $('#branch_id_collection').val(),
                                 branch_name: branch
                             },
-                            total_amount: this.branch_collection.total_amount,
+                            total_amount: total,
                             isEditing: false,
                         });
 
@@ -1286,10 +1288,12 @@
                     if ($('#remarks').val() == "") {
                         alert("Please add account officer collection");
                     } else {
+                        var total = this.amountConverter(this.officer_collection.total);
+
                         this.collectionBreakdown.account_officer_collections.push({
                             representative: this.officer_collection.representative,
                             note: this.officer_collection.note,
-                            total: this.officer_collection.total,
+                            total: total,
                             isEditing: false
                         });
 
@@ -1306,9 +1310,11 @@
                     if (this.pos_collections.or_no == null) {
                         alert("Please enter or no.");
                     } else {
+                        var total = this.amountConverter(this.pos_collections.total_amount)
+
                         this.collectionBreakdown.pos_collections.push({
                             or_no: this.pos_collections.or_no,
-                            total_amount: this.pos_collections.total_amount,
+                            total_amount: total,
                             isEditing: false,
                         });
 
@@ -1747,7 +1753,8 @@
                     var total = 0;
                     if (aoCollection.length > 0) {
                         for (var i in aoCollection) {
-                            total += parseFloat(aoCollection[i].total);
+
+                            total += parseFloat(aoCollection[i].total.replace(/[^0-9\.-]+/g, ""));
                         }
                     }
                     return this.amountConverter(total);
@@ -1757,13 +1764,13 @@
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
                     if (otherPayment) {
-
+                        console.log(this.aoCollectionTotal);
                         total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
                             parseFloat(otherPayment.check_amount) +
                             parseFloat(otherPayment.memo_amount) +
                             parseFloat(otherPayment.pos_amount) +
                             parseFloat(otherPayment.interbranch_amount)
-                        console.log(parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")));
+                        /* console.log(parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, ""))); */
                     }
                     return this.amountConverter(total);
                 },
@@ -1773,7 +1780,8 @@
                     if (this.collectionBreakdown.other_payment) {
                         if (branchCollection.length > 0) {
                             for (var i in branchCollection) {
-                                total += parseFloat(branchCollection[i].total_amount);
+
+                                total += parseFloat(branchCollection[i].total);
                             }
 
                         }
