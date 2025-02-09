@@ -70,7 +70,7 @@ class CollectionBreakdown extends Model
 
     public static function getCollectionById($id)
     {
-        $collection = CollectionBreakdown::with(['account_officer_collections', 'branch_collections.branch', 'other_payment'])->where('collection_id', $id)->first();
+        $collection = CollectionBreakdown::with(['account_officer_collections', 'branch_collections.branch', 'other_payment', 'pos_collections'])->where('collection_id', $id)->first();
         return $collection;
     }
     public static function getCollectionBreakdownByBranch($transactionDate, $branchId = null)

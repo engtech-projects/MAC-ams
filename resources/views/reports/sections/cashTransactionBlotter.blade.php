@@ -426,7 +426,8 @@
 
                                                             </div>
                                                             <div v-else>
-                                                                <h6 v-text="officerCollection.total"></h6>
+                                                                <h6>@{{ amountConverter(officerCollection.total) }}
+                                                                </h6>
                                                             </div>
                                                         </td>
                                                         <td class="text-center">
@@ -556,7 +557,7 @@
 
                                                             </div>
                                                             <div v-else>
-                                                                <h6 v-text="branchCollection.total_amount"></h6>
+                                                                <h6>@{{ amountConverter(branchCollection.total_amount) }}
                                                             </div>
 
                                                         </td>
@@ -673,7 +674,7 @@
 
                                                         </div>
                                                         <div v-else>
-                                                            <h6 v-text="posCollection.total_amount"></h6>
+                                                            <h6>@{{ amountConverter(posCollection.total_amount) }}
                                                         </div>
 
                                                     </td>
@@ -1267,13 +1268,12 @@
                         alert("Please add branch");
                     } else {
                         var branch = $('#branch_id_collection option:selected').text().trim();
-                        var total = this.amountConverter(this.branch_collection.total_amount);
                         this.collectionBreakdown.branch_collections.push({
                             branch: {
                                 branch_id: $('#branch_id_collection').val(),
                                 branch_name: branch
                             },
-                            total_amount: total,
+                            total_amount: this.branch_collection.total_amount,
                             isEditing: false,
                         });
 
@@ -1288,12 +1288,11 @@
                     if ($('#remarks').val() == "") {
                         alert("Please add account officer collection");
                     } else {
-                        var total = this.amountConverter(this.officer_collection.total);
 
                         this.collectionBreakdown.account_officer_collections.push({
                             representative: this.officer_collection.representative,
                             note: this.officer_collection.note,
-                            total: total,
+                            total: this.officer_collection.total,
                             isEditing: false
                         });
 
@@ -1310,11 +1309,9 @@
                     if (this.pos_collections.or_no == null) {
                         alert("Please enter or no.");
                     } else {
-                        var total = this.amountConverter(this.pos_collections.total_amount)
-
                         this.collectionBreakdown.pos_collections.push({
                             or_no: this.pos_collections.or_no,
-                            total_amount: total,
+                            total_amount: this.pos_collections.total_amount,
                             isEditing: false,
                         });
 
@@ -1379,6 +1376,8 @@
                     this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
                         .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
+                        .replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal
                         .replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
@@ -1780,13 +1779,12 @@
                     if (this.collectionBreakdown.other_payment) {
                         if (branchCollection.length > 0) {
                             for (var i in branchCollection) {
-
-                                total += parseFloat(branchCollection[i].total);
+                                total += parseFloat(branchCollection[i].total_amount.replace(/[^0-9\.-]+/g,
+                                    ""));
                             }
 
                         }
                     }
-
                     return this.amountConverter(total);
                 },
 
@@ -1797,7 +1795,7 @@
                     if (this.collectionBreakdown.other_payment) {
                         if (pos.length > 0) {
                             for (var i in pos) {
-                                total += parseFloat(pos[i].total_amount);
+                                total += parseFloat(pos[i].total_amount.replace(/[^0-9\.-]+/g, ""));
                             }
 
                         }

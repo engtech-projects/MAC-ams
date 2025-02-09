@@ -817,6 +817,7 @@ class ReportsController extends MainController
 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
+
         return response()->json([
             'entries' => $cashTransactionsEntries
         ], 200);
