@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('reports/general-ledger-search', [ReportsController::class, 'generalLedgerSearch'])->name('reports.generalLedgerSearch');
+/* Route::get('reports/general-ledger-search', [ReportsController::class, 'generalLedgerSearch'])->name('reports.generalLedgerSearch'); */
 /*
 |--------------------------------------------------------------------------
 | API Routes
