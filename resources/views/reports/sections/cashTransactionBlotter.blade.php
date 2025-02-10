@@ -945,7 +945,7 @@
                                         </tbody>
                                     </table>
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Cash Breakdown</th>
@@ -1021,7 +1021,7 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Account Officer</th>
@@ -1077,7 +1077,29 @@
                                             </table>
 
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <th>POS Collection</th>
+                                                    <th>Amount</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="pos in collections.pos_collections">
+                                                        <td>@{{ pos.or_no }}</td>
+                                                        <td>@{{ formatCurrency(pos.total_amount) }}</td>
+                                                    </tr>
+
+                                                    <tr
+                                                        style="border-top:4px dashed black;border-bottom:4px dashed black;">
+                                                        <td><strong>TOTAL COLLECTION</strong></td>
+                                                        <td><strong>@{{ collections.other_payment ? formatCurrency(collections.other_payment.pos_amount) : formatCurrency(0) }}</strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
+                                        <div class="col-md-3">
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Interbranch</th>
@@ -1791,7 +1813,6 @@
                 posCollectionTotal: function() {
                     var pos = this.collectionBreakdown.pos_collections;
                     var total = 0;
-                    console.log(pos);
                     if (this.collectionBreakdown.other_payment) {
                         if (pos.length > 0) {
                             for (var i in pos) {
@@ -1800,6 +1821,7 @@
 
                         }
                     }
+                    alert(total);
                     return this.amountConverter(total);
                 },
                 filteredCashBlotter: function() {
