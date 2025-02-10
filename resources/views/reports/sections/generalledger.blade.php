@@ -33,8 +33,8 @@
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
-                    <form id="frm-generate-ledger" method="get">
-                        @csrf
+                    <form method="get">
+
                         <input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"
                             placeholder="">
                         <div class="row">
@@ -48,7 +48,8 @@
                                     <div class="form-group">
                                         <label class="label-normal" for="book_ref">Account Name</label>
                                         <div class="input-group">
-                                            <select name="account_id" class="select2 form-control form-control-sm" id="select-account" value="" required>
+                                            <select name="account_id" class="select2 form-control form-control-sm"
+                                                id="select-account" value="" required>
                                                 <!-- <option value="all" selected>-All-</option> -->
                                                 @foreach ($chartOfAccount as $data)
                                                     @if (request('account_id') == $data->account_id)
@@ -71,8 +72,7 @@
                                         <div class="input-group">
                                             <input v-model="filter.from" value="{{ $requests['from'] }}" type="date"
                                                 class="form-control form-control-sm rounded-0" name="from"
-                                                id="genLedgerFrom" 
-                                                required>
+                                                id="genLedgerFrom" required>
                                         </div>
                                     </div>
                                 </div>
@@ -84,8 +84,7 @@
                                         <div class="input-group">
                                             <input type="date" v-model="filter.to" value="{{ $requests['to'] }}"
                                                 class="form-control form-control-sm rounded-0" name="to"
-                                                id="genLedgerTo" 
-                                                required>
+                                                id="genLedgerTo" required>
                                         </div>
                                     </div>
                                 </div>
@@ -104,7 +103,7 @@
 
                 <div class="col-md-12">
                     <div id="external_filter_container"></div>
-                    <table style="" id="generalLedgerTbl" class="table table-sm">
+                    <table style="" class="table table-sm">
                         <thead>
                             <tr>
                                 <th width="10%">Date</th>
@@ -120,80 +119,94 @@
                             </tr>
                         </thead>
 
-                        @foreach ($transactions as $transaction)
-                            <thead>
-                                <tr class="account_name">
-                                    <td class="font-weight-bold" colspan="5">{{ $transaction['account_number'] }} -
-                                        {{ $transaction['account_name'] }}</td>
-                                    <td colspan="4" class="font-weight-bold text-right" style="padding-right: 10px;">
-                                        {{ $transaction['balance'] }}</td>
-                                </tr>
-                            </thead>
+                        @if (count($transactions) > 0)
+                            @foreach ($transactions as $transaction)
+                                <thead>
 
-                            <tbody id="generalLedgerTblContainer">
-
-                                @foreach ($transaction['entries'] as $entry)
-                                    <tr id="journal">
-                                        <td>{{ $entry['journal_date'] }}</td>
-                                        <td>{{ $entry['journal_no'] }}</td>
-                                        <td>{{ $entry['branch_name'] }}</td>
-                                        <td>{{ $entry['source'] }}</td>
-                                        <td>{{ $entry['cheque_date'] }}</td>
-                                        <td>{{ $entry['cheque_no'] }}</td>
-                                        <td class="text-right">{{ $entry['debit'] }}</td>
-                                        <td class="text-right">{{ $entry['credit'] }}</td>
-                                        <td class="text-right">{{ $entry['current_balance'] }}</td>
-                                        <td>
-                                            <div class="row">
-                                                <button value="{{ $entry['journal_id'] }}"
-                                                    class="btn btn-flat btn-sm JnalView bg-gradient-success"><i
-                                                        class="fa fa-eye"></i>View</button>
-                                                @if(Gate::allows('manager'))
-                                                <button value="{{ $entry['journal_id'] }}"
-                                                    class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white"><i
-                                                        class="fa fa-pen text-white"></i>Edit</button>
-                                                @endif
-                                            </div>
-
-                                        </td>
+                                    <tr class="account_name">
+                                        <td class="font-weight-bold" colspan="5">{{ $transaction['account_number'] }} -
+                                            {{ $transaction['account_name'] }}</td>
+                                        <td colspan="4" class="font-weight-bold text-right" style="padding-right: 10px;">
+                                            {{ $transaction['balance'] }}</td>
                                     </tr>
+                                </thead>
 
-                                    <thead>
-                                        <tr>
-                                            <td></td>
-                                            <td colspan="8">
-                                                <div>Payee : {{ $entry['payee'] }}</div>
-                                                <div>{{ $entry['remarks'] }}</div>
+                                <tbody id="generalLedgerTblContainer">
+
+                                    @foreach ($transaction['entries'] as $entry)
+                                        <tr id="journal">
+                                            <td>{{ $entry['journal_date'] }}</td>
+                                            <td>{{ $entry['journal_no'] }}</td>
+                                            <td>{{ $entry['branch_name'] }}</td>
+                                            <td>{{ $entry['source'] }}</td>
+                                            <td>{{ $entry['cheque_date'] }}</td>
+                                            <td>{{ $entry['cheque_no'] }}</td>
+                                            <td class="text-right">{{ $entry['debit'] }}</td>
+                                            <td class="text-right">{{ $entry['credit'] }}</td>
+                                            <td class="text-right">{{ $entry['current_balance'] }}</td>
+                                            <td>
+                                                <div class="row">
+                                                    <button value="{{ $entry['journal_id'] }}"
+                                                        class="btn btn-flat btn-sm JnalView bg-gradient-success"><i
+                                                            class="fa fa-eye"></i>View</button>
+                                                    @if (Gate::allows('manager'))
+                                                        <button value="{{ $entry['journal_id'] }}"
+                                                            class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white"><i
+                                                                class="fa fa-pen text-white"></i>Edit</button>
+                                                    @endif
+                                                </div>
+
                                             </td>
                                         </tr>
-                                    </thead>
-                                @endforeach
 
-                                <tr class="account_name">
-                                    <td></td>
-                                    <td></td>
-                                    <td class="font-weight-bold">Total</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td class="font-weight-bold text-right">{{ $transaction['total_debit'] }}</td>
-                                    <td class="font-weight-bold text-right">{{ $transaction['total_credit'] }}</td>
-                                    <td></td>
-                                </tr>
+                                        <thead>
+                                            <tr>
+                                                <td></td>
+                                                <td colspan="8">
+                                                    <div>Payee : {{ $entry['payee'] }}</div>
+                                                    <div>{{ $entry['remarks'] }}</div>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                    @endforeach
 
+                                    <tr class="account_name">
+                                        <td></td>
+                                        <td></td>
+                                        <td class="font-weight-bold">Total</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="font-weight-bold text-right">{{ $transaction['total_debit'] }}</td>
+                                        <td class="font-weight-bold text-right">{{ $transaction['total_credit'] }}</td>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr class="account_name">
+                                        <td></td>
+                                        <td></td>
+                                        <td class="font-weight-bold">Net movement</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="font-weight-bold text-right">{{ $transaction['current_balance'] }}</td>
+                                    </tr>
+                                </tbody>
+                            @endforeach
+                        @else
+                            <thead>
                                 <tr class="account_name">
-                                    <td></td>
-                                    <td></td>
-                                    <td class="font-weight-bold">Net movement</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td class="font-weight-bold text-right">{{ $transaction['current_balance'] }}</td>
+                                    <td class="font-weight-bold" colspan="5">{{ $account['account_number'] }} -
+                                        {{ $account['account_name'] }}</td>
+                                    <td colspan="4" class="font-weight-bold text-right" style="padding-right: 10px;">
+                                        {{ $balance }}
+                                    </td>
                                 </tr>
-                            </tbody>
-                        @endforeach
+                            </thead>
+                        @endif
+
                     </table>
                 </div>
 
@@ -426,8 +439,7 @@
 
                                                             <select required name="edit_book_id"
                                                                 class="select2 form-control form-control-sm"
-                                                                id="edit_book_id"
-                                                                style="width: 150px;">
+                                                                id="edit_book_id" style="width: 150px;">
                                                                 <option id="edit_book_id" value="" disabled>
                                                                 </option>
                                                                 @foreach ($journalBooks as $journalBook)
@@ -496,15 +508,17 @@
                                             </div>
                                             <div class="col-md-4 col-xs-12">
                                                 <div class="box">
-                                                <div class="form-group">
-                                                    <label class="label-normal" for="edit_status">Status</label>
-                                                    <div class="input-group">
-                                                        <select name="edit_status" class="form-control form-control-sm" id="edit_status" required>
-                                                            <option value="unposted">Unposted</option>
-                                                            <option value="posted" selected>Posted</option>
-                                                        </select>
+                                                    <div class="form-group">
+                                                        <label class="label-normal" for="edit_status">Status</label>
+                                                        <div class="input-group">
+                                                            <select name="edit_status"
+                                                                class="form-control form-control-sm" id="edit_status"
+                                                                required>
+                                                                <option value="unposted">Unposted</option>
+                                                                <option value="posted" selected>Posted</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
-                                                </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 col-xs-12">
@@ -528,7 +542,7 @@
                                                             <input type="text"
                                                                 class="form-control form-control-sm rounded-0"
                                                                 name="edit_payee" id="edit_payee" placeholder="Payee">
-                                                                
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -614,34 +628,55 @@
     <!-- /.content -->
 
     <script>
-        // new Vue({
-        // 	el: '#app',
-        // 	data: {
-        // 		data: @json($transactions),
-        // 		filter:{
-        // 			from:@json($requests['from'])?@json($requests['from']):'',
-        // 			to:@json($requests['to'])?@json($requests['to']):'',
-        // 			account_id:@json($requests['account_id'])?@json($requests['account_id']):'all'
-        // 		},
-        // 		baseUrl: window.location.protocol + "//" + window.location.host
-        // 	},
-        // 	methods: {
-        // 		search:function(){
-        // 			console.log(this.filter);
-        // 			window.location.href = this.baseUrl + "/reports/generalLedger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&account_id=' +  this.filter.account_id;
-        // 		},
-        // 		logbook:function(e){
-        // 			console.log(e);
-        // 		}
-        // 	},
-        // 	mounted(){
-        // 		// for(var i in this.data){
-        // 		// 	if(this.data[i]){
-        // 		// 		console.log(this.data[i]);
-        // 		// 	}
-        // 		// }
-        // 	}
-        // });
+        new Vue({
+            el: '#app',
+            data: {
+                data: @json($transactions),
+                filter: {
+                    from: @json($requests['from']) ? @json($requests['from']) : '',
+                    to: @json($requests['to']) ? @json($requests['to']) : '',
+                    account_id: @json($requests['account_id']) ? @json($requests['account_id']) : 'all'
+                },
+                baseUrl: window.location.protocol + "//" + window.location.host
+            },
+            methods: {
+                search: function() {
+                    axios.get('/MAC-ams/api/reports/general-ledger-search', {
+                        params: {
+                            from: this.filter.from,
+                            to: this.filter.to,
+                            account_id: this.filter.account_id
+
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        this.data = response.data.transactions;
+                        console.log(this.data);
+                        /* window.location.reload(); */
+                        //  this.resetForm();
+                    }).catch(err => {
+                        toastr.error(err.response.data);
+
+                    })
+
+                    /* window.location.href = this.baseUrl + "/reports/generalLedger?from=" + this.filter.from +
+                        '&&to=' + this.filter.to + '&&account_id=' + this.filter.account_id; */
+                },
+                logbook: function(e) {
+                    console.log(e);
+                }
+            },
+            mounted() {
+                // for(var i in this.data){
+                // 	if(this.data[i]){
+                // 		console.log(this.data[i]);
+                // 	}
+                // }
+            }
+        });
     </script>
 @endsection
 

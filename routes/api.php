@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ReportsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
+
+Route::get('reports/general-ledger-search', [ReportsController::class, 'generalLedgerSearch'])->name('reports.generalLedgerSearch');
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -23,9 +26,3 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('user',[LoginController::class,'user'])->name('logged.user'); */
-
-
-
-
-
-
