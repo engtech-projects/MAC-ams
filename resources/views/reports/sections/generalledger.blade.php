@@ -201,7 +201,7 @@
                                     <td class="font-weight-bold" colspan="5">{{ $account['account_number'] }} -
                                         {{ $account['account_name'] }}</td>
                                     <td colspan="4" class="font-weight-bold text-right" style="padding-right: 10px;">
-                                        {{ $balance }}
+                                        @{{ formatCurrency(balance) }}
                                     </td>
                                 </tr>
                             </thead>
@@ -632,6 +632,7 @@
             el: '#app',
             data: {
                 data: @json($transactions),
+                balance: @json($balance),
                 filter: {
                     from: @json($requests['from']) ? @json($requests['from']) : '',
                     to: @json($requests['to']) ? @json($requests['to']) : '',
@@ -640,6 +641,17 @@
                 baseUrl: window.location.protocol + "//" + window.location.host
             },
             methods: {
+                formatCurrency: function(amount) {
+                    amount = parseFloat(amount);
+                    if (isNaN(amount)) {
+                        return "Invalid Number";
+                    }
+                    amount = amount.toFixed(2);
+
+                    amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    return amount;
+                },
                 search: function() {
                     axios.get('/MAC-ams/api/reports/general-ledger-search', {
                         params: {
