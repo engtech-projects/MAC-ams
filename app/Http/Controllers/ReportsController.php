@@ -336,11 +336,11 @@ class ReportsController extends MainController
         $accountName = null;
 
 
-        if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
+        if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
-        } elseif ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
+        } elseif ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
-        } else if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+        } else if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
@@ -377,19 +377,19 @@ class ReportsController extends MainController
             ];
 
 
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_INSUR) {
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_SUPPLY) {
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::SUPPLY) {
                 $details['journal_details_debit'] = $account->account_number == 5185 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_AMORT) {
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::AMORT) {
                 $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_monthly_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
             }
-            if ($subsidiary->sub_cat_id === SubsidiaryCategory::CAT_DEPRE) {
+            if ($subsidiary->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
                     $details['journal_details_debit'] = $request->total['total_monthly_amort'];
                     $details['journal_details_credit'] = 0.0;
@@ -426,11 +426,10 @@ class ReportsController extends MainController
 
         foreach ($sub_ids as $sub_id) {
             $subsidiary = Subsidiary::find($sub_id);
-            $sub_no_amort = $subsidiary->sub_no_amort + 1;
-            $subsidiary->sub_no_amort = $sub_no_amort;
-            $subsidiary->update([
-                'sub_no_amort' => $sub_no_amort
-            ]);
+            if ($subsidiary->sub_no_depre > $subsidiary->sub_no_amort) {
+                $subsidiary->sub_no_amort = $subsidiary->sub_no_amort + 1;
+            }
+            $subsidiary->update();
         }
     }
 
@@ -442,7 +441,7 @@ class ReportsController extends MainController
         $filter['type'] = $filter['type'] ?? 'subsidiary-ledger';
         $data = [
             'subsidiaryData' => Subsidiary::get(),
-            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->get(),
             'sub_categories' => SubsidiaryCategory::get(),
             'title' => 'MAC-AMS | Subsidiary Ledger',
             'journalBooks' => JournalBook::get(),
@@ -474,9 +473,31 @@ class ReportsController extends MainController
             case 'subsidiary_per_account':
                 $glAccounts = new Accounts();
                 $transactions = $glAccounts->ledger([$filter['from'], $filter['to']], $filter['account_id'], $filter['subsidiary_id']);
+                $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
+
+                $account = Accounts::join('account_type', 'account_type.account_type_id', '=', 'chart_of_accounts.account_type_id')
+                    ->join('account_category', 'account_category.account_category_id', '=', 'account_type.account_category_id')
+                    ->where('account_id', $filter['account_id'])
+                    ->first();
+
+                if (count($transactions) == 0) {
+                    $transactions[$account->account_id] = [
+                        'account_category' => $account->accountType->accountCategory->account_category,
+                        'account_type' => $account->accountType->account_type,
+                        'account_number' => $account->account_number,
+                        'account_name' => $account->account_name,
+                        'branch_name' => $account->branch_name,
+                        'balance' => number_format($balance, 2),
+                        'current_balance' => 0,
+                        'total_debit' => 0,
+                        'total_credit' => 0,
+                        'to_increase' => $account->to_increase,
+                        'entries' => []
+                    ];
+                }
 
                 //$transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
-                $balance = Accounts::getSubsidiaryAccountBalance($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
+
 
                 return response()->json(['data' => [$transactions, $balance]]);
 

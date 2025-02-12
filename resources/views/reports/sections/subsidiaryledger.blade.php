@@ -277,13 +277,13 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_from">From</label>
                                         <div class="input-group">
                                             <input v-model="filter.from" type="date"
-                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'"
+                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'"
                                                 class=" form-control form-control-sm rounded-0" name="from"
                                                 id="sub_date" required>
                                         </div>
@@ -292,7 +292,7 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'">
+                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_to">To</label>
@@ -406,11 +406,11 @@
 
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            {{-- <tr v-if="!subsidiaryAll.entries">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
 
                                             <tr v-for="ps in listing"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -434,11 +434,11 @@
 
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            {{-- <tr v-if="!subsidiaryAll.entries">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
 
                                             <tr v-for="ps in summary">
                                                 <td v-for="p,i in ps" :class="rowStyleSubsidiarySummary(p, i, ps)"
@@ -464,11 +464,11 @@
                                             <th class="text-right"></th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="subsidiaryAll.length == 0">
+                                            {{-- <tr v-if="subsidiaryAll.length == 0">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
                                             {{--
                                             <tr v-for="ps in processedSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -478,20 +478,22 @@
                                             <tr v-for="(ps,i) in subsidiaryLedger"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
+
                                                 <td v-if="i<=8" v-for="p,i in ps"
                                                     :class="rowStyleSubsidiaryListing(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
                                                 <td v-if="ps[2]"> <!-- Check if journal_no exists -->
+                                                    
                                                     <button v-if="ps[2]" :value="`${ps[9]}`"
                                                         class="btn btn-flat btn-sm JnalView bg-gradient-success">
                                                         <i class="fa fa-eye"></i> View
                                                     </button>
-                                                    @if(Gate::allows('manager'))
-                                                    <button v-if="ps[9]" :value="`${ps[9]}`"
-                                                        class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
-                                                        <i class="fa fa-pen text-white"></i> Edit
-                                                    </button>
+                                                    @if (Gate::allows('manager'))
+                                                        <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                            class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
+                                                            <i class="fa fa-pen text-white"></i> Edit
+                                                        </button>
                                                     @endif
                                                 </td>
 
@@ -513,12 +515,13 @@
                                             <th class="text-right">Balance</th>
                                             <th class="text-right"></th>
                                         </thead>
+
                                         <tbody id="generalLedgerTblContainer">
-                                            <tr v-if="!subsidiaryAll.entries">
+                                            {{-- <tr v-if="!subsidiaryAll.entries">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
 
                                             <tr v-for="(ps,i) in processedSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -551,12 +554,13 @@
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr
-                                                v-if="!processedIncomeExpense.income.length&&!processedIncomeExpense.expense.length">
+                                                v-if="processedIncomeExpense.income.length < 1&& processedIncomeExpense.expense.length < 1">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length">
+
+                                            <tr v-if="processedIncomeExpense.income.length > 0">
                                                 <td><b>REVENUE</b></td>
                                                 <td></td>
                                                 <td></td>
@@ -570,7 +574,8 @@
                                                 v-for="i in processedIncomeExpense.income">
                                                 <td v-for="j in i">@{{ j }}</td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length">
+                                            <tr>
+                                            <tr v-if="processedIncomeExpense.income.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -580,7 +585,7 @@
                                                 <td>0.00</td>
                                                 <td></td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length">
+                                            <tr v-if="processedIncomeExpense.income.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -590,7 +595,8 @@
                                                 <td></td>
                                                 <td>0.00</td>
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.expense.length">
+
+                                            <tr v-if="processedIncomeExpense.expense.length > 0">
                                                 <td><b>EXPENSE</b></td>
                                                 <td></td>
                                                 <td></td>
@@ -788,7 +794,8 @@
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit" aria-hidden="true">
+            <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog"
+                aria-labelledby="journalModalEdit" aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-body">
@@ -837,8 +844,7 @@
 
                                                             <select required name="edit_book_id"
                                                                 class="select2 form-control form-control-sm"
-                                                                id="edit_book_id"
-                                                                style="width: 150px;">
+                                                                id="edit_book_id" style="width: 150px;">
                                                                 <option id="edit_book_id" value="" disabled>
                                                                 </option>
                                                                 @foreach ($journalBooks as $journalBook)
@@ -910,7 +916,9 @@
                                                     <div class="form-group">
                                                         <label class="label-normal" for="edit_status">Status</label>
                                                         <div class="input-group">
-                                                            <select name="edit_status" class="form-control form-control-sm" id="edit_status" required>
+                                                            <select name="edit_status"
+                                                                class="form-control form-control-sm" id="edit_status"
+                                                                required>
                                                                 <option value="unposted">Unposted</option>
                                                                 <option value="posted" selected>Posted</option>
                                                             </select>
@@ -939,7 +947,7 @@
                                                             <input type="text"
                                                                 class="form-control form-control-sm rounded-0"
                                                                 name="edit_payee" id="edit_payee" placeholder="Payee">
-                                                                
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1036,7 +1044,7 @@
                     branch_id: '',
                     from: '',
                     to: '',
-                    asof:new Date().toISOString().split('T')[0],
+                    asof: new Date().toISOString().split('T')[0],
                     account_id: 'all',
                     type: ''
                 },
@@ -1080,6 +1088,7 @@
                             if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
                                 'subsidiary-ledger-summary-report') {
                                 this.subsidiaryAll = response.data.data;
+
                                 this.balance = response.data.balance;
 
                             } else {
@@ -1222,7 +1231,9 @@
                         data = this.subsidiaryAll;
                     }
 
-                    let currentBalance = this.balance;;
+
+                    let currentBalance = this.balance;
+
 
                     for (var i in data) {
                         var result = data[i];
@@ -1262,13 +1273,19 @@
 
                         }
 
+
                         rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
                                 totalDebit) : '',
                             totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
                             ''
                         ]);
-                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(parseFloat(
-                            arr[8].replace(/,/g, "")))])
+                        if (arr) {
+                            rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
+                                parseFloat(
+                                    arr[8].replace(/,/g, "")))])
+
+                        }
+
                     }
 
 
@@ -1541,53 +1558,57 @@
                         income: [],
                         expense: []
                     }
-                    this.incomeExpense.income.forEach(income => {
-                        result.income.push([income.account_name, '', '', '', '', '', '', ''])
-                        var totalAmount = 0;
-                        income.entries.forEach(entry => {
-                            var row = [];
-                            var amount = entry.credit == 0 ? entry.debit : entry.credit;
-                            totalAmount += parseFloat(amount);
-                            row.push(entry.journal_date);
-                            row.push(entry.journal_no);
-                            row.push(entry.subsidiary_name);
-                            row.push(entry.source);
-                            row.push(entry.cheque_date);
-                            row.push(entry.cheque_no);
-                            row.push(this.formatCurrency(amount));
-                            row.push('0.00');
-                            result.income.push(row);
+                    if (this.incomeExpense.income) {
+                        this.incomeExpense.income.forEach(income => {
+                            result.income.push([income.account_name, '', '', '', '', '', '', ''])
+                            var totalAmount = 0;
+                            income.entries.forEach(entry => {
+                                var row = [];
+                                var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                totalAmount += parseFloat(amount);
+                                row.push(entry.journal_date);
+                                row.push(entry.journal_no);
+                                row.push(entry.subsidiary_name);
+                                row.push(entry.source);
+                                row.push(entry.cheque_date);
+                                row.push(entry.cheque_no);
+                                row.push(this.formatCurrency(amount));
+                                row.push('0.00');
+                                result.income.push(row);
+                            });
+                            if (income.entries.length) {
+                                result.income.push(['', '', '', '', '', '', this.formatCurrency(
+                                    totalAmount), ''])
+                                result.income.push(['', '', '', '', '', '', '', '0.00'])
+                            }
                         });
-                        if (income.entries.length) {
-                            result.income.push(['', '', '', '', '', '', this.formatCurrency(
-                                totalAmount), ''])
-                            result.income.push(['', '', '', '', '', '', '', '0.00'])
-                        }
-                    });
-                    this.incomeExpense.expense.forEach(expense => {
-                        result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
-                        var totalAmount = 0;
-                        expense.entries.forEach(entry => {
-                            var row = [];
-                            var amount = entry.credit == 0 ? entry.debit : entry.credit;
-                            totalAmount += parseFloat(amount);
-                            row.push(entry.journal_date);
-                            row.push(entry.journal_no);
-                            row.push(entry.subsidiary_name);
-                            row.push(entry.source);
-                            row.push(entry.cheque_date);
-                            row.push(entry.cheque_no);
-                            row.push(this.formatCurrency(amount));
-                            row.push('0.00');
-                            result.expense.push(row);
-                        });
-                        if (expense.entries.length) {
-                            result.expense.push(['', '', '', '', '', '', this.formatCurrency(
-                                totalAmount), ''])
-                            result.expense.push(['', '', '', '', '', '', '', '0.00'])
-                        }
+                    }
+                    if (this.incomeExpense.expense) {
+                        this.incomeExpense.expense.forEach(expense => {
+                            result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
+                            var totalAmount = 0;
+                            expense.entries.forEach(entry => {
+                                var row = [];
+                                var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                totalAmount += parseFloat(amount);
+                                row.push(entry.journal_date);
+                                row.push(entry.journal_no);
+                                row.push(entry.subsidiary_name);
+                                row.push(entry.source);
+                                row.push(entry.cheque_date);
+                                row.push(entry.cheque_no);
+                                row.push(this.formatCurrency(amount));
+                                row.push('0.00');
+                                result.expense.push(row);
+                            });
+                            if (expense.entries.length) {
+                                result.expense.push(['', '', '', '', '', '', this.formatCurrency(
+                                    totalAmount), ''])
+                                result.expense.push(['', '', '', '', '', '', '', '0.00'])
+                            }
 
-                    });
+                        });
+                    }
                     return result;
                 }
             },

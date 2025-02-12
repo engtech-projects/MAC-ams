@@ -31,16 +31,21 @@
             font-size: 11px;
 
         }
+
         @media print {
             body {
                 margin: 10px !important;
             }
-            .no-print, .toast {
+
+            .no-print,
+            .toast {
                 display: none;
             }
+
             .table td {
                 padding: 1px !important;
             }
+
             .page-break {
                 page-break-before: always;
             }
@@ -75,6 +80,7 @@
                     <div class="row">
                         <div class="col-md-12 frm-header">
                             <h4><b>Cashier's Transaction Blotter</b></h4>
+
                         </div>
                     </div>
                     <div class="row">
@@ -98,14 +104,16 @@
                             </div>
                         </div>
 
-                        @if(Gate::allows(['accounting-staff']) || Gate::allows(['manager']))
-                        <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6':'2' }}">
-                            <div class="mt-4 text-right">
-                                <button type="button" class="btn btn-primary" data-type="create"
-                                    id="create-cashblotter">New Transaction</button>
-                            </div>
+                        @if (Gate::allows(['accounting-staff']) || Gate::allows(['manager']))
+                            <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6' : '2' }}"
+                                @click="processCreateCollection()">
+                                <div class="mt-4 text-right">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#Mymodal">New
+                                        Transaction</button>
+                                </div>
 
-                        </div>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -114,261 +122,491 @@
 
 
             <div class="modal fade bd-example-modal-lg" id="Mymodal" tabindex="-1" role="dialog"
-                aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <form id="add-cash-blotter">
-                            @csrf
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-md-12 frm-header" style="padding:10px;">
-                                        <h4 id="title"><b></b></h4>
-                                    </div>
-                                </div>
+                aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
 
-                                <div class="row" style="margin-left:15px;">
-                                    @if(Gate::allows(['manager']))
+                <div class="modal-dialog modal-xl">
+
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create Transaction</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12 frm-header" style="padding:10px;">
+                                    <h4 id="title"><b></b></h4>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-left:15px;">
+                                @if (Gate::allows(['manager']))
                                     <div class="col-md-3">
                                         <label for="branch">Select Branch</label>
-                                        <select name="branch_id" id="branch_id" class="select-branch form-control form-control-sm" required>
-                                            <option value="" disabled selected>Select Branch</option>
+                                        <select name="branch_id" v-model="collectionBreakdown.branch_id"
+                                            class="select2 form-control form-control-sm" style="width:100%" id="branchID">
                                             @foreach ($branches as $branch)
-                                                <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}</option>
+                                                <option value="{{ $branch->branch_id }}">
+                                                    {{ $branch->branch_name }}
+                                                </option>
                                             @endforeach
                                         </select>
+                                        {{-- <select name="branch_id" id="branch_id" v-model="branch"
+                                                class="select2 form-control form-control-sm" required>
+                                                <option value="" disabled selected v-text="branch"></option>
+                                                @foreach ($branches as $branch)
+                                                    <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select> --}}
                                     </div>
-                                    @endif
-                                    <div class="col-md-3">
-                                        <label for="transactionDate">Transaction Date</label>
-                                        <div class="input-group">
-                                            <input type="date" name="transaction_date" id="transactionDate" disabled
-                                                class="form-control form-control-sm" required>
-                                        </div>
+                                @endif
+                                <div class="col-md-3">
+                                    <label for="transactionDate">Transaction Date</label>
+                                    <div class="input-group">
+                                        <input type="date" name="transaction_date"
+                                            v-model="collectionBreakdown.transaction_date"
+                                            class="form-control form-control-sm">
                                     </div>
                                 </div>
+                            </div>
 
 
-                                <div class="container pl-4">
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <div class="row">
-                                                <form id="add-cash-blotter" method="POST">
-                                                    <table class="table table-sm cash-breakdown-tbl">
-                                                        <thead>
-                                                            <th class="table-header">Cash Breakdown</th>
-                                                            <th class="table-header">Pcs.</th>
-                                                            <th class="table-header">Total Amount</th>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱1000.00</td>
-                                                                <td><input type="number" name="p_1000" id="onethousand"
-                                                                        class="form-control form-control-sm pcs" required>
-                                                                </td>
-                                                                <td id="onethousandtotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱500.00</td>
-                                                                <td><input type="number" name="p_500" id="fivehundred"
-                                                                        class="form-control form-control-sm pcs" required>
-                                                                </td>
-                                                                <td id="fivehundredtotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱200.00</td>
-                                                                <td><input type="number" name="p_200" id="twohundred"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="twohundredtotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱100.00</td>
-                                                                <td><input type="number" name="p_100" id="onehundred"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="onehundredtotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱50.00</td>
-                                                                <td><input type="number" name="p_50" id="fifty"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="fiftytotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱20.00</td>
-                                                                <td><input type="number" name="p_20" id="twenty"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="twentytotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱10.00</td>
-                                                                <td><input type="number" name="p_10" id="ten"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="tentotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱5.00</td>
-                                                                <td><input type="number" name="p_5" id="five"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="fivetotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱1.00</td>
-                                                                <td><input type="number" name="p_1" id="one"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="onetotalamount" class="total">0</td>
-                                                            </tr>
-                                                            <tr class="cash-breakdown">
-                                                                <td>₱0.25</td>
-                                                                <td><input type="number" name="c_25" id="centavo"
-                                                                        class="form-control form-control-sm" required></td>
-                                                                <td id="centavototalamount" class="total">0</td>
-                                                            </tr>
+                            <div class="container pl-4">
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="row">
 
-                                                        </tbody>
-                                                        <tfoot>
-                                                            <tr>
-                                                                <td colspan="3">
-                                                                    <p>Total Cash Count</p>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
+                                            <table class="table table-sm cash-breakdown-tbl">
+                                                <thead>
+                                                    <th class="table-header">Cash Breakdown</th>
+                                                    <th class="table-header">Pcs.</th>
+                                                    <th class="table-header">Total Amount</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱1000.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_1000"
+                                                                name="p_1000" id="onethousand"
+                                                                class="form-control form-control-sm pcs" required>
+                                                        </td>
+                                                        <td id="onethousandtotalamount" class="total">
+                                                            <h6 v-text="total.p_1000"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱500.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_500"
+                                                                name="p_500" id="fivehundred"
+                                                                class="form-control form-control-sm pcs" required>
+                                                        </td>
+                                                        <td id="fivehundredtotalamount" class="total">
+                                                            <h6 v-text="total.p_500"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱200.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_200"
+                                                                name="p_200" id="twohundred"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="twohundredtotalamount" class="total">
+                                                            <h6 v-text="total.p_200"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱100.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_100"
+                                                                name="p_100" id="onehundred"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="onehundredtotalamount" class="total">
+                                                            <h6 v-text="total.p_100"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱50.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_50"
+                                                                name="p_50" id="fifty"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="fiftytotalamount" class="total">
+                                                            <h6 v-text="total.p_50"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱20.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_20"
+                                                                name="p_20" id="twenty"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="twentytotalamount" class="total">
+                                                            <h6 v-text="total.p_20"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱10.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_10"
+                                                                name="p_10" id="ten"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="tentotalamount" class="total">
+                                                            <h6 v-text="total.p_10"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱5.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_5"
+                                                                name="p_5" id="five"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="fivetotalamount" class="total">
+                                                            <h6 v-text="total.p_5"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱1.00</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.p_1"
+                                                                name="p_1" id="one"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="onetotalamount" class="total">
+                                                            <h6 v-text="total.p_1"></h6>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="cash-breakdown">
+                                                        <td>₱0.25</td>
+                                                        <td><input type="number" v-model="collectionBreakdown.c_25"
+                                                                name="c_25" id="centavo"
+                                                                class="form-control form-control-sm" required></td>
+                                                        <td id="centavototalamount" class="total">
+                                                            <h6 v-text="total.c_25"></h6>
+                                                        </td>
+                                                    </tr>
 
-                                                                <td class="text-right bg-primary" colspan="3"
-                                                                    id="totalcashcount"><b>0</b></td>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
-
-                                                </form>
-                                            </div>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            Total
+                                                        </td>
+                                                        <td class="text-right" colspan="2" id="totalcashcount"
+                                                            v-text="totalCash">
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
                                         </div>
+                                    </div>
 
-                                        <div class="col-md-6">
-                                            <div class="col-md-12 col-sm-12">
+                                    <div class="col-md-6">
+                                        <div class="col-md-12 col-sm-12">
 
-                                                <table class="table table-bordered table-sm"
-                                                    id="account-officer-table-collection">
-                                                    <thead class="table-header">
-                                                        <tr>
-                                                            <th width="200">Account Officer</th>
-                                                            <th>Remarks</th>
-                                                            <th>Total Amount</th>
-                                                            <th></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <input type="text" class="form-control form-control-sm"
-                                                                    id="accountofficer_id">
-                                                            </td>
-                                                            <td>
-                                                                <input type="text" id="remarks"
-                                                                    class="form-control form-control-sm rounded-0"
-                                                                    name="remarks" form="frm-add-account-officer-details"
-                                                                    placeholder="Remarks">
-                                                            </td>
-                                                            <td>
-                                                                <input type="text"
-                                                                    class="form-control form-control-sm rounded-0 text-right"
-                                                                    id="total_amount" placeholder="0.00">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="button"
+                                            <table class="table table-bordered table-sm"
+                                                id="account-officer-table-collection">
+                                                <thead class="table-header">
+                                                    <tr>
+                                                        <th width="200">Account Officer</th>
+                                                        <th>Remarks</th>
+                                                        <th>Total Amount</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-if="isEdit">
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                id="accountofficer_id"
+                                                                v-model="officer_collection.representative">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" id="remarks"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                v-model="officer_collection.note" name="remarks"
+                                                                form="frm-add-account-officer-details"
+                                                                placeholder="Remarks">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="total_amount" placeholder="0.00"
+                                                                v-model="officer_collection.total">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-primary"
+                                                                @click="addAccountOfficerCollection()">
+                                                                <i class="fas fa-plus fa-xs"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="isEdit"
+                                                        v-for="officerCollection in collectionBreakdown.account_officer_collections">
+                                                        <td>
+                                                            <h6 v-text="officerCollection.representative"></h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="officerCollection.note"></h6>
+
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="officerCollection.total"></h6>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{-- <button type="button"
                                                                     id="btn-add-account-officer-collection"
-                                                                    class="btn btn-xs btn-primary add-accounting-officer">
-                                                                    <i class="fas fa-plus fa-xs"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr id="footer-row">
-                                                            <!-- <td colspan="7"></td> -->
-                                                        </tr>
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <td colspan="4">
-                                                                <p>Total A/O Collection</p>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
+                                                                    class="btn btn-xs btn-danger add-accounting-officer">
+                                                                    <i class="fas fa-trash fa-xs"></i>
+                                                                </button> --}}
+                                                            <button class="btn btn-xs btn-danger"
+                                                                @click="removeAccountOfficerCollection(officerCollection)">
+                                                                <i class="fas fa-trash fa-xs"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="!isEdit">
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm"
+                                                                v-model="officer_collection.representative"
+                                                                id="accountofficer_id">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" id="remarks"
+                                                                class="form-control form-control-sm rounded-0"
+                                                                v-model="officer_collection.note" name="remarks"
+                                                                form="frm-add-account-officer-details"
+                                                                placeholder="Remarks">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" v-model="officer_collection.total"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="total_amount" placeholder="0.00">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-primary"
+                                                                @click="addAccountOfficerCollection()">
+                                                                <i class="fas fa-plus fa-xs"></i>
+                                                            </button>
 
-                                                            <td class="text-right bg-primary" colspan="4"
-                                                                id="totalaccountofficercollection"><b>0</b></td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="!isEdit"
+                                                        v-for="officerCollection in collectionBreakdown.account_officer_collections">
+                                                        <td v-text='officerCollection.representative'>
+                                                            <h6 v-text="officerCollection.representative"></h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 v-text="officerCollection.note"></h6>
 
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="text-right" v-text="officerCollection.total"></h6>
+                                                        </td>
+                                                        <td class="text-center">
 
-                                            </div>
+                                                            <button class="btn btn-xs btn-danger">
+                                                                <i class="fas fa-trash fa-xs"
+                                                                    @click="removeAccountOfficerCollection(officerCollection)"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
 
-                                            <div class="col-md-12">
-                                                <table class="table table-bordered table-sm" id="account-officer-table">
-                                                    <thead class="table-header">
-                                                        <tr>
-                                                            <th width="200">Branch Collection</th>
-                                                            <th>Total Amount</th>
-                                                            <th></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <select
-                                                                    class="select-branch form-control form-control-sm rounded-0"
-                                                                    id="branch_id_collection">
-                                                                    <option value="" disabled selected>-Select
-                                                                        Branch-</option>
-                                                                    @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch->branch_id }}">
-                                                                            {{ $branch->branch_name }}</option>
-                                                                    @endforeach
+                                                    <tr id="footer-row">
+                                                        <!-- <td colspan="7"></td> -->
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            total
+                                                        </td>
+                                                        <td class="text-right" colspan="3"
+                                                            id="totalaccountofficercollection" v-text='aoCollectionTotal'>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
 
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <input type="text"
-                                                                    class="form-control form-control-sm rounded-0 text-right"
-                                                                    id="branchcollection_amount" placeholder="0.00">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="button" class="btn btn-xs btn-primary"
-                                                                    id="btn-add-branch-collection">
-                                                                    <i class="fas fa-plus fa-xs"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr style="background-color: #f1f1f1;" id="branch-collection-row">
-                                                            <!-- <td colspan="7">&nbsp;</td> -->
-                                                        </tr>
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <td colspan="4">
-                                                                <p>Total Branch Collection</p>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-
-                                                            <td class="text-right bg-primary" colspan="4"
-                                                                id="totalbranchcollection"><b>0</b></td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
-                                                <div class="text-right">
-                                                    <button type="submit" class="btn btn-success" style="margin-bottom: 20px;">Post</button>
-                                                </div>
-                                            </div>
 
                                         </div>
+
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm" id="account-officer-table">
+                                                <thead class="table-header">
+                                                    <tr>
+                                                        <th width="200">Branch Collection</th>
+                                                        <th>Total Amount</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <select
+                                                                class="select-branch form-control form-control-sm rounded-0"
+                                                                id="branch_id_collection">
+                                                                <option value="" disabled selected>-Select
+                                                                    Branch-</option>
+                                                                @foreach ($branches as $branch)
+                                                                    <option value="{{ $branch->branch_id }}">
+                                                                        {{ $branch->branch_name }}</option>
+                                                                @endforeach
+
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" v-model="branch_collection.total_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="branchcollection_amount" placeholder="0.00">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-primary"
+                                                                @click="addBranchCollection()">
+                                                                <i class="fas fa-plus fa-xs"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="isEdit"
+                                                        v-for="branchCollection in collectionBreakdown.branch_collections">
+                                                        <td>
+                                                            <h6 v-text="branchCollection.branch.branch_name"
+                                                                value="branchCollection.branch.branch_id"></h6>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <h6 v-text="branchCollection.total_amount"></h6>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-danger">
+                                                                <i class="fas fa-trash fa-xs"
+                                                                    @click="removeBranchCollection(branchCollection)"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr v-if="!isEdit"
+                                                        v-for="branchCollection in collectionBreakdown.branch_collections">
+                                                        <td>
+                                                            <h6 v-text="branchCollection.branch.branch_name"></h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="text-right" v-text="branchCollection.total_amount">
+                                                            </h6>
+
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-xs btn-danger">
+                                                                <i class="fas fa-trash fa-xs"
+                                                                    @click="removeBranchCollection(branchCollection)"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr style="background-color: #f1f1f1;" id="branch-collection-row">
+                                                        <!-- <td colspan="7">&nbsp;</td> -->
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            total
+                                                        </td>
+                                                        <td class="text-right" colspan="3" id="totalbranchcollection"
+                                                            v-text="branchCollectionTotal">
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+
+                                        </div>
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm" id="account-officer-table">
+                                                <thead>
+
+                                                    <th colspan="2"> Other Payment</th>
+
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <p>CASH</p>
+                                                        </td>
+                                                        <td class="text-right" v-text='aoCollectionTotal'>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+
+                                                        <td>
+                                                            <p>CHECK</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.check_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                required placeholder="0.00">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <p>POS</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.pos_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                required placeholder="0.00">
+
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+
+                                                        <td>
+                                                            <p>MEMO</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.memo_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                required placeholder="0.00">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            INTERBRANCH
+                                                        </td>
+                                                        <td class="text-right" v-text='branchCollectionTotal'>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            total
+                                                        </td>
+                                                        <td class="text-right" colspan="3" v-text="otherPaymentTotal">
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                        <div class="text-right">
+
+                                            {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
+                                                style="margin-bottom: 20px;">
+                                                Cancel
+                                            </button> --}}
+
+                                            <button type="button" @click="processCreateOrUpdate()"
+                                                class="btn btn-success" style="margin-bottom: 20px;"> Save</button>
+                                        </div>
+
+
+
+
                                     </div>
                                 </div>
 
                             </div>
-
-
-
+                        </div>
                     </div>
+
                 </div>
+
             </div>
 
 
@@ -380,6 +618,7 @@
                             <th>Transaction Date</th>
                             <th>Cash Ending Balance</th>
                             <th>Total Branch Collection</th>
+                            <th> Difference (+/-) </th>
                             <th>Status</th>
                             <th>Action</th>
                         </thead>
@@ -389,17 +628,32 @@
                                 <td>@{{ d.transaction_date }}</td>
                                 <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
                                 <td>@{{ formatCurrency(d.total) }}</td>
+                                <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
                                 <td>@{{ d.status }}</td>
                                 <td>
                                     <button @click="showCashBlotter(d.collection_id, d.branch_id)"
-                                        class="mr-1 btn btn-xs btn-success"><i class="fas fa-xs fa-eye"
-                                            data-toggle="modal" data-target="#cashBlotterPreviewModal"></i></button>
-                                    <button class="mr-1 btn btn-xs btn-primary"><i
-                                            class="fas fa-xs fa-download download-cashblotter"></i></button>
-                                    <button class="mr-1 btn btn-xs btn-default"><i
-                                            class="fas fa-xs fa-print print-cashblotter"></i></button>
-                                            <button class="mr-1 btn btn-xs btn-primary" @click='processPost(d)'>Post</button>
-                                            <button class="mr-1 btn btn-xs btn-warning" @click='processUnpost(d)'>Unpost</button>
+                                        class="mr-1 btn btn-xs btn-success">
+                                        <i class="fas fa-xs fa-eye" data-toggle="modal"
+                                            data-target="#cashBlotterPreviewModal"></i>
+                                    </button>
+                                    <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
+                                        <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
+                                    </button>
+                                    <button @click="deleteCollectionBreakdown(d.collection_id, d.branch_id)"
+                                        class="mr-1 btn btn-xs btn-danger">
+                                        <i class="fas fa-xs fa-trash"></i>
+                                    </button>
+
+                                    <button class="mr-1 btn btn-xs btn-primary">
+                                        <i class="fas fa-xs fa-download download-cashblotter"></i>
+                                    </button>
+                                    <button class="mr-1 btn btn-xs btn-default">
+                                        <i class="fas fa-xs fa-print print-cashblotter"></i>
+                                    </button>
+                                    <button class="mr-1 btn btn-xs btn-primary"
+                                        @click="updateStatus(d,'posted')">Post</button>
+                                    <button class="mr-1 btn btn-xs btn-warning"
+                                        @click="updateStatus(d,'unposted')">Unpost</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -443,50 +697,8 @@
 
                                                 </div>
                                             </div>
-                                            <!-- <div class="col-md-6">
-                             <div class="col-md-12">
-                              <h6 class="mb-4">Voucher Date: &nbsp;&nbsp;&nbsp; <strong
-                                id="journal_voucher_date"></strong></h6>
 
-                             </div>
-                            </div>
-                            <div class="col-md-6">
-                             <div class="col-md-12">
-                              <h6 class="mb-4">Reference No: &nbsp;&nbsp;&nbsp; <strong
-                                id="journal_voucher_ref_no"></strong></h6>
-
-                             </div>
-                            </div> -->
                                         </div>
-                                        <!-- <div class="row" style="padding-top:15px; border-bottom:10px solid gray;">
-                            <div class="col-md-12">
-                             <div class="col-md-12">
-                              <h6 class="mb-4">Voucher Source : &nbsp;&nbsp;&nbsp; <strong
-                                id="journal_voucher_source"></strong></h6>
-
-                             </div>
-                            </div>
-                            <div class="col-md-12">
-                             <div class="col-md-12">
-                              <h6 class="mb-4">Particular : &nbsp;&nbsp;&nbsp; <strong
-                                id="journal_voucher_particular"></strong></h6>
-
-                             </div>
-                            </div>
-                            <div class="col-md-12">
-                             <div class="col-md-12">
-                              <h6 class="mb-4">Amount : &nbsp;&nbsp;&nbsp; ₱ <strong
-                                id="journal_voucher_amount"></strong></h6>
-
-                             </div>
-                            </div>
-                            <div class="col-md-12">
-                             <div class="col-md-12">
-                              <h6 class="mb-4">Amount in words : &nbsp;&nbsp;&nbsp; <strong
-                                id="journal_voucher_amount_in_words"
-                                style="text-transform:capitalize;"></strong></h6>
-
-                           </div> -->
                                     </div>
                                 </div>
                                 <div class="table-responsive-sm" style="padding-top:5px;">
@@ -601,10 +813,10 @@
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Account Officer</th>
-                                                    <th>Total Amount</th>
+                                                    <th>Amount</th>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="officer in collections.account_officer_collection">
+                                                    <tr v-for="officer in collections.account_officer_collections">
                                                         <td>@{{ officer.representative }} ; @{{ officer.note }}</td>
                                                         <td>@{{ formatCurrency(officer.total) }}</td>
                                                     </tr>
@@ -616,30 +828,58 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <th class="text-uppercase text-bold">Other Payments</th>
+                                                    <th>Amount</th>
+                                                </thead>
+                                                <tbody class="text-uppercase">
+                                                    <tr>
+                                                        <td>Cash</td>
+                                                        <td v-text="otherPayment.cash_amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>check</td>
+                                                        <td v-text="otherPayment.check_amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>pos</td>
+                                                        <td v-text="otherPayment.pos_amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>memo</td>
+                                                        <td v-text="otherPayment.memo_amount"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>interbranch</td>
+                                                        <td v-text="otherPayment.interbranch_amount"></td>
+                                                    </tr>
+
+
+                                                    <tr
+                                                        style="border-top:4px dashed black;border-bottom:4px dashed black;">
+                                                        <td><strong>TOTAL</strong></td>
+                                                        <td v-text="otherPayment.total"><strong></strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
                                         </div>
                                         <div class="col-md-4">
                                             <table class="table table-striped">
                                                 <thead>
-                                                    <th>Other Cash Received</th>
-                                                    <th>Total Amount</th>
+                                                    <th>Interbranch</th>
+                                                    <th>Amount</th>
                                                 </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td></td>
+                                                <tbody class="text-uppercase">
+                                                    <tr v-for="bc in collections.branch_collections">
+                                                        <td class="text-bold" v-text="bc.branch.branch_name"></td>
+                                                        <td v-text="bc.total_amount"></td>
                                                     </tr>
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
-                                                        <td><strong>TOTAL CASH OTHERS</strong></td>
-                                                        <td><strong>0.00</strong></td>
+                                                        <td><strong>TOTAL</strong></td>
+                                                        <td><strong>@{{ total_interbranch_collection }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -676,8 +916,8 @@
                                     <div class="col-lg-4 col-sm-5 ml-auto">
 
                                         <div>
-                                             <button @click="print" class="btn btn-success float-right no-print"
-                                                        data-dismiss="modal" style="padding:5px 32px">Print</button>
+                                            <button @click="print" class="btn btn-success float-right no-print"
+                                                data-dismiss="modal" style="padding:5px 32px">Print</button>
                                         </div>
                                     </div>
                                 </div>
@@ -699,11 +939,13 @@
                 accountOfficers: @json($account_officers),
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
                 branches: null,
-                branch:null,
+                branch: null,
                 filter: {
-                    transaction_date: null,
-                    branch_id:null,
+                    transaction_date: "", //'2024-11-30',
+                    branch_id: null,
                 },
+                isEdit: false,
+                isUpdateStatus: false,
                 result: {},
                 entries: {
                     begining_balance: {},
@@ -718,29 +960,278 @@
                     coci_received: [],
                     coci_encashment: [],
                 },
-                collectionBreakdown:{},
+                officer_collection: {
+                    representative: '',
+                    note: '',
+                    total: 0,
+                },
+                branch_collection: {
+                    total_amount: 0,
+                    branch_id: null,
+                    branch: ''
+                },
+                other_payment: {
+                    cash_amount: 0,
+                    check_amount: 0,
+                    pos_amount: 0,
+                    memo_amount: 0,
+                    interbranch_amount: 0,
+                    total: 0
+                },
+                collectionBreakdown: {
+                    total: 0,
+                    collection_id: 0,
+                    branch_id: null,
+                    transaction_date: "",
+                    p_1000: 0, //34,
+                    p_500: 0, //1,
+                    p_200: 0,
+                    p_100: 0, //1,
+                    p_50: 0,
+                    p_20: 0,
+                    p_10: 0,
+                    p_5: 0,
+                    p_1: 0, //4,
+                    c_25: 0,
+                    total: 0,
+                    flag: "",
+                    account_officer_collections: [],
+                    branch_collections: [],
+                    other_payment: {
+                        cash_amount: 0,
+                        check_amount: 0,
+                        pos_amount: 0,
+                        memo_amount: 0,
+                        interbranch_amount: 0,
+                        total: 0
+                    }
+                },
+                isValid: true,
+                total: {
+                    grandTotal: 0,
+                    p_1000: 0,
+                    p_500: 0,
+                    p_200: 0,
+                    p_100: 0,
+                    p_50: 0,
+                    p_20: 0,
+                    p_10: 0,
+                    p_5: 0,
+                    p_1: 0,
+                    c_25: 0,
+                },
+                accountOfficers: [],
+
                 collections: {
                     transaction_date: ''
                 },
-                statusUpdate:false,
+                statusUpdate: false,
             },
             methods: {
-                greet: function(data) {
-                    alert(data);
-                },
-                processPost:function(collectionBreakdown) {
-                    this.collectionBreakdown = collectionBreakdown;
-                    this.collectionBreakdown.status = "Posted";
-                    this.updateCollectionBreakdown();
-                },
-                processUnpost:function(collectionBreakdown) {
-                    this.collectionBreakdown = collectionBreakdown;
-                    this.collectionBreakdown.status = "Unposted";
-                    this.updateCollectionBreakdown();
-                },
-                updateCollectionBreakdown: function() {
+                amountConverter: function(amount) {
+                    const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
 
-                    axios.post('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this.collectionBreakdown, {
+                    });
+
+                    return formatter.format(amount)
+                },
+                addBranchCollection() {
+                    if ($('#branch_id_collection').val() == "") {
+                        alert("Please add branch");
+                    } else {
+                        this.collectionBreakdown.branch_collections.push({
+                            branch: {
+                                branch_id: $('#branch_id_collection').val(),
+                                branch_name: $('#branch_id_collection option:selected').text(),
+                            },
+                            total_amount: this.branch_collection.total_amount
+                        });
+                    }
+                },
+                addAccountOfficerCollection: function() {
+                    if ($('#remarks').val() == "") {
+                        alert("Please add account officer collection");
+                    } else {
+                        console.log(this.officer_collection);
+                        this.collectionBreakdown.account_officer_collections.push({
+                            representative: this.officer_collection.representative,
+                            note: this.officer_collection.note,
+                            total: this.officer_collection.total
+                        });
+                    }
+
+
+
+                },
+                processCreateOrUpdate: function() {
+                    if (this.isEdit) {
+                        this.updateCollectionBreakdown();
+
+                    } else {
+                        this.createValidation()
+                        if (this.isValid) {
+                            this.createNewCollectionBreakdown();
+
+                        }
+                    }
+                },
+                createValidation: function() {
+                    if (this.collectionBreakdown.other_payment.pos_amount === '') {
+                        alert('POS amount is required.')
+                        this.isValid = false;
+                    } else if (this.collectionBreakdown.other_payment.memo_amount === '') {
+                        alert('MEMO amount is required.')
+                        this.isValid = false;
+                    } else if (this.collectionBreakdown.other_payment.check_amount === '') {
+                        alert('CHECK amount is required.')
+                        this.isValid = false;
+                    } else {
+                        this.isValid = true;
+                    }
+
+
+                },
+                createNewCollectionBreakdown: function() {
+                    this.collectionBreakdown.status = 'unposted';
+                    var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
+                        .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
+                        .replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    axios.post('/MAC-ams/collections', this.collectionBreakdown, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        toastr.success(response.data.message);
+                        this.resetForm();
+                    }).catch(err => {
+                        toastr.error(err.response.data.message);
+
+                    })
+                },
+                removeBranchCollection: function(collection) {
+                    if (this.isEdit) {
+                        axios.delete('/MAC-ams/branch-collection/' + collection.id, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+
+                            this.collectionBreakdown.branch_collections = updatedArray;
+                        }).catch(err => {
+                            toastr.error(err.data.message);
+                        })
+                    }
+                    const isEqual = (obj1, obj2) =>
+                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
+                    const updatedArray = this.collectionBreakdown.branch_collections.filter(
+                        element => !
+                        isEqual(element, collection));
+
+                },
+                resetForm: function() {
+                    this.collectionBreakdown.collection_id = null,
+                        this.collectionBreakdown.branch_id = null;
+                    this.collectionBreakdown.transaction_date = '';
+                    this.collectionBreakdown.p_1000 = 0;
+                    this.collectionBreakdown.p_500 = 0;
+                    this.collectionBreakdown.p_200 = 0;
+                    this.collectionBreakdown.p_100 = 0;
+                    this.collectionBreakdown.p_50 = 0;
+                    this.collectionBreakdown.p_20 = 0;
+                    this.collectionBreakdown.p_10 = 0;
+                    this.collectionBreakdown.p_5 = 0;
+                    this.collectionBreakdown.p_1 = 0;
+                    this.collectionBreakdown.c_25 = 0;
+                    this.collectionBreakdown.branch_collections = [];
+                    this.collectionBreakdown.account_officer_collections = [];
+                    this.collectionBreakdown.other_payment = {
+                        cash_amount: 0,
+                        check_amount: 0,
+                        pos_amount: 0,
+                        memo_amount: 0,
+                        interbranch_amount: 0
+                    }
+                },
+                removeAccountOfficerCollection: function(collection) {
+                    if (this.isEdit) {
+                        axios.delete('/MAC-ams/account-officer-collection/' + collection.collection_ao_id, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+
+                        }).catch(err => {
+                            toastr.error(err.data.message);
+                        })
+                    }
+                    const isEqual = (obj1, obj2) =>
+                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
+                    const updatedArray = this.collectionBreakdown.account_officer_collections
+                        .filter(element =>
+                            !
+                            isEqual(element, collection));
+                    this.collectionBreakdown.account_officer_collections = updatedArray;
+
+
+
+                },
+
+                calculateCashCount: function(collectionBreakdown) {
+                    this.total.p_1000 = collectionBreakdown.p_1000 * 1000;
+                    this.total.p_500 = collectionBreakdown.p_500 * 500
+                    this.total.p_200 = collectionBreakdown.p_200 * 200;
+                    this.total.p_100 = collectionBreakdown.p_100 * 100;
+                    this.total.p_50 = collectionBreakdown.p_50 * 50;
+                    this.total.p_20 = collectionBreakdown.p_20 * 20;
+                    this.total.p_10 = collectionBreakdown.p_10 * 10;
+                    this.total.p_5 = collectionBreakdown.p_5 * 5;
+                    this.total.p_1 = collectionBreakdown.p_1 * 1;
+                    this.total.c_25 = collectionBreakdown.c_25 * .25;
+
+
+
+
+                },
+                editCollectionBreakdown: function(collectionBreakdown) {
+                    this.isEdit = true;
+                    this.calculateCashCount(collectionBreakdown)
+                    this.collectionBreakdown = collectionBreakdown;
+                    this.branch = $('#branchID').find(':selected').val()
+                    axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            var cb = response.data.data.collections;
+                            if (!cb.other_payment) {
+                                cb.other_payment = {
+                                    cash_amount: 0,
+                                    check_amount: 0,
+                                    pos_amount: 0,
+                                    memo_amount: 0,
+                                    interbranch_amount: 0
+                                }
+                            }
+                            this.collectionBreakdown = cb;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    this.calculateCashCount(collectionBreakdown);
+                },
+                deleteCollectionBreakdown: function(collection_id) {
+                    axios.delete('/MAC-ams/collection-breakdown/' + collection_id, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -748,17 +1239,40 @@
                     }).then(response => {
                         toastr.success(response.data.message);
                     }).catch(err => {
-                        console.error(err);
-                       // var errors = err.response.data.errors;
-                       // var messages = [];
-                       // for (var i in errors) {
-                       //     var error = errors[i];
-                       //     for (var j in error) {
-                       //         var message = error[j];
-                       //         messages.push(message + '<br />');
-                       //     }
-                       // }
-                        //toastr.error(messages);
+                        toastr.success(err);
+                    })
+                },
+                processCreateCollection: function() {
+                    this.isEdit = false;
+
+                },
+                updateStatus: function(collectionBreakdown, status) {
+                    this.isUpdateStatus = true;
+                    this.collectionBreakdown = collectionBreakdown;
+                    this.collectionBreakdown.status = status
+                    this.updateCollectionBreakdown();
+                },
+
+                updateCollectionBreakdown: function() {
+                    if (!this.isUpdateStatus) {
+                        var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
+                            .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.total = totalCash
+                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
+                            .replace(/[^0-9\.-]+/g, ""));
+                    }
+                    axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
+                        .collectionBreakdown, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                    }).then(response => {
+                        toastr.success(response.data.message);
+                        this.isUpdateStatus = false;
+                    }).catch(err => {
+                        toastr.error(err.response.data.message);
                     })
                 },
                 getBranchName(branchId) {
@@ -783,15 +1297,12 @@
                 filterCollections: function() {
                     var data = {
                         transaction_date: this.filter.transaction_date,
-                        branch_id:this.filter.branch_id
+                        branch_id: this.filter.branch_id
                     }
                     var url = "{{ route('reports.cashTransactionBlotter') }}"
                     axios.post(url, data)
                         .then(response => {
-                            // console.log(response.data.data)
                             this.data = response.data.data
-                            //this.branch = response.data.data.branch.branch_name
-                            // console.log(this.data);
                             toastr.success(response.data.message);
                         }).catch(error => {
                             console.error(error);
@@ -807,18 +1318,15 @@
                             }
                         }) // Replace with your API endpoint
                         .then(response => {
-                            // console.log(response);
                             this.responseData = response.data;
                             this.entries = response.data['entries'];
                             this.collections = response.data['entries']['collections'];
-                            // console.log("Collections Data:", this.collections);
                             this.arrangeData(response.data['entries']);
                             this.collections.total_accountofficer = 0;
-                            for (var i in this.collections.account_officer_collection) {
+                            for (var i in this.collections.account_officer_collections) {
                                 this.collections.total_accountofficer += parseFloat(this.collections
-                                    .account_officer_collection[i].total);
+                                    .account_officer_collections[i].total);
                             }
-                            // console.log(this.collections);
                         })
                         .catch(error => {
                             console.error(error);
@@ -832,12 +1340,8 @@
                                 this.entries[i] = data[k];
                             }
                         }
-                        // if(i == 'collections'){
-                        // 	this.collections = entry;
-                        // 	console.log(this.collections);
-                        // }
                     }
-                    // console.log(this.entries);
+
                 },
                 upperWords: function(inputString) {
                     var stringWithSpaces = inputString.replace(/_/g, ' ');
@@ -890,10 +1394,83 @@
                 }
             },
             computed: {
+                total_interbranch_collection: function() {
+                    return this.collections.branch_collections ? this.collections.branch_collections.reduce((
+                            sum, item) => sum + item.total_amount,
+                        0) : 0;
+                },
+                otherPayment: function() {
+                    var collections = this.collections;
+                    if (collections.other_payment) {
+                        var otherPayment = collections.other_payment;
+                        return {
+                            cash_amount: this.formatCurrency(otherPayment.cash_amount),
+                            check_amount: this.formatCurrency(otherPayment.check_amount),
+                            memo_amount: this.formatCurrency(otherPayment.memo_amount),
+                            pos_amount: this.formatCurrency(otherPayment.pos_amount),
+                            interbranch_amount: this.formatCurrency(otherPayment.interbranch_amount),
+                            total: this.formatCurrency(otherPayment.cash_amount + otherPayment.check_amount +
+                                otherPayment.memo_amount + otherPayment.pos_amount + otherPayment
+                                .interbranch_amount),
+                        };
+                    }
+
+                    return this.other_payment;
+
+                },
                 collectionsBreakdown: function() {
                     return this.data.collections
                 },
+                totalCash: function() {
+                    var total = parseFloat(this.collectionBreakdown.p_1000 * 1000) +
+                        parseFloat(this.collectionBreakdown.p_500 * 500) +
+                        parseFloat(this.collectionBreakdown.p_200 * 200) +
+                        parseFloat(this.collectionBreakdown.p_100 * 100) +
+                        parseFloat(this.collectionBreakdown.p_50 * 50) +
+                        parseFloat(this.collectionBreakdown.p_20 * 20) +
+                        parseFloat(this.collectionBreakdown.p_10 * 10) +
+                        parseFloat(this.collectionBreakdown.p_5 * 5) +
+                        parseFloat(this.collectionBreakdown.p_1 * 1) +
+                        parseFloat(this.collectionBreakdown.c_25 * 0.25);
+                    return this.amountConverter(total);
+                },
+                aoCollectionTotal: function() {
+                    var aoCollection = this.collectionBreakdown.account_officer_collections;
+                    var total = 0;
+                    if (aoCollection.length > 0) {
+                        for (var i in aoCollection) {
+                            total += parseFloat(aoCollection[i].total);
+                        }
+                    }
+                    return this.amountConverter(total);
+                },
+                otherPaymentTotal: function() {
 
+                    var otherPayment = this.collectionBreakdown.other_payment;
+                    let total = 0;
+                    if (otherPayment) {
+                        total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
+                            parseFloat(otherPayment.check_amount) +
+                            parseFloat(otherPayment.memo_amount) +
+                            parseFloat(otherPayment.pos_amount) +
+                            parseFloat(otherPayment.interbranch_amount)
+                    }
+                    return this.amountConverter(total);
+                },
+                branchCollectionTotal: function() {
+                    var branchCollection = this.collectionBreakdown.branch_collections;
+                    var total = 0;
+                    if (this.collectionBreakdown.other_payment) {
+                        if (branchCollection.length > 0) {
+                            for (var i in branchCollection) {
+                                total += parseFloat(branchCollection[i].total_amount);
+                            }
+
+                        }
+                    }
+
+                    return this.amountConverter(total);
+                },
                 filteredCashBlotter: function() {
                     var rows = [];
                     var cashEndingBalance = 0;

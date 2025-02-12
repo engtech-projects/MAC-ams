@@ -22,7 +22,7 @@
 
 
 
-        $('#create-cashblotter').click(function(){
+       /*  $('#create-cashblotter').click(function(){
             $('#Mymodal').modal('show')
             reset()
             $('#title').text("Cashier's Transaction Blotter (New)")
@@ -40,6 +40,24 @@
                 fetchCollectionBreakdown(branchID);
             }
         });
+        $('#edit-cashblotter').click(function(){
+            $('#Mymodal').modal('show')
+            reset()
+            $('#title').text("Cashier's Transaction Blotter (New)")
+
+            var branchID;
+
+            if ($('#branch_id').length) {
+                $(document).on('change','#branch_id',function(){
+                    branchID = $(this).val(); // Get selected value from the dropdown
+                    fetchCollectionBreakdown(branchID);
+                });
+            } else {
+                $('#transactionDate').prop('disabled', false);
+                branchID = "{{ session()->get('auth_user_branch') }}"; // Use session value if not visible
+                fetchCollectionBreakdown(branchID);
+            }
+        }); */
 
         // Function to fetch collection breakdown based on branch ID
         function fetchCollectionBreakdown(branchID) {
@@ -296,7 +314,7 @@
     })
 
 
-    $(document).on('submit','#add-cash-blotter',function(e){
+    /* $(document).on('submit','#add-cash-blotter',function(e){
         e.preventDefault()
 
         var form = $(this);
@@ -392,7 +410,7 @@
                 alert("Failed to retrieve Cash Ending Balance. Please try again.");
             }
         });
-    });
+    }); */
 
     function reset() {
         $('#add-cash-blotter')[0].reset()
@@ -725,7 +743,7 @@
             var five = Number($('#fivetotalamount').text().replace(/[^0-9\.-]+/g,""))
             var one = Number($('#onetotalamount').text().replace(/[^0-9\.-]+/g,""))
             var centavo = parseFloat(Number($('#centavototalamount').text().replace(/[^0-9\.-]+/g,"")))
-            var total = onethousand+fivehundred+twohundred+onehundred+fifty+twenty+ten+five+one+centavo
+        var total = onethousand+fivehundred+twohundred+onehundred+fifty+twenty+ten+five+one+centavo
             $('#totalcashcount').text(amountConverter(total))
         }
 

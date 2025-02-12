@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CollectionBreakdown;
+use Illuminate\Validation\Rule;
 
 class CreateOrUpdateCollectionRequest extends FormRequest
 {
@@ -25,6 +26,7 @@ class CreateOrUpdateCollectionRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
             "p_1000" => 'required|numeric',
             "p_500" => 'required|numeric',
@@ -36,10 +38,17 @@ class CreateOrUpdateCollectionRequest extends FormRequest
             "p_5" => 'required|numeric',
             "p_1" => 'required|numeric',
             "c_25" => 'required|numeric',
-            "transaction_date" => 'required|date|unique:collection_breakdown,transaction_date,NULL,id,branch_id,' . $this->branch_id,
+            'transaction_date' => [
+                'required',
+                'date',
+                Rule::unique('collection_breakdown', 'transaction_date')->where('branch_id', $this->branch_id)->ignore($this->collection_id, 'collection_id'),
+            ],
             "branch_id" => 'required|numeric',
-            "total" => 'required|numeric',
-            "collection_ao" => "required",
+            "total" => 'numeric',
+            "account_officer_collections" => "array",
+            "branch_collections" => "array",
+            "other_payment" => "nullable",
+            "status" => 'string',
         ];
     }
     public function messages()
@@ -52,12 +61,14 @@ class CreateOrUpdateCollectionRequest extends FormRequest
     }
     protected function prepareForValidation()
     {
+        if(!$this->route('collectionBreakdown')) {
+            //$this->merge(['status' => 'unposted']);
+        }
+        $this->merge(['flag' => CollectionBreakdown::COLLECTION_FLAG]);
         if (Auth::user()->can('manager')) {
             $this->merge(['branch_id' => $this->input('branch_id')]);
         } else {
             $this->merge(['branch_id' => session()->get('auth_user_branch')]);
         }
     }
-
-
 }

@@ -13,7 +13,7 @@ class JournalBook extends Model
 
     const CASH_BLOTTER_BOOKS = [1, 9, 6, 8, 7, 4];
     const LOAN_PAYMENTS_BOOK = 9;
-    const CASH_PAID_BOOK = [6, 8, 7, 5];
+    const CASH_PAID_BOOK = [1, 6, 8, 7, 5];
     const POS_PAYMENT_BOOK = [9];
     const COLLECTION_DEPOSITS_BOOK = 7;
     const INTER_BRANCH_BOOKS = [9, 4];
@@ -49,16 +49,42 @@ class JournalBook extends Model
 
     public function generateJournalNumber()
     {
-        $entry = $this->journalEntries()->whereNotNull('journal_no')->orderBy('journal_id', 'desc')->first();
+        return DB::transaction(function () {
+            // Fetch or create the sequence for the current book code
+            $sequence = DB::table('journal_sequences')
+                ->lockForUpdate()
+                ->where('book_code', $this->book_code)
+                ->first();
 
-        if ($entry) {
-            $series = explode('-', $entry->journal_no);
-            $lastNumber = (int)$series[1];
-            $journalNumber = $this->book_code . '-' . sprintf('%006s', $lastNumber + 1);
-        } else {
-            $journalNumber = $this->book_code . '-' . sprintf('%006s', 1);
-        }
-        return $journalNumber;
+            if ($sequence) {
+                // Increment the last number
+                $lastNumber = $sequence->last_number + 1;
+
+                // Update the sequence in the table
+                DB::table('journal_sequences')
+                    ->where('id', $sequence->id)
+                    ->update(['last_number' => $lastNumber]);
+            } else {
+                // Initialize the sequence for the book code
+                $lastNumber = 1;
+
+                DB::table('journal_sequences')->insert([
+                    'book_code' => $this->book_code,
+                    'last_number' => $lastNumber,
+                ]);
+            }
+
+            // Generate the journal number
+            $journalNumber = $this->book_code . '-' . sprintf('%006s', $lastNumber);
+
+            // Save the new journal number as a journal entry
+            $this->journalEntries()->create([
+                'journal_no' => $journalNumber,
+                // Add other necessary fields
+            ]);
+
+            return $journalNumber;
+        });
     }
 
 
