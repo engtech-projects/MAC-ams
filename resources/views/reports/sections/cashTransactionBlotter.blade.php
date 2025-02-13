@@ -1736,6 +1736,7 @@
                 },
                 otherPayment: function() {
                     var collections = this.collections;
+
                     if (collections.other_payment) {
                         var otherPayment = collections.other_payment;
                         return {
@@ -1784,14 +1785,15 @@
 
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
-                    if (otherPayment) {
-                        console.log(this.aoCollectionTotal);
+
+                    if (otherPayment.check_amount) {
+
                         total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
-                            parseFloat(otherPayment.check_amount) +
                             parseFloat(otherPayment.memo_amount) +
-                            parseFloat(otherPayment.pos_amount) +
-                            parseFloat(otherPayment.interbranch_amount)
-                        /* console.log(parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, ""))); */
+                            parseFloat(otherPayment.check_amount) +
+                            parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
+                            parseFloat(this.posCollectionTotal.replace(/[^0-9\.-]+/g, ""))
+
                     }
                     return this.amountConverter(total);
                 },
@@ -1821,7 +1823,6 @@
 
                         }
                     }
-                    alert(total);
                     return this.amountConverter(total);
                 },
                 filteredCashBlotter: function() {
