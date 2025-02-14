@@ -1373,6 +1373,7 @@
                         if (this.isValid) {
                             this.createNewCollectionBreakdown();
 
+
                         }
                     }
                 },
@@ -1409,7 +1410,7 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        /* window.location.reload(); */
+                        window.location.reload();
                         //  this.resetForm();
                     }).catch(err => {
                         toastr.error(err.response.data.message);
