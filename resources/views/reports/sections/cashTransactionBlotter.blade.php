@@ -332,8 +332,7 @@
                                                         <td>
                                                             <input type="number"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                id="total_amount" placeholder="0.00"
-                                                                v-model="officer_collection.total">
+                                                                id="total_amount" v-model="officer_collection.total">
                                                         </td>
                                                         <td class="text-center">
                                                             <button class="btn btn-xs btn-primary"
@@ -383,7 +382,7 @@
                                                         <td>
                                                             <input type="number" v-model="officer_collection.total"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                id="total_amount" placeholder="0.00">
+                                                                id="total_amount">
                                                         </td>
                                                         <td class="text-center">
                                                             <button class="btn btn-xs btn-primary"
@@ -1200,16 +1199,16 @@
                 officer_collection: {
                     representative: '',
                     note: '',
-                    total: 0,
+                    total: null,
                 },
                 branch_collection: {
-                    total_amount: 0,
+                    total_amount: null,
                     branch_id: null,
                     branch: ''
                 },
                 pos_collections: {
                     or_no: null,
-                    total_amout: 0,
+                    total_amout: null,
                     isEditing: false
                 },
                 other_payment: {
@@ -1303,7 +1302,7 @@
 
                         $('#branch_id_collection option:selected').val("");
 
-                        this.branch_collection.total_amount = 0;
+                        this.branch_collection.total_amount = null;
 
                     }
                 },
@@ -1320,7 +1319,7 @@
                             isEditing: false
                         });
 
-                        this.officer_collection.total = 0;
+                        this.officer_collection.total = null;
                         this.officer_collection.representative = '';
                         this.officer_collection.note = '';
                     }
@@ -1778,8 +1777,10 @@
                     var total = 0;
                     if (aoCollection.length > 0) {
                         for (var i in aoCollection) {
-
-                            total += parseFloat(aoCollection[i].total.replace(/[^0-9\.-]+/g, ""));
+                            var totalCollection = aoCollection[i].total;
+                            if (totalCollection) {
+                                total += parseFloat(aoCollection[i].total.replace(/[^0-9\.-]+/g, ""));
+                            }
                         }
                     }
                     return this.amountConverter(total);
