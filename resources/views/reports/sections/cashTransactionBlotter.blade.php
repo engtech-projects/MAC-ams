@@ -881,7 +881,7 @@
                             <div id="ui-view">
                                 <div class="card">
                                     <div class="card-body" id="journal_toPrintVouch">
-                                        <link rel="stylesheet"
+                                        {{-- <link rel="stylesheet"
                                             href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
                                         <link rel="stylesheet"
                                             href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -889,7 +889,7 @@
                                         <div class="col-md-12">
                                             <img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"
                                                 class="img img-fluid">
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-12">
                                             <h3 style="text-align:center">Cashier's Transaction Blotter</h3>
                                         </div>
@@ -1778,6 +1778,7 @@
                     if (aoCollection.length > 0) {
                         for (var i in aoCollection) {
                             var totalCollection = aoCollection[i].total;
+                            aler(totalCollection);
                             if (totalCollection) {
                                 total += parseFloat(aoCollection[i].total.replace(/[^0-9\.-]+/g, ""));
                             }
