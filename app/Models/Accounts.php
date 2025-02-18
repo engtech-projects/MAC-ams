@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use App\Models\Accounts;
 use App\Models\journalEntryDetails;
 use App\Models\AccountType;
 use Carbon\Carbon;
@@ -1055,7 +1054,8 @@ class Accounts extends Model
                 if ($account->account_id == 84) {
                     $subtotal = ($account->total - $opening_balance);
                 } else {
-                    $subtotal = abs($account->total - $opening_balance);
+                    // $subtotal = abs($account->total - $opening_balance);
+                    $subtotal = ($account->total - $opening_balance) * -1;
                 }
                 // if( $account->total >= 0 ) {
                 //    $subtotal = abs($account->total + $opening_balance);
