@@ -1778,7 +1778,6 @@
                     if (aoCollection.length > 0) {
                         for (var i in aoCollection) {
                             var totalCollection = aoCollection[i].total;
-                            aler(totalCollection);
                             if (totalCollection) {
                                 total += parseFloat(aoCollection[i].total.replace(/[^0-9\.-]+/g, ""));
                             }
