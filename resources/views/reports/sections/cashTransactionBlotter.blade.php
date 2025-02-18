@@ -282,7 +282,7 @@
                                                         <td><input type="number" v-model="collectionBreakdown.c_25"
                                                                 name="c_25" id="centavo" ref="c_25"
                                                                 class="form-control form-control-sm" required></td>
-                                                        <td id="centavototalamount" class="total">
+                                                        <td id="cenmtavoonetotalamount" class="total">
                                                             <h6 v-text="total.c_25"></h6>
                                                         </td>
                                                     </tr>
@@ -1047,7 +1047,9 @@
                                                 </thead>
                                                 <tbody class="text-uppercase">
                                                     <tr>
-                                                        <td>Cash</td>
+                                                        <td>
+                                                            <h1 v-text="otherPayment"></h1>
+                                                        </td>
                                                         <td v-text="otherPayment.cash_amount"></td>
                                                     </tr>
                                                     <tr>
@@ -1071,7 +1073,7 @@
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
                                                         <td><strong>TOTAL</strong></td>
-                                                        <td v-text="otherPayment.total"><strong></strong></td>
+                                                        <td v-text="otherPayment"><strong></strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -1211,11 +1213,11 @@
                     isEditing: false
                 },
                 other_payment: {
-                    cash_amount: null,
-                    check_amount: null,
-                    pos_amount: null,
-                    memo_amount: null,
-                    interbranch_amount: null,
+                    cash_amount: 0,
+                    check_amount: 0,
+                    pos_amount: 0,
+                    memo_amount: 0,
+                    interbranch_amount: 0,
                     total: 0
                 },
                 collectionBreakdown: {
@@ -1239,8 +1241,8 @@
                     branch_collections: [],
                     pos_collections: [],
                     other_payment: {
-                        cash_amount: null,
-                        check_amount: null,
+                        cash_amount: 0,
+                        check_amount: 0,
                         pos_amount: 0,
                         memo_amount: 0,
                         interbranch_amount: 0,
@@ -1532,7 +1534,7 @@
                     this.total.p_10 = collectionBreakdown.p_10 * 10;
                     this.total.p_5 = collectionBreakdown.p_5 * 5;
                     this.total.p_1 = collectionBreakdown.p_1 * 1;
-                    this.total.c_25 = collectionBreakdown.c_25 * .25;
+                    this.total.c_25 = collectionBreakdown.c_25 * 0.25;
 
 
 
@@ -1787,15 +1789,15 @@
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
 
-                    if (otherPayment.check_amount) {
 
-                        total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
-                            parseFloat(otherPayment.memo_amount) +
-                            parseFloat(otherPayment.check_amount) +
-                            parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
-                            parseFloat(this.posCollectionTotal.replace(/[^0-9\.-]+/g, ""))
 
-                    }
+                    total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
+                        parseFloat(otherPayment.memo_amount) +
+                        parseFloat(otherPayment.check_amount) +
+                        parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
+                        parseFloat(this.posCollectionTotal.replace(/[^0-9\.-]+/g, ""))
+
+
                     return this.amountConverter(total);
                 },
                 branchCollectionTotal: function() {
