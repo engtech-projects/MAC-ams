@@ -740,10 +740,12 @@
                                 <button class="mr-1 btn btn-xs btn-default">
                                     <i class="fas fa-xs fa-print print-cashblotter"></i>
                                 </button>
+                                @if (Gate::allows('manager'))
                                 <button class="mr-1 btn btn-xs btn-primary"
                                     @click="updateStatus(d,'posted')">Post</button>
                                 <button class="mr-1 btn btn-xs btn-warning"
                                     @click="updateStatus(d,'unposted')">Unpost</button>
+                                @endif
                             </td>
                         </tr>
                     </tbody>
