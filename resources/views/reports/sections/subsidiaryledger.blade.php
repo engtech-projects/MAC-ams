@@ -231,10 +231,10 @@
 
                     </form>
                     <form @submit.prevent="submitForm" action="">
-                        <div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'||reportType=='subsidiary-ledger-listing-report'||reportType=='subsidiary-ledger-summary-report'"
+                        <div v-show="['subsidiary_all_account', 'subsidiary_per_account', 'income_minus_expense', 'subsidiary-ledger-listing-report', 'subsidiary-ledger-summary-report', 'income_minus_expense_summary'].includes(reportType)"
                             class="row col-md-12 no-print">
                             <div class="col-md-2 col-xs-12"
-                                v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'">
+                                v-show="['subsidiary_all_account', 'subsidiary_per_account', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
@@ -252,7 +252,7 @@
                                 </div>
                             </div>
 
-                            <div v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='subsidiary-ledger-summary-report'"
+                            <div v-show="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'subsidiary-ledger-summary-report'].includes(reportType)"
                                 class="col-md-3 col-xs-12" style="margin-right:64px;">
                                 <div class="box">
                                     <div class="form-group">
@@ -277,13 +277,12 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
+                                v-if="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_from">From</label>
                                         <div class="input-group">
                                             <input v-model="filter.from" type="date"
-                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'"
                                                 class=" form-control form-control-sm rounded-0" name="from"
                                                 id="sub_date" required>
                                         </div>
@@ -292,7 +291,7 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
+                                v-if="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_to">To</label>
@@ -304,7 +303,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2 col-xs-12" v-show="reportType=='subsidiary-ledger-summary-report'">
+                            <div
+                                class="col-md-2 col-xs-12" 
+                                v-show="['subsidiary-ledger-summary-report'].includes(reportType)"
+                            >
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_date">As of:</label>
@@ -339,7 +341,82 @@
                         Excel</button>
                 </div>
                 <div class="col-md-12">
-
+                    <div v-if="reportType=='income_minus_expense_summary'">
+                        <section class="content">
+                            <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+                                <div class="row justify-content-start">
+                                    <div class="col-md-8">
+                                        <table class="table table-sm border">
+                                            <table v-for="(type,category) in incomeStatementSummary.accounts" class="table table-sm border">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="indent-1" width="50%">@{{ category.toUpperCase() }}</th>
+                                                        <th width="25%"></th>
+                                                        <th width="25%"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template v-for="(data,group) in type.types">
+                                                        
+                                                        <tr class="border-0">
+                                                            <td class="indent-1">@{{titleCase(data.name)}}</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                            <template v-for="(value,key) in data.accounts">
+                                                                <tr class="border-0">
+                                                                    <td class="indent-2">@{{titleCase(value.account_name)}}</td>
+                                                                    <td class="text-right">@{{value.total}}</td>
+                                                                    <td></td>
+                                                                </tr>
+                                                            </template>
+                                                        <tr class="border-0">
+                                                            <td colspan="3">&nbsp;</td>
+                                                        </tr>
+                                                        <tr style="border-style: double;">
+                                                            <td class="indent-1">Total @{{ titleCase(data.name) }}</td>
+                                                            <td></td>
+                                                            <td class="text-bold text-right indent-1-r">@{{ data.total }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="3">&nbsp;</td>
+                                                        </tr>
+                                                    </template>
+                                                    <tr style="border-style: double;">
+                                                        <td class="indent-1 text-bold">Total @{{ titleCase(category) }}</td>
+                                                        <td></td>
+                                                        <td class="text-bold text-right indent-1-r">@{{ type.total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3">&nbsp;</td>
+                                                    </tr>
+                                                </tbody>
+                                            <table>
+                                            <thead v-if="incomeStatementSummary!={}">
+                                                <tr>
+                                                    <th class="indent-1" width="50%">@{{ incomeStatementSummary?.profit?.title }}</th>
+                                                    <th width="25%"></th>
+                                                    <th width="25%" class="text-right indent-1-r">@{{ incomeStatementSummary?.profit?.value }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="indent-1" width="50%">@{{ incomeStatementSummary?.income_tax?.title }}</th>
+                                                    <th width="25%"></th>
+                                                    <th width="25%" class="text-right indent-1-r">@{{ incomeStatementSummary?.income_tax?.value }}</th>
+                                                </tr>
+                                                <tr><th colspan="3">&nbsp;</th></tr>
+                                                <tr>
+                                                    <th class="indent-1" width="50%">@{{ incomeStatementSummary?.net_income?.title }}</th>
+                                                    <th width="25%"></th>
+                                                    <th width="25%" class="text-right indent-1-r">@{{ incomeStatementSummary?.net_income?.value }}</th>
+                                                </tr>
+                                            </thead>
+                                                
+                                        </table>
+                                    </div>
+                                </div>	
+                            </div>
+                        </section>
+                    </div>
                     <!-- Table -->
                     <section class="content">
                         <div class="container-fluid">
@@ -1050,6 +1127,7 @@
                     income: [],
                     expense: []
                 },
+                incomeStatementSummary: {},
                 subsidiaryAll: [],
                 balance: 0,
                 url: "{{ route('reports.subsidiary-ledger') }}",
@@ -1089,6 +1167,8 @@
 
                                 this.balance = response.data.balance;
 
+                            } else if (this.reportType == 'income_minus_expense_summary') {
+                                this.incomeStatementSummary = response.data.incomeStatement;
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
                                 let bal = response.data.data[1];
@@ -1168,7 +1248,12 @@
                     });
 
                     return formatter.format(number);
-                }
+                },
+                titleCase: function(str) {
+                    return str.replace(/\w\S*/g, function(txt){
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                },
             },
             computed: {
                 processedSubsidiary: function() {

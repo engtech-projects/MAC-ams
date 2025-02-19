@@ -1289,5 +1289,140 @@ class Accounts extends Model
         return $sheet;
     }
 
+    public function incomeStatementSummary($range, $filter)
+    {
+
+        $accounts = Accounts::join('account_type as at', 'at.account_type_id', '=', 'coa.account_type_id')
+            ->join('account_category as ac', 'ac.account_category_id', '=', 'at.account_category_id')
+            ->select(
+                'ac.account_category',
+                'ac.account_category_id',
+                'ac.to_increase',
+                'at.account_type',
+                'at.account_type_id',
+                'coa.account_id',
+                'coa.account_number',
+                'coa.account_name',
+            )
+            ->from('chart_of_accounts as coa')
+            ->where(['coa.status' => 'active'])
+            ->whereIn('coa.type', ['L', 'R', 'X'])
+            ->whereIn('ac.account_category', ['revenue', 'expense'])
+            ->orderBy('coa.account_number', 'ASC')
+            ->groupBy('coa.account_id')
+            ->get();
+
+        $sheet = [
+            'accounts' => [],
+            'profit' => [],
+            'income_tax' => [],
+            'net_income' => []
+        ];
+
+        foreach ($accounts as $account) {
+
+            $data = journalEntry::leftJoin('journal_entry_details as jed', 'je.journal_id', '=', 'jed.journal_id')
+                ->select(
+                    DB::raw('SUM(jed.journal_details_debit) as debit'),
+                    DB::raw('SUM(jed.journal_details_credit) as credit'),
+                    DB::raw('(SUM(jed.journal_details_debit) - SUM(jed.journal_details_credit)) as total'),
+                )
+                ->from('journal_entry as je')
+                ->whereBetween("je.journal_date", $range)
+                ->where(['jed.account_id' => $account->account_id, 'je.status' => 'posted'])
+                ->where('jed.subsidiary_id', $filter)
+                ->groupBy('jed.account_id')
+                ->groupBy('jed.journal_details_account_no')
+                ->limit(1)
+                ->first();
+
+            if ($data) {
+                $account->debit = $data['debit'];
+                $account->credit = $data['credit'];
+                $account->total = $data['total'];
+            } else {
+
+                // // account id of Current Earnings
+                // if( $account->account_id == 84 ) {
+                //     $account->debit = 0;
+                //     $account->credit = 0;
+                //     $account->total = $this->currentEarnings($range);
+                // }else{
+                $account->debit = 0;
+                $account->credit = 0;
+                $account->total = 0;
+                // }
+            }
+
+            // ------------------------------------------------------------------------
+
+            if (!isset($sheet['accounts'][$account->account_category])) {
+                $sheet['accounts'][$account->account_category] = [
+                    'total' => 0,
+                    'types' => []
+                ];
+            }
+
+            if (!isset($sheet['accounts'][$account->account_category]['types'][$account->account_type_id])) {
+                $sheet['accounts'][$account->account_category]['types'][$account->account_type_id] = [
+                    'total' => 0,
+                    'name' => $account->account_type,
+                    'accounts' => []
+
+                ];
+            } else {
+            }
+
+            // $opening_balance =  $this->getAccountBalance($range[0], $range[1], $account->account_id);
+            if (strtolower($account->account_category) == 'expense') {
+                $subtotal = $account->total;
+            } else {
+                $subtotal = $account->total * -1;
+            }
+            // if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
+            //     $subtotal = ($account->total + $opening_balance);
+            // }else{
+            //       $subtotal = abs($account->total - $opening_balance);
+            // }
+
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
+                'account_number' => $account->account_number,
+                'account_name' => $account->account_name,
+                'debit' =>  $account->debit,
+                'credit' => $account->credit,
+                // 'opening_balance' => $opening_balance,
+                'total' => number_format(round($subtotal, 2), 2),
+                'computed' => number_format(round($subtotal, 2), 2),
+            ];
+
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] = number_format(floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total']) + floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed']), 2);
+
+            $sheet['accounts'][$account->account_category]['total'] += floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed']);
+        }
+        $netProfit = $sheet['accounts']['revenue']['total'] - $sheet['accounts']['expense']['total'];
+        $incomeTax = 0;
+        $netIncome = $netProfit - $incomeTax;
+
+        $sheet['accounts']['revenue']['total'] = number_format($sheet['accounts']['revenue']['total'], 2);
+        $sheet['accounts']['expense']['total'] = number_format($sheet['accounts']['expense']['total'], 2);
+
+        $sheet['profit'] = [
+            'title' => 'Profit / (Loss) before tax',
+            'value' => number_format(round($netProfit, 2), 2)
+        ];
+
+        $sheet['income_tax'] = [
+            'title' => 'Less Provision for Income tax (0%)',
+            'value' => number_format(round($incomeTax, 2), 2)
+        ];
+
+        $sheet['net_income'] = [
+            'title' => 'Net Income / (Loss)',
+            'value' => number_format(round($netIncome, 2), 2)
+        ];
+
+        return $sheet;
+    }
+
     public function bankReconciliation() {}
 }
