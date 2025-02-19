@@ -744,7 +744,7 @@
             var val = .25
             var pcs = $('#centavo').val()
             var total = val * pcs
-            $('#cenmtavoonetotalamount').text(total === 0 ? '' : formatCurrency(total))
+            $('#centavototalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -765,7 +765,7 @@
             var centavo = parseFloat(Number($('#centavototalamount').text().replace(/[^0-9\.-]+/g, "")))
             var total = onethousand + fivehundred + twohundred + onehundred + fifty + twenty + ten + five + one +
                 centavo
-            $('#totalcashcount').text(amountConverter(total))
+            $('#totalcashcount').text(formatCurrency(total))
         }
 
         function amountConverter(amount) {
@@ -784,7 +784,7 @@
             if (isNaN(amount)) {
                 return 0;
             }
-            amount = amount.toFixed(0);
+            amount = amount.toFixed(2);
 
             amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 

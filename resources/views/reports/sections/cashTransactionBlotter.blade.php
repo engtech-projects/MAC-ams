@@ -282,7 +282,7 @@
                                                         <td><input type="number" v-model="collectionBreakdown.c_25"
                                                                 name="c_25" id="centavo" ref="c_25"
                                                                 class="form-control form-control-sm" required></td>
-                                                        <td id="cenmtavoonetotalamount" class="total">
+                                                        <td id="centavototalamount" class="total">
                                                             @{{ formatCurrency(total.c_25) }}
                                                         </td>
                                                     </tr>
@@ -464,7 +464,8 @@
                                                             total
                                                         </td>
                                                         <td class="text-right" colspan="3"
-                                                            id="totalaccountofficercollection" v-text='aoCollectionTotal'>
+                                                            id="totalaccountofficercollection">
+                                                            @{{ formatCurrency(aoCollectionTotal) }}
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -594,8 +595,8 @@
                                                 <td class="text-uppercase">
                                                     total
                                                 </td>
-                                                <td class="text-right" colspan="3" id="totalbranchcollection"
-                                                    v-text="branchCollectionTotal">
+                                                <td class="text-right" colspan="3" id="totalbranchcollection">
+                                                    @{{ formatCurrency(branchCollectionTotal) }}
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -732,7 +733,8 @@
                                                 <td>
                                                     <p>CASH</p>
                                                 </td>
-                                                <td class="text-right" v-text='aoCollectionTotal'>
+                                                <td class="text-right">
+                                                    @{{ formatCurrency(aoCollectionTotal) }}
                                                 </td>
 
                                             </tr>
@@ -781,14 +783,16 @@
                                                 <td>
                                                     INTERBRANCH
                                                 </td>
-                                                <td class="text-right" v-text='branchCollectionTotal'>
+                                                <td class="text-right">
+                                                    @{{ formatCurrency(branchCollectionTotal) }}
                                                 </td>
                                             </tr>
                                             <tr class="bg-primary">
                                                 <td class="text-uppercase">
                                                     total
                                                 </td>
-                                                <td class="text-right" colspan="3" v-text="otherPaymentTotal">
+                                                <td class="text-right" colspan="3">
+                                                    @{{ formatCurrency(otherPaymentTotal) }}
                                                 </td>
                                             </tr>
 
@@ -1048,30 +1052,40 @@
                                                 <tbody class="text-uppercase">
                                                     <tr>
                                                         <td>cash amount</td>
-                                                        <td v-text="otherPayment.cash_amount"></td>
+                                                        <td>
+                                                            @{{ formatCurrency(otherPayment.cash_amount) }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>check</td>
-                                                        <td v-text="otherPayment.check_amount"></td>
+                                                        <td>
+                                                            @{{ otherPayment.check_amount }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>pos</td>
-                                                        <td v-text="otherPayment.pos_amount"></td>
+                                                        <td>
+                                                            @{{ otherPayment.pos_amount }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>memo</td>
-                                                        <td v-text="otherPayment.memo_amount"></td>
+                                                        <td>
+                                                            @{{ otherPayment.memo_amount }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>interbranch</td>
-                                                        <td v-text="otherPayment.interbranch_amount"></td>
+                                                        <td>
+                                                            @{{ formatCurrency(otherPayment.interbranch_amount) }}
+                                                        </td>
                                                     </tr>
 
 
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
                                                         <td><strong>TOTAL</strong></td>
-                                                        <td v-text="otherPayment.total"><strong></strong></td>
+                                                        <td><strong>@{{ formatCurrency(otherPayment.total) }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -1395,13 +1409,12 @@
                 },
                 createNewCollectionBreakdown: function() {
                     this.collectionBreakdown.status = 'unposted';
-                    var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    var totalCash = parseFloat(this.totalCash);
                     this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
-                        .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
-                        .replace(/[^0-9\.-]+/g, ""));
+                        .branchCollectionTotal);
+                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
                     this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
-                    this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.total = totalCash;
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1698,7 +1711,7 @@
                     if (isNaN(amount)) {
                         return 0;
                     }
-                    amount = amount.toFixed(0);
+                    amount = amount.toFixed(2);
 
                     amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -1770,7 +1783,7 @@
                         parseFloat(this.collectionBreakdown.p_5 * 5) +
                         parseFloat(this.collectionBreakdown.p_1 * 1) +
                         parseFloat(this.collectionBreakdown.c_25 * 0.25);
-                    return this.formatCurrency(total);
+                    return total
                 },
                 aoCollectionTotal: function() {
                     var aoCollection = this.collectionBreakdown.account_officer_collections;
@@ -1783,7 +1796,7 @@
                             }
                         }
                     }
-                    return this.formatCurrency(total);
+                    return total;
                 },
                 otherPaymentTotal: function() {
 
@@ -1799,7 +1812,7 @@
                         parseFloat(this.posCollectionTotal)
 
 
-                    return this.formatCurrency(total);
+                    return total;
                 },
                 branchCollectionTotal: function() {
                     var branchCollection = this.collectionBreakdown.branch_collections;
@@ -1812,7 +1825,7 @@
 
                         }
                     }
-                    return this.formatCurrency(total);
+                    return total;
                 },
 
                 posCollectionTotal: function() {
@@ -1826,7 +1839,7 @@
 
                         }
                     }
-                    return this.formatCurrency(total);
+                    return total;
                 },
                 filteredCashBlotter: function() {
                     var rows = [];
