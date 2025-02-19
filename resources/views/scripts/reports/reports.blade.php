@@ -675,7 +675,7 @@
             var val = 1000
             var pcs = $('#onethousand').val()
             var total = val * pcs
-            $('#onethousandtotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#onethousandtotalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -683,7 +683,7 @@
             var val = 500
             var pcs = $('#fivehundred').val()
             var total = val * pcs
-            $('#fivehundredtotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#fivehundredtotalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -691,7 +691,7 @@
             var val = 200
             var pcs = $('#twohundred').val()
             var total = val * pcs
-            $('#twohundredtotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#twohundredtotalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -699,7 +699,7 @@
             var val = 100
             var pcs = $('#onehundred').val()
             var total = val * pcs
-            $('#onehundredtotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#onehundredtotalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -707,7 +707,7 @@
             var val = 50
             var pcs = $('#fifty').val()
             var total = val * pcs
-            $('#fiftytotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#fiftytotalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -715,7 +715,7 @@
             var val = 20
             var pcs = $('#twenty').val()
             var total = val * pcs
-            $('#twentytotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#twentytotalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -723,28 +723,28 @@
             var val = 10
             var pcs = $('#ten').val()
             var total = val * pcs
-            $('#tentotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#tentotalamount').text(total === 0 ? '' : formatCurrency(total))
             totalCashCount()
         })
         $(document).on('change', '#five', function() {
             var val = 5
             var pcs = $('#five').val()
             var total = val * pcs
-            $('#fivetotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#fivetotalamount').text(total === 0 ? '' : formatCurrency(total))
             totalCashCount()
         })
         $(document).on('change', '#one', function() {
             var val = 1
             var pcs = $('#one').val()
             var total = val * pcs
-            $('#onetotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#onetotalamount').text(total === 0 ? '' : formatCurrency(total))
             totalCashCount()
         })
         $(document).on('change', '#centavo', function() {
             var val = .25
             var pcs = $('#centavo').val()
             var total = val * pcs
-            $('#cenmtavoonetotalamount').text(total === 0 ? '' : amountConverter(total))
+            $('#cenmtavoonetotalamount').text(total === 0 ? '' : formatCurrency(total))
 
             totalCashCount()
         })
@@ -777,6 +777,18 @@
             });
 
             return formatter.format(amount)
+        }
+
+        function formatCurrency(amount) {
+            amount = parseFloat(amount);
+            if (isNaN(amount)) {
+                return 0;
+            }
+            amount = amount.toFixed(0);
+
+            amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            return amount;
         }
 
         var dtbleOption = {

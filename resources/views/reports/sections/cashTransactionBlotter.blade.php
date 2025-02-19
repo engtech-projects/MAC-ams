@@ -193,7 +193,7 @@
                                                                 class="form-control form-control-sm pcs" required>
                                                         </td>
                                                         <td id="onethousandtotalamount" class="total">
-                                                            <h6 v-text="total.p_1000"></h6>
+                                                            @{{ formatCurrency(total.p_1000) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -204,7 +204,7 @@
                                                                 class="form-control form-control-sm pcs" required>
                                                         </td>
                                                         <td id="fivehundredtotalamount" class="total">
-                                                            <h6 v-text="total.p_500"></h6>
+                                                            @{{ formatCurrency(total.p_500) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -214,7 +214,7 @@
                                                                 @keydown.enter="nextTextField('p_100')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="twohundredtotalamount" class="total">
-                                                            <h6 v-text="total.p_200"></h6>
+                                                            @{{ formatCurrency(total.p_200) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -224,7 +224,7 @@
                                                                 @keydown.enter="nextTextField('p_50')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="onehundredtotalamount" class="total">
-                                                            <h6 v-text="total.p_100"></h6>
+                                                            @{{ formatCurrency(total.p_100) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -234,7 +234,7 @@
                                                                 @keydown.enter="nextTextField('p_20')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="fiftytotalamount" class="total">
-                                                            <h6 v-text="total.p_50"></h6>
+                                                            @{{ formatCurrency(total.p_50) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -244,7 +244,7 @@
                                                                 @keydown.enter="nextTextField('p_10')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="twentytotalamount" class="total">
-                                                            <h6 v-text="total.p_20"></h6>
+                                                            @{{ formatCurrency(total.p_20) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -254,7 +254,7 @@
                                                                 @keydown.enter="nextTextField('p_5')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="tentotalamount" class="total">
-                                                            <h6 v-text="total.p_10"></h6>
+                                                            @{{ formatCurrency(total.p_10) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -264,7 +264,7 @@
                                                                 @keydown.enter="nextTextField('p_1')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="fivetotalamount" class="total">
-                                                            <h6 v-text="total.p_5"></h6>
+                                                            @{{ formatCurrency(total.p_5) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -274,7 +274,7 @@
                                                                 @keydown.enter="nextTextField('c_25')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="onetotalamount" class="total">
-                                                            <h6 v-text="total.p_1"></h6>
+                                                            @{{ formatCurrency(total.p_1) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -283,7 +283,7 @@
                                                                 name="c_25" id="centavo" ref="c_25"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="cenmtavoonetotalamount" class="total">
-                                                            <h6 v-text="total.c_25"></h6>
+                                                            @{{ formatCurrency(total.c_25) }}
                                                         </td>
                                                     </tr>
 
@@ -351,7 +351,7 @@
 
                                                         </td>
                                                         <td>
-                                                            <h6 v-text="officerCollection.total">@{{ formatCurrency }}
+                                                            <h6>@{{ formatCurrency(officerCollection.total) }}
                                                             </h6>
                                                         </td>
                                                         <td class="text-center">
@@ -425,7 +425,7 @@
 
                                                             </div>
                                                             <div v-else>
-                                                                <h6>@{{ amountConverter(officerCollection.total) }}
+                                                                <h6>@{{ formatCurrency(officerCollection.total) }}
                                                                 </h6>
                                                             </div>
                                                         </td>
@@ -556,7 +556,7 @@
 
                                                             </div>
                                                             <div v-else>
-                                                                <h6>@{{ amountConverter(branchCollection.total_amount) }}
+                                                                <h6>@{{ formatCurrency(branchCollection.total_amount) }}
                                                             </div>
 
                                                         </td>
@@ -638,7 +638,7 @@
                                                         <h6 v-text="posCollection.or_no"></h6>
                                                     </td>
                                                     <td class="text-right">
-                                                        <h6 v-text="posCollection.total_amount"></h6>
+                                                        <h6>@{{ formatCurrency(posCollection.total_amount) }}</h6>
                                                     </td>
                                                     <td class="text-center">
                                                         <button class="btn btn-xs btn-danger"
@@ -673,7 +673,7 @@
 
                                                         </div>
                                                         <div v-else>
-                                                            <h6>@{{ amountConverter(posCollection.total_amount) }}
+                                                            <h6>@{{ formatCurrency(posCollection.total_amount) }}
                                                         </div>
 
                                                     </td>
@@ -711,8 +711,8 @@
                                             <td class="text-uppercase">
                                                 total
                                             </td>
-                                            <td class="text-right" colspan="3" id="totalPosCollection"
-                                                v-text="posCollectionTotal">
+                                            <td class="text-right" colspan="3" id="totalPosCollection">
+                                                @{{ formatCurrency(posCollectionTotal) }}
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -754,7 +754,8 @@
                                                 <td>
                                                     <p>POS</p>
                                                 </td>
-                                                <td class="text-right" v-text='posCollectionTotal'>
+                                                <td class="text-right">
+                                                    @{{ formatCurrency(posCollectionTotal) }}
                                                     {{-- <td class="text-right">
                                                     <input type="number"
                                                         v-model="collectionBreakdown.other_payment.pos_amount"
@@ -1046,9 +1047,7 @@
                                                 </thead>
                                                 <tbody class="text-uppercase">
                                                     <tr>
-                                                        <td>
-                                                            <h1 v-text="otherPayment"></h1>
-                                                        </td>
+                                                        <td>cash amount</td>
                                                         <td v-text="otherPayment.cash_amount"></td>
                                                     </tr>
                                                     <tr>
@@ -1072,7 +1071,7 @@
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
                                                         <td><strong>TOTAL</strong></td>
-                                                        <td v-text="otherPayment"><strong></strong></td>
+                                                        <td v-text="otherPayment.total"><strong></strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -1087,7 +1086,7 @@
                                                 <tbody>
                                                     <tr v-for="pos in collections.pos_collections">
                                                         <td>@{{ pos.or_no }}</td>
-                                                        <td>@{{ formatCurrency(pos.total_amount) }}</td>
+                                                        <td>@{{ pos.total_amount }}</td>
                                                     </tr>
 
                                                     <tr
@@ -1401,8 +1400,7 @@
                         .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
                     this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
                         .replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal
-                        .replace(/[^0-9\.-]+/g, ""));
+                    this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
                     this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
@@ -1575,6 +1573,7 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        window.location.reload();
                     }).catch(err => {
                         toastr.success(err);
                     })
@@ -1608,6 +1607,7 @@
                         }).then(response => {
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
+                        window.location.reload();
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
@@ -1696,9 +1696,9 @@
                 formatCurrency: function(amount) {
                     amount = parseFloat(amount);
                     if (isNaN(amount)) {
-                        return "Invalid Number";
+                        return 0;
                     }
-                    amount = amount.toFixed(2);
+                    amount = amount.toFixed(0);
 
                     amount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -1770,7 +1770,7 @@
                         parseFloat(this.collectionBreakdown.p_5 * 5) +
                         parseFloat(this.collectionBreakdown.p_1 * 1) +
                         parseFloat(this.collectionBreakdown.c_25 * 0.25);
-                    return this.amountConverter(total);
+                    return this.formatCurrency(total);
                 },
                 aoCollectionTotal: function() {
                     var aoCollection = this.collectionBreakdown.account_officer_collections;
@@ -1779,11 +1779,11 @@
                         for (var i in aoCollection) {
                             var totalCollection = aoCollection[i].total;
                             if (totalCollection) {
-                                total += parseFloat(aoCollection[i].total.replace(/[^0-9\.-]+/g, ""));
+                                total += parseFloat(aoCollection[i].total);
                             }
                         }
                     }
-                    return this.amountConverter(total);
+                    return this.formatCurrency(total);
                 },
                 otherPaymentTotal: function() {
 
@@ -1792,14 +1792,14 @@
 
 
 
-                    total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
+                    total = parseFloat(this.aoCollectionTotal) +
                         parseFloat(otherPayment.memo_amount) +
                         parseFloat(otherPayment.check_amount) +
-                        parseFloat(this.branchCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
-                        parseFloat(this.posCollectionTotal.replace(/[^0-9\.-]+/g, ""))
+                        parseFloat(this.branchCollectionTotal) +
+                        parseFloat(this.posCollectionTotal)
 
 
-                    return this.amountConverter(total);
+                    return this.formatCurrency(total);
                 },
                 branchCollectionTotal: function() {
                     var branchCollection = this.collectionBreakdown.branch_collections;
@@ -1807,27 +1807,26 @@
                     if (this.collectionBreakdown.other_payment) {
                         if (branchCollection.length > 0) {
                             for (var i in branchCollection) {
-                                total += parseFloat(branchCollection[i].total_amount.replace(/[^0-9\.-]+/g,
-                                    ""));
+                                total += parseFloat(branchCollection[i].total_amount);
                             }
 
                         }
                     }
-                    return this.amountConverter(total);
+                    return this.formatCurrency(total);
                 },
 
                 posCollectionTotal: function() {
                     var pos = this.collectionBreakdown.pos_collections;
                     var total = 0;
                     if (this.collectionBreakdown.other_payment) {
-                        if (pos.length > 0) {
+                        if (pos) {
                             for (var i in pos) {
-                                total += parseFloat(pos[i].total_amount.replace(/[^0-9\.-]+/g, ""));
+                                total += parseFloat(pos[i].total_amount);
                             }
 
                         }
                     }
-                    return this.amountConverter(total);
+                    return this.formatCurrency(total);
                 },
                 filteredCashBlotter: function() {
                     var rows = [];

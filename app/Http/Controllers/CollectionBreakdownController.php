@@ -158,6 +158,10 @@ class CollectionBreakdownController extends Controller
     public function destroy(CollectionBreakdown $collectionBreakdown)
     {
         try {
+            $collectionBreakdown->branch_collections()->delete();
+            $collectionBreakdown->pos_collections()->delete();
+            $collectionBreakdown->other_payment()->delete();
+            $collectionBreakdown->account_officer_collections()->delete();
             $collectionBreakdown->delete();
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()]);
