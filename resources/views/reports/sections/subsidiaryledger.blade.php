@@ -549,51 +549,49 @@
                                             <th>Source</th>
                                             <th>Cheque Date</th>
                                             <th>Cheque No.</th>
-                                            <th class="text-right">Amount</th>
-                                            <th class="text-right">Commulative</th>
+                                            <th>Amount</th>
+                                            <th>Cumulative</th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr
-                                                v-if="processedIncomeExpense.income.length < 1&& processedIncomeExpense.expense.length < 1">
+                                                v-if="processedIncomeExpense.revenue.length < 1&& processedIncomeExpense.expense.length < 1">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
                                             </tr>
 
-                                            <tr v-if="processedIncomeExpense.income.length > 0">
+                                            <tr v-if="processedIncomeExpense.revenue.length > 0">
                                                 <td><b>REVENUE</b></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td></td>
-                                                <td></td>
+                                              
                                             </tr>
                                             <tr :Class="rowStylesIncomeExpense(i)"
-                                                v-for="i in processedIncomeExpense.income">
+                                                v-for="i in processedIncomeExpense.revenue">
                                                 <td v-for="j in i">@{{ j }}</td>
                                             </tr>
                                             <tr>
-                                            <tr v-if="processedIncomeExpense.income.length > 0">
+                                            <tr v-if="processedIncomeExpense.revenue.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>0.00</td>
-                                                <td></td>
+                                               
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length > 0">
+                                            <tr v-if="processedIncomeExpense.revenue.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
+                                               
                                                 <td></td>
-                                                <td></td>
-                                                <td>0.00</td>
+                                                
                                             </tr>
 
                                             <tr v-if="processedIncomeExpense.expense.length > 0">
@@ -604,7 +602,7 @@
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td></td>
+                                                
                                             </tr>
                                             <tr :Class="rowStylesIncomeExpense(l)"
                                                 v-for="l in processedIncomeExpense.expense">
@@ -1555,17 +1553,26 @@
                 },
                 processedIncomeExpense: function() {
                     var result = {
-                        income: [],
+                        revenue: [],
                         expense: []
                     }
-                    if (this.incomeExpense.income) {
-                        this.incomeExpense.income.forEach(income => {
-                            result.income.push([income.account_name, '', '', '', '', '', '', ''])
+
+                    var cumulativeRevenue = 0;
+                    var cumulativeExpense = 0;
+                    var grandTotalRevenue = 0;
+                    var grandTotalExpense = 0;
+
+
+                    if (this.incomeExpense.revenue) {
+                        this.incomeExpense.revenue.forEach(revenue => {
+                            result.revenue.push([revenue.account_name, '', '', '', '', '', '', ''])
                             var totalAmount = 0;
-                            income.entries.forEach(entry => {
+                            revenue.entries.forEach(entry => {
                                 var row = [];
                                 var amount = entry.credit == 0 ? entry.debit : entry.credit;
                                 totalAmount += parseFloat(amount);
+                                cumulativeRevenue += parseFloat(amount);
+
                                 row.push(entry.journal_date);
                                 row.push(entry.journal_no);
                                 row.push(entry.subsidiary_name);
@@ -1573,24 +1580,33 @@
                                 row.push(entry.cheque_date);
                                 row.push(entry.cheque_no);
                                 row.push(this.formatCurrency(amount));
-                                row.push('0.00');
-                                result.income.push(row);
+                                row.push(this.formatCurrency(cumulativeRevenue));
+                                result.revenue.push(row);
                             });
-                            if (income.entries.length) {
-                                result.income.push(['', '', '', '', '', '', this.formatCurrency(
+                            grandTotalRevenue += totalAmount;
+
+                            if (revenue.entries.length) {
+                                result.revenue.push(['', '', '', '', '', '', this.formatCurrency(
                                     totalAmount), ''])
-                                result.income.push(['', '', '', '', '', '', '', '0.00'])
+                                // result.revenue.push(['', '', '', '', '', '', '', '0.00'])
                             }
                         });
+
+                        if (grandTotalRevenue > 0) {
+                                result.revenue.push(['GRAND TOTAL REVENUE', '', '', '', '', '', this.formatCurrency(grandTotalRevenue), this.formatCurrency(cumulativeRevenue)]);
+                            }
                     }
                     if (this.incomeExpense.expense) {
                         this.incomeExpense.expense.forEach(expense => {
                             result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
                             var totalAmount = 0;
+
                             expense.entries.forEach(entry => {
                                 var row = [];
                                 var amount = entry.credit == 0 ? entry.debit : entry.credit;
                                 totalAmount += parseFloat(amount);
+                                cumulativeExpense += parseFloat(amount);
+
                                 row.push(entry.journal_date);
                                 row.push(entry.journal_no);
                                 row.push(entry.subsidiary_name);
@@ -1598,17 +1614,26 @@
                                 row.push(entry.cheque_date);
                                 row.push(entry.cheque_no);
                                 row.push(this.formatCurrency(amount));
-                                row.push('0.00');
+                                row.push(this.formatCurrency(cumulativeExpense));
                                 result.expense.push(row);
                             });
+                            grandTotalExpense += totalAmount;
+
                             if (expense.entries.length) {
                                 result.expense.push(['', '', '', '', '', '', this.formatCurrency(
                                     totalAmount), ''])
-                                result.expense.push(['', '', '', '', '', '', '', '0.00'])
+                                // result.expense.push(['', '', '', '', '', '', '', '0.00'])
                             }
 
                         });
+
+                        if (grandTotalExpense > 0) {
+                            result.expense.push(['GRAND TOTAL EXPENSE', '', '', '', '', '', this.formatCurrency(grandTotalExpense), this.formatCurrency(cumulativeExpense)]);
+                        }
                     }
+
+                    var netTotal = grandTotalRevenue - grandTotalExpense;
+                    result.expense.push(['REVENUE MINUS EXPENSE', '', '', '', '', '',  this.formatCurrency(netTotal)]);
                     return result;
                 }
             },

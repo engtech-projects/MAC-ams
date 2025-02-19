@@ -682,9 +682,10 @@ class Accounts extends Model
             ->join('subsidiary as sub', 'sub.sub_id', '=', 'detail.subsidiary_id')
             ->join('branch', 'branch.branch_id', '=', 'entry.branch_id')
             ->whereIn('acc_categ.account_category_id', [4, 5])
-            ->orderBy('entry.journal_id', 'desc')
             ->where('detail.subsidiary_id', $filter["subsidiary_id"])
             ->whereBetween("entry.journal_date", [$filter["date_from"], $filter["date_to"]])
+            ->orderBy('account.account_number', 'asc') // First, sort by account_number
+            ->orderBy('entry.journal_date', 'asc')    // Then, sort by journal_date
             ->chunk(500, function (Collection $items) use (&$accountsJournalEntries) {
                 foreach ($items as $item) {
                     $accountsJournalEntries->push($item);
