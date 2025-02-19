@@ -1051,6 +1051,7 @@
                                                 </thead>
                                                 <tbody class="text-uppercase">
                                                     <tr>
+
                                                         <td>cash amount</td>
                                                         <td>
                                                             @{{ formatCurrency(otherPayment.cash_amount) }}
@@ -1077,7 +1078,7 @@
                                                     <tr>
                                                         <td>interbranch</td>
                                                         <td>
-                                                            @{{ formatCurrency(otherPayment.interbranch_amount) }}
+                                                            @{{ otherPayment.interbranch_amount }}
                                                         </td>
                                                     </tr>
 
@@ -1085,7 +1086,7 @@
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
                                                         <td><strong>TOTAL</strong></td>
-                                                        <td><strong>@{{ formatCurrency(otherPayment.total) }}</strong></td>
+                                                        <td><strong>@{{ otherPayment.total }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -1127,7 +1128,7 @@
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
                                                         <td><strong>TOTAL</strong></td>
-                                                        <td><strong>@{{ total_interbranch_collection }}</strong></td>
+                                                        <td><strong>@{{ formatCurrency(total_interbranch_collection) }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
