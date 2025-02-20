@@ -1109,7 +1109,12 @@
                                 amountConverter(total_credit))
                             $('#vbalance_debit').text(
                                 amountConverter(
-                                    parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                    parseFloat(
+                                        (
+                                            parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))
+                                        ).toFixed(2)
+                                    )
+                                )
                             );
                         });
                     }
