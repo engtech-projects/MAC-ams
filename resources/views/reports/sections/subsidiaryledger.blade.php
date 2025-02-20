@@ -231,10 +231,10 @@
 
                     </form>
                     <form @submit.prevent="submitForm" action="">
-                        <div v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'||reportType=='subsidiary-ledger-listing-report'||reportType=='subsidiary-ledger-summary-report'"
+                        <div v-show="['subsidiary_all_account', 'subsidiary_per_account', 'income_minus_expense', 'subsidiary-ledger-listing-report', 'subsidiary-ledger-summary-report', 'income_minus_expense_summary'].includes(reportType)"
                             class="row col-md-12 no-print">
                             <div class="col-md-2 col-xs-12"
-                                v-show="reportType=='subsidiary_all_account'||reportType=='subsidiary_per_account'||reportType=='income_minus_expense'">
+                                v-show="['subsidiary_all_account', 'subsidiary_per_account', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_acct_no">Subsidiary</label>
@@ -252,7 +252,7 @@
                                 </div>
                             </div>
 
-                            <div v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='subsidiary-ledger-summary-report'"
+                            <div v-show="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'subsidiary-ledger-summary-report'].includes(reportType)"
                                 class="col-md-3 col-xs-12" style="margin-right:64px;">
                                 <div class="box">
                                     <div class="form-group">
@@ -277,13 +277,12 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-show="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
+                                v-if="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_from">From</label>
                                         <div class="input-group">
                                             <input v-model="filter.from" type="date"
-                                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'"
                                                 class=" form-control form-control-sm rounded-0" name="from"
                                                 id="sub_date" required>
                                         </div>
@@ -292,7 +291,7 @@
                             </div>
 
                             <div class="col-md-2 col-xs-12"
-                                v-if="reportType=='subsidiary_per_account'||reportType=='subsidiary-ledger-listing-report'||reportType=='income_minus_expense'">
+                                v-if="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="date_to">To</label>
@@ -304,7 +303,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2 col-xs-12" v-show="reportType=='subsidiary-ledger-summary-report'">
+                            <div
+                                class="col-md-2 col-xs-12" 
+                                v-show="['subsidiary-ledger-summary-report'].includes(reportType)"
+                            >
                                 <div class="box">
                                     <div class="form-group">
                                         <label class="label-normal" for="sub_date">As of:</label>
@@ -339,7 +341,82 @@
                         Excel</button>
                 </div>
                 <div class="col-md-12">
-
+                    <div v-if="reportType=='income_minus_expense_summary'">
+                        <section class="content">
+                            <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+                                <div class="row justify-content-start">
+                                    <div class="col-md-8">
+                                        <table class="table table-sm border">
+                                            <table v-for="(type,category) in incomeStatementSummary.accounts" class="table table-sm border">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="indent-1" width="50%">@{{ category.toUpperCase() }}</th>
+                                                        <th width="25%"></th>
+                                                        <th width="25%"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template v-for="(data,group) in type.types">
+                                                        
+                                                        <tr class="border-0">
+                                                            <td class="indent-1">@{{titleCase(data.name)}}</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                            <template v-for="(value,key) in data.accounts">
+                                                                <tr class="border-0">
+                                                                    <td class="indent-2">@{{titleCase(value.account_name)}}</td>
+                                                                    <td class="text-right">@{{value.total}}</td>
+                                                                    <td></td>
+                                                                </tr>
+                                                            </template>
+                                                        <tr class="border-0">
+                                                            <td colspan="3">&nbsp;</td>
+                                                        </tr>
+                                                        <tr style="border-style: double;">
+                                                            <td class="indent-1">Total @{{ titleCase(data.name) }}</td>
+                                                            <td></td>
+                                                            <td class="text-bold text-right indent-1-r">@{{ data.formatted_total }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="3">&nbsp;</td>
+                                                        </tr>
+                                                    </template>
+                                                    <tr style="border-style: double;">
+                                                        <td class="indent-1 text-bold">Total @{{ titleCase(category) }}</td>
+                                                        <td></td>
+                                                        <td class="text-bold text-right indent-1-r">@{{ type.total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3">&nbsp;</td>
+                                                    </tr>
+                                                </tbody>
+                                            <table>
+                                            <thead v-if="incomeStatementSummary!={}">
+                                                <tr>
+                                                    <th class="indent-1" width="50%">@{{ incomeStatementSummary?.profit?.title }}</th>
+                                                    <th width="25%"></th>
+                                                    <th width="25%" class="text-right indent-1-r">@{{ incomeStatementSummary?.profit?.value }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="indent-1" width="50%">@{{ incomeStatementSummary?.income_tax?.title }}</th>
+                                                    <th width="25%"></th>
+                                                    <th width="25%" class="text-right indent-1-r">@{{ incomeStatementSummary?.income_tax?.value }}</th>
+                                                </tr>
+                                                <tr><th colspan="3">&nbsp;</th></tr>
+                                                <tr>
+                                                    <th class="indent-1" width="50%">@{{ incomeStatementSummary?.net_income?.title }}</th>
+                                                    <th width="25%"></th>
+                                                    <th width="25%" class="text-right indent-1-r">@{{ incomeStatementSummary?.net_income?.value }}</th>
+                                                </tr>
+                                            </thead>
+                                                
+                                        </table>
+                                    </div>
+                                </div>	
+                            </div>
+                        </section>
+                    </div>
                     <!-- Table -->
                     <section class="content">
                         <div class="container-fluid">
@@ -547,53 +624,51 @@
                                             <th>Reference</th>
                                             <th width="26%">Particular</th>
                                             <th>Source</th>
+                                            <th>Cheque No. </th>
                                             <th>Cheque Date</th>
-                                            <th>Cheque No.</th>
-                                            <th class="text-right">Amount</th>
-                                            <th class="text-right">Commulative</th>
+                                            <th>Amount</th>
+                                            <th>Cumulative</th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr
-                                                v-if="processedIncomeExpense.income.length < 1&& processedIncomeExpense.expense.length < 1">
+                                                v-if="processedIncomeExpense.revenue.length < 1&& processedIncomeExpense.expense.length < 1">
                                                 <td colspan="7">
                                                     <center>No data available in table.</b>
                                                 </td>
                                             </tr>
 
-                                            <tr v-if="processedIncomeExpense.income.length > 0">
+                                            <tr v-if="processedIncomeExpense.revenue.length > 0">
                                                 <td><b>REVENUE</b></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td></td>
-                                                <td></td>
+                                              
                                             </tr>
                                             <tr :Class="rowStylesIncomeExpense(i)"
-                                                v-for="i in processedIncomeExpense.income">
+                                                v-for="i in processedIncomeExpense.revenue">
                                                 <td v-for="j in i">@{{ j }}</td>
                                             </tr>
                                             <tr>
-                                            <tr v-if="processedIncomeExpense.income.length > 0">
+                                            <tr v-if="processedIncomeExpense.revenue.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>0.00</td>
-                                                <td></td>
+                                               
                                             </tr>
-                                            <tr v-if="processedIncomeExpense.income.length > 0">
+                                            <tr v-if="processedIncomeExpense.revenue.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
+                                               
                                                 <td></td>
-                                                <td></td>
-                                                <td>0.00</td>
+                                                
                                             </tr>
 
                                             <tr v-if="processedIncomeExpense.expense.length > 0">
@@ -604,7 +679,7 @@
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td></td>
+                                                
                                             </tr>
                                             <tr :Class="rowStylesIncomeExpense(l)"
                                                 v-for="l in processedIncomeExpense.expense">
@@ -1052,6 +1127,7 @@
                     income: [],
                     expense: []
                 },
+                incomeStatementSummary: {},
                 subsidiaryAll: [],
                 balance: 0,
                 url: "{{ route('reports.subsidiary-ledger') }}",
@@ -1091,6 +1167,8 @@
 
                                 this.balance = response.data.balance;
 
+                            } else if (this.reportType == 'income_minus_expense_summary') {
+                                this.incomeStatementSummary = response.data.incomeStatement;
                             } else {
                                 this.subsidiaryAll = response.data.data[0];
                                 let bal = response.data.data[1];
@@ -1170,7 +1248,12 @@
                     });
 
                     return formatter.format(number);
-                }
+                },
+                titleCase: function(str) {
+                    return str.replace(/\w\S*/g, function(txt){
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                },
             },
             computed: {
                 processedSubsidiary: function() {
@@ -1555,17 +1638,26 @@
                 },
                 processedIncomeExpense: function() {
                     var result = {
-                        income: [],
+                        revenue: [],
                         expense: []
                     }
-                    if (this.incomeExpense.income) {
-                        this.incomeExpense.income.forEach(income => {
-                            result.income.push([income.account_name, '', '', '', '', '', '', ''])
+
+                    var cumulativeRevenue = 0;
+                    var cumulativeExpense = 0;
+                    var grandTotalRevenue = 0;
+                    var grandTotalExpense = 0;
+
+
+                    if (this.incomeExpense.revenue) {
+                        this.incomeExpense.revenue.forEach(revenue => {
+                            result.revenue.push([revenue.account_name, '', '', '', '', '', '', ''])
                             var totalAmount = 0;
-                            income.entries.forEach(entry => {
+                            revenue.entries.forEach(entry => {
                                 var row = [];
                                 var amount = entry.credit == 0 ? entry.debit : entry.credit;
                                 totalAmount += parseFloat(amount);
+                                cumulativeRevenue += parseFloat(amount);
+
                                 row.push(entry.journal_date);
                                 row.push(entry.journal_no);
                                 row.push(entry.subsidiary_name);
@@ -1573,24 +1665,34 @@
                                 row.push(entry.cheque_date);
                                 row.push(entry.cheque_no);
                                 row.push(this.formatCurrency(amount));
-                                row.push('0.00');
-                                result.income.push(row);
+                                row.push(this.formatCurrency(cumulativeRevenue));
+                                result.revenue.push(row);
                             });
-                            if (income.entries.length) {
-                                result.income.push(['', '', '', '', '', '', this.formatCurrency(
-                                    totalAmount), ''])
-                                result.income.push(['', '', '', '', '', '', '', '0.00'])
+                            grandTotalRevenue += totalAmount;
+
+                            if (revenue.entries.length) {
+                                result.revenue.push(['', '', '', '', '', '', this.formatCurrency(
+                                    totalAmount), this.formatCurrency(
+                                        cumulativeRevenue)])
+                                //  result.revenue.push(['', '', '', '', '', '', '', '0.00'])
                             }
                         });
+
+                        if (grandTotalRevenue > 0) {
+                                result.revenue.push(['GRAND TOTAL REVENUE', '', '', '', '', '', this.formatCurrency(grandTotalRevenue), this.formatCurrency(cumulativeRevenue)]);
+                            }
                     }
                     if (this.incomeExpense.expense) {
                         this.incomeExpense.expense.forEach(expense => {
                             result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
                             var totalAmount = 0;
+
                             expense.entries.forEach(entry => {
                                 var row = [];
                                 var amount = entry.credit == 0 ? entry.debit : entry.credit;
                                 totalAmount += parseFloat(amount);
+                                cumulativeExpense += parseFloat(amount);
+
                                 row.push(entry.journal_date);
                                 row.push(entry.journal_no);
                                 row.push(entry.subsidiary_name);
@@ -1598,17 +1700,26 @@
                                 row.push(entry.cheque_date);
                                 row.push(entry.cheque_no);
                                 row.push(this.formatCurrency(amount));
-                                row.push('0.00');
+                                row.push(this.formatCurrency(cumulativeExpense));
                                 result.expense.push(row);
                             });
+                            grandTotalExpense += totalAmount;
+
                             if (expense.entries.length) {
                                 result.expense.push(['', '', '', '', '', '', this.formatCurrency(
                                     totalAmount), ''])
-                                result.expense.push(['', '', '', '', '', '', '', '0.00'])
+                                // result.expense.push(['', '', '', '', '', '', '', '0.00'])
                             }
 
                         });
+
+                        if (grandTotalExpense > 0) {
+                            result.expense.push(['GRAND TOTAL EXPENSE', '', '', '', '', '', this.formatCurrency(grandTotalExpense), this.formatCurrency(cumulativeExpense)]);
+                        }
                     }
+
+                    var netTotal = grandTotalRevenue - grandTotalExpense;
+                    result.expense.push(['REVENUE MINUS EXPENSE', '', '', '', '', '',  this.formatCurrency(netTotal)]);
                     return result;
                 }
             },

@@ -490,6 +490,17 @@ class ReportsController extends MainController
                 $revenueMinusExpenseReport = $this->revenueMinusExpense($filter);
                 return response()->json(['data' => $revenueMinusExpenseReport]);
 
+            case 'income_minus_expense_summary':
+                $coa = new Accounts();
+                $accounting = Accounting::getFiscalYear();
+                $from = $request->from ?? $accounting->start_date;
+                $to = $request->to ?? $accounting->end_date;
+                $subsidiaryId = $request->subsidiary_id ?? null;
+                $incomeStatement = $coa->incomeStatementSummary([$from, $to], $subsidiaryId);
+                $data = [
+                    'incomeStatement' => $incomeStatement,
+                ];
+                return response()->json($data);
             case 'subsidiary_all_account':
 
                 $transactions = Accounts::subsidiaryLedger($request->from, $request->to, '', $request->subsidiary_id);
@@ -1065,6 +1076,30 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.incomeStatement', $data);
+    }
+
+    public function incomeStatementsummary(Request $request)
+    {
+
+        $coa = new Accounts();
+        $accounting = Accounting::getFiscalYear();
+
+        $from = $request->from ?? $accounting->start_date;
+        $to = $request->to ?? $accounting->end_date;
+        $subsidiaryId = $request->subsidiary_id ?? null;
+
+        $incomeStatement = $coa->incomeStatementSummary([$from, $to], $subsidiaryId);
+
+        $data = [
+            'title' => 'MAC-AMS | Income Statement',
+            'requests' => ['from' => $from, 'to' => $to],
+            'fiscalYear' => $accounting,
+            'incomeStatement' => $incomeStatement,
+            'from' => $from,
+            'to' => $to,
+            'subsidiary_id' => $subsidiaryId
+        ];
+        return view('reports.sections.incomeStatementSum', $data);
     }
 
     public function getCashEndingBalance($branchId, Request $request)
