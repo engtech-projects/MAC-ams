@@ -475,8 +475,8 @@
                                             <th>Reference</th>
                                             <th width="26%">Preference Name</th>
                                             <th>Source</th>
-                                            <th>Cheque Date</th>
                                             <th>Cheque No.</th>
+                                            <th>Cheque Date</th>
                                             <th class="text-right">Debit</th>
                                             <th class="text-right">Credit</th>
                                             <th class="text-right">Balance</th>
