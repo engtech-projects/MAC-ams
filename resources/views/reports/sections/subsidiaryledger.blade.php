@@ -1672,8 +1672,9 @@
 
                             if (revenue.entries.length) {
                                 result.revenue.push(['', '', '', '', '', '', this.formatCurrency(
-                                    totalAmount), ''])
-                                // result.revenue.push(['', '', '', '', '', '', '', '0.00'])
+                                    totalAmount), this.formatCurrency(
+                                        cumulativeRevenue)])
+                                //  result.revenue.push(['', '', '', '', '', '', '', '0.00'])
                             }
                         });
 
