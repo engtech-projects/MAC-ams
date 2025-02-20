@@ -376,7 +376,7 @@
                                                         <tr style="border-style: double;">
                                                             <td class="indent-1">Total @{{ titleCase(data.name) }}</td>
                                                             <td></td>
-                                                            <td class="text-bold text-right indent-1-r">@{{ data.total }}</td>
+                                                            <td class="text-bold text-right indent-1-r">@{{ data.formatted_total }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td colspan="3">&nbsp;</td>

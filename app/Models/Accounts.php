@@ -1395,9 +1395,13 @@ class Accounts extends Model
                 'computed' => number_format(round($subtotal, 2), 2),
             ];
 
-            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] = number_format(floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total']) + floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed']), 2);
+            //$sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] = number_format(floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total']) + floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed']), 2);
+            // $sheet['accounts'][$account->account_category]['total'] += floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed']);
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'] += round(floatval($subtotal), 2);
+            $sheet['accounts'][$account->account_category]['total'] += round(floatval($subtotal), 2);
 
-            $sheet['accounts'][$account->account_category]['total'] += floatval($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id]['computed']);
+            $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['formatted_total'] = number_format($sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['total'], 2);
+            $sheet['accounts'][$account->account_category]['formatted_total'] = number_format($sheet['accounts'][$account->account_category]['total'], 2);
         }
         $netProfit = $sheet['accounts']['revenue']['total'] - $sheet['accounts']['expense']['total'];
         $incomeTax = 0;
