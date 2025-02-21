@@ -176,7 +176,7 @@
                             $('#vbalance_debit').text(
                                 amountConverter(
                                     parseFloat(
-                                        (total_debit - total_credit).toFixed(2)
+                                        parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
                                     )
                                 )
                             )
@@ -953,8 +953,7 @@
                                     parseFloat(vv.journal_details_debit)
                                 total_credit = parseFloat(total_credit) +
                                     parseFloat(vv.journal_details_credit)
-                                balance = parseFloat(total_debit) - parseFloat(
-                                    total_credit)
+                                balance = parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
                             });
                             $('#edit_total_debit').text(Number(total_debit)
                                 .toLocaleString(undefined, {
