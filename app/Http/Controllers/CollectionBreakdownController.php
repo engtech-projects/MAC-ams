@@ -25,7 +25,7 @@ class CollectionBreakdownController extends Controller
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($collectionBreakdown->collection_id, $collectionBreakdown->branch_id);
         $otherPayment = $collectionBreakdown->other_payment;
-        if(!$otherPayment) {
+        if (!$otherPayment) {
             $cashTransactionsEntries['collections']['other_payment'] = [
                 'cash_amount' => 0,
                 'check_amount' => 0,
@@ -57,6 +57,12 @@ class CollectionBreakdownController extends Controller
                     $collection->branch_collections()->create([
                         "total_amount" => $bc["total_amount"],
                         "branch_id" => $bc["branch"]["branch_id"],
+                    ]);
+                }
+                foreach ($attributes['pos_collections'] as $pc) {
+                    $collection->pos_collections()->create([
+                        "total_amount" => $pc["total_amount"],
+                        "or_no" => $pc["or_no"],
                     ]);
                 }
                 DB::commit();
@@ -113,7 +119,7 @@ class CollectionBreakdownController extends Controller
             }
             if (isset($data["other_payment"])) {
                 $op = $data["other_payment"];
-                if(isset($op['id'])) {
+                if (isset($op['id'])) {
                     OtherPayment::find($op["id"])->update([
                         "cash_amount" => $op["cash_amount"],
                         "check_amount" => $op["check_amount"],
@@ -123,7 +129,6 @@ class CollectionBreakdownController extends Controller
                         "collection_id" => $collectionBreakdown->collection_id,
                     ]);
                 }
-
             }
         } catch (\Exception $e) {
             return response()->json([
@@ -153,6 +158,10 @@ class CollectionBreakdownController extends Controller
     public function destroy(CollectionBreakdown $collectionBreakdown)
     {
         try {
+            $collectionBreakdown->branch_collections()->delete();
+            $collectionBreakdown->pos_collections()->delete();
+            $collectionBreakdown->other_payment()->delete();
+            $collectionBreakdown->account_officer_collections()->delete();
             $collectionBreakdown->delete();
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()]);

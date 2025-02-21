@@ -659,7 +659,8 @@ class ReportsController extends MainController
 
         $transactions = $glAccounts->ledger([$from, $to], $account_id);
         $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
-
+        $balance = $glAccounts->getAccountBalance($from, $to, $account_id);
+        $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
         $data = [
             'title' => 'MAC-AMS | General Ledger',
             'chartOfAccount' => $accounts,
@@ -668,10 +669,38 @@ class ReportsController extends MainController
             'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
             'journalBooks' => JournalBook::get(),
             'transactions' => $transactions,
+            'balance' => $balance,
+            'account' => Accounts::where('account_id', '=', $account_id)->first()
         ];
 
 
         return view('reports.sections.generalledger', $data);
+    }
+
+    public function generalLedgerSearch(Request $request)
+    {
+        $glAccounts = new Accounts();
+        $accounting = Accounting::getFiscalYear();
+
+        $from = $request->from ? $request->from : $accounting->default_start;
+        $to = $request->to ? $request->to : $accounting->default_end;
+        $account_id = !$request->account_id ? 3 : $request->account_id;
+
+        $transactions = $glAccounts->ledger([$from, $to], $account_id);
+        $balance = $this->getAccountBalance($from, $to, $account_id);
+        $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
+        $data = [
+            'title' => 'MAC-AMS | General Ledger',
+            'chartOfAccount' => $accounts,
+            'requests' => ['from' => $from, 'to' => $to, 'account_id' => $account_id],
+            'fiscalYear' => $accounting,
+            'subsidiaries' => Subsidiary::with(['subsidiary_category'])->orderBy('sub_cat_id', 'ASC')->get(),
+            'journalBooks' => JournalBook::get(),
+            'transactions' => $transactions,
+            'balance' => "Asd",
+            'account_filtered' => 'asdas'
+        ];
+        return response()->json($data);
     }
 
 
@@ -803,7 +832,7 @@ class ReportsController extends MainController
         $cashblotter = new CashBlotter();
         $cashblotter->transaction_date = $request['transaction_date'];
         $cashblotter->total_collection = $request['totalcash_count'];
-        $cashblotter->branch_id = $request['branch_id'];
+        $cashblotter->$cashblotter->branch_id = $request['branch_id'];
         $cashblotter->save();
 
 
@@ -811,6 +840,7 @@ class ReportsController extends MainController
 
         $ao_collection = json_decode($request['ao_collection']);
         $branch_collection = json_decode($request['branch_collection']);
+        $pos_collections = json_decode($request['pos_collections']);
         $this->storeAoCollection($cashblotter_id, $ao_collection);
         $this->storeBranchCollection($cashblotter_id, $branch_collection);
         $this->storeCashBreakdown($cashblotter_id, $request);
@@ -827,6 +857,7 @@ class ReportsController extends MainController
 
         $journalEntries = new journalEntry();
         $cashTransactionsEntries = $journalEntries->getCashBlotterEntries($id, $request->branch_id);
+
         return response()->json([
             'entries' => $cashTransactionsEntries
         ], 200);

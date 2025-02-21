@@ -193,7 +193,7 @@
                                                                 class="form-control form-control-sm pcs" required>
                                                         </td>
                                                         <td id="onethousandtotalamount" class="total">
-                                                            <h6 v-text="total.p_1000"></h6>
+                                                            @{{ formatCurrency(total.p_1000) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -204,7 +204,7 @@
                                                                 class="form-control form-control-sm pcs" required>
                                                         </td>
                                                         <td id="fivehundredtotalamount" class="total">
-                                                            <h6 v-text="total.p_500"></h6>
+                                                            @{{ formatCurrency(total.p_500) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -214,7 +214,7 @@
                                                                 @keydown.enter="nextTextField('p_100')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="twohundredtotalamount" class="total">
-                                                            <h6 v-text="total.p_200"></h6>
+                                                            @{{ formatCurrency(total.p_200) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -224,7 +224,7 @@
                                                                 @keydown.enter="nextTextField('p_50')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="onehundredtotalamount" class="total">
-                                                            <h6 v-text="total.p_100"></h6>
+                                                            @{{ formatCurrency(total.p_100) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -234,7 +234,7 @@
                                                                 @keydown.enter="nextTextField('p_20')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="fiftytotalamount" class="total">
-                                                            <h6 v-text="total.p_50"></h6>
+                                                            @{{ formatCurrency(total.p_50) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -244,7 +244,7 @@
                                                                 @keydown.enter="nextTextField('p_10')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="twentytotalamount" class="total">
-                                                            <h6 v-text="total.p_20"></h6>
+                                                            @{{ formatCurrency(total.p_20) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -254,7 +254,7 @@
                                                                 @keydown.enter="nextTextField('p_5')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="tentotalamount" class="total">
-                                                            <h6 v-text="total.p_10"></h6>
+                                                            @{{ formatCurrency(total.p_10) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -264,7 +264,7 @@
                                                                 @keydown.enter="nextTextField('p_1')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="fivetotalamount" class="total">
-                                                            <h6 v-text="total.p_5"></h6>
+                                                            @{{ formatCurrency(total.p_5) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -274,7 +274,7 @@
                                                                 @keydown.enter="nextTextField('c_25')"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="onetotalamount" class="total">
-                                                            <h6 v-text="total.p_1"></h6>
+                                                            @{{ formatCurrency(total.p_1) }}
                                                         </td>
                                                     </tr>
                                                     <tr class="cash-breakdown">
@@ -283,7 +283,7 @@
                                                                 name="c_25" id="centavo" ref="c_25"
                                                                 class="form-control form-control-sm" required></td>
                                                         <td id="centavototalamount" class="total">
-                                                            <h6 v-text="total.c_25"></h6>
+                                                            @{{ formatCurrency(total.c_25) }}
                                                         </td>
                                                     </tr>
 
@@ -332,8 +332,7 @@
                                                         <td>
                                                             <input type="number"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                id="total_amount" placeholder="0.00"
-                                                                v-model="officer_collection.total">
+                                                                id="total_amount" v-model="officer_collection.total">
                                                         </td>
                                                         <td class="text-center">
                                                             <button class="btn btn-xs btn-primary"
@@ -352,7 +351,8 @@
 
                                                         </td>
                                                         <td>
-                                                            <h6 v-text="officerCollection.total"></h6>
+                                                            <h6>@{{ formatCurrency(officerCollection.total) }}
+                                                            </h6>
                                                         </td>
                                                         <td class="text-center">
                                                             {{-- <button type="button"
@@ -370,7 +370,7 @@
                                                         <td>
                                                             <input type="text" class="form-control form-control-sm"
                                                                 v-model="officer_collection.representative"
-                                                                id="accountofficer_id">
+                                                                id="accountofficer_id" placeholder="Account Officer">
                                                         </td>
                                                         <td>
                                                             <input type="text" id="remarks"
@@ -382,7 +382,7 @@
                                                         <td>
                                                             <input type="number" v-model="officer_collection.total"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                id="total_amount" placeholder="0.00">
+                                                                id="total_amount">
                                                         </td>
                                                         <td class="text-center">
                                                             <button class="btn btn-xs btn-primary"
@@ -425,7 +425,8 @@
 
                                                             </div>
                                                             <div v-else>
-                                                                <h6 v-text="officerCollection.total"></h6>
+                                                                <h6>@{{ formatCurrency(officerCollection.total) }}
+                                                                </h6>
                                                             </div>
                                                         </td>
                                                         <td class="text-center">
@@ -463,7 +464,8 @@
                                                             total
                                                         </td>
                                                         <td class="text-right" colspan="3"
-                                                            id="totalaccountofficercollection" v-text='aoCollectionTotal'>
+                                                            id="totalaccountofficercollection">
+                                                            @{{ formatCurrency(aoCollectionTotal) }}
                                                         </td>
                                                     </tr>
                                                 </tfoot>
@@ -555,7 +557,7 @@
 
                                                             </div>
                                                             <div v-else>
-                                                                <h6 v-text="branchCollection.total_amount"></h6>
+                                                                <h6>@{{ formatCurrency(branchCollection.total_amount) }}
                                                             </div>
 
                                                         </td>
@@ -593,109 +595,235 @@
                                                 <td class="text-uppercase">
                                                     total
                                                 </td>
-                                                <td class="text-right" colspan="3" id="totalbranchcollection"
-                                                    v-text="branchCollectionTotal">
+                                                <td class="text-right" colspan="3" id="totalbranchcollection">
+                                                    @{{ formatCurrency(branchCollectionTotal) }}
                                                 </td>
                                             </tr>
                                         </tfoot>
                                         </table>
 
                                     </div>
+
+                                    <!-- POS COLLECTION -->
                                     <div class="col-md-12">
                                         <table class="table table-bordered table-sm" id="account-officer-table">
-                                            <thead>
-
-                                                <th colspan="2"> Other Payment</th>
-
+                                            <thead class="table-header">
+                                                <tr>
+                                                    <th width="200">POS Collection</th>
+                                                    <th>Total Amount</th>
+                                                    <th></th>
+                                                </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <p>CASH</p>
+                                                        <input type="text" v-model="pos_collections.or_no"
+                                                            class="form-control form-control-sm rounded-0 text-right"
+                                                            id="pos_collection_or_no" placeholder="OR No.">
                                                     </td>
-                                                    <td class="text-right" v-text='aoCollectionTotal'>
-                                                    </td>
-
-                                                </tr>
-                                                <tr>
-
                                                     <td>
-                                                        <p>CHECK</p>
+                                                        <input type="number" v-model="pos_collections.total_amount"
+                                                            class="form-control form-control-sm rounded-0 text-right"
+                                                            id="pos_collection_total_amount">
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-xs btn-primary"
+                                                            @click="addPosCollection()">
+                                                            <i class="fas fa-plus fa-xs"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr v-if="isEdit"
+                                                    v-for="(posCollection,i) in collectionBreakdown.pos_collections">
+                                                    <td>
+                                                        <h6 v-text="posCollection.or_no"></h6>
                                                     </td>
                                                     <td class="text-right">
-                                                        <input type="number"
-                                                            v-model="collectionBreakdown.other_payment.check_amount"
-                                                            class="form-control form-control-sm rounded-0 text-right"
-                                                            required placeholder="0.00">
+                                                        <h6>@{{ formatCurrency(posCollection.total_amount) }}</h6>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-xs btn-danger"
+                                                            @click="removePosCollection(posCollection,i)">
+                                                            <i class="fas fa-trash fa-xs"></i>
+                                                        </button>
                                                     </td>
                                                 </tr>
 
-                                                <tr>
+                                                <tr v-if="!isEdit"
+                                                    v-for="(posCollection,i) in collectionBreakdown.pos_collections">
                                                     <td>
-                                                        <p>POS</p>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <input type="number"
-                                                            v-model="collectionBreakdown.other_payment.pos_amount"
-                                                            class="form-control form-control-sm rounded-0 text-right"
-                                                            required placeholder="0.00">
+                                                        <div v-if="posCollection.isEditing">
+
+                                                            <input type="text" v-model="posCollection.or_no"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="pos_collection_or_no" placeholder="OR No.">
+
+
+                                                        </div>
+
+                                                        <div v-else>
+                                                            <h6 v-text="posCollection.or_no"></h6>
+                                                        </div>
 
                                                     </td>
-                                                </tr>
-
-                                                <tr>
-
                                                     <td>
-                                                        <p>MEMO</p>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <input type="number"
-                                                            v-model="collectionBreakdown.other_payment.memo_amount"
-                                                            class="form-control form-control-sm rounded-0 text-right"
-                                                            required placeholder="0.00">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        INTERBRANCH
-                                                    </td>
-                                                    <td class="text-right" v-text='branchCollectionTotal'>
-                                                    </td>
-                                                </tr>
-                                                <tr class="bg-primary">
-                                                    <td class="text-uppercase">
-                                                        total
-                                                    </td>
-                                                    <td class="text-right" colspan="3" v-text="otherPaymentTotal">
-                                                    </td>
-                                                </tr>
+                                                        <div v-if="posCollection.isEditing">
 
-                                            </tbody>
+                                                            <input type="number" class="form-control form-control-sm"
+                                                                v-model="posCollection.total_amount">
 
-                                        </table>
+                                                        </div>
+                                                        <div v-else>
+                                                            <h6>@{{ formatCurrency(posCollection.total_amount) }}
+                                                        </div>
+
+                                                    </td>
+
+
+
+                                                    <td class="text-center">
+
+                                                        <button v-if="!isEditing" class="btn btn-xs btn-success"
+                                                            @click="editPosCollection(i,posCollection)">
+                                                            <i class="fas fa-pen fa-xs"></i>
+                                                        </button>
+
+                                                        <button v-else class="btn btn-xs btn-success"
+                                                            @click="savePosCollection(i)">
+                                                            <i class="fas fa-save fa-xs"></i>
+                                                        </button>
+
+
+                                                        <button class="btn btn-xs btn-danger">
+                                                            <i class="fas fa-trash fa-xs"
+                                                                @click="removePosCollection(posCollection,i)"></i>
+                                                        </button>
+
                                     </div>
-                                    <div class="text-right">
+                                    </td>
+                                    </tr>
 
-                                        {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
+                                    <tr style="background-color: #f1f1f1;" id="branch-collection-row">
+                                        <!-- <td colspan="7">&nbsp;</td> -->
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="bg-primary">
+                                            <td class="text-uppercase">
+                                                total
+                                            </td>
+                                            <td class="text-right" colspan="3" id="totalPosCollection">
+                                                @{{ formatCurrency(posCollectionTotal) }}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                    </table>
+
+                                </div>
+                                <!--/POS COLLECTION-->
+                                <div class="col-md-12">
+                                    <table class="table table-bordered table-sm" id="account-officer-table">
+                                        <thead>
+
+                                            <th colspan="2"> Other Payment</th>
+
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <p>CASH</p>
+                                                </td>
+                                                <td class="text-right">
+                                                    @{{ formatCurrency(aoCollectionTotal) }}
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+
+                                                <td>
+                                                    <p>CHECK</p>
+                                                </td>
+                                                <td class="text-right">
+                                                    <input type="number"
+                                                        v-model="collectionBreakdown.other_payment.check_amount"
+                                                        @keydown.enter="nextTextField('pos_amount')" ref="check_amount"
+                                                        @change="calculateTotal()"
+                                                        class="form-control form-control-sm rounded-0 text-right" required
+                                                        placeholder="0.00">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    <p>POS</p>
+                                                </td>
+                                                <td class="text-right">
+                                                    @{{ formatCurrency(posCollectionTotal) }}
+                                                    {{-- <td class="text-right">
+                                                    <input type="number"
+                                                        v-model="collectionBreakdown.other_payment.pos_amount"
+                                                        ref="pos_amount" @keydown.enter="nextTextField('memo_amount')"
+                                                        class="form-control form-control-sm rounded-0 text-right">
+
+                                                </td> --}}
+                                            </tr>
+
+                                            <tr>
+
+                                                <td>
+                                                    <p>MEMO</p>
+                                                </td>
+                                                <td class="text-right">
+                                                    <input type="number"
+                                                        v-model="collectionBreakdown.other_payment.memo_amount"
+                                                        ref="memo_amount" @keydown.enter="nextTextField('p_10')"
+                                                        @change="calculateTotal()"
+                                                        class="form-control form-control-sm rounded-0 text-right">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    INTERBRANCH
+                                                </td>
+                                                <td class="text-right">
+                                                    @{{ formatCurrency(branchCollectionTotal) }}
+                                                </td>
+                                            </tr>
+                                            <tr class="bg-primary">
+                                                <td class="text-uppercase">
+                                                    total
+                                                </td>
+                                                <td class="text-right" colspan="3">
+                                                    @{{ formatCurrency(otherPaymentTotal) }}
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                                <div class="text-right">
+
+                                    {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
                                                 style="margin-bottom: 20px;">
                                                 Cancel
                                             </button> --}}
 
-                                        <button type="button" @click="processCreateOrUpdate()" class="btn btn-success"
-                                            style="margin-bottom: 20px;"> Save</button>
-                                    </div>
-
-
-
-
+                                    <button type="button" @click="processCreateOrUpdate()" class="btn btn-success"
+                                        style="margin-bottom: 20px;"> Save</button>
                                 </div>
-                            </div>
 
+
+
+
+                            </div>
                         </div>
+
                     </div>
                 </div>
-
             </div>
+
+        </div>
 
         </div>
 
@@ -762,7 +890,7 @@
                             <div id="ui-view">
                                 <div class="card">
                                     <div class="card-body" id="journal_toPrintVouch">
-                                        <link rel="stylesheet"
+                                        {{-- <link rel="stylesheet"
                                             href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
                                         <link rel="stylesheet"
                                             href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -770,7 +898,7 @@
                                         <div class="col-md-12">
                                             <img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"
                                                 class="img img-fluid">
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-12">
                                             <h3 style="text-align:center">Cashier's Transaction Blotter</h3>
                                         </div>
@@ -825,7 +953,7 @@
                                         </tbody>
                                     </table>
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Cash Breakdown</th>
@@ -901,7 +1029,7 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Account Officer</th>
@@ -927,37 +1055,70 @@
                                                 </thead>
                                                 <tbody class="text-uppercase">
                                                     <tr>
-                                                        <td>Cash</td>
-                                                        <td v-text="otherPayment.cash_amount"></td>
+
+                                                        <td>cash amount</td>
+                                                        <td>
+                                                            @{{ otherPayment.cash_amount }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>check</td>
-                                                        <td v-text="otherPayment.check_amount"></td>
+                                                        <td>
+                                                            @{{ otherPayment.check_amount }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>pos</td>
-                                                        <td v-text="otherPayment.pos_amount"></td>
+                                                        <td>
+                                                            @{{ otherPayment.pos_amount }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>memo</td>
-                                                        <td v-text="otherPayment.memo_amount"></td>
+                                                        <td>
+                                                            @{{ otherPayment.memo_amount }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td>interbranch</td>
-                                                        <td v-text="otherPayment.interbranch_amount"></td>
+                                                        <td>
+                                                            @{{ otherPayment.interbranch_amount }}
+                                                        </td>
                                                     </tr>
 
 
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
                                                         <td><strong>TOTAL</strong></td>
-                                                        <td v-text="otherPayment.total"><strong></strong></td>
+                                                        <td><strong>@{{ otherPayment.total }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
 
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <th>POS Collection</th>
+                                                    <th>Amount</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="pos in collections.pos_collections">
+                                                        <td>@{{ pos.or_no }}</td>
+                                                        <td>@{{ pos.total_amount }}</td>
+                                                    </tr>
+
+                                                    <tr
+                                                        style="border-top:4px dashed black;border-bottom:4px dashed black;">
+                                                        <td><strong>TOTAL COLLECTION</strong></td>
+                                                        <td><strong>@{{ collections.other_payment ? formatCurrency(collections.other_payment.pos_amount) : formatCurrency(0) }}</strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
+                                        <div class="col-md-3">
                                             <table class="table table-striped">
                                                 <thead>
                                                     <th>Interbranch</th>
@@ -971,7 +1132,7 @@
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
                                                         <td><strong>TOTAL</strong></td>
-                                                        <td><strong>@{{ total_interbranch_collection }}</strong></td>
+                                                        <td><strong>@{{ formatCurrency(total_interbranch_collection) }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -1056,12 +1217,17 @@
                 officer_collection: {
                     representative: '',
                     note: '',
-                    total: 0,
+                    total: null,
                 },
                 branch_collection: {
-                    total_amount: 0,
+                    total_amount: null,
                     branch_id: null,
                     branch: ''
+                },
+                pos_collections: {
+                    or_no: null,
+                    total_amout: null,
+                    isEditing: false
                 },
                 other_payment: {
                     cash_amount: 0,
@@ -1090,6 +1256,7 @@
                     flag: "",
                     account_officer_collections: [],
                     branch_collections: [],
+                    pos_collections: [],
                     other_payment: {
                         cash_amount: 0,
                         check_amount: 0,
@@ -1101,17 +1268,17 @@
                 },
                 isValid: true,
                 total: {
-                    grandTotal: 0,
-                    p_1000: 0,
-                    p_500: 0,
-                    p_200: 0,
-                    p_100: 0,
-                    p_50: 0,
-                    p_20: 0,
-                    p_10: 0,
-                    p_5: 0,
-                    p_1: 0,
-                    c_25: 0,
+                    grandTotal: null,
+                    p_1000: null,
+                    p_500: null,
+                    p_200: null,
+                    p_100: null,
+                    p_50: null,
+                    p_20: null,
+                    p_10: null,
+                    p_5: null,
+                    p_1: null,
+                    c_25: null,
                 },
                 accountOfficers: [],
 
@@ -1126,6 +1293,22 @@
                     if (nextInput) {
                         nextInput.focus();
                     }
+                },
+                calculateTotal: function() {
+                    /* var otherPayment = this.collectionBreakdown.other_payment;
+                    if (otherPayment.memo_amount == "") {
+                        otherPayment.memo_amount = 0;
+                    }
+                    if (otherPayment.check_amount == "") {
+                        otherPayment.check_amount = 0;
+                    }
+
+                    this.otherPayment.total = otherPayment.cash_amount + otherPayment.check_amount +
+                        otherPayment.pos_amount + otherPayment.memo_amount + otherPayment.interbranch_amount;
+
+                    this.otherPaymentTotal = this.otherPayment.total; */
+
+
                 },
                 amountConverter: function(amount) {
                     const formatter = new Intl.NumberFormat('en-US', {
@@ -1153,14 +1336,16 @@
 
                         $('#branch_id_collection option:selected').val("");
 
-                        this.branch_collection.total_amount = 0;
+                        this.branch_collection.total_amount = null;
 
                     }
                 },
+
                 addAccountOfficerCollection: function() {
                     if ($('#remarks').val() == "") {
                         alert("Please add account officer collection");
                     } else {
+
                         this.collectionBreakdown.account_officer_collections.push({
                             representative: this.officer_collection.representative,
                             note: this.officer_collection.note,
@@ -1168,7 +1353,7 @@
                             isEditing: false
                         });
 
-                        this.officer_collection.total = 0;
+                        this.officer_collection.total = null;
                         this.officer_collection.representative = '';
                         this.officer_collection.note = '';
                     }
@@ -1176,10 +1361,39 @@
 
 
                 },
+                addPosCollection() {
+                    this.isEditing = false;
+                    if (this.pos_collections.or_no == null) {
+                        alert("Please enter or no.");
+                    } else {
+                        this.collectionBreakdown.pos_collections.push({
+                            or_no: this.pos_collections.or_no,
+                            total_amount: this.pos_collections.total_amount,
+                            isEditing: false,
+                        });
+
+
+                        this.pos_collections.total_amount = 0;
+
+                    }
+                    this.pos_collections.or_no = null;
+                    this.pos_collections.total_amount = null;
+                },
+                editPosCollection: function(index) {
+                    var or_no = this.collectionBreakdown.pos_collections[index].or_no;
+                    this.collectionBreakdown.pos_collections[index].isEditing = true;
+                    /* this.pos_collections.or_no = or_no; */
+                    this.isEditing = true;
+
+                },
                 editOfficerCollection: function(index) {
                     this.collectionBreakdown.account_officer_collections[index].isEditing = true;
                     this.isEditing = true;
 
+                },
+                savePosCollection: function(index) {
+                    this.collectionBreakdown.pos_collections[index].isEditing = false;
+                    this.isEditing = false;
                 },
                 saveOfficerCollection: function(index) {
                     this.collectionBreakdown.account_officer_collections[index].isEditing = false;
@@ -1194,18 +1408,13 @@
                         if (this.isValid) {
                             this.createNewCollectionBreakdown();
 
+
                         }
                     }
                 },
                 createValidation: function() {
                     if (this.collectionBreakdown.other_payment.pos_amount === '') {
                         alert('POS amount is required.')
-                        this.isValid = false;
-                    } else if (this.collectionBreakdown.other_payment.memo_amount === '') {
-                        alert('MEMO amount is required.')
-                        this.isValid = false;
-                    } else if (this.collectionBreakdown.other_payment.check_amount === '') {
-                        alert('CHECK amount is required.')
                         this.isValid = false;
                     } else {
                         this.isValid = true;
@@ -1215,12 +1424,12 @@
                 },
                 createNewCollectionBreakdown: function() {
                     this.collectionBreakdown.status = 'unposted';
-                    var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                    var totalCash = parseFloat(this.totalCash);
                     this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
-                        .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
-                        .replace(/[^0-9\.-]+/g, ""));
-                    this.collectionBreakdown.total = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                        .branchCollectionTotal);
+                    this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
+                    this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
+                    this.collectionBreakdown.total = totalCash;
                     axios.post('/MAC-ams/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1245,6 +1454,21 @@
                     var branch = $('#branch_id_collection_edit option:selected').text().trim();
                     this.collectionBreakdown.branch_collections[index].branch.branch_name = branch;
                     this.isEditing = false;
+                },
+                removePosCollection: function(collection, index) {
+                    this.collectionBreakdown.pos_collections[index].isEditing = false;
+                    if (index !== -1) {
+                        console.log(collection);
+                        this.collectionBreakdown.pos_collections.splice(index, 1);
+                    }
+
+
+                    /* const isEqual = (obj1, obj2) =>
+                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
+                    const updatedArray = this.collectionBreakdown.branch_collections.filter(
+                        element => !
+                        isEqual(element, collection)); */
+
                 },
                 removeBranchCollection: function(collection, index) {
                     this.collectionBreakdown.branch_collections[index].isEditing = false;
@@ -1335,7 +1559,7 @@
                     this.total.p_10 = collectionBreakdown.p_10 * 10;
                     this.total.p_5 = collectionBreakdown.p_5 * 5;
                     this.total.p_1 = collectionBreakdown.p_1 * 1;
-                    this.total.c_25 = collectionBreakdown.c_25 * .25;
+                    this.total.c_25 = collectionBreakdown.c_25 * 0.25;
 
 
 
@@ -1377,6 +1601,7 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        window.location.reload();
                     }).catch(err => {
                         toastr.success(err);
                     })
@@ -1394,12 +1619,11 @@
 
                 updateCollectionBreakdown: function() {
                     if (!this.isUpdateStatus) {
-                        var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                        var totalCash = parseFloat(this.totalCash);
                         this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
-                            .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                            .branchCollectionTotal);
                         this.collectionBreakdown.total = totalCash
-                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
-                            .replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
                     }
                     axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
@@ -1410,6 +1634,7 @@
                         }).then(response => {
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
+                        window.location.reload();
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
@@ -1498,7 +1723,7 @@
                 formatCurrency: function(amount) {
                     amount = parseFloat(amount);
                     if (isNaN(amount)) {
-                        return "Invalid Number";
+                        return 0;
                     }
                     amount = amount.toFixed(2);
 
@@ -1540,6 +1765,7 @@
                 },
                 otherPayment: function() {
                     var collections = this.collections;
+
                     if (collections.other_payment) {
                         var otherPayment = collections.other_payment;
                         return {
@@ -1571,30 +1797,88 @@
                         parseFloat(this.collectionBreakdown.p_5 * 5) +
                         parseFloat(this.collectionBreakdown.p_1 * 1) +
                         parseFloat(this.collectionBreakdown.c_25 * 0.25);
-                    return this.amountConverter(total);
+                    return total
                 },
                 aoCollectionTotal: function() {
                     var aoCollection = this.collectionBreakdown.account_officer_collections;
                     var total = 0;
                     if (aoCollection.length > 0) {
                         for (var i in aoCollection) {
-                            total += parseFloat(aoCollection[i].total);
+                            var totalCollection = aoCollection[i].total;
+                            if (totalCollection) {
+                                total += parseFloat(aoCollection[i].total);
+                            }
                         }
                     }
-                    return this.amountConverter(total);
+                    return total;
                 },
+                /* otherPaymentTotal: {
+                    get: function() {
+                        var otherPayment = this.collectionBreakdown.other_payment;
+                        let total = 0;
+                        let memo = 0;
+                        let check = 0;
+
+                        if (otherPayment.memo_amount == "") {
+                            otherPayment.memo_amount = 0;
+                        }
+                        if (otherPayment.check_amount == "") {
+                            otherPayment.check_amount = 0;
+                        }
+
+                        total = parseFloat(this.aoCollectionTotal) +
+                            parseFloat(otherPayment.memo_amount) +
+                            parseFloat(otherPayment.check_amount) +
+                            parseFloat(this.branchCollectionTotal) +
+                            parseFloat(this.posCollectionTotal)
+
+                        this.otherPaymentTotal = total;
+
+
+                    },
+                    set: function(newVal) {
+                        var otherPayment = this.collectionBreakdown.other_payment;
+                        let total = 0;
+                        let memo = 0;
+                        let check = 0;
+
+                        if (otherPayment.memo_amount == "") {
+                            otherPayment.memo_amount = 0;
+                        }
+                        if (otherPayment.check_amount == "") {
+                            otherPayment.check_amount = 0;
+                        }
+
+                        newVal = parseFloat(this.aoCollectionTotal) +
+                            parseFloat(otherPayment.memo_amount) +
+                            parseFloat(otherPayment.check_amount) +
+                            parseFloat(this.branchCollectionTotal) +
+                            parseFloat(this.posCollectionTotal)
+
+                    }
+                }, */
                 otherPaymentTotal: function() {
 
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
-                    if (otherPayment) {
-                        total = parseFloat(this.aoCollectionTotal.replace(/[^0-9\.-]+/g, "")) +
-                            parseFloat(otherPayment.check_amount) +
-                            parseFloat(otherPayment.memo_amount) +
-                            parseFloat(otherPayment.pos_amount) +
-                            parseFloat(otherPayment.interbranch_amount)
+                    let memo = 0;
+                    let check = 0;
+
+                    if (otherPayment.memo_amount == "") {
+                        otherPayment.memo_amount = 0;
                     }
-                    return this.amountConverter(total);
+                    if (otherPayment.check_amount == "") {
+                        otherPayment.check_amount = 0;
+                    }
+
+
+                    total = parseFloat(this.aoCollectionTotal) +
+                        parseFloat(otherPayment.memo_amount) +
+                        parseFloat(otherPayment.check_amount) +
+                        parseFloat(this.branchCollectionTotal) +
+                        parseFloat(this.posCollectionTotal)
+
+                    return total;
                 },
                 branchCollectionTotal: function() {
                     var branchCollection = this.collectionBreakdown.branch_collections;
@@ -1607,8 +1891,21 @@
 
                         }
                     }
+                    return total;
+                },
 
-                    return this.amountConverter(total);
+                posCollectionTotal: function() {
+                    var pos = this.collectionBreakdown.pos_collections;
+                    var total = 0;
+                    if (this.collectionBreakdown.other_payment) {
+                        if (pos) {
+                            for (var i in pos) {
+                                total += parseFloat(pos[i].total_amount);
+                            }
+
+                        }
+                    }
+                    return total;
                 },
                 filteredCashBlotter: function() {
                     var rows = [];
