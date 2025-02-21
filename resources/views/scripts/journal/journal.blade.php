@@ -311,10 +311,10 @@
             html: true,
             title: "Hello",
             template: `
-        <div class="custom-tooltip tooltip">
-            <div class="tooltip-inner">Hi</div>
-        </div>
-        `
+                <div class="custom-tooltip tooltip">
+                    <div class="tooltip-inner">Hi</div>
+                </div>
+            `
         })
 
         $('form').attr('autocomplete', 'off');
@@ -398,9 +398,7 @@
                 }); */
 
 
-        $(".editables").on("shown", function(e, editable) {
-
-        });
+        $(".editables").on("shown", function(e, editable) {});
 
         function submitEditable() {
             $('.editable-table-data .editableform').editable().submit();
@@ -416,9 +414,12 @@
             getBalance()
             checkTotalAndAmount()
         })
+        let jefIsLoading = false;
         $(document).on('submit', '#journalEntryForm', function(e) {
             e.preventDefault();
-
+            console.log(jefIsLoading)
+            if (jefIsLoading) return
+            jefIsLoading = true
             var balances = document.getElementById("balance_debit");
             var spanBal = balances.innerText;
 
@@ -429,6 +430,7 @@
                     placeholder: 'Select',
                     allowClear: true,
                 });
+                jefIsLoading = false
                 return alert('Error: No reference number generated. Please try again.');
             } else {
                 console.log('LrefNo value set:', $('#LrefNo').text());
@@ -447,18 +449,22 @@
                 $.each($('#tbl-create-journal-container').find('tr'), function(k, v) {
                     var field = $(v).children()
                     if ($(field[1]).find('.editable-row-item').val() == null) {
+                        jefIsLoading = false
                         return alert("Account is required.");
                     }
                     if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3]).find('.editable-row-item').text() === "₱0.00") {
+                        jefIsLoading = false
                         return alert("Debit or credit amount is required.");
                     }
                     if ($(field[4]).find('.editable-row-item').val() == null) {
+                        jefIsLoading = false
                         return alert("Subsidiary is required.");
                     }
                     if ($(field[0]).find('.editable-row-item').text() == '' ||
                         $(field[1]).find('.editable-row-item').val() == '' ||
                         $(field[4]).find('.editable-row-item').val() == '') {
                         _st = false;
+                        jefIsLoading = false
                         return false;
                     } else {
                         _st = true;
@@ -466,6 +472,7 @@
                 });
                 var details = saveJournalEntryDetails('save');
                 if (details.length < 1) {
+                    jefIsLoading = false
                     return alert("Journal details is required.")
                 }
 
@@ -525,8 +532,11 @@
                                     } else {
                                         toastr.error('Error');
                                     }
+                                    jefIsLoading = false
                                 }
                             });
+                        } else {
+                            jefIsLoading = false
                         }
                         //}
 
@@ -535,15 +545,18 @@
 
                 } else if ($('#amount').val() != parseFloat($('#total_credit').text().float())) {
                     alert('AMOUNT VALUE IS NOT EQUAL TO DEBIT');
+                    jefIsLoading = false
                 } else {
                     alert('MUST ALL COMPLETE THE JOURNAL DETAILS FIELD');
+                    jefIsLoading = false
                 }
             } else {
                 alert("Unable to save Debit and Credit not equal")
+                jefIsLoading = false
             }
-
         });
         $(document).on('click', '.JnalFetch', function(e) {
+            
             e.preventDefault();
             var id = $(this).attr('value');
             $.ajax({
@@ -1355,30 +1368,30 @@
 				<select fieldName="subsidiary_id" class="select-subsidiary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
 					<?php
-     $temp = '';
-     foreach ($subsidiaries as $subsidiary) {
-         if (is_array($subsidiary->toArray()['subsidiary_category']) && $subsidiary->toArray()['subsidiary_category'] > 0) {
-             if ($temp == '') {
-                 $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-                 echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-             } elseif ($temp != $subsidiary->toArray()['subsidiary_category']['sub_cat_name']) {
-                 echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-                 $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-             }
-             echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
-         }
-     }
-     ?>
-				</select>
-			</td>
-			<td>
-				<button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
-					<span>
-						<i class="fas fa-trash" aria-hidden="true"></i>
-					</span>
-				</button>
-			</td>
-		</tr>`
+            $temp = '';
+            foreach ($subsidiaries as $subsidiary) {
+                if (is_array($subsidiary->toArray()['subsidiary_category']) && $subsidiary->toArray()['subsidiary_category'] > 0) {
+                    if ($temp == '') {
+                        $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
+                        echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
+                    } elseif ($temp != $subsidiary->toArray()['subsidiary_category']['sub_cat_name']) {
+                        echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
+                        $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
+                    }
+                    echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
+                }
+            }
+            ?>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary btn-flat btn-sm btn-default remove-journalDetails">
+                            <span>
+                                <i class="fas fa-trash" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>`
             $('#tbl-create-journal-container').append(content);
 
             recordsEditable()
