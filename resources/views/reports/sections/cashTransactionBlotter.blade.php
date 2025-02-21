@@ -747,6 +747,7 @@
                                                     <input type="number"
                                                         v-model="collectionBreakdown.other_payment.check_amount"
                                                         @keydown.enter="nextTextField('pos_amount')" ref="check_amount"
+                                                        @change="calculateTotal()"
                                                         class="form-control form-control-sm rounded-0 text-right" required
                                                         placeholder="0.00">
                                                 </td>
@@ -776,6 +777,7 @@
                                                     <input type="number"
                                                         v-model="collectionBreakdown.other_payment.memo_amount"
                                                         ref="memo_amount" @keydown.enter="nextTextField('p_10')"
+                                                        @change="calculateTotal()"
                                                         class="form-control form-control-sm rounded-0 text-right">
                                                 </td>
                                             </tr>
@@ -1054,7 +1056,7 @@
 
                                                         <td>cash amount</td>
                                                         <td>
-                                                            @{{ formatCurrency(otherPayment.cash_amount) }}
+                                                            @{{ otherPayment.cash_amount }}
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -1290,6 +1292,22 @@
                         nextInput.focus();
                     }
                 },
+                calculateTotal: function() {
+                    /* var otherPayment = this.collectionBreakdown.other_payment;
+                    if (otherPayment.memo_amount == "") {
+                        otherPayment.memo_amount = 0;
+                    }
+                    if (otherPayment.check_amount == "") {
+                        otherPayment.check_amount = 0;
+                    }
+
+                    this.otherPayment.total = otherPayment.cash_amount + otherPayment.check_amount +
+                        otherPayment.pos_amount + otherPayment.memo_amount + otherPayment.interbranch_amount;
+
+                    this.otherPaymentTotal = this.otherPayment.total; */
+
+
+                },
                 amountConverter: function(amount) {
                     const formatter = new Intl.NumberFormat('en-US', {
                         style: 'currency',
@@ -1395,12 +1413,6 @@
                 createValidation: function() {
                     if (this.collectionBreakdown.other_payment.pos_amount === '') {
                         alert('POS amount is required.')
-                        this.isValid = false;
-                    } else if (this.collectionBreakdown.other_payment.memo_amount === '') {
-                        alert('MEMO amount is required.')
-                        this.isValid = false;
-                    } else if (this.collectionBreakdown.other_payment.check_amount === '') {
-                        alert('CHECK amount is required.')
                         this.isValid = false;
                     } else {
                         this.isValid = true;
@@ -1605,12 +1617,11 @@
 
                 updateCollectionBreakdown: function() {
                     if (!this.isUpdateStatus) {
-                        var totalCash = parseFloat(this.totalCash.replace(/[^0-9\.-]+/g, ""));
+                        var totalCash = parseFloat(this.totalCash);
                         this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
-                            .branchCollectionTotal.replace(/[^0-9\.-]+/g, ""));
+                            .branchCollectionTotal);
                         this.collectionBreakdown.total = totalCash
-                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal
-                            .replace(/[^0-9\.-]+/g, ""));
+                        this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
                     }
                     axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
@@ -1799,11 +1810,64 @@
                     }
                     return total;
                 },
+                /* otherPaymentTotal: {
+                    get: function() {
+                        var otherPayment = this.collectionBreakdown.other_payment;
+                        let total = 0;
+                        let memo = 0;
+                        let check = 0;
+
+                        if (otherPayment.memo_amount == "") {
+                            otherPayment.memo_amount = 0;
+                        }
+                        if (otherPayment.check_amount == "") {
+                            otherPayment.check_amount = 0;
+                        }
+
+                        total = parseFloat(this.aoCollectionTotal) +
+                            parseFloat(otherPayment.memo_amount) +
+                            parseFloat(otherPayment.check_amount) +
+                            parseFloat(this.branchCollectionTotal) +
+                            parseFloat(this.posCollectionTotal)
+
+                        this.otherPaymentTotal = total;
+
+
+                    },
+                    set: function(newVal) {
+                        var otherPayment = this.collectionBreakdown.other_payment;
+                        let total = 0;
+                        let memo = 0;
+                        let check = 0;
+
+                        if (otherPayment.memo_amount == "") {
+                            otherPayment.memo_amount = 0;
+                        }
+                        if (otherPayment.check_amount == "") {
+                            otherPayment.check_amount = 0;
+                        }
+
+                        newVal = parseFloat(this.aoCollectionTotal) +
+                            parseFloat(otherPayment.memo_amount) +
+                            parseFloat(otherPayment.check_amount) +
+                            parseFloat(this.branchCollectionTotal) +
+                            parseFloat(this.posCollectionTotal)
+
+                    }
+                }, */
                 otherPaymentTotal: function() {
 
                     var otherPayment = this.collectionBreakdown.other_payment;
                     let total = 0;
+                    let memo = 0;
+                    let check = 0;
 
+                    if (otherPayment.memo_amount == "") {
+                        otherPayment.memo_amount = 0;
+                    }
+                    if (otherPayment.check_amount == "") {
+                        otherPayment.check_amount = 0;
+                    }
 
 
                     total = parseFloat(this.aoCollectionTotal) +
@@ -1811,7 +1875,6 @@
                         parseFloat(otherPayment.check_amount) +
                         parseFloat(this.branchCollectionTotal) +
                         parseFloat(this.posCollectionTotal)
-
 
                     return total;
                 },
