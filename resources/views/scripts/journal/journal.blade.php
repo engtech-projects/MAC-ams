@@ -173,8 +173,13 @@
                                 .toLocaleString("en-US"))
                             $('#vtotal_credit, #total_credit_voucher').text(total_credit
                                 .toLocaleString("en-US"))
-                            $('#vbalance_debit').text(amountConverter((parseFloat(
-                                total_debit) - parseFloat(total_credit))))
+                            $('#vbalance_debit').text(
+                                amountConverter(
+                                    parseFloat(
+                                        parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                    )
+                                )
+                            )
                         });
                     }
 
@@ -276,9 +281,12 @@
                                 .toLocaleString("en-US"))
                             $('#vtotal_credit, #total_credit_voucher').text(total_credit
                                 .toLocaleString("en-US"))
-                            $('#vbalance_debit').text((parseFloat(total_debit) -
-                                parseFloat(total_credit)).toLocaleString(
-                                "en-US"))
+                           $('#vbalance_debit').text(
+                            amountConverter(
+                                    parseFloat(
+                                        parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                    )
+                                ))
                         });
                     }
 
@@ -945,8 +953,7 @@
                                     parseFloat(vv.journal_details_debit)
                                 total_credit = parseFloat(total_credit) +
                                     parseFloat(vv.journal_details_credit)
-                                balance = parseFloat(total_debit) - parseFloat(
-                                    total_credit)
+                                balance = parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
                             });
                             $('#edit_total_debit').text(Number(total_debit)
                                 .toLocaleString(undefined, {
@@ -1107,8 +1114,11 @@
                                 amountConverter(total_debit))
                             $('#vtotal_credit, #total_credit_voucher').text(
                                 amountConverter(total_credit))
-                            $('#vbalance_debit').text(amountConverter((parseFloat(
-                                total_debit) - parseFloat(total_credit))))
+                            $('#vbalance_debit').text(
+                                amountConverter(
+                                    parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                )
+                            );
                         });
                     }
                     $('#journalModalView').modal('show')
@@ -1614,14 +1624,18 @@
 
         function getBalance() {
             $('#balance_debit').text(
-                (parseFloat($('#total_debit').text().replace(",", "")) - parseFloat($('#total_credit').text()
-                    .replace(",", ""))).toLocaleString("en-US", {
+                (
+                    parseFloat($('#total_debit').text().replaceAll(",", "")) - 
+                    parseFloat($('#total_credit').text().replaceAll(",", ""))
+                ).toLocaleString("en-US", {
                     minimumFractionDigits: 2
                 })
             );
             $('#edit_balance_debit').text(
-                (parseFloat($('#edit_total_debit').text().replace(",", "")) - parseFloat($('#edit_total_credit')
-                    .text().replace(",", ""))).toLocaleString("en-US", {
+                (
+                    parseFloat($('#edit_total_debit').text().replaceAll(",", "")) - 
+                    parseFloat($('#edit_total_credit').text().replaceAll(",", ""))
+                ).toLocaleString("en-US", {
                     minimumFractionDigits: 2
                 })
             );
@@ -1679,8 +1693,8 @@
                     checkTotalAndAmount();
                 } else {
                     $('#amount').val(parseFloat(amount));
-                    if (amount < parseFloat($('#total_debit').text().replace(",", "")) || amount < parseFloat($(
-                            '#total_credit').text().replace(",", ""))) {
+                    if (amount < parseFloat($('#total_debit').text().replaceAll(",", "")) || amount < parseFloat($(
+                            '#total_credit').text().replaceAll(",", ""))) {
                         alert('INPUTED EXCEED FROM EXPECTED AMOUNT')
                     }
                 }

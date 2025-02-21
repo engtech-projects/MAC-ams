@@ -33,6 +33,10 @@ class Subsidiary extends Model
     {
         return $this->belongsTo(SubsidiaryCategory::class, 'sub_cat_id');
     }
+    public function subsidiary_accounts()
+    {
+        return $this->belongsToMany(Accounts::class, 'subsidiary_accounts', 'sub_id', 'account_id');
+    }
     public static function fetchBranch()
     {
         $branch = Subsidiary::leftJoin("subsidiary_category", "subsidiary.sub_cat_id", "=", "subsidiary_category.sub_cat_id")
@@ -53,7 +57,7 @@ class Subsidiary extends Model
             $query->whereDate('sub_date', '<=', $date);
         })->whereHas('subsidiary_category', function ($query) {
             $query->where('sub_cat_type', 'depre');
-        })->whereNotNull('sub_per_branch')->get();
+        })->whereNotNull('sub_per_branch')->with(['subsidiary_accounts'])->get();
         return $subsidiary;
     }
 }
