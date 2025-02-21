@@ -983,8 +983,12 @@
                                 amountConverter(total_debit))
                             $('#vtotal_credit, #total_credit_voucher').text(
                                 amountConverter(total_credit))
-                            $('#vbalance_debit').text(amountConverter((parseFloat(
-                                total_debit) - parseFloat(total_credit))))
+                            $('#vbalance_debit').text(amountConverter(
+                                    parseFloat(
+                                        (total_debit - total_credit).toFixed(2)
+                                    )
+                                )
+                        )
                         });
                     }
                     $('#journalModalView').modal('show')

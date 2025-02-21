@@ -173,8 +173,13 @@
                                 .toLocaleString("en-US"))
                             $('#vtotal_credit, #total_credit_voucher').text(total_credit
                                 .toLocaleString("en-US"))
-                            $('#vbalance_debit').text(amountConverter((parseFloat(
-                                total_debit) - parseFloat(total_credit))))
+                            $('#vbalance_debit').text(
+                                amountConverter(
+                                    parseFloat(
+                                        (total_debit - total_credit).toFixed(2)
+                                    )
+                                )
+                            )
                         });
                     }
 
@@ -276,9 +281,12 @@
                                 .toLocaleString("en-US"))
                             $('#vtotal_credit, #total_credit_voucher').text(total_credit
                                 .toLocaleString("en-US"))
-                            $('#vbalance_debit').text((parseFloat(total_debit) -
-                                parseFloat(total_credit)).toLocaleString(
-                                "en-US"))
+                           $('#vbalance_debit').text(
+                            amountConverter(
+                                    parseFloat(
+                                        (total_debit - total_credit).toFixed(2)
+                                    )
+                                ))
                         });
                     }
 
