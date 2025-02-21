@@ -1619,14 +1619,18 @@
 
         function getBalance() {
             $('#balance_debit').text(
-                (parseFloat($('#total_debit').text().replace(",", "")) - parseFloat($('#total_credit').text()
-                    .replace(",", ""))).toLocaleString("en-US", {
+                (
+                    parseFloat($('#total_debit').text().replaceAll(",", "")) - 
+                    parseFloat($('#total_credit').text().replaceAll(",", ""))
+                ).toLocaleString("en-US", {
                     minimumFractionDigits: 2
                 })
             );
             $('#edit_balance_debit').text(
-                (parseFloat($('#edit_total_debit').text().replace(",", "")) - parseFloat($('#edit_total_credit')
-                    .text().replace(",", ""))).toLocaleString("en-US", {
+                (
+                    parseFloat($('#edit_total_debit').text().replaceAll(",", "")) - 
+                    parseFloat($('#edit_total_credit').text().replaceAll(",", ""))
+                ).toLocaleString("en-US", {
                     minimumFractionDigits: 2
                 })
             );
@@ -1684,8 +1688,8 @@
                     checkTotalAndAmount();
                 } else {
                     $('#amount').val(parseFloat(amount));
-                    if (amount < parseFloat($('#total_debit').text().replace(",", "")) || amount < parseFloat($(
-                            '#total_credit').text().replace(",", ""))) {
+                    if (amount < parseFloat($('#total_debit').text().replaceAll(",", "")) || amount < parseFloat($(
+                            '#total_credit').text().replaceAll(",", ""))) {
                         alert('INPUTED EXCEED FROM EXPECTED AMOUNT')
                     }
                 }
