@@ -729,13 +729,7 @@ class Accounts extends Model
 
                     ];
                     return $details;
-                })->filter(function ($item) {
-                    if ($item["to_increase"] === "credit") {
-                        return $item["credit"] > 0;
-                    } else {
-                        return $item["debit"] > 0;
-                    }
-                })->filter()->values();
+                })->values();
                 return $groupAccounts;
             })->unique()->values();
             return $groupAccounts;
@@ -746,7 +740,7 @@ class Accounts extends Model
                 } else {
                     unset($item);
                 }
-            })->filter()->values();
+            })->values();
             return $accounts;
         });
 

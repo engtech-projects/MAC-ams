@@ -1646,6 +1646,7 @@
                     var cumulativeExpense = 0;
                     var grandTotalRevenue = 0;
                     var grandTotalExpense = 0;
+                    var amount = 0;
 
 
                     if (this.incomeExpense.revenue) {
@@ -1654,7 +1655,8 @@
                             var totalAmount = 0;
                             revenue.entries.forEach(entry => {
                                 var row = [];
-                                var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                // var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                amount = entry.credit - entry.debit;
                                 totalAmount += parseFloat(amount);
                                 cumulativeRevenue += parseFloat(amount);
 
@@ -1664,6 +1666,7 @@
                                 row.push(entry.source);
                                 row.push(entry.cheque_date);
                                 row.push(entry.cheque_no);
+
                                 row.push(this.formatCurrency(amount));
                                 row.push(this.formatCurrency(cumulativeRevenue));
                                 result.revenue.push(row);
