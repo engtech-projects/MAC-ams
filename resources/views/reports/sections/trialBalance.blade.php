@@ -138,7 +138,7 @@
 									<tr>
 										<td class="font-weight-bold"></td>
 										<td></td>
-										<td><b>{{number_format($totalcred, 2, '.', ',')}}</b></td>
+										<td><b>{{number_format($totaldeb, 2, '.', ',')}}</b></td>
 										<td><b>{{number_format($totalcred, 2, '.', ',')}}</b></td>
 									</tr>
 								</tbody>
