@@ -1242,7 +1242,7 @@ class Accounts extends Model
             if (strtolower($account->account_category) == 'expense') {
                 $subtotal = $account->total;
             } else {
-                $subtotal = abs($account->total);
+                $subtotal = ($account->total) * -1;
             }
             // if( isset($account->to_increase) && strtolower($account->to_increase) == 'debit' ) {
             //     $subtotal = ($account->total + $opening_balance);
