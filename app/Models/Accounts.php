@@ -356,7 +356,7 @@ class Accounts extends Model
                 if ($account->account_id == 84) {
                     $account->debit = 0;
                     $account->credit = 0;
-                    $account->total = $this->currentEarnings($range);
+                    $account->total = $this->currentEarnings($range) * -1;
                 } else {
                     $account->debit = 0;
                     $account->credit = 0;
@@ -385,17 +385,15 @@ class Accounts extends Model
             // $opening_balance = in_array($account->account_category, ["revenue", "expense"]) && $account->debit == 0 && $account->credit == 0 ? 0 : $this->getAccountBalance($range[0], $range[1], $account->account_id);
             $opening_balance = $this->getAccountBalance($range[0], $range[1], $account->account_id);
 
+
+            // if ($account->account_number == '3300') {
+            //     dd(($account->total - $opening_balance));
+            // }
+
             if (isset($account->to_increase) && strtolower($account->to_increase) == 'debit') {
                 $subtotal = ($account->total + $opening_balance);
             } else {
                 $subtotal = ($account->total - $opening_balance) * -1;
-                // if( $account->total >= 0 ) {
-                //    $subtotal = abs($account->total + $opening_balance);
-                // }else{
-                //     $subtotal = abs($account->total + ($opening_balance) * -1);
-                // }
-
-
             }
 
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
@@ -417,7 +415,6 @@ class Accounts extends Model
             'title' => 'TOTAL LIABILITIES AND EQUITY',
             'value' => ($sheet['accounts']['liabilities']['total'] + $sheet['accounts']['equity']['total'])
         ];
-
         return $sheet;
     }
 
@@ -1015,7 +1012,7 @@ class Accounts extends Model
                 if ($account->account_id == 84) {
                     $account->debit = 0;
                     $account->credit = 0;
-                    $account->total = $this->currentEarnings($range);
+                    $account->total = $this->currentEarnings($range) * -1;
                 } else {
                     $account->debit = 0;
                     $account->credit = 0;
@@ -1047,19 +1044,7 @@ class Accounts extends Model
             if (isset($account->to_increase) && strtolower($account->to_increase) == 'debit') {
                 $subtotal = ($account->total + $opening_balance);
             } else {
-                if ($account->account_id == 84) {
-                    $subtotal = ($account->total - $opening_balance);
-                } else {
-                    // $subtotal = abs($account->total - $opening_balance);
-                    $subtotal = ($account->total - $opening_balance) * -1;
-                }
-                // if( $account->total >= 0 ) {
-                //    $subtotal = abs($account->total + $opening_balance);
-                // }else{
-                //     $subtotal = abs($account->total + ($opening_balance) * -1);
-                // }
-
-
+                $subtotal = ($account->total - $opening_balance) * -1;
             }
 
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
