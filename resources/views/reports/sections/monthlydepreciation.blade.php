@@ -300,7 +300,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Amount:</label>
-                                        <input type="text" v-model="subsidiary.sub_amount" class="form-control"
+                                        <input type="number" v-model="subsidiary.sub_amount" class="form-control"
                                             id="sub_tel" required>
                                     </div>
                                     <div class="col-md-6">
@@ -334,6 +334,20 @@
                                         <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
                                         <input type="text" v-model="ratePercentage" class="form-control">
                                     </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Used:</label>
+                                        <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
+                                            id="sub_no_amort" >
+                                    </div>
+                                    <!-- <div class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                    </div> -->
                                 </div>
 
                             </div>
@@ -711,6 +725,8 @@
                     }
                 },
                 processEdit: function(sub) {
+                    console.log("Editing Subsidiary:", sub); // Debugging
+                    // console.log("sub_no_amort value:", sub[6]); 
                     this.isEdit = true;
                     this.subId = sub[13];
                     this.monthlyAmortization = sub[4];
@@ -719,12 +735,13 @@
                     this.subsidiary.sub_per_branch = sub[17];
                     this.subsidiary.sub_name = sub[1];
                     this.subsidiary.sub_code = sub[15];
-                    this.subsidiary.sub_no_amort = sub[3];
-                    this.subsidiary.sub_amount = parseInt(sub[4]);
+                    this.subsidiary.sub_no_amort = sub[6];
+                    this.subsidiary.sub_amount = parseInt(sub[3]);
                     this.subsidiary.sub_salvage = parseInt(sub[14]);
                     this.subsidiary.sub_rate_percentage = sub[6];
                     this.subsidiary.sub_date_of_depreciation = sub[7];
                     this.subsidiary.sub_no_depre = sub[5];
+                    // this.subsidiary.sub_no_amort = sub[]
 
                 },
                 createSubsidiary: function() {
@@ -754,7 +771,7 @@
                 },
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
-                    this.subsidiary.sub_no_amort = 0;
+                    // this.subsidiary.sub_no_amort = 0;
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
