@@ -514,7 +514,7 @@
                                     ]);
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
@@ -720,7 +720,7 @@
                     this.subsidiary.sub_name = sub[1];
                     this.subsidiary.sub_code = sub[15];
                     this.subsidiary.sub_no_amort = sub[3];
-                    this.subsidiary.sub_amount = parseInt(sub[4]);
+                    this.subsidiary.sub_amount = parseInt(sub[3]);
                     this.subsidiary.sub_salvage = parseInt(sub[14]);
                     this.subsidiary.sub_rate_percentage = sub[6];
                     this.subsidiary.sub_date_of_depreciation = sub[7];
