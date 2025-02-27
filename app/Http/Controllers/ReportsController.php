@@ -175,10 +175,10 @@ class ReportsController extends MainController
             }
             $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
 
-            $salvage = round(($value->sub_amount * $value->sub_salvage) / 100, 2);
-            $monthlyAmort = round(($value->sub_amount - $salvage) / $value->sub_no_depre, 2);
+            $salvage = (($value->sub_amount * $value->sub_salvage) / 100);
+            $monthlyAmort = (($value->sub_amount - $salvage) / $value->sub_no_depre);
             // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
-            $rem = round($value->sub_no_depre - $value->sub_no_amort, 2);
+            $rem = ($value->sub_no_depre - $value->sub_no_amort);
             $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
             $value['branch_code'] = $branch->branch_code;
             $value['branch_id'] = $branch->branch_id;
@@ -187,13 +187,13 @@ class ReportsController extends MainController
             $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
             $value['monthly_amort'] = $monthlyAmort;
             $value['salvage'] = $salvage;
-            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
-            $value['unexpensed'] = round($rem * $monthlyAmort, 2);
+            $value['expensed'] = $monthlyAmort * $value->sub_no_amort;
+            $value['unexpensed'] = ($rem * $monthlyAmort);
 
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
+            $value['due_amort'] = $rem > 0 ? ($monthlyAmort) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 
@@ -278,10 +278,10 @@ class ReportsController extends MainController
             }
             $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
 
-            $salvage = round(($value->sub_amount * $value->sub_salvage) / 100, 2);
-            $monthlyAmort = round(($value->sub_amount - $salvage) / $value->sub_no_depre, 2);
+            $salvage = (($value->sub_amount * $value->sub_salvage) / 100);
+            $monthlyAmort = (($value->sub_amount - $salvage) / $value->sub_no_depre);
             // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
-            $rem = round($value->sub_no_depre - $value->sub_no_amort, 2);
+            $rem = ($value->sub_no_depre - $value->sub_no_amort);
             $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
             $value['branch_code'] = $branch->branch_code;
             $value['branch_id'] = $branch->branch_id;
@@ -290,13 +290,13 @@ class ReportsController extends MainController
             $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
             $value['monthly_amort'] = $monthlyAmort;
             $value['salvage'] = $salvage;
-            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
-            $value['unexpensed'] = round($rem * $monthlyAmort, 2);
+            $value['expensed'] = $monthlyAmort * $value->sub_no_amort;
+            $value['unexpensed'] = ($rem * $monthlyAmort);
 
 
             $value['rem'] = $rem;
 
-            $value['due_amort'] = $rem > 0 ? round($monthlyAmort, 2) : 0;
+            $value['due_amort'] = $rem > 0 ? ($monthlyAmort) : 0;
             $value['inv'] = 0;
             $value['no'] = 0;
 

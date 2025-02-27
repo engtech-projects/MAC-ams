@@ -514,7 +514,7 @@
                                     ]);
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
@@ -562,7 +562,7 @@
                             }
                             rows.push(['BRANCH TOTAL', '', '',
                                 this.formatCurrency(totalAmount),
-                                this.formatCurrency(gTotalMonthly),
+                                this.formatCurrency(total_monthly_amort),
                                 this.formatCurrency(total_no_depre),
                                 total_used,
                                 this.formatCurrency(total_expensed),
@@ -576,7 +576,7 @@
                         }
                         rows.push(['GRAND TOTAL', '', '',
                             this.formatCurrency(gTotalAmount),
-                            this.formatCurrency(gTotalMonthlyAmort),
+                            this.formatCurrency(gTotalMonthly),
                             this.formatCurrency(gTotalNoDepre),
                             gTotalUsed,
                             this.formatCurrency(gTotalExpensed),
@@ -632,6 +632,7 @@
                     const formatter = new Intl.NumberFormat('en-US', {
                         style: 'decimal',
                         minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                     });
 
                     return formatter.format(number);
