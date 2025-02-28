@@ -16,7 +16,6 @@ class SubsidiaryController extends Controller
     {
         $data = $request->validate([
             'sub_name' => 'string|required',
-            'sub_code' => 'string|required',
             'sub_no_amort' => 'required',
             'sub_date' => 'date|required',
             'sub_cat_id' => 'integer|required',
@@ -47,7 +46,6 @@ class SubsidiaryController extends Controller
     {
         $data = $request->validate([
             'sub_name' => 'string|required',
-            'sub_code' => 'string|required',
             'sub_no_amort' => 'required',
             'sub_date' => 'date|required',
             'sub_cat_id' => 'integer|required',
