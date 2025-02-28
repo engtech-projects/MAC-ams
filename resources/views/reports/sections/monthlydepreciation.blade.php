@@ -342,12 +342,12 @@
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Used:</label>
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
-                                            id="sub_no_amort" >
+                                            id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                        <input type="text" v-model="ratePercentage" class="form-control">
-                                    </div> -->
+                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                    <input type="text" v-model="ratePercentage" class="form-control">
+                                                                </div> -->
                                 </div>
 
                             </div>
@@ -528,7 +528,7 @@
                                     ]);
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
@@ -726,7 +726,7 @@
                 },
                 processEdit: function(sub) {
                     console.log("Editing Subsidiary:", sub); // Debugging
-                    // console.log("sub_no_amort value:", sub[6]); 
+                    // console.log("sub_no_amort value:", sub[6]);
                     this.isEdit = true;
                     this.subId = sub[13];
                     this.monthlyAmortization = sub[4];
@@ -780,6 +780,7 @@
                     }).then(response => {
                         toastr.success(response.data.message);
                         this.subsidiary = {};
+                        window.reload();
                     }).catch(err => {
                         var errors = err.response.data.errors;
 
