@@ -300,23 +300,12 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Amount:</label>
-                                        <input type="number" v-model="subsidiary.sub_amount" class="form-control"
-                                            id="sub_tel" required>
+                                        <input type="text" v-model="subsidiary.sub_amount" class="form-control"
+                                            @change="formatTextField()" id="sub_tel" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Monthly Amortization</label>
                                         <input type="text" disabled v-model="monthlyAmort" class="form-control"
-                                            id="sub_acct_no" required>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label for="message-text" class="col-form-label">Monthly Amortization</label>
-                                        <input type="text" disabled v-model="amort" class="form-control"
                                             id="sub_acct_no" required>
                                     </div>
 
@@ -345,9 +334,9 @@
                                             id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                            <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
                                 </div>
 
                             </div>
@@ -386,6 +375,7 @@
                     account_id: '',
                     type: ''
                 },
+                subAmount: 0,
                 subsidiary: {
                     sub_name: '',
                     sub_code: null,
@@ -431,23 +421,36 @@
                     return this.type
                 },
                 monthlyAmort: function() {
-                    this.monthlyAmortization = this.subsidiary.sub_amount / this.subsidiary.sub_no_depre;
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.monthlyAmortization = amount / this.subsidiary.sub_no_depre;
                     if (this.subsidiary.sub_salvage > 0) {
                         this.ratePercentage / this.subsidiary.sub_no_depre;
                     }
-                    return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
+
+                    return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
                 },
                 amort: function() {
-                    var amort = (this.subsidiary.sub_amount - this.subsidiary.rate_percentage) / this.subsidiary
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    var amort = (amount - this.subsidiary.rate_percentage) / this.subsidiary
                         .sub_no_depre;
-                    return isNaN(amort) ? 0 : amort.toFixed(2);
+
+                    return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
                     //return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
 
 
                 ratePercentage: function() {
-                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * this.subsidiary
-                        .sub_amount
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * amount
                     return this.subsidiary.rate_percentage;
                 },
                 processSubsidiary: function() {
@@ -725,6 +728,10 @@
                         this.editSubsidiary(this.subId);
                     }
                 },
+                formatTextField() {
+                    this.subsidiary.sub_amount = this.formatCurrency(this.subsidiary.sub_amount);
+                    this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
+                },
                 processEdit: function(sub) {
                     // console.log("sub_no_amort value:", sub[6]);
                     this.isEdit = true;
@@ -736,7 +743,7 @@
                     this.subsidiary.sub_name = sub[1];
                     this.subsidiary.sub_code = sub[15];
                     this.subsidiary.sub_no_amort = sub[6];
-                    this.subsidiary.sub_amount = Number(sub[3].replace(/[^0-9\.-]+/g, ""))
+                    this.subsidiary.sub_amount = sub[3];
                     this.subsidiary.sub_salvage = parseInt(sub[14]);
                     this.subsidiary.sub_rate_percentage = sub[6];
                     this.subsidiary.sub_date_of_depreciation = sub[7];
@@ -747,6 +754,13 @@
                 createSubsidiary: function() {
                     this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.sub_amount = amount;
+
+                    /* this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, "")) */
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -771,6 +785,11 @@
                 },
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.sub_amount = amount;
                     // this.subsidiary.sub_no_amort = 0;
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
