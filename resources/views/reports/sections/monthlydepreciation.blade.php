@@ -345,9 +345,9 @@
                                             id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                    <input type="text" v-model="ratePercentage" class="form-control">
-                                                                </div> -->
+                                                                                                                                                                                                                                            <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                        </div> -->
                                 </div>
 
                             </div>
@@ -719,13 +719,13 @@
                 },
                 processAction: function() {
                     if (!this.isEdit) {
+
                         this.createSubsidiary();
                     } else {
                         this.editSubsidiary(this.subId);
                     }
                 },
                 processEdit: function(sub) {
-                    console.log("Editing Subsidiary:", sub); // Debugging
                     // console.log("sub_no_amort value:", sub[6]);
                     this.isEdit = true;
                     this.subId = sub[13];
@@ -736,7 +736,7 @@
                     this.subsidiary.sub_name = sub[1];
                     this.subsidiary.sub_code = sub[15];
                     this.subsidiary.sub_no_amort = sub[6];
-                    this.subsidiary.sub_amount = parseInt(sub[3]);
+                    this.subsidiary.sub_amount = Number(sub[3].replace(/[^0-9\.-]+/g, ""))
                     this.subsidiary.sub_salvage = parseInt(sub[14]);
                     this.subsidiary.sub_rate_percentage = sub[6];
                     this.subsidiary.sub_date_of_depreciation = sub[7];
