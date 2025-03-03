@@ -267,16 +267,17 @@
                         <form>
                             <div class="form-group">
                                 <div class="row">
+                                   
+                                    <div class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Inventory Number: </label>
+                                        <input type="text" disabled v-model="subsidiary.sub_code" class="form-control"
+                                            id="sub_code" required>
+                                    </div>
                                     <div class="col-md-6">
                                         <label for="recipient-name" class="col-form-label">Particular Name: </label>
                                         <input type="text" v-model="subsidiary.sub_name" class="form-control"
                                             id="sub_name" required>
                                         <input v-if="isEdit" type="hidden" name="_method" value="PUT">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Inventory Number: </label>
-                                        <input type="text" v-model="subsidiary.sub_code" class="form-control"
-                                            id="sub_code" required>
                                     </div>
                                 </div>
                             </div>
@@ -509,8 +510,8 @@
                                 if (j == subsidiary.branch) {
 
                                     sub_ids.push(subsidiary.sub_id)
-                                    rows.push([no,
-                                        subsidiary.sub_code + '-' + subsidiary.sub_name,
+                                    rows.push([no + ' - ' + subsidiary.sub_code ,
+                                        subsidiary.sub_name,
                                         subsidiary.sub_date,
                                         this.formatCurrency(subsidiary.sub_amount),
                                         this.formatCurrency(subsidiary.monthly_amort),
@@ -733,7 +734,7 @@
                     this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
                 },
                 processEdit: function(sub) {
-                    // console.log("sub_no_amort value:", sub[6]);
+                    console.log("sub_no_amort value:", sub[1]);
                     this.isEdit = true;
                     this.subId = sub[13];
                     this.monthlyAmortization = sub[4];
