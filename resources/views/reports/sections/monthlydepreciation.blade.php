@@ -314,10 +314,15 @@
                             </div>
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <label for="message-text" class="col-form-label">Monthly Amortization</label>
-                                        <input type="text" disabled v-model="amort" class="form-control"
-                                            id="sub_acct_no" required>
+                                    <div class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Salvage:</label>
+                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+
+                                        <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
+                                            id="sub_salvage" required>
                                     </div>
 
                                 </div>
