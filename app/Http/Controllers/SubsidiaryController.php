@@ -8,13 +8,16 @@ use App\Models\Subsidiary;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SubsidiaryController extends Controller
 {
 
     public function store(Request $request)
     {
+        Log::info('Incoming subsidiary data:', $request->all()); // ✅ Debug incoming request
         $data = $request->validate([
+            'sub_code' => 'string|required',
             'sub_name' => 'string|required',
             'sub_no_amort' => 'required',
             'sub_date' => 'date|required',
@@ -33,6 +36,7 @@ class SubsidiaryController extends Controller
             }
             Subsidiary::create($data);
         } catch (\Exception $e) {
+            Log::error('Error creating subsidiary:', ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => $e->getMessage()
             ]);
