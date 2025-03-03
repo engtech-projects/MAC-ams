@@ -270,7 +270,7 @@
                                    
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Inventory Number: </label>
-                                        <input type="text" disabled v-model="subsidiary.sub_code" class="form-control"
+                                        <input type="text"  v-model="subsidiary.sub_code" class="form-control"
                                             id="sub_code" required>
                                     </div>
                                     <div class="col-md-6">
