@@ -189,7 +189,6 @@ class ReportsController extends MainController
             $value['salvage'] = $salvage;
             $value['expensed'] = $monthlyAmort * $value->sub_no_amort;
             $value['unexpensed'] = ($rem * $monthlyAmort);
-           // $value['sub_code'] = ();
 
 
             $value['rem'] = $rem;
@@ -215,7 +214,7 @@ class ReportsController extends MainController
     }
 
     public function monthlyDepreciation(Request $request)
-    {  
+    {
 
         /* $branches = Branch::all();
         $date = $request->sub_date;
@@ -277,8 +276,6 @@ class ReportsController extends MainController
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
-
-            
             $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
 
             $salvage = (($value->sub_amount * $value->sub_salvage) / 100);
@@ -295,7 +292,7 @@ class ReportsController extends MainController
             $value['salvage'] = $salvage;
             $value['expensed'] = $monthlyAmort * $value->sub_no_amort;
             $value['unexpensed'] = ($rem * $monthlyAmort);
-            // $value['sub_code'] =  $value->sub_code;
+
 
             $value['rem'] = $rem;
 
