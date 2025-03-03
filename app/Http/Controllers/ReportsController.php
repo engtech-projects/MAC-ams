@@ -1090,7 +1090,7 @@ class ReportsController extends MainController
     {
 
         $coa = new Accounts();
-        $accounting = Accounting::getFiscalYear();
+        $accounting = Accounting::getFiscaltoday();
 
         $from = isset($request->from) ? $request->from : $accounting->start_date;
         $to = isset($request->to) ? $request->to : $accounting->end_date;
