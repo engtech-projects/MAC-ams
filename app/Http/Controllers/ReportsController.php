@@ -353,8 +353,8 @@ class ReportsController extends MainController
         $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
 
         $subAccounts = [];
-        foreach ($subIds as $subId2) {
-            $subsidiary = Subsidiary::whereHas('subsidiary_accounts')->find($subId2);
+        foreach ($subIds as $subId) {
+            $subsidiary = Subsidiary::whereHas('subsidiary_accounts')->find($subId);
             if ($subsidiary) {
                 $subAccounts[] = $subsidiary->subsidiary_accounts->pluck('account_id')->toArray();
             }
@@ -368,7 +368,7 @@ class ReportsController extends MainController
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
-            'amount' => $request->total['total_due_amort'],
+            'amount' => $request->total['total_monthly_amort'],
         ]);
 
 
@@ -385,7 +385,7 @@ class ReportsController extends MainController
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
                     'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
-                    'journal_details_debit' => $request->total['total_due_amort'],
+                    'journal_details_debit' => $request->total['total_monthly_amort'],
                     'journal_details_credit' => 0
 
                 ];
@@ -404,24 +404,24 @@ class ReportsController extends MainController
             ];
 
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
-                $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
-                $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_due_amort'] : 0;
+                $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_monthly_amort'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_monthly_amort'] : 0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
-                $details['journal_details_debit'] = $account->account_number == 5185 ? $request->total['total_due_amort'] : 0;
-                $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_due_amort'] : 0;
+                $details['journal_details_debit'] = $account->account_number == 5185 ? $request->total['total_monthly_amort'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1410 ? $request->total['total_monthly_amort'] : 0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
-                $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_due_amort'] : 0;
-                $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_due_amort'] : 0;
+                $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_monthly_amort'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_monthly_amort'] : 0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
-                    $details['journal_details_debit'] = $request->total['total_due_amort'];
+                    $details['journal_details_debit'] = $request->total['total_monthly_amort'];
                     $details['journal_details_credit'] = 0.0;
                 } else {
                     $details['journal_details_debit'] = 0.0;
-                    $details['journal_details_credit'] = $request->total['total_due_amort'];
+                    $details['journal_details_credit'] = $request->total['total_monthly_amort'];
                 }
             }
             round($details['journal_details_debit'], 2);
