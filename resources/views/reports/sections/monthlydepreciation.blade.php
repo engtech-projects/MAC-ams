@@ -32,7 +32,7 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
-        <h1 v-text='monthlyDepreciationReportType'></h1>
+        <!-- <h1 v-text='monthlyDepreciationReportType'></h1> -->
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -317,12 +317,13 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Salvage:</label>
-                                        <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
-                                            id="sub_salvage" required>
+                                        <input type="text" v-model="ratePercentage" class="form-control">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                        
+                                        <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
+                                            id="sub_salvage" required>
                                     </div>
                                 </div>
 
@@ -703,6 +704,7 @@
                     })
                 },
                 add: function(subsidiary) {
+
                     this.subsidiary.sub_cat_id = !Number.isInteger(subsidiary) ? subsidiary.sub_cat_id :
                         this.filter.sub_cat_id;
                     let isObject = subsidiary.constructor === Object;
@@ -719,6 +721,19 @@
                             return false;
                         }
                     }
+
+                    this.subsidiary = {
+                        sub_code: '',
+                        sub_name: '',
+                        sub_no_amort: 0,
+                        sub_date: '',
+                        sub_cat_id: null,
+                        sub_salvage: '',
+                        sub_amount: '',
+                        sub_no_depre: '',
+                        sub_per_branch: null,
+                        branch_id: null
+                    };
 
                 },
                 processAction: function() {
