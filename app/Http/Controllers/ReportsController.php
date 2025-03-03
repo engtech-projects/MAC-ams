@@ -1092,8 +1092,8 @@ class ReportsController extends MainController
         $coa = new Accounts();
         $accounting = Accounting::getFiscaltoday();
 
-        $from = isset($request->from) ? $request->from : $accounting->start_date;
-        $to = isset($request->to) ? $request->to : $accounting->end_date;
+        $from = isset($request->from) ? $request->from : $accounting->default_start;
+        $to = isset($request->to) ? $request->to : $accounting->default_end;
 
         $incomeStatement = $coa->incomeStatement([$from, $to]);
 
