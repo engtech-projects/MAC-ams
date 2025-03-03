@@ -340,9 +340,9 @@
                                             id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
                                 </div>
 
                             </div>
@@ -465,7 +465,6 @@
 
                     if (this.subsidiaryAll) {
                         data = this.subsidiaryAll;
-
                     }
                     var grandTotal = {};
                     var accTotal = {};
@@ -733,9 +732,6 @@
                     })
                 },
                 add: function(subsidiary) {
-
-                    this.subsidiary.sub_cat_id = !Number.isInteger(subsidiary) ? subsidiary.sub_cat_id :
-                        this.filter.sub_cat_id;
                     let isObject = subsidiary.constructor === Object;
                     if (isObject) {
                         this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
@@ -756,12 +752,12 @@
                         sub_name: '',
                         sub_no_amort: 0,
                         sub_date: '',
-                        sub_cat_id: null,
+                        sub_cat_id: subsidiary.sub_cat_id,
                         sub_salvage: '',
                         sub_amount: '',
                         sub_no_depre: '',
-                        sub_per_branch: null,
-                        branch_id: null
+                        sub_per_branch: subsidiary.sub_per_branch,
+                        branch_id: subsidiary.branch_id
                     };
 
                 },
@@ -813,7 +809,6 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        this.subsidiary = {};
                         window.reload();
                     }).catch(err => {
                         var errors = err.response.data.errors;
