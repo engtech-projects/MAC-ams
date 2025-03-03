@@ -32,7 +32,7 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
-        <h1 v-text='monthlyDepreciationReportType'></h1>
+        <!-- <h1 v-text='monthlyDepreciationReportType'></h1> -->
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -225,6 +225,10 @@
                                             <th>Particular</th>
                                             <th>Amount</th>
                                             <th>Expensed</th>
+                                            <th>Unexpensed</th>
+                                            <th>Salvage</th>
+                                            <th>Due Amort.</th>
+                                            <th>Rem.</th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr v-if="subsidiaryAll.length < 1">
@@ -237,7 +241,6 @@
                                                 <td v-if="i<=8" v-for="p,i in ps" :class="rowStyles(ps[0])"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
-                                                <td v-text="ps[2]"></td>
 
                                             </tr>
 
@@ -267,16 +270,17 @@
                         <form>
                             <div class="form-group">
                                 <div class="row">
+
+                                    <div class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Inventory Number: </label>
+                                        <input type="text" v-model="subsidiary.sub_code" class="form-control"
+                                            id="sub_code" required>
+                                    </div>
                                     <div class="col-md-6">
                                         <label for="recipient-name" class="col-form-label">Particular Name: </label>
                                         <input type="text" v-model="subsidiary.sub_name" class="form-control"
                                             id="sub_name" required>
                                         <input v-if="isEdit" type="hidden" name="_method" value="PUT">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Inventory Number: </label>
-                                        <input type="text" v-model="subsidiary.sub_code" class="form-control"
-                                            id="sub_code" required>
                                     </div>
                                 </div>
                             </div>
@@ -301,7 +305,7 @@
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Amount:</label>
                                         <input type="text" v-model="subsidiary.sub_amount" class="form-control"
-                                            id="sub_tel" required>
+                                            @change="formatTextField()" id="sub_tel" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Monthly Amortization</label>
@@ -319,21 +323,26 @@
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage" required>
                                     </div>
+                                    <div class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Salvage:</label>
 
+
+                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                    </div>
                                 </div>
 
                             </div>
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Salvage:</label>
-                                        <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
-                                            id="sub_salvage" required>
+                                        <label for="message-text" class="col-form-label">Used:</label>
+                                        <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
+                                            id="sub_no_amort">
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                        <input type="text" v-model="ratePercentage" class="form-control">
-                                    </div>
+                                    <!-- <div class="col-md-6">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
                                 </div>
 
                             </div>
@@ -372,6 +381,7 @@
                     account_id: '',
                     type: ''
                 },
+                subAmount: 0,
                 subsidiary: {
                     sub_name: '',
                     sub_code: null,
@@ -417,23 +427,36 @@
                     return this.type
                 },
                 monthlyAmort: function() {
-                    this.monthlyAmortization = this.subsidiary.sub_amount / this.subsidiary.sub_no_depre;
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.monthlyAmortization = amount / this.subsidiary.sub_no_depre;
                     if (this.subsidiary.sub_salvage > 0) {
                         this.ratePercentage / this.subsidiary.sub_no_depre;
                     }
-                    return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
+
+                    return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
                 },
                 amort: function() {
-                    var amort = (this.subsidiary.sub_amount - this.subsidiary.rate_percentage) / this.subsidiary
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    var amort = (amount - this.subsidiary.rate_percentage) / this.subsidiary
                         .sub_no_depre;
-                    return isNaN(amort) ? 0 : amort.toFixed(2);
+
+                    return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
                     //return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
 
 
                 ratePercentage: function() {
-                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * this.subsidiary
-                        .sub_amount
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * amount
                     return this.subsidiary.rate_percentage;
                 },
                 processSubsidiary: function() {
@@ -492,8 +515,8 @@
                                 if (j == subsidiary.branch) {
 
                                     sub_ids.push(subsidiary.sub_id)
-                                    rows.push([no,
-                                        subsidiary.sub_code + '-' + subsidiary.sub_name,
+                                    rows.push([no + ' - ' + subsidiary.sub_code,
+                                        subsidiary.sub_name,
                                         subsidiary.sub_date,
                                         this.formatCurrency(subsidiary.sub_amount),
                                         this.formatCurrency(subsidiary.monthly_amort),
@@ -596,29 +619,54 @@
                     var rows = [];
                     for (var i in result) {
                         var branch = result[i];
+                        grandTotal = []
                         let grandTotalAmount = 0;
                         let grandTotalExpensed = 0;
+                        let grandTotalUnexpensed = 0;
+                        let grandTotalDueAmort = 0;
+                        let grandTotalRem = 0;
+                        let grandTotalSubSalvage = 0;
                         for (var j in branch) {
                             var subsidiary = branch[j];
                             let branchTotalExpensed = 0;
                             let branchTotalAmount = 0;
+                            let branchTotalUnexpensed = 0;
+                            let branchTotalDueAmort = 0;
+                            let branchTotalRem = 0;
+                            let branchSubSalvage = 0;
                             for (var k in subsidiary) {
                                 branchTotalExpensed += parseFloat(subsidiary[k].expensed);
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
+                                branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
+                                branchSubSalvage += parseFloat(subsidiary[k].sub_salvage);
+                                branchTotalDueAmort += parseFloat(subsidiary[k].due_amort);
+                                branchTotalRem += parseFloat(subsidiary[k].rem);
+
                             }
                             var result = [
                                 j,
                                 this.formatCurrency(branchTotalAmount.toFixed(2)),
-                                this.formatCurrency(branchTotalExpensed.toFixed(2))
+                                this.formatCurrency(branchTotalExpensed.toFixed(2)),
+                                this.formatCurrency(branchTotalUnexpensed.toFixed(2)),
+                                this.formatCurrency(branchSubSalvage.toFixed(2)),
+                                this.formatCurrency(branchTotalDueAmort.toFixed(2)),
+                                this.formatCurrency(branchTotalRem.toFixed(2))
                             ]
                             rows.push(result);
                             grandTotalAmount += branchTotalAmount;
                             grandTotalExpensed += branchTotalExpensed;
+                            grandTotalUnexpensed += branchTotalUnexpensed;
+                            grandTotalDueAmort += branchTotalDueAmort;
+                            grandTotalRem += branchTotalRem;
                         }
                         var result = [
                             'Grand Total',
                             this.formatCurrency(grandTotalAmount.toFixed(2)),
-                            this.formatCurrency(grandTotalExpensed.toFixed(2))
+                            this.formatCurrency(grandTotalExpensed.toFixed(2)),
+                            this.formatCurrency(grandTotalUnexpensed.toFixed(2)),
+                            this.formatCurrency(grandTotalSubSalvage.toFixed(2)),
+                            this.formatCurrency(grandTotalDueAmort.toFixed(2)),
+                            this.formatCurrency(grandTotalRem.toFixed(2))
                         ];
 
                         rows.push(result);
@@ -685,6 +733,7 @@
                     })
                 },
                 add: function(subsidiary) {
+
                     this.subsidiary.sub_cat_id = !Number.isInteger(subsidiary) ? subsidiary.sub_cat_id :
                         this.filter.sub_cat_id;
                     let isObject = subsidiary.constructor === Object;
@@ -702,15 +751,34 @@
                         }
                     }
 
+                    this.subsidiary = {
+                        sub_code: '',
+                        sub_name: '',
+                        sub_no_amort: 0,
+                        sub_date: '',
+                        sub_cat_id: null,
+                        sub_salvage: '',
+                        sub_amount: '',
+                        sub_no_depre: '',
+                        sub_per_branch: null,
+                        branch_id: null
+                    };
+
                 },
                 processAction: function() {
                     if (!this.isEdit) {
+
                         this.createSubsidiary();
                     } else {
                         this.editSubsidiary(this.subId);
                     }
                 },
+                formatTextField() {
+                    this.subsidiary.sub_amount = this.formatCurrency(this.subsidiary.sub_amount);
+                    this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
+                },
                 processEdit: function(sub) {
+                    console.log("sub_no_amort value:", sub[1]);
                     this.isEdit = true;
                     this.subId = sub[13];
                     this.monthlyAmortization = sub[4];
@@ -719,17 +787,25 @@
                     this.subsidiary.sub_per_branch = sub[17];
                     this.subsidiary.sub_name = sub[1];
                     this.subsidiary.sub_code = sub[15];
-                    this.subsidiary.sub_no_amort = sub[3];
-                    this.subsidiary.sub_amount = parseInt(sub[3]);
+                    this.subsidiary.sub_no_amort = sub[6];
+                    this.subsidiary.sub_amount = sub[3];
                     this.subsidiary.sub_salvage = parseInt(sub[14]);
                     this.subsidiary.sub_rate_percentage = sub[6];
                     this.subsidiary.sub_date_of_depreciation = sub[7];
                     this.subsidiary.sub_no_depre = sub[5];
+                    // this.subsidiary.sub_no_amort = sub[]
 
                 },
                 createSubsidiary: function() {
                     this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.sub_amount = amount;
+
+                    /* this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, "")) */
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -754,7 +830,12 @@
                 },
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
-                    this.subsidiary.sub_no_amort = 0;
+                    var amount = this.subsidiary.sub_amount;
+                    if (typeof this.subsidiary.sub_amount === 'string') {
+                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.sub_amount = amount;
+                    // this.subsidiary.sub_no_amort = 0;
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -763,6 +844,7 @@
                     }).then(response => {
                         toastr.success(response.data.message);
                         this.subsidiary = {};
+                        window.reload();
                     }).catch(err => {
                         var errors = err.response.data.errors;
 

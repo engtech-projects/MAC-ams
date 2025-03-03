@@ -725,7 +725,7 @@
                                     <table class="table table-bordered table-sm" id="account-officer-table">
                                         <thead>
 
-                                            <th colspan="2"> Other Payment</th>
+                                            <th colspan="2"> Payment Summary</th>
 
                                         </thead>
                                         <tbody>
@@ -835,7 +835,7 @@
                         <th>Branch</th>
                         <th>Transaction Date</th>
                         <th>Cash Ending Balance</th>
-                        <th>Total Branch Collection</th>
+                        <th>Total Entries</th>
                         <th> Difference (+/-) </th>
                         <th>Status</th>
                         <th>Action</th>
@@ -890,7 +890,7 @@
                             <div id="ui-view">
                                 <div class="card">
                                     <div class="card-body" id="journal_toPrintVouch">
-                                        {{-- <link rel="stylesheet"
+                                         <link rel="stylesheet"
                                             href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
                                         <link rel="stylesheet"
                                             href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -898,7 +898,7 @@
                                         <div class="col-md-12">
                                             <img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"
                                                 class="img img-fluid">
-                                        </div> --}}
+                                        </div> 
                                         <div class="col-md-12">
                                             <h3 style="text-align:center">Cashier's Transaction Blotter</h3>
                                         </div>
@@ -1043,14 +1043,14 @@
 
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
-                                                        <td><strong>TOTAL COLLECTION</strong></td>
+                                                        <td><strong>TOTAL CASH COLLECTION</strong></td>
                                                         <td><strong>@{{ formatCurrency(collections.total_accountofficer) }}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                             <table class="table table-striped">
                                                 <thead>
-                                                    <th class="text-uppercase text-bold">Other Payments</th>
+                                                    <th class="text-uppercase text-bold">Payment Summary</th>
                                                     <th>Amount</th>
                                                 </thead>
                                                 <tbody class="text-uppercase">
@@ -1089,7 +1089,7 @@
 
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
-                                                        <td><strong>TOTAL</strong></td>
+                                                        <td><strong>GRAND TOTAL</strong></td>
                                                         <td><strong>@{{ otherPayment.total }}</strong></td>
                                                     </tr>
                                                 </tbody>
@@ -1105,12 +1105,12 @@
                                                 <tbody>
                                                     <tr v-for="pos in collections.pos_collections">
                                                         <td>@{{ pos.or_no }}</td>
-                                                        <td>@{{ pos.total_amount }}</td>
+                                                        <td>@{{ formatCurrency(pos.total_amount) }}</td>
                                                     </tr>
 
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
-                                                        <td><strong>TOTAL COLLECTION</strong></td>
+                                                        <td><strong>TOTAL POS COLLECTION</strong></td>
                                                         <td><strong>@{{ collections.other_payment ? formatCurrency(collections.other_payment.pos_amount) : formatCurrency(0) }}</strong></td>
                                                     </tr>
                                                 </tbody>
@@ -1131,7 +1131,7 @@
                                                     </tr>
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
-                                                        <td><strong>TOTAL</strong></td>
+                                                        <td><strong>TOTAL INTERBRANCH</strong></td>
                                                         <td><strong>@{{ formatCurrency(total_interbranch_collection) }}</strong></td>
                                                     </tr>
                                                 </tbody>
