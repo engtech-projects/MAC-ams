@@ -316,14 +316,15 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Salvage:</label>
-                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                        <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
+                                        <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
+                                        id="sub_salvage" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                        <label for="message-text" class="col-form-label">Salvage:</label>
                                         
-                                        <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
-                                            id="sub_salvage" required>
+                                      
+                                            <input type="text" v-model="ratePercentage" class="form-control">
                                     </div>
                                 </div>
 
