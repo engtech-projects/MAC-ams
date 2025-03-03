@@ -651,7 +651,7 @@ class ReportsController extends MainController
     {
 
         $glAccounts = new Accounts();
-        $accounting = Accounting::getFiscalYear();
+        $accounting = Accounting::getFiscaltoday();
 
         $from = $request->from ? $request->from : $accounting->default_start;
         $to = $request->to ? $request->to : $accounting->default_end;

@@ -20,12 +20,29 @@ class Accounting extends Model
 		$accounting = Accounting::where(['status' => 'open' ])->first();
 
 		$year = Carbon::parse($accounting->start_date)->year;
+		
 
 		$accounting->default_start = Carbon::parse($currentDate->startOfMonth()->toDateString())->year($year)->format('Y-m-d');
 		$accounting->default_end = Carbon::parse($currentDate->endOfMonth()->toDateString())->year($year)->format('Y-m-d');
 
 		return $accounting;
 	}
+
+	public static function getFiscaltoday() {
+
+		$currentDate = Carbon::now();
+
+		$accounting = Accounting::where(['status' => 'open' ])->first();
+
+		// $year = Carbon::parse($accounting->start_date)->year;
+		$currentYear = $currentDate->year;
+
+		$accounting->default_start = Carbon::parse($currentDate->startOfMonth()->toDateString())->year($currentYear)->format('Y-m-d');
+		$accounting->default_end = Carbon::parse($currentDate->endOfMonth()->toDateString())->year($currentYear)->format('Y-m-d');
+
+		return $accounting;
+	}
+
 
 	public function createFiscalYear($start, $end, $method = 'accrual') {
 
