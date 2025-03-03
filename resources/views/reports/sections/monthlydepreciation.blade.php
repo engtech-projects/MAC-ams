@@ -225,6 +225,10 @@
                                             <th>Particular</th>
                                             <th>Amount</th>
                                             <th>Expensed</th>
+                                            <th>Unexpensed</th>
+                                            <th>Salvage</th>
+                                            <th>Due Amort.</th>
+                                            <th>Rem.</th>
                                         </thead>
                                         <tbody id="generalLedgerTblContainer">
                                             <tr v-if="subsidiaryAll.length < 1">
@@ -237,7 +241,6 @@
                                                 <td v-if="i<=8" v-for="p,i in ps" :class="rowStyles(ps[0])"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
                                                 </td>
-                                                <td v-text="ps[2]"></td>
 
                                             </tr>
 
@@ -267,10 +270,10 @@
                         <form>
                             <div class="form-group">
                                 <div class="row">
-                                   
+
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Inventory Number: </label>
-                                        <input type="text"  v-model="subsidiary.sub_code" class="form-control"
+                                        <input type="text" v-model="subsidiary.sub_code" class="form-control"
                                             id="sub_code" required>
                                     </div>
                                     <div class="col-md-6">
@@ -318,13 +321,13 @@
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
-                                        id="sub_salvage" required>
+                                            id="sub_salvage" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Salvage:</label>
-                                        
-                                      
-                                            <input type="text" v-model="ratePercentage" class="form-control">
+
+
+                                        <input type="text" v-model="ratePercentage" class="form-control">
                                     </div>
                                 </div>
 
@@ -337,9 +340,9 @@
                                             id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
                                 </div>
 
                             </div>
@@ -512,7 +515,7 @@
                                 if (j == subsidiary.branch) {
 
                                     sub_ids.push(subsidiary.sub_id)
-                                    rows.push([no + ' - ' + subsidiary.sub_code ,
+                                    rows.push([no + ' - ' + subsidiary.sub_code,
                                         subsidiary.sub_name,
                                         subsidiary.sub_date,
                                         this.formatCurrency(subsidiary.sub_amount),
@@ -616,29 +619,54 @@
                     var rows = [];
                     for (var i in result) {
                         var branch = result[i];
+                        grandTotal = []
                         let grandTotalAmount = 0;
                         let grandTotalExpensed = 0;
+                        let grandTotalUnexpensed = 0;
+                        let grandTotalDueAmort = 0;
+                        let grandTotalRem = 0;
+                        let grandTotalSubSalvage = 0;
                         for (var j in branch) {
                             var subsidiary = branch[j];
                             let branchTotalExpensed = 0;
                             let branchTotalAmount = 0;
+                            let branchTotalUnexpensed = 0;
+                            let branchTotalDueAmort = 0;
+                            let branchTotalRem = 0;
+                            let branchSubSalvage = 0;
                             for (var k in subsidiary) {
                                 branchTotalExpensed += parseFloat(subsidiary[k].expensed);
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
+                                branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
+                                branchSubSalvage += parseFloat(subsidiary[k].sub_salvage);
+                                branchTotalDueAmort += parseFloat(subsidiary[k].due_amort);
+                                branchTotalRem += parseFloat(subsidiary[k].rem);
+
                             }
                             var result = [
                                 j,
                                 this.formatCurrency(branchTotalAmount.toFixed(2)),
-                                this.formatCurrency(branchTotalExpensed.toFixed(2))
+                                this.formatCurrency(branchTotalExpensed.toFixed(2)),
+                                this.formatCurrency(branchTotalUnexpensed.toFixed(2)),
+                                this.formatCurrency(branchSubSalvage.toFixed(2)),
+                                this.formatCurrency(branchTotalDueAmort.toFixed(2)),
+                                this.formatCurrency(branchTotalRem.toFixed(2))
                             ]
                             rows.push(result);
                             grandTotalAmount += branchTotalAmount;
                             grandTotalExpensed += branchTotalExpensed;
+                            grandTotalUnexpensed += branchTotalUnexpensed;
+                            grandTotalDueAmort += branchTotalDueAmort;
+                            grandTotalRem += branchTotalRem;
                         }
                         var result = [
                             'Grand Total',
                             this.formatCurrency(grandTotalAmount.toFixed(2)),
-                            this.formatCurrency(grandTotalExpensed.toFixed(2))
+                            this.formatCurrency(grandTotalExpensed.toFixed(2)),
+                            this.formatCurrency(grandTotalUnexpensed.toFixed(2)),
+                            this.formatCurrency(grandTotalSubSalvage.toFixed(2)),
+                            this.formatCurrency(grandTotalDueAmort.toFixed(2)),
+                            this.formatCurrency(grandTotalRem.toFixed(2))
                         ];
 
                         rows.push(result);
