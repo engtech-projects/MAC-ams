@@ -536,7 +536,7 @@
                                     ]);
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
@@ -634,10 +634,11 @@
                             let branchTotalRem = 0;
                             let branchSubSalvage = 0;
                             for (var k in subsidiary) {
+                                console.log(subsidiary[k]);
                                 branchTotalExpensed += parseFloat(subsidiary[k].expensed);
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
-                                branchSubSalvage += parseFloat(subsidiary[k].sub_salvage);
+                                branchSubSalvage += parseFloat(subsidiary[k].salvage);
                                 branchTotalDueAmort += parseFloat(subsidiary[k].due_amort);
                                 branchTotalRem += parseFloat(subsidiary[k].rem);
 
@@ -655,6 +656,7 @@
                             grandTotalAmount += branchTotalAmount;
                             grandTotalExpensed += branchTotalExpensed;
                             grandTotalUnexpensed += branchTotalUnexpensed;
+                            grandTotalSubSalvage += branchSubSalvage;
                             grandTotalDueAmort += branchTotalDueAmort;
                             grandTotalRem += branchTotalRem;
                         }
