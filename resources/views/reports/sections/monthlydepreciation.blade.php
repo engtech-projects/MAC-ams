@@ -53,7 +53,17 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <select name="sub_cat_id"
+                                                                <select v-model="filter.category"
+                                                                    class="form-control form-control-sm" id="branch">
+                                                                    <option value="" disabled selected>
+                                                                        -select-category-
+                                                                    </option>
+                                                                    <option v-for="sub_cat in sub_categories"
+                                                                        v-bind:value="{ sub_cat_id: sub_cat.sub_cat_id,sub_cat_name: sub_cat.description }">
+                                                                        @{{ sub_cat.description }}
+                                                                    </option>
+                                                                </select>
+                                                                {{-- <select name="sub_cat_id"
                                                                     class="form-control form-control-sm"
                                                                     v-model="filter.sub_cat_id" id="sub_cat_id">
                                                                     <option value="" disabled selected>-Select
@@ -63,7 +73,7 @@
                                                                             {{ $sub_category->description }}
                                                                         </option>
                                                                     @endforeach
-                                                                </select>
+                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -72,7 +82,16 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <select name="branch_id" v-model="filter.branch_id"
+                                                                <select v-model="filter.branch"
+                                                                    class="form-control form-control-sm" id="branch">
+                                                                    <option value="" disabled selected>-Select Branch-
+                                                                    </option>
+                                                                    <option v-for="branch in branches"
+                                                                        v-bind:value="{ branch_id: branch.branch_id,branch_code: branch.branch_code, branch_name:branch.branch_name,   branch_alias:`${branch.branch_code}-${branch.branch_name}` }">
+                                                                        @{{ branch.branch_code + '-' + branch.branch_name }}
+                                                                    </option>
+                                                                </select>
+                                                                {{-- <select name="branch_id" v-model="filter.branch_id"
                                                                     class="form-control form-control-sm" id="branch">
                                                                     <option value="" disabled selected>-Select Branch-
                                                                     </option>
@@ -82,7 +101,7 @@
                                                                             {{ $branch->branch_name }}
                                                                         </option>
                                                                     @endforeach
-                                                                </select>
+                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -137,8 +156,10 @@
                         <h1 v-text="type"> </h1>
 
                         <div class="container-fluid">
+
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
+                                    {{--  @{{ subsidiaries[filter.category?.sub_cat_name] }} --}}
                                     <table class="table">
                                         <thead>
                                             <th>No.</th>
@@ -172,9 +193,10 @@
                                                     </button>
                                                 </td>
                                             <tr>
+
                                             <tr v-for="(ps,i) in processSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
-                                                <!-- <td><h1 v-text="subsidiaryAll"></h1</td> -->
+                                                {{-- <td v-text="ps"></td> --}}
                                                 <td v-for="p,i in ps" v-if="i<=12"
                                                     :class="rowStyleSubsidiaryListing(p, i, ps)"
                                                     :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
@@ -340,9 +362,9 @@
                                             id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div> -->
                                 </div>
 
                             </div>
@@ -363,6 +385,8 @@
         new Vue({
             el: '#app',
             data: {
+                branches: @json($branches),
+                sub_categories: @json($subsidiary_categories),
                 showModal: true,
                 reportType: '',
                 sub_month: '',
@@ -373,9 +397,9 @@
                 subId: null,
                 newSub: null,
                 filter: {
-                    branch_id: '',
+                    branch: null,
                     subsidiary_id: '',
-                    sub_cat_id: '',
+                    category: null,
                     from: '',
                     to: '',
                     account_id: '',
@@ -470,7 +494,7 @@
                     var accTotal = {};
 
 
-                    for (var i in data) {
+                    for (var i in this.subsidiaries) {
                         var branches = data[i];
                         let gTotalAmount = 0;
                         let gTotalMonthlyAmort = 0;
@@ -508,7 +532,6 @@
                             var sub_ids = [];
 
                             for (var k in branch) {
-
                                 var subsidiary = branch[k];
                                 no += 1;
                                 if (j == subsidiary.branch) {
@@ -524,7 +547,7 @@
                                         this.formatCurrency(subsidiary.expensed),
                                         this.formatCurrency(subsidiary.unexpensed),
                                         this.formatCurrency(subsidiary.due_amort),
-                                        this.formatCurrency(subsidiary.salvage),
+                                        subsidiary.salvage,
                                         this.formatCurrency(subsidiary.rem),
                                         subsidiary.inv,
                                         subsidiary.sub_id,
@@ -536,7 +559,7 @@
                                     ]);
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
@@ -609,8 +632,6 @@
                             gTotalInv, branch, data
                         ]);
                     }
-
-
                     return rows;
                 },
                 subsidiaryMonthlyDepreciation: function() {
@@ -634,7 +655,6 @@
                             let branchTotalRem = 0;
                             let branchSubSalvage = 0;
                             for (var k in subsidiary) {
-                                console.log(subsidiary[k]);
                                 branchTotalExpensed += parseFloat(subsidiary[k].expensed);
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
@@ -674,7 +694,14 @@
                     }
                     return rows;
 
+                },
+                subsidiaries: function() {
+                    return this.subsidiaryAll;
+                },
+                subTutyo: function() {
+                    return this.processSubsidiaries();
                 }
+
             },
             methods: {
                 formatCurrency: function(number) {
@@ -776,7 +803,6 @@
                     this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
                 },
                 processEdit: function(sub) {
-                    console.log("sub_no_amort value:", sub[1]);
                     this.isEdit = true;
                     this.subId = sub[13];
                     this.monthlyAmortization = sub[4];
@@ -793,6 +819,18 @@
                     this.subsidiary.sub_no_depre = sub[5];
                     // this.subsidiary.sub_no_amort = sub[]
 
+                },
+                resetForm: function() {
+                    this.subsidiary = {
+                        sub_name: '',
+                        sub_code: null,
+                        sub_no_amort: 0,
+                        sub_amount: 0,
+                        sub_no_depre: 0,
+                        sub_per_branch: null,
+                        sub_salvage: 0,
+                        rate_percentage: 0,
+                    }
                 },
                 createSubsidiary: function() {
                     this.isEdit = false;
@@ -811,7 +849,9 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        window.reload();
+                        this.addSubsidiary(response.data.data);
+                        $('#createSubsidiaryModal').modal('hide');
+                        this.resetForm();
                     }).catch(err => {
                         var errors = err.response.data.errors;
                         var messages = [];
@@ -825,6 +865,45 @@
                         toastr.error(messages);
                     })
                 },
+                addSubsidiary: function(data) {
+                    var filters = this.filter;
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                        .branch_alias
+                    ].push(data);
+                },
+                updateSubsidiary: function(data) {
+                    var filters = this.filter;
+                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                        .branch_alias
+                    ]
+                    subsidiaries = subsidiaries.map(sub =>
+                        sub.sub_id === data.sub_id ? {
+                            ...sub,
+                            ...data
+                        } : sub
+                    );
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
+                        subsidiaries;
+
+                    console.log(this.subsidiaryAll)
+
+
+                },
+                deleteSubsidiary: function(subId) {
+                    var filters = this.filter;
+                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                        .branch_alias
+                    ]
+                    subsidiaries.forEach((sub, index) => {
+                        if (sub.sub_id === subId) {
+                            subsidiaries.splice(index, 1); // Remove 1 element at this index
+                        }
+                    });
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
+                        subsidiaries;
+
+
+                },
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
                     var amount = this.subsidiary.sub_amount;
@@ -835,13 +914,15 @@
                     // this.subsidiary.sub_no_amort = 0;
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            'X-CSRF-TOKEN': document.head.querySelector(
+                                    'meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        this.subsidiary = {};
-                        window.reload();
+                        this.updateSubsidiary(response.data.data)
+                        $('#createSubsidiaryModal').modal('hide');
+                        this.resetForm();
                     }).catch(err => {
                         var errors = err.response.data.errors;
 
@@ -860,11 +941,13 @@
                     var url = @json(env('APP_URL'));
                     axios.delete('/MAC-ams/subsidiary/' + data, {
                         headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            'X-CSRF-TOKEN': document.head.querySelector(
+                                    'meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        this.deleteSubsidiary(data);
                     }).catch(err => {
                         toastr.success(err);
                     })
@@ -874,7 +957,8 @@
                     this.filter.type = this.reportType;
                     axios.post(this.search, this.filter, {
                             headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                'X-CSRF-TOKEN': document.head.querySelector(
+                                        'meta[name="csrf-token"]')
                                     .content
                             }
                         })

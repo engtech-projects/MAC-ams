@@ -166,36 +166,30 @@ class ReportsController extends MainController
         if ($request->type == 'summary') {
             $type = $request->type;
         }
-        $branch = Branch::find($request->branch_id);
+        $branch = Branch::find($request->branch['branch_id']);
 
-        $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
+        $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
         $data = $result->map(function ($value) {
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
-            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
-
-            $salvage = (($value->sub_amount * $value->sub_salvage) / 100);
-            $monthlyAmort = (($value->sub_amount - $salvage) / $value->sub_no_depre);
-            // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
-            $rem = ($value->sub_no_depre - $value->sub_no_amort);
-            $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
-            $value['branch_code'] = $branch->branch_code;
-            $value['branch_id'] = $branch->branch_id;
-            $value['description'] = $value->subsidiary_category->description;
-            $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
+            $value['branch'] = $value->branch;
+            $value['branch_code'] = $value->sub_per_branch;
+            $value['branch_id'] = $value->branch_id;
+            $value['description'] = $value->description;
+            $value['sub_cat_name'] = $value->sub_cat_name;
             $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
-            $value['monthly_amort'] = $monthlyAmort;
-            $value['salvage'] = $salvage;
-            $value['expensed'] = $monthlyAmort * $value->sub_no_amort;
-            $value['unexpensed'] = ($rem * $monthlyAmort);
+            $value['monthly_amort'] = $value->monthly_amort;
+            $value['salvage'] = $value->salvage;
+            $value['expensed'] = $value->expensed;
+            $value['unexpensed'] = $value->unexpensed;
 
 
-            $value['rem'] = $rem;
+            $value['rem'] = $value->rem;
 
-            $value['due_amort'] = $rem > 0 ? ($monthlyAmort) : 0;
-            $value['inv'] = 0;
-            $value['no'] = 0;
+            $value['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
+            $value['inv'] = $value->inv;
+            $value['no'] = $value->no;
 
             return $value;
         })->groupBy('description')->map(function ($value) {
@@ -276,29 +270,24 @@ class ReportsController extends MainController
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
-            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
 
-            $salvage = (($value->sub_amount * $value->sub_salvage) / 100);
-            $monthlyAmort = (($value->sub_amount - $salvage) / $value->sub_no_depre);
-            // $monthlySalvage = $monthlyAmort -  ($salvage / $value->sub_no_depre);
-            $rem = ($value->sub_no_depre - $value->sub_no_amort);
-            $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
-            $value['branch_code'] = $branch->branch_code;
-            $value['branch_id'] = $branch->branch_id;
-            $value['description'] = $value->subsidiary_category->description;
-            $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
+            $value['branch'] = $value->branch;
+            $value['branch_code'] = $value->sub_per_branch;
+            $value['branch_id'] = $value->branch_id;
+            $value['description'] = $value->description;
+            $value['sub_cat_name'] = $value->sub_cat_name;
             $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
-            $value['monthly_amort'] = $monthlyAmort;
-            $value['salvage'] = $salvage;
-            $value['expensed'] = $monthlyAmort * $value->sub_no_amort;
-            $value['unexpensed'] = ($rem * $monthlyAmort);
+            $value['monthly_amort'] = $value->monthly_amort;
+            $value['salvage'] = $value->salvage;
+            $value['expensed'] = $value->expensed;
+            $value['unexpensed'] = $value->unexpensed;
 
 
-            $value['rem'] = $rem;
+            $value['rem'] = $value->rem;
 
-            $value['due_amort'] = $rem > 0 ? ($monthlyAmort) : 0;
-            $value['inv'] = 0;
-            $value['no'] = 0;
+            $value['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
+            $value['inv'] = $value->inv;
+            $value['no'] = $value->no;
 
             return $value;
         })->groupBy('description')->map(function ($value) {

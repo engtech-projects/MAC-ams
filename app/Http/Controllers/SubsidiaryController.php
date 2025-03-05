@@ -34,13 +34,36 @@ class SubsidiaryController extends Controller
             if ($data['branch_id']) {
                 $data['sub_per_branch'] = Branch::where('branch_id', $data['branch_id'])->pluck('branch_code')->first();
             }
-            Subsidiary::create($data);
+            $subsidiary = Subsidiary::create($data);
+            /*             dd($subsidiary->sub_id); */
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ]);
         }
+        $subsidiary =  $subsidiary->with(['subsidiary_category', 'subsidiary_accounts'])->find($subsidiary->sub_id);
+
+        $branch = Branch::find($request->branch_id);
+        $branchAlias = $branch->branch_code . '-' . $branch->branch_name;
+        $subsidiary->branch = $branchAlias;
+        if ($subsidiary->sub_no_depre == 0) {
+            $subsidiary->sub_no_depre = 1;
+        }
+
+        $subsidiary['branch_code'] = $branch->branch_code;
+
+        $subsidiary['monthly_amort'] = $subsidiary->monthly_amort;
+        $subsidiary['rem'] = $subsidiary->rem;
+        $subsidiary['salvage'] = $subsidiary->salvage;
+        $subsidiary['description'] = $subsidiary->description;
+        $subsidiary['expensed'] = $subsidiary->expensed;
+        $subsidiary['unexpensed'] = $subsidiary->unexpensed;
+        $subsidiary['due_amort'] = $subsidiary->due_amort;
+        $subsidiary['inv'] = $subsidiary->inv;
+        $subsidiary['no'] = $subsidiary->no;
+        $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
         return new JsonResponse([
+            'data' => $subsidiary,
             'message' => 'Successfully created.'
         ], JsonResponse::HTTP_CREATED);
     }
@@ -66,6 +89,17 @@ class SubsidiaryController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
+        $subsidiary['branch'] = $subsidiary->branch;
+        $subsidiary['monthly_amort'] = $subsidiary->monthly_amort;
+        $subsidiary['rem'] = $subsidiary->rem;
+        $subsidiary['salvage'] = $subsidiary->salvage;
+        $subsidiary['description'] = $subsidiary->description;
+        $subsidiary['expensed'] = $subsidiary->expensed;
+        $subsidiary['unexpensed'] = $subsidiary->unexpensed;
+        $subsidiary['due_amort'] = $subsidiary->due_amort;
+        $subsidiary['inv'] = $subsidiary->inv;
+        $subsidiary['no'] = $subsidiary->no;
+        $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
 
         return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary], 200);
     }
@@ -73,7 +107,9 @@ class SubsidiaryController extends Controller
     public function destroy(Subsidiary $subsidiary)
     {
         try {
-            $subsidiary->delete();
+            $subsidiary->subsidiary_accounts()->detach([$subsidiary->sub_id]);
+            $subsidiary->subsidiary_opening_balance()->delete($subsidiary->sub_id);
+            $subsidiary->delete($subsidiary);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()

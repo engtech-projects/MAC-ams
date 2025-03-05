@@ -37,6 +37,10 @@ class Subsidiary extends Model
     {
         return $this->belongsToMany(Accounts::class, 'subsidiary_accounts', 'sub_id', 'account_id');
     }
+    public function subsidiary_opening_balance()
+    {
+        return $this->hasMany(SubsidiaryOpeningBalance::class, 'sub_id');
+    }
     public static function fetchBranch()
     {
         $branch = Subsidiary::leftJoin("subsidiary_category", "subsidiary.sub_cat_id", "=", "subsidiary_category.sub_cat_id")
@@ -59,5 +63,61 @@ class Subsidiary extends Model
             $query->where('sub_cat_type', 'depre');
         })->whereNotNull('sub_per_branch')->with(['subsidiary_accounts'])->get();
         return $subsidiary;
+    }
+
+    public function getBranchAttribute()
+    {
+        $branch = Branch::where('branch_code', $this->sub_per_branch)->first();
+        return $branch->branch_code . '-' . $branch->branch_name;
+    }
+
+    public function getSalvageAttribute()
+    {
+        return ($this->sub_amount * $this->sub_salvage) / 100;
+    }
+    public function getMonthlyAmortAttribute()
+    {
+        $amount = floatval($this->sub_amount);
+        $salvage = floatval($this->salvage);
+        $subNoDepre = intval($this->sub_no_depre);
+
+        // Prevent division by zero
+        return ($subNoDepre > 0) ? (($amount - $salvage) / $subNoDepre) : 0.0;
+    }
+    public function getRemAttribute()
+    {
+        return intVal($this->sub_no_depre) - intVal($this->sub_no_amort);
+    }
+    public function getDescriptionAttribute()
+    {
+        return $this->subsidiary_category->description;
+    }
+    public function getSubCatNameAttribute()
+    {
+        return $this->subsidiary_category->sub_cat_name;
+    }
+    /*     public function getSubCatIdAttribute()
+    {
+        return $this->subsidiary_category->sub_cat_id;
+    } */
+    public function getExpensedAttribute()
+    {
+        return $this->monthly_amort * $this->sub_no_amort;
+    }
+    public function getUnexpensedAttribute()
+    {
+        return $this->rem * $this->monthly_amort;
+    }
+    public function getDueAmortAttribute()
+    {
+        return $this->rem > 0 ? ($this->monthly_amort) : 0;
+    }
+    public function getInvAttribute()
+    {
+        return 0;
+    }
+    public function getNoAttribute()
+    {
+        return 0;
     }
 }
