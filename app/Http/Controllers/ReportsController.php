@@ -166,7 +166,10 @@ class ReportsController extends MainController
         if ($request->type == 'summary') {
             $type = $request->type;
         }
-        $branch = Branch::find($request->branch['branch_id']);
+        $branch = null;
+        if ($request->branch) {
+            $branch = Branch::find($request->branch['branch_id']);
+        }
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
         $data = $result->map(function ($value) {
