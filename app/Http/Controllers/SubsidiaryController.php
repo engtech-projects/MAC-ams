@@ -27,12 +27,13 @@ class SubsidiaryController extends Controller
             'sub_no_depre' => 'numeric|required',
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
+            'branch' => 'nullable',
 
         ]);
 
         try {
-            if ($data['branch_id']) {
-                $data['sub_per_branch'] = Branch::where('branch_id', $data['branch_id'])->pluck('branch_code')->first();
+            if ($data['branch']) {
+                $data['sub_per_branch'] = Branch::where('branch_id', $data['branch']['branch_id'])->pluck('branch_code')->first();
             }
             $subsidiary = Subsidiary::create($data);
             /*             dd($subsidiary->sub_id); */
@@ -43,7 +44,7 @@ class SubsidiaryController extends Controller
         }
         $subsidiary =  $subsidiary->with(['subsidiary_category', 'subsidiary_accounts'])->find($subsidiary->sub_id);
 
-        $branch = Branch::find($request->branch_id);
+        $branch = Branch::find($data['branch']['branch_id']);
         $branchAlias = $branch->branch_code . '-' . $branch->branch_name;
         $subsidiary->branch = $branchAlias;
         if ($subsidiary->sub_no_depre == 0) {
