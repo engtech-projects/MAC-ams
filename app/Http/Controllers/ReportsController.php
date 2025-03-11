@@ -167,9 +167,32 @@ class ReportsController extends MainController
             $type = $request->type;
         }
         $branch = null;
+        $journaEntry = JournalEntry::query();
         if ($request->branch) {
             $branch = Branch::find($request->branch['branch_id']);
+            $journalEntry = $journaEntry->where('branch_id', $request->branch['branch_id']);
+        };
+        $subCatId = $request->category['sub_cat_id'];
+        if ($request->subsidiary) {
+            $journaEntry = $journalEntry->whereHas('details', function ($query) use ($subCatId) {
+                $query->with('subsidiary_category', function ($query) use ($subCatId) {
+                    $query->where('sub_cat_id', $subCatId);
+                });
+            });
         }
+
+        $lastEntry = JournalEntry::where('source', JournalEntry::DEPRECIATION_SOURCE)->orderBy('journal_date', 'desc')->first();
+        $filteredDate = Carbon::parse($date);
+        $lastEntryDate = Carbon::parse($lastEntry->journal_date);
+        $diffInDays = $filteredDate->diffInDays($lastEntryDate);
+        /*         dd($filteredDate, $lastEntryDate, $diffInDays); */
+
+
+
+        /* dd($journalEntry->with('details', function ($query) {
+            $query->select(['subsidiary_id', 'journal_id']);
+        })->first()); */
+
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
         $data = $result->map(function ($value) {

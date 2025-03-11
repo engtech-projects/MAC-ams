@@ -110,7 +110,7 @@ class SubsidiaryController extends Controller
         try {
             $subsidiary->subsidiary_accounts()->detach([$subsidiary->sub_id]);
             $subsidiary->subsidiary_opening_balance()->delete($subsidiary->sub_id);
-            $subsidiary->delete($subsidiary);
+             $subsidiary->delete($subsidiary);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
