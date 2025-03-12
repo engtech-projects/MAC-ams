@@ -181,10 +181,12 @@ class ReportsController extends MainController
             });
         }
 
-        $lastEntry = JournalEntry::where('source', JournalEntry::DEPRECIATION_SOURCE)->orderBy('journal_date', 'desc')->first();
+        $lastEntry = JournalEntry::with('details')->where('source', JournalEntry::DEPRECIATION_SOURCE)->orderBy('journal_date', 'desc')->first();
         $filteredDate = Carbon::parse($date);
         $lastEntryDate = Carbon::parse($lastEntry->journal_date);
-        $diffInDays = $filteredDate->diffInDays($lastEntryDate);
+        $diffInDays = $lastEntryDate->diffInDays($filteredDate);
+
+
         /*         dd($filteredDate, $lastEntryDate, $diffInDays); */
 
 
@@ -195,7 +197,7 @@ class ReportsController extends MainController
 
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
-        $data = $result->map(function ($value) {
+        $data = $result->map(function ($value) use ($diffInDays) {
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
@@ -209,6 +211,7 @@ class ReportsController extends MainController
             $value['salvage'] = $value->salvage;
             $value['expensed'] = $value->expensed;
             $value['unexpensed'] = $value->unexpensed;
+            $value['sub_no_amort'] = $diffInDays > 30 ? $value->sub_no_amort - 1 : $value->sub_no_amort;
 
 
             $value['rem'] = $value->rem;
@@ -228,7 +231,8 @@ class ReportsController extends MainController
             'as_of' => $date,
             'branches' => $branches,
             'title' => 'MAC-AMS | Monthly Depreciation',
-            'type' => $type
+            'type' => $type,
+            'diffInDays' => $diffInDays
         ];
         return response()->json($data);
     }
