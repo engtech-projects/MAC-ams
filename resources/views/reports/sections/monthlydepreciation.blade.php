@@ -180,20 +180,16 @@
                                             <th>Action</th>
                                         </thead>
                                         <tbody>
-                                            <tr v-if="subsidiaryAll.length <=0">
-                                                <td colspan="15">
-                                                    <b>
-                                                        <center>No data available in table.</center>
-                                                    </b>
-                                                </td>
-                                                <td v-if="filter.category && filter.to && subsidiaryAll.length ==0 ">
+
+                                            {{-- <tr v-show="filter.category && filter.to && subsidiaryAll.length ==0 ">
+                                                <td>
                                                     <button class="btn btn-success" data-toggle="modal"
                                                         data-target="#createSubsidiaryModal"
                                                         @click="add(filter.sub_cat_id)">
                                                         Add
                                                     </button>
                                                 </td>
-                                            <tr>
+                                            </tr> --}}
 
                                             <tr v-for="(ps,i) in processSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
@@ -215,17 +211,33 @@
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'">
-                                                    <button class="btn btn-primary" v-if="filter.branch"
-                                                        @click="post(ps[14])">
+                                                    <button
+                                                        v-show="processSubsidiary.length >3 && filter.branch && searching"
+                                                        class="btn btn-primary" @click="post(ps[14])">
                                                         Post
                                                     </button>
-                                                    <button class="btn btn-success" data-toggle="modal" v-if="filter.branch"
-                                                        data-target="#createSubsidiaryModal" @click="add(ps[13][0])">
+                                                    <button v-show="filter.branch && searching" class="btn btn-success"
+                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
+                                                        @click="add(ps[13][0])">
                                                         Add
                                                     </button>
 
                                                 </td>
                                             </tr>
+                                            {{-- <tr v-show="processSubsidiary === false">
+                                                <td colspan="15">
+                                                    <b>
+                                                        <center>No data available in table.</center>
+                                                    </b>
+                                                </td>
+                                                <td v-if="filter.category && filter.branch && filter.to && searching">
+                                                    <button class="btn btn-success" data-toggle="modal"
+                                                        data-target="#createSubsidiaryModal"
+                                                        @click="add(filter.sub_cat_id)">
+                                                        Add
+                                                    </button>
+                                                </td>
+                                            <tr> --}}
 
 
 
@@ -364,9 +376,9 @@
                                             id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
                                 </div>
 
                             </div>
@@ -398,6 +410,7 @@
                 isEdit: false,
                 subId: null,
                 newSub: null,
+                searching: false,
                 filter: {
                     branch: null,
                     subsidiary_id: '',
@@ -494,42 +507,42 @@
                     }
                     var grandTotal = {};
                     var accTotal = {};
-
+                    var no = 0;
+                    let totalAmount = 0;
+                    let total_monthly_amort = 0;
+                    let total_monthly = 0;
+                    let total_no_depre = 0;
+                    let total_no_amort = 0;
+                    let total_amort = 0;
+                    let total_used = 0;
+                    let total_expensed = 0;
+                    let total_unexpensed = 0;
+                    let total_due_amort = 0;
+                    let total_sub_salvage = 0;
+                    let total_rem = 0;
+                    let total_inv = 0;
+                    let gTotalAmount = 0;
+                    let gTotalMonthlyAmort = 0;
+                    let gTotalMonthly = 0;
+                    let gTotalNoDepre = 0;
+                    let gTotalNoAmort = 0;
+                    let gTotalAmort = 0;
+                    let gTotalUsed = 0;
+                    let gTotalExpensed = 0;
+                    let gTotalUnexpensed = 0;
+                    let gTotalDueAmort = 0;
+                    let gTotalSubSalvage = 0;
+                    let gTotalRem = 0;
+                    let gTotalInv = 0;
 
                     for (var i in this.subsidiaries) {
                         var branches = data[i];
-                        let gTotalAmount = 0;
-                        let gTotalMonthlyAmort = 0;
-                        let gTotalMonthly = 0;
-                        let gTotalNoDepre = 0;
-                        let gTotalNoAmort = 0;
-                        let gTotalAmort = 0;
-                        let gTotalUsed = 0;
-                        let gTotalExpensed = 0;
-                        let gTotalUnexpensed = 0;
-                        let gTotalDueAmort = 0;
-                        let gTotalSubSalvage = 0;
-                        let gTotalRem = 0;
-                        let gTotalInv = 0;
+
                         rows.push([i]);
 
                         for (var j in branches) {
                             var branch = branches[j];
                             rows.push([j]);
-                            var no = 0;
-                            let totalAmount = 0;
-                            let total_monthly_amort = 0;
-                            let total_monthly = 0;
-                            let total_no_depre = 0;
-                            let total_no_amort = 0;
-                            let total_amort = 0;
-                            let total_used = 0;
-                            let total_expensed = 0;
-                            let total_unexpensed = 0;
-                            let total_due_amort = 0;
-                            let total_sub_salvage = 0;
-                            let total_rem = 0;
-                            let total_inv = 0;
                             let branchTotal = [];
                             var sub_ids = [];
 
@@ -648,6 +661,50 @@
                             gTotalInv, branch, data
                         ]);
                     }
+                    if (this.subsidiaries.length === 0) {
+                        rows.push(['No Data Found.']);
+                        rows.push(['',
+                            '',
+                            '',
+                            'TOTAL AMOUNT',
+                            'TOTAL MONTHLY',
+                            'TOTAL AMORT',
+                            'TOTAL USED',
+                            'TOTAL EXPENSED',
+                            'TOTAL UNEXPENSED',
+                            'TOTAL DUE AMORT',
+                            'TOTAL SALVAGE',
+                            'TOTAL REM.',
+                            'TOTAL INV.',
+                        ]);
+                        rows.push(['BRANCH TOTAL', '', '',
+                            this.formatCurrency(totalAmount),
+                            this.formatCurrency(total_monthly_amort),
+                            this.formatCurrency(total_no_depre),
+                            total_used,
+                            this.formatCurrency(total_expensed),
+                            this.formatCurrency(total_unexpensed),
+                            this.formatCurrency(total_due_amort),
+                            this.formatCurrency(total_sub_salvage),
+                            this.formatCurrency(total_rem),
+                            total_inv
+
+                        ]);
+                        rows.push(['GRAND TOTAL', '', '',
+                            this.formatCurrency(gTotalAmount),
+                            this.formatCurrency(gTotalMonthly),
+                            this.formatCurrency(gTotalNoDepre),
+                            gTotalUsed,
+                            this.formatCurrency(gTotalExpensed),
+                            this.formatCurrency(gTotalUnexpensed),
+                            this.formatCurrency(gTotalDueAmort),
+                            this.formatCurrency(gTotalSubSalvage),
+                            this.formatCurrency(gTotalRem),
+                            gTotalInv
+                        ]);
+
+                    }
+
                     return rows;
                 },
                 subsidiaryMonthlyDepreciation: function() {
@@ -747,7 +804,9 @@
                     return style;
                 },
                 submitForm: function() {
+
                     this.fetchSubAll();
+                    this.searching = true;
                 },
 
                 getDate: function() {
@@ -903,7 +962,8 @@
                     this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
                         subsidiaries;
 
-                    console.log(this.subsidiaryAll)
+
+
 
 
                 },
@@ -973,7 +1033,8 @@
 
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
-                    console.log(this.filter);
+
+
                     axios.post(this.search, this.filter, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
