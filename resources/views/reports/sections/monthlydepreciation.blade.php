@@ -216,11 +216,20 @@
                                                         class="btn btn-primary" @click="post(ps[14])">
                                                         Post
                                                     </button>
-                                                    <button v-show="filter.branch && searching" class="btn btn-success"
+
+
+                                                    <button v-show="ps.length >=13 && filter.branch && searching"
+                                                        class="btn
+                                                        btn-success"
                                                         data-toggle="modal" data-target="#createSubsidiaryModal"
-                                                        @click="add(ps[13][0])">
+                                                        @click="add(ps[13])">
                                                         Add
                                                     </button>
+                                                    {{-- <button v-show="processSubsidiary.length === 0" class="btn btn-success"
+                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
+                                                        @click="add(null)">
+                                                        Add
+                                                    </button> --}}
 
                                                 </td>
                                             </tr>
@@ -376,9 +385,9 @@
                                             id="sub_no_amort">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
                                 </div>
 
                             </div>
@@ -535,7 +544,7 @@
                     let gTotalRem = 0;
                     let gTotalInv = 0;
 
-                    for (var i in this.subsidiaries) {
+                    for (var i in this.subsidiaryAll) {
                         var branches = data[i];
 
                         rows.push([i]);
@@ -661,7 +670,7 @@
                             gTotalInv, branch, data
                         ]);
                     }
-                    if (this.subsidiaries.length === 0) {
+                    if (this.subsidiaryAll.length === 0) {
                         rows.push(['No Data Found.']);
                         rows.push(['',
                             '',
@@ -768,12 +777,8 @@
                     return rows;
 
                 },
-                subsidiaries: function() {
-                    return this.subsidiaryAll;
-                },
-                subTutyo: function() {
-                    return this.processSubsidiaries();
-                }
+
+
 
             },
             methods: {
@@ -840,32 +845,14 @@
                     })
                 },
                 add: function(subsidiary) {
-                    let isObject = subsidiary.constructor === Object;
-                    if (isObject) {
+                    if (Array.isArray(subsidiary)) {
+                        subsidiary = subsidiary[0];
                         this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
                         this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
-                    } else {
-                        if (this.filter.branch_id != '') {
-                            this.subsidiary.sub_cat_id = this.filter.sub_cat_id
-                            this.subsidiary.branch_id = this.filter.branch_id
-                        } else {
-                            this.showModal = false;
-                            alert("Please select a branch.")
-                            return false;
-                        }
-                    }
 
-                    this.subsidiary = {
-                        sub_code: '',
-                        sub_name: '',
-                        sub_no_amort: 0,
-                        sub_date: '',
-                        sub_cat_id: subsidiary.sub_cat_id,
-                        sub_salvage: '',
-                        sub_amount: '',
-                        sub_no_depre: '',
-                        sub_per_branch: subsidiary.sub_per_branch,
-                        branch_id: subsidiary.branch_id
+                    } else {
+                        this.subsidiary.sub_cat_id = this.filter.category.sub_cat_id;
+                        this.subsidiary.branch_id = this.filter.branch.branch_id;
                     };
 
                 },
@@ -947,9 +934,22 @@
                 },
                 addSubsidiary: function(data) {
                     var filters = this.filter;
+
+                    if (this.subsidiaryAll.length === 0) {
+                        this.subsidiaryAll = {};
+                        if (!this.subsidiaryAll[filters.category.sub_cat_name]) {
+                            this.subsidiaryAll[filters.category.sub_cat_name] = {};
+                        }
+                        if (!this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias]) {
+                            this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] = [];
+                        }
+
+                    }
+
                     this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
                         .branch_alias
                     ].push(data);
+
                 },
                 updateSubsidiary: function(data) {
                     var filters = this.filter;
@@ -977,7 +977,7 @@
                     ]
                     subsidiaries.forEach((sub, index) => {
                         if (sub.sub_id === subId) {
-                            subsidiaries.splice(index, 1); // Remove 1 element at this index
+                            subsidiaries.splice(index, 1);
                         }
                     });
                     this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
@@ -1004,6 +1004,7 @@
                         this.updateSubsidiary(response.data.data)
                         $('#createSubsidiaryModal').modal('hide');
                         this.resetForm();
+                        this.isEdit = false;
                     }).catch(err => {
                         var errors = err.response.data.errors;
 
@@ -1036,8 +1037,6 @@
 
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
-
-
                     axios.post(this.search, this.filter, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
