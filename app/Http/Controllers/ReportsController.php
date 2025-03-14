@@ -518,7 +518,7 @@ class ReportsController extends MainController
                         'branch_name' => $account->branch_name,
                         'balance' => number_format($balance, 2),
                         'current_balance' => 0,
-                        'total_debit' => 0,
+                        'total_debit' => 0,                        
                         'total_credit' => 0,
                         'to_increase' => $account->to_increase,
                         'entries' => []

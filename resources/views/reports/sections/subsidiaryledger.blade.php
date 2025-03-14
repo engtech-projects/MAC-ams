@@ -1336,9 +1336,13 @@
                             const debit = parseFloat(entry.debit.replace(/,/g, ""));
                             totalCredit += credit
                             totalDebit += debit;
-                            currentBalance += debit;
-                            currentBalance -= credit;
-
+                            if(entry.to_increase == 'debit'){
+                                currentBalance += debit;
+                                currentBalance -= credit;
+                            }else{
+                                currentBalance += credit;
+                                currentBalance -= debit;
+                            }
                             var arr = [
                                 entry.journal_date,
                                 entry.journal_no,

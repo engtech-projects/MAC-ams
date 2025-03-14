@@ -951,6 +951,7 @@ class Accounts extends Model
                 'debit' => number_format($value->journal_details_debit, 2),
                 'credit' => number_format($value->journal_details_credit, 2),
                 'current_balance' => number_format($current_balance, 2),
+                'to_increase' => $value->to_increase,
                 'payee' => $value->payee,
                 'remarks' => $value->remarks
             ];
