@@ -182,22 +182,12 @@ class ReportsController extends MainController
         }
 
         $lastEntry = JournalEntry::with('details')->where('source', JournalEntry::DEPRECIATION_SOURCE)->orderBy('journal_date', 'desc')->first();
-        $filteredDate = Carbon::parse($date);
-        $lastEntryDate = Carbon::parse($lastEntry->journal_date);
-        $diffInDays = $lastEntryDate->diffInDays($filteredDate);
-
-
-        /*         dd($filteredDate, $lastEntryDate, $diffInDays); */
-
-
-
-        /* dd($journalEntry->with('details', function ($query) {
-            $query->select(['subsidiary_id', 'journal_id']);
-        })->first()); */
-
+        $filteredDate = Carbon::parse($date)->month;
+        $lastEntryDate = Carbon::parse($lastEntry->journal_date)->month;
+        $isPosted = $lastEntryDate > $filteredDate;
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
-        $data = $result->map(function ($value) use ($diffInDays) {
+        $data = $result->map(function ($value) use ($isPosted) {
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
@@ -211,7 +201,7 @@ class ReportsController extends MainController
             $value['salvage'] = $value->salvage;
             $value['expensed'] = $value->expensed;
             $value['unexpensed'] = $value->unexpensed;
-            $value['sub_no_amort'] = $diffInDays > 30 ? $value->sub_no_amort - 1 : $value->sub_no_amort;
+            $value['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
 
 
             $value['rem'] = $value->rem;
@@ -232,7 +222,6 @@ class ReportsController extends MainController
             'branches' => $branches,
             'title' => 'MAC-AMS | Monthly Depreciation',
             'type' => $type,
-            'diffInDays' => $diffInDays
         ];
         return response()->json($data);
     }
