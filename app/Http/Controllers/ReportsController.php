@@ -197,7 +197,7 @@ class ReportsController extends MainController
         $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
             if($isPosted){
                  // If the date is earlier than the last entry AND not in the same month, subtract 1
-                 $value->sub_no_depre = max(0, $value->sub_no_depre - 1); 
+                 $value->sub_no_amort = max(0, $value->sub_no_amort - 1); 
             }
            
             $value['branch'] = $value->branch;
@@ -210,8 +210,7 @@ class ReportsController extends MainController
             $value['salvage'] = $value->salvage;
             $value['expensed'] = $value->expensed;
             $value['unexpensed'] = $value->unexpensed;
-            $value['sub_no_amort'] =  $isPosted ? max(0, $value->sub_no_amort - 1) : $value->sub_no_amort; // Ensures no negative values
-
+            $value['sub_no_amort'] = $value->sub_no_amort; 
             $value['rem'] = $value->rem;
             $value['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
             $value['inv'] = $value->inv;
