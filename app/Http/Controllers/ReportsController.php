@@ -182,15 +182,18 @@ class ReportsController extends MainController
         }
 
         $lastEntry = JournalEntry::with('details')->where('source', JournalEntry::DEPRECIATION_SOURCE)->orderBy('journal_date', 'desc')->first();
-        $filteredDate = Carbon::parse($date)->month;
-        $lastEntryDate = Carbon::parse($lastEntry->journal_date)->month;
-        $isPosted = $lastEntryDate > $filteredDate;
+        $filteredDate = Carbon::parse($date);
+        $lastEntryDate = $lastEntry ? Carbon::parse($lastEntry->journal_date) : null;
+        $isPosted = $lastEntryDate && $lastEntryDate > $filteredDate;
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
-        $data = $result->map(function ($value) use ($isPosted) {
-            if ($value->sub_no_depre == 0) {
-                $value->sub_no_depre = 1;
+
+        $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
+            if($isPosted){
+                 // If the filtered date is earlier than last entry date, subtract 1
+                 $value->sub_no_depre = max(0, $value->sub_no_depre - 1); 
             }
+           
             $value['branch'] = $value->branch;
             $value['branch_code'] = $value->sub_per_branch;
             $value['branch_id'] = $value->branch_id;
@@ -201,11 +204,9 @@ class ReportsController extends MainController
             $value['salvage'] = $value->salvage;
             $value['expensed'] = $value->expensed;
             $value['unexpensed'] = $value->unexpensed;
-            $value['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
-
+            $value['sub_no_amort'] =  $isPosted ? max(0, $value->sub_no_amort - 1) : $value->sub_no_amort; // Ensures no negative values
 
             $value['rem'] = $value->rem;
-
             $value['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
             $value['inv'] = $value->inv;
             $value['no'] = $value->no;
