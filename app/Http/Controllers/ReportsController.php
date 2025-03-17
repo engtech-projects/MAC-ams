@@ -184,13 +184,19 @@ class ReportsController extends MainController
         $lastEntry = JournalEntry::with('details')->where('source', JournalEntry::DEPRECIATION_SOURCE)->orderBy('journal_date', 'desc')->first();
         $filteredDate = Carbon::parse($date);
         $lastEntryDate = $lastEntry ? Carbon::parse($lastEntry->journal_date) : null;
-        $isPosted = $lastEntryDate && $lastEntryDate > $filteredDate;
+        
+        // Check if the filtered month is the same as the last entry month
+        $isSameMonth = $lastEntryDate && $filteredDate->format('Y-m') === $lastEntryDate->format('Y-m');
+
+        
+        $isPosted = $lastEntryDate && $lastEntryDate->greaterThan($filteredDate) && !$isSameMonth;
+        
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
 
         $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
             if($isPosted){
-                 // If the filtered date is earlier than last entry date, subtract 1
+                 // If the date is earlier than the last entry AND not in the same month, subtract 1
                  $value->sub_no_depre = max(0, $value->sub_no_depre - 1); 
             }
            
@@ -287,9 +293,9 @@ class ReportsController extends MainController
         $result = $subsidiary->getDepreciation($request->sub_cat_id, null, $date);
 
         $data = $result->map(function ($value) {
-            if ($value->sub_no_depre == 0) {
-                $value->sub_no_depre = 1;
-            }
+            // if ($value->sub_no_depre == 0) {
+            //     $value->sub_no_depre = 1;
+            // }
 
             $value['branch'] = $value->branch;
             $value['branch_code'] = $value->sub_per_branch;
