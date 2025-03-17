@@ -16,6 +16,7 @@ class SubsidiaryCategory extends Model
     const SUPPLY = 'SUPLY';
     const AMORT = 'AMORT';
     const DEPRE = 'DEPRE';
+    const INSUR_ADD = 'INSUR-ADD';
 
     protected $fillable = [
         'sub_cat_name',

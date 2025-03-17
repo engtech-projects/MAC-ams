@@ -28,7 +28,9 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
             'branch' => 'nullable',
-
+            'prepaid_expense' => 'required_if:sub_cat_id,50'
+        ], [
+            'prepaid_expense.required_if' => "Prepaid expense is required."
         ]);
 
         try {
@@ -36,13 +38,17 @@ class SubsidiaryController extends Controller
                 $data['sub_per_branch'] = Branch::where('branch_id', $data['branch']['branch_id'])->pluck('branch_code')->first();
             }
             $subsidiary = Subsidiary::create($data);
-            /*             dd($subsidiary->sub_id); */
+
+            $subsidiary->prepaid_expense()->create([
+                'amount' => $data['prepaid_expense'],
+                'sub_id' => $subsidiary->sub_id
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ]);
         }
-        $subsidiary =  $subsidiary->with(['subsidiary_category', 'subsidiary_accounts'])->find($subsidiary->sub_id);
+        $subsidiary =  $subsidiary->with(['subsidiary_category', 'prepaid_expense', 'subsidiary_accounts'])->find($subsidiary->sub_id);
 
         $branch = Branch::find($data['branch']['branch_id']);
         $branchAlias = $branch->branch_code . '-' . $branch->branch_name;
@@ -110,7 +116,7 @@ class SubsidiaryController extends Controller
         try {
             $subsidiary->subsidiary_accounts()->detach([$subsidiary->sub_id]);
             $subsidiary->subsidiary_opening_balance()->delete($subsidiary->sub_id);
-             $subsidiary->delete($subsidiary);
+            $subsidiary->delete($subsidiary);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()

@@ -33,6 +33,10 @@ class Subsidiary extends Model
     {
         return $this->belongsTo(SubsidiaryCategory::class, 'sub_cat_id');
     }
+    public function prepaid_expense()
+    {
+        return $this->belongsTo(PrepaidExpense::class, 'sub_id', 'sub_id');
+    }
     public function subsidiary_accounts()
     {
         return $this->belongsToMany(Accounts::class, 'subsidiary_accounts', 'sub_id', 'account_id');
@@ -55,13 +59,14 @@ class Subsidiary extends Model
     {
         $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branch) {
             $query->where('sub_cat_id', $categoryId);
-        })->when(isset($branch), function ($query) use ($branch) {
-            $query->where('sub_per_branch', $branch->branch_code);
-        })->when(isset($date), function ($query) use ($date) {
-            $query->whereDate('sub_date', '<=', $date);
-        })->whereHas('subsidiary_category', function ($query) {
-            $query->where('sub_cat_type', 'depre');
-        })->whereNotNull('sub_per_branch')->with(['subsidiary_accounts'])->get();
+        })->with('prepaid_expense')
+            ->when(isset($branch), function ($query) use ($branch) {
+                $query->where('sub_per_branch', $branch->branch_code);
+            })->when(isset($date), function ($query) use ($date) {
+                $query->whereDate('sub_date', '<=', $date);
+            })->whereHas('subsidiary_category', function ($query) {
+                $query->where('sub_cat_type', 'depre');
+            })->whereNotNull('sub_per_branch')->with(['subsidiary_accounts'])->get();
         return $subsidiary;
     }
 

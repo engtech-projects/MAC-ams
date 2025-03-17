@@ -202,6 +202,7 @@ class ReportsController extends MainController
             $value['expensed'] = $value->expensed;
             $value['unexpensed'] = $value->unexpensed;
             $value['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
+            $value['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
 
 
             $value['rem'] = $value->rem;
@@ -223,6 +224,7 @@ class ReportsController extends MainController
             'title' => 'MAC-AMS | Monthly Depreciation',
             'type' => $type,
         ];
+
         return response()->json($data);
     }
 
@@ -352,6 +354,8 @@ class ReportsController extends MainController
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
+        } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+            $accountName = Accounts::where('account_number', 1415)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
         }
@@ -411,6 +415,7 @@ class ReportsController extends MainController
 
             ];
 
+
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_due_amort'] : 0;
@@ -422,6 +427,11 @@ class ReportsController extends MainController
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
                 $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_due_amort'] : 0;
+            }
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                /*                 dd($request); */
+                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_prepaid_exepnse'] : 0;
+                $details['journal_details_debit'] =  0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
