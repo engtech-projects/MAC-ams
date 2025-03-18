@@ -28,9 +28,9 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
             'branch' => 'nullable',
-            'prepaid_expense' => 'required_if:sub_cat_id,50'
+            'prepaid_expense' => 'required_if:sub_cat_id,50',
         ], [
-            'prepaid_expense.required_if' => "Prepaid expense is required."
+            'required_if' => 'Expense is required.'
         ]);
 
         try {
