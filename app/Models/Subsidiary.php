@@ -107,7 +107,7 @@ class Subsidiary extends Model
     } */
     public function getExpensedAttribute()
     {
-        return $this->monthly_amort * $this->sub_no_amort;
+        return floatval($this->monthly_amort) * intVal($this->sub_no_amort);
     }
     public function getUnexpensedAttribute()
     {

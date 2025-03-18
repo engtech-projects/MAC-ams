@@ -16,6 +16,8 @@ class SubsidiaryController extends Controller
     public function store(Request $request)
     {
         Log::info('Incoming subsidiary data:', $request->all());
+
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -28,7 +30,7 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
             'branch' => 'nullable',
-            'prepaid_expense' => 'required_if:sub_cat_id,50',
+            'prepaid_expense' => 'array|required_if:sub_cat_id,0',
         ], [
             'required_if' => 'Expense is required.'
         ]);
@@ -40,7 +42,7 @@ class SubsidiaryController extends Controller
             $subsidiary = Subsidiary::create($data);
 
             $subsidiary->prepaid_expense()->create([
-                'amount' => $data['prepaid_expense'],
+                'amount' => $data['prepaid_expense']['amount'],
                 'sub_id' => $subsidiary->sub_id
             ]);
         } catch (\Exception $e) {
@@ -87,10 +89,22 @@ class SubsidiaryController extends Controller
             'sub_amount' => 'numeric|required',
             'sub_no_depre' => 'numeric|required',
             'sub_per_branch' => 'string',
+            'prepaid_expense' => 'array|required_if:sub_cat_id,0',
 
+        ], [
+            'required_if' => 'Expense is required.'
         ]);
         try {
             $subsidiary->update($data);
+            if ($data['prepaid_expense']['id']) {
+                $subsidiary->prepaid_expense->amount = $data['prepaid_expense']['amount'];
+                $subsidiary->prepaid_expense->save();
+            } else {
+                $subsidiary->prepaid_expense()->create([
+                    'amount' => $data['prepaid_expense']['amount'],
+                    'sub_id' => $subsidiary->sub_id
+                ]);
+            }
         } catch (Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
@@ -107,6 +121,7 @@ class SubsidiaryController extends Controller
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
+        $subsidiary['prepaid_expense'] = $subsidiary->prepaid_expense;
 
         return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary], 200);
     }
