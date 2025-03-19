@@ -170,10 +170,11 @@
                                             <th>Amount</th>
                                             <th>Monthly</th>
                                             <th>Amort.</th>
-                                            <th
-                                                v-text="filter.category?.sub_cat_name === 'Additional Prepaid Expense' ? 'Prepaid Expense' : 'Used' ">
+                                            <th>Used
                                             </th>
-                                            <th>Expensed</th>
+                                            <th
+                                                v-text="filter.category?.sub_cat_name === 'Additional Prepaid Expense' ? 'Prepaid Expense' : 'Expensed' ">
+                                            </th>
                                             <th>Unexpensed</th>
                                             <th>Due Amort</th>
                                             <th>Salvage</th>
@@ -183,29 +184,38 @@
                                         </thead>
                                         <tbody>
 
-                                            {{-- <tr v-show="filter.category && filter.to && subsidiaryAll.length ==0 ">
-                                                <td>
-                                                    <button class="btn btn-success" data-toggle="modal"
-                                                        data-target="#createSubsidiaryModal"
-                                                        @click="add(filter.sub_cat_id)">
-                                                        Add
-                                                    </button>
-                                                </td>
-                                            </tr> --}}
-
                                             <tr v-for="(ps,i) in processSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                                <template v-if="filter.category?.sub_cat_name === prepaid_expense">
+                                                    <td v-for="(p, j) in ps" v-if="j <= 12" :key="j"
+                                                        :class="rowStyleSubsidiaryListing(p, j, ps)"
+                                                        :colspan="ps.length == 2 && j == 1 ? 8 : ''">
 
 
+                                                        <template v-if="j === 7 && filter.category?.sub_cat_name">
+                                                            @{{ typeof p === 'object' && p !== null ? (p.amount ?? 0) : p }}
+                                                        </template>
+                                                        <template v-else-if="ps[0] === 'BRANCH TOTAL'">
+                                                            @{{ p }}
+                                                        </template>
+                                                        <template v-else-if="Array.isArray(p)">
+                                                            @{{ p.join(', ') }}
+                                                        </template>
+                                                        <template v-else-if="typeof p === 'object' && p !== null">
+                                                            @{{ p.id === null ? 0 : (p.amount ?? p.total?.total_prepaid_exepnse ?? 0) }}
+                                                        </template>
+                                                        <template v-else>
+                                                            @{{ p }}
+                                                        </template>
 
-                                                <td v-for="(p, j) in ps" v-if="j <= 12" :key="j"
-                                                    :class="rowStyleSubsidiaryListing(p, j, ps)"
-                                                    :colspan="ps.length == 2 && j == 1 ? 8 : ''">
-                                                    <template v-if="j === 6"> @{{ p.amount }}</template>
-                                                    <template v-else>
-                                                        @{{ p }}
-                                                    </template>
-                                                </td>
+                                                    </td>
+                                                </template>
+                                                <template v-else>
+                                                    <td v-for="p,i in ps" v-if="i<=12"
+                                                        :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                        :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                    </td>
+                                                </template>
 
 
 
@@ -400,9 +410,9 @@
                                         <input type="number" v-model="prepaid_amount" class="form-control">
                                     </div>
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div> -->
                                 </div>
 
                             </div>
@@ -429,6 +439,7 @@
                 reportType: '',
                 sub_month: '',
                 monthlyAmortization: 0,
+                prepaid_expense: 'Additional Prepaid Expense',
                 rate_percentage: 0,
                 type: '',
                 isEdit: false,
@@ -588,25 +599,50 @@
                                 if (j == subsidiary.branch) {
 
                                     sub_ids.push(subsidiary.sub_id)
-                                    if (!subsidiary.prepaid_expense) {
-                                        subsidiary.prepaid_expense = {
-                                            id: null,
-                                            amount: 0,
-                                            sub_id: null,
-                                            updated_at: null,
-                                            create_at: null
-                                        }
-                                    }
-                                    rows.push([no + ' - ' + subsidiary.sub_code,
+                                    let val = [no + ' - ' + subsidiary.sub_code,
                                         subsidiary.sub_name,
                                         subsidiary.sub_date,
                                         this.formatCurrency(subsidiary.sub_amount),
                                         this.formatCurrency(subsidiary.monthly_amort),
                                         subsidiary.sub_no_depre,
-                                        subsidiary.prepaid_expense ? subsidiary
-                                        .prepaid_expense :
                                         subsidiary.sub_no_amort,
-                                        this.formatCurrency(subsidiary.expensed),
+                                    ]
+
+                                    if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                        let amount = 0;
+                                        if (subsidiary.prepaid_expense) {
+                                            amount = subsidiary.prepaid_expense.amount
+                                        }
+                                        val.push(this.formatCurrency(amount))
+                                    } else {
+                                        val.push(this.formatCurrency(subsidiary.expensed))
+                                    }
+                                    val.push(this.formatCurrency(subsidiary.unexpensed),
+                                        this.formatCurrency(subsidiary.due_amort),
+                                        this.formatCurrency(subsidiary.salvage),
+                                        this.formatCurrency(subsidiary.rem),
+                                        subsidiary.inv,
+                                        subsidiary.sub_id,
+                                        subsidiary.sub_salvage,
+                                        subsidiary.sub_code,
+                                        subsidiary.sub_cat_id,
+                                        subsidiary.sub_per_branch)
+
+                                    rows.push(val);
+
+
+
+
+                                    /* rows.push([no + ' - ' + subsidiary.sub_code,
+                                        subsidiary.sub_name,
+                                        subsidiary.sub_date,
+                                        this.formatCurrency(subsidiary.sub_amount),
+                                        this.formatCurrency(subsidiary.monthly_amort),
+                                        subsidiary.sub_no_depre,
+                                        subsidiary.sub_no_amort,
+                                        subsidiary.prepaid_expense && this.filter.category
+                                        ?.sub_cat_name === this.prepaid_expense ? subsidiary
+                                        .prepaid_expense : 0,
                                         this.formatCurrency(subsidiary.unexpensed),
                                         this.formatCurrency(subsidiary.due_amort),
                                         this.formatCurrency(subsidiary.salvage),
@@ -618,16 +654,16 @@
                                         subsidiary.sub_cat_id,
                                         subsidiary.sub_per_branch
 
-                                    ]);
+                                    ]); */
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
                                         total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
-                                    total_used += subsidiary.prepaid_expense ? parseFloat(subsidiary
-                                        .prepaid_expense.amount) : parseFloat(subsidiary.sub_no_amort)
-                                    total_expensed += parseFloat(subsidiary.expensed)
+                                    total_used += parseInt(subsidiary.sub_no_amort)
+                                    total_expensed += subsidiary.prepaid_expense ? parseFloat(subsidiary
+                                        .prepaid_expense.amount) : parseFloat(subsidiary.expensed)
                                     total_unexpensed += parseFloat(subsidiary.unexpensed)
                                     total_due_amort += parseFloat(subsidiary.due_amort)
                                     total_sub_salvage += parseFloat(subsidiary.salvage)
@@ -675,9 +711,9 @@
                                 'TOTAL AMOUNT',
                                 'TOTAL MONTHLY',
                                 'TOTAL AMORT',
-                                this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' ?
-                                'TOTAL PREPAID EXP.' : 'TOTAL USED',
-                                'TOTAL EXPENSED',
+                                'TOTAL USED',
+                                this.filter.category && this.filter.category.sub_cat_name === this
+                                .prepaid_expense ? 'TOTAL PREPAID EXP.' : 'TOTAL EXPENSED',
                                 'TOTAL UNEXPENSED',
                                 'TOTAL DUE AMORT',
                                 'TOTAL SALVAGE',
@@ -688,8 +724,7 @@
                                 this.formatCurrency(totalAmount),
                                 this.formatCurrency(total_monthly_amort),
                                 this.formatCurrency(total_no_depre),
-                                this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' ?
-                                this.formatCurrency(total_used) : total_used,
+                                total_used,
                                 this.formatCurrency(total_expensed),
                                 this.formatCurrency(total_unexpensed),
                                 this.formatCurrency(total_due_amort),
@@ -703,7 +738,7 @@
                             this.formatCurrency(gTotalAmount),
                             this.formatCurrency(gTotalMonthly),
                             this.formatCurrency(gTotalNoDepre),
-                            this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' ?
+                            this.filter.category?.sub_cat_name === this.prepaid_expense ?
                             this.formatCurrency(gTotalUsed) : gTotalUsed,
                             this.formatCurrency(gTotalExpensed),
                             this.formatCurrency(gTotalUnexpensed),
@@ -715,15 +750,13 @@
                     }
                     if (this.subsidiaryAll.length === 0) {
                         rows.push(['No Data Found.']);
-                        console.log(this.filter.category?.sub_cat_name)
                         rows.push(['',
                             '',
                             '',
                             'TOTAL AMOUNT',
                             'TOTAL MONTHLY',
                             'TOTAL AMORT',
-                            this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' ?
-                            'TOTAL PREPAID EXP.' : 'TOTAL USED',
+                            'TOTAL USED',
                             'TOTAL EXPENSED',
                             'TOTAL UNEXPENSED',
                             'TOTAL DUE AMORT',
@@ -758,7 +791,6 @@
                         ]);
 
                     }
-
                     return rows;
                 },
                 subsidiaryMonthlyDepreciation: function() {
@@ -875,7 +907,6 @@
                     return current_month;
                 },
                 post: function(data) {
-                    console.log(data);
                     data.branch_id = this.filter.branch.branch_id;
                     axios.post(this.url, data, {
                         headers: {
@@ -960,7 +991,6 @@
                     this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
                     var amount = this.subsidiary.sub_amount;
-                    console.log(this.subsidiary);
                     this.subsidiary.prepaid_expense.amount = this.prepaid_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
