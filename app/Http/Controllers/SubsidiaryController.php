@@ -30,7 +30,7 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
             'branch' => 'nullable',
-            'prepaid_expense' => 'array|required_if:sub_cat_id,0',
+            'prepaid_expense' => 'required_if:sub_cat_id,0',
         ], [
             'required_if' => 'Expense is required.'
         ]);
@@ -89,20 +89,20 @@ class SubsidiaryController extends Controller
             'sub_amount' => 'numeric|required',
             'sub_no_depre' => 'numeric|required',
             'sub_per_branch' => 'string',
-            'prepaid_expense' => 'array|required_if:sub_cat_id,0',
+            'prepaid_expense' => 'required_if:sub_cat_id,0',
 
         ], [
             'required_if' => 'Expense is required.'
         ]);
         try {
             $subsidiary->update($data);
-            if ($data['prepaid_expense']['id']) {
-                $subsidiary->prepaid_expense->amount = $data['prepaid_expense']['amount'];
+
+            if ($subsidiary->prepaid_expense) {
+                $subsidiary->prepaid_expense->amount = $data['prepaid_expense'];
                 $subsidiary->prepaid_expense->save();
             } else {
                 $subsidiary->prepaid_expense()->create([
-                    'amount' => $data['prepaid_expense']['amount'],
-                    'sub_id' => $subsidiary->sub_id
+                    'amount' => $data['prepaid_expense']
                 ]);
             }
         } catch (Exception $e) {
