@@ -186,34 +186,48 @@ class ReportsController extends MainController
         $lastEntryDate = Carbon::parse($lastEntry->journal_date)->month;
         $isPosted = $lastEntryDate > $filteredDate;
 
+
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
         $data = $result->map(function ($value) use ($isPosted) {
+
+
+            $subs  = [];
             if ($value->sub_no_depre == 0) {
                 $value->sub_no_depre = 1;
             }
-            $value['branch'] = $value->branch;
-            $value['branch_code'] = $value->sub_per_branch;
-            $value['branch_id'] = $value->branch_id;
-            $value['description'] = $value->description;
-            $value['sub_cat_name'] = $value->sub_cat_name;
-            $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
-            $value['monthly_amort'] = $value->monthly_amort;
-            $value['salvage'] = $value->salvage;
-            $value['expensed'] = $value->expensed;
-            $value['unexpensed'] = $value->unexpensed;
-            $value['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
-            $value['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
+            $subs['branch'] = $value->branch;
+            $subs['branch_code'] = $value->sub_per_branch;
+            $subs['sub_name'] = $value->sub_name;
+            $subs['sub_code'] = $value->sub_code;
+            $subs['sub_no_depre'] = $value->sub_no_depre;
+            $subs['sub_per_branch'] = $value->sub_per_branch;
+            $subs['sub_address'] = $value->sub_address;
+            $subs['sub_date_post'] = $value->sub_date_post;
+            $subs['branch_id'] = $value->branch_id;
+            $subs['description'] = $value->description;
+            $subs['sub_cat_name'] = $value->sub_cat_name;
+            $subs['sub_amount'] = $value->sub_amount;
+            $subs['sub_no_amort'] = $value->sub_no_amort;
+            $subs['sub_cat_id'] = $value->sub_cat_id;
+            $subs['monthly_amort'] = $value->monthly_amort;
+            $subs['salvage'] = $value->salvage;
+            $subs['expensed'] = $value->expensed;
+            $subs['unexpensed'] = $value->unexpensed;
+            $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
+            if ($value->prepaid_expense) {
+                $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
+            }
+            $subs['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
 
+            $subs['rem'] = $value->rem;
 
-            $value['rem'] = $value->rem;
+            $subs['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
+            $subs['inv'] = $value->inv;
+            $subs['no'] = $value->no;
 
-            $value['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
-            $value['inv'] = $value->inv;
-            $value['no'] = $value->no;
-
-            return $value;
-        })->groupBy('description')->map(function ($value) {
-            return $value->groupBy('branch');
+            return $subs;
+        })->groupBy('description')->map(function ($subs) {
+            return $subs->groupBy('branch');
         });
 
         $data = [
