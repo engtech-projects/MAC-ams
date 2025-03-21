@@ -80,6 +80,7 @@ class Subsidiary extends Model
     {
         return ($this->sub_amount * $this->sub_salvage) / 100;
     }
+  
     public function getMonthlyAmortAttribute()
     {
         $amount = floatval($this->sub_amount);

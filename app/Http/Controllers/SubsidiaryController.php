@@ -50,7 +50,9 @@ class SubsidiaryController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
-        $subsidiary =  $subsidiary->with(['subsidiary_category', 'prepaid_expense', 'subsidiary_accounts'])->find($subsidiary->sub_id);
+        $subsidiary =  $subsidiary->with(['subsidiary_category', 'prepaid_expense' => function ($query) {
+            return $query->pluck('amount');
+        }, 'subsidiary_accounts'])->find($subsidiary->sub_id);
 
         $branch = Branch::find($data['branch']['branch_id']);
         $branchAlias = $branch->branch_code . '-' . $branch->branch_name;
@@ -71,8 +73,9 @@ class SubsidiaryController extends Controller
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
+        $subsidiary->prepaid_expense = $subsidiary->prepaid_expense ? $subsidiary->prepaid_expense->amount : 0;
         return new JsonResponse([
-            'data' => $subsidiary,
+            'data' => $subsidiary->getAttributes(),
             'message' => 'Successfully created.'
         ], JsonResponse::HTTP_CREATED);
     }
@@ -123,7 +126,7 @@ class SubsidiaryController extends Controller
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
         $subsidiary['prepaid_expense'] = $subsidiary->prepaid_expense;
 
-        return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary], 200);
+        return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary->getAttributes()], 200);
     }
 
     public function destroy(Subsidiary $subsidiary)
