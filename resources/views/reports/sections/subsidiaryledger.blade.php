@@ -1497,11 +1497,13 @@
                     var grandTotal = 0;
                     var grandTotalCredit = 0;
                     var grandTotalDebit = 0;
+                    var grandTotalBalance = 0;
+
                     for (var i in data) {
                         var subsidiary = data[i];
 
                         var entries = subsidiary.entries;
-
+                        var totalBalance = 0;
                         for (var d in entries) {
                             var entry = entries[d];
                             var detailsList = entry.data;
@@ -1511,19 +1513,24 @@
                                 var details = detailsList[h];
                                 totalCredit += parseFloat(details.credit);
                                 totalDebit += parseFloat(details.debit);
+                                totalBalance = details.balance;
                             }
                         }
 
-                        rows.push([subsidiary.sub_code, subsidiary.sub_name, this.formatCurrency(totalDebit),
+                        rows.push([
+                            subsidiary.sub_code,
+                            subsidiary.sub_name, 
+                            this.formatCurrency(totalDebit),
                             this.formatCurrency(totalCredit),
-                            this.formatCurrency(totalDebit - totalCredit)
+                            this.formatCurrency(totalBalance)
                         ]);
                         grandTotalDebit += totalDebit;
-                        grandTotalCredit += totalCredit
+                        grandTotalCredit += totalCredit;
+                        
                     }
                     rows.push(['Grand Total', '', this.formatCurrency(grandTotalDebit), this.formatCurrency(
                             grandTotalCredit),
-                        this.formatCurrency(grandTotalDebit - grandTotalCredit)
+                        this.formatCurrency(totalBalance)
                     ]);
 
                     return rows;
