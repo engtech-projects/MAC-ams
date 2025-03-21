@@ -620,16 +620,14 @@ class Accounts extends Model
 
 
                         if ($entry['to_increase'] == 'debit') {
-                            $balance += $v['debit'];
-                            $balance -= $v['credit'];
+                            $balance = bcadd($balance, $v['debit'], 2);
+                            $balance = bcsub($balance, $v['credit'], 2);
+                        } elseif ($entry['to_increase'] == 'credit') {
+                            $balance = bcadd($balance, $v['credit'], 2);
+                            $balance = bcsub($balance, $v['debit'], 2);
                         }
 
-                        if ($entry['to_increase'] == 'credit') {
-                            $balance += $v['credit'];
-                            $balance -= $v['debit'];
-                        }
-
-                        $entries[$key]['data'][$k]['balance'] = $balance;
+                        $entries[$key]['data'][$k]['balance'] = (abs($balance) < 0.01) ? 0.00 : round($balance, 2);
                     }
                 }
 
