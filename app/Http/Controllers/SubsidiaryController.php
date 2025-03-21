@@ -42,7 +42,7 @@ class SubsidiaryController extends Controller
             $subsidiary = Subsidiary::create($data);
 
             $subsidiary->prepaid_expense()->create([
-                'amount' => $data['prepaid_expense']['amount'],
+                'amount' => $data['prepaid_expense'],
                 'sub_id' => $subsidiary->sub_id
             ]);
         } catch (\Exception $e) {
