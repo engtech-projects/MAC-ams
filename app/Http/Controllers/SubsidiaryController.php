@@ -124,7 +124,7 @@ class SubsidiaryController extends Controller
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
-        $subsidiary['prepaid_expense'] = $subsidiary->prepaid_expense;
+        $subsidiary['prepaid_expense'] = $subsidiary->prepaid_expense ? $subsidiary->prepaid_expense->amount : 0;
 
         return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary->getAttributes()], 200);
     }
