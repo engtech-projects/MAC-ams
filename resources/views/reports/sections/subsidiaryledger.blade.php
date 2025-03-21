@@ -1526,11 +1526,12 @@
                         ]);
                         grandTotalDebit += totalDebit;
                         grandTotalCredit += totalCredit;
+                        grandTotalBalance += totalBalance;
                         
                     }
                     rows.push(['Grand Total', '', this.formatCurrency(grandTotalDebit), this.formatCurrency(
                             grandTotalCredit),
-                        this.formatCurrency(totalBalance)
+                        this.formatCurrency(grandTotalBalance)
                     ]);
 
                     return rows;
