@@ -199,6 +199,11 @@ class ReportsController extends MainController
             $subs['branch_code'] = $value->sub_per_branch;
             $subs['sub_name'] = $value->sub_name;
             $subs['sub_code'] = $value->sub_code;
+            $subs['sub_tel'] = $value->sub_tel;
+            $subs['sub_acct_no'] = $value->sub_acct_no;
+            $subs['sub_salvage'] = $value->sub_salvage;
+            $subs['sub_life_used'] = $value->sub_life_used;
+            $subs['sub_date'] = $value->sub_date;
             $subs['sub_no_depre'] = $value->sub_no_depre;
             $subs['sub_per_branch'] = $value->sub_per_branch;
             $subs['sub_address'] = $value->sub_address;
