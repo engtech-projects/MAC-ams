@@ -1129,6 +1129,7 @@
                 },
                 incomeStatementSummary: {},
                 subsidiaryAll: [],
+                subsidiarySummary: [],
                 balance: 0,
                 url: "{{ route('reports.subsidiary-ledger') }}",
             },
@@ -1150,7 +1151,6 @@
                     } else {
                         this.fetchSubAll();
                     }
-
                 },
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
@@ -1161,21 +1161,19 @@
                             }
                         })
                         .then(response => {
-                            if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
-                                'subsidiary-ledger-summary-report') {
+                            if (this.reportType == 'subsidiary-ledger-listing-report') {
                                 this.subsidiaryAll = response.data.data;
-
                                 this.balance = response.data.balance;
-
+                            } else if (this.reportType == 'subsidiary-ledger-summary-report') {
+                                this.subsidiarySummary = response.data.data;
+                                this.balance = response.data.balance;
                             } else if (this.reportType == 'income_minus_expense_summary') {
                                 this.incomeStatementSummary = response.data.incomeStatement;
-                            } else {
+                            }  else {
                                 this.subsidiaryAll = response.data.data[0];
                                 let bal = response.data.data[1];
                                 this.balance = parseFloat(bal);
                             }
-
-
 
                         })
                         .catch(error => {
@@ -1489,8 +1487,8 @@
                     var data = {};
                     var rows = [];
 
-                    if (this.subsidiaryAll) {
-                        data = this.subsidiaryAll;
+                    if (this.subsidiarySummary) {
+                        data = this.subsidiarySummary;
                     }
 
 
