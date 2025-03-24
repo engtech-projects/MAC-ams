@@ -491,7 +491,9 @@ class Accounts extends Model
     public static function subsidiaryLedger($from = '', $to = '', $account_id = '', $subsidiary_id = '')
     {
 
-        $balance = SubsidiaryOpeningBalance::where(['account_id' => $account_id, 'sub_id' => $subsidiary_id])->first();
+        $cycle = Accounting::getFiscalYear(1);
+        $startDate = Carbon::parse($cycle->start_date);
+        $balances = SubsidiaryOpeningBalance::all();
 
         $query = Subsidiary::select(
             'subsidiary.sub_id',
@@ -572,12 +574,14 @@ class Accounts extends Model
 
                     if (!array_key_exists($value['account_number'], $entries)) {
 
-
+                        $subsidiaryOpeningBalance = $balances->where("sub_id", $subsidiary["sub_id"])
+                        ->where("account_id", $value["account_id"])
+                        ->first();
                         $entries[$value['account_number']]['account_id'] = $value['account_id'];
                         $entries[$value['account_number']]['account_number'] = $value['account_number'];
                         $entries[$value['account_number']]['account_name'] = $value['account_name'];
                         $entries[$value['account_number']]['to_increase'] = $value['to_increase'];
-                        $entries[$value['account_number']]['opening_balance'] = is_null($value['subsidiary_opening_balance']) ? 0 : $value['subsidiary_opening_balance']['opening_balance'];
+                        $entries[$value['account_number']]['opening_balance'] = is_null($subsidiaryOpeningBalance) ? 0 : $subsidiaryOpeningBalance->opening_balance;
 
                         $entries[$value['account_number']]['data'][] = [
                             'sub_name' => $value['sub_name'],
@@ -607,26 +611,28 @@ class Accounts extends Model
                             'debit' => $value['journal_details_debit'],
                             'credit' => $value['journal_details_credit'],
                             'branch' => $value['branch_name'],
+                            
                         ];
                     }
                 }
 
                 foreach ($entries as $key => $entry) {
-
-                    $balance = 0;
-                    $balance = $entry['opening_balance'];
+                    $maxEntryDate = Carbon::parse(collect($entry["data"])->max("journal_date"));
+                    $lastEntryIsAfterCycleStart = $startDate->lt($maxEntryDate);
+                    $balance = $lastEntryIsAfterCycleStart ? $entry['opening_balance'] : 0;
 
                     foreach ($entry['data'] as $k => $v) {
-
-
-                        if ($entry['to_increase'] == 'debit') {
-                            $balance = bcadd($balance, $v['debit'], 2);
-                            $balance = bcsub($balance, $v['credit'], 2);
-                        } elseif ($entry['to_increase'] == 'credit') {
-                            $balance = bcadd($balance, $v['credit'], 2);
-                            $balance = bcsub($balance, $v['debit'], 2);
+                        // add only to fiscal year opening balance the entries after the fiscal year start
+                        // or add all entries before fiscal year if it does not have entries after fiscal year start
+                        if(($lastEntryIsAfterCycleStart && $startDate->lt($v["journal_date"])) || !$lastEntryIsAfterCycleStart) {
+                            if ($entry['to_increase'] == 'debit') {
+                                $balance = bcadd($balance, $v['debit'], 2);
+                                $balance = bcsub($balance, $v['credit'], 2);
+                            } elseif ($entry['to_increase'] == 'credit') {
+                                $balance = bcadd($balance, $v['credit'], 2);
+                                $balance = bcsub($balance, $v['debit'], 2);
+                            }
                         }
-
                         $entries[$key]['data'][$k]['balance'] = (abs($balance) < 0.01) ? 0.00 : round($balance, 2);
                     }
                 }
