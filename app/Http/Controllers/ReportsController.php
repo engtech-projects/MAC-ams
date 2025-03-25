@@ -396,7 +396,7 @@ class ReportsController extends MainController
         }
 
 
-        $data = $journalEntry->create([
+        $journalEntry = JournalEntry::create([
             'journal_no' => $journalNumber,
             'journal_date' => $as_of->format('Y-m-d'),
             'branch_id' => $request->branch_id,
@@ -406,7 +406,6 @@ class ReportsController extends MainController
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
             'amount' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? $request->total['total_expensed'] : $request->total['total_due_amort'],
         ]);
-
 
 
         $journalDetails = [];
@@ -424,13 +423,15 @@ class ReportsController extends MainController
             ];
         } */
 
+
+        $branch = Branch::where('branch_code', $request->branch_code)->first();
         foreach ($subAccounts as $subAccount) {
             foreach ($subAccount as $accountId) {
                 $account = Accounts::find($accountId);
                 $journalDetails[] = [
                     'account_id' => $account->account_id,
                     'journal_details_title' => $account->account_name,
-                    'subsidiary_id' =>  $request->branch_id === Branch::BRANCH_HEAD_OFFICE_ID ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
+                    'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
                     'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
@@ -445,7 +446,7 @@ class ReportsController extends MainController
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
-                'subsidiary_id' => $request->branch_id === Branch::BRANCH_HEAD_OFFICE_ID ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
+                'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
                 'status' => JournalEntry::STATUS_POSTED,
                 'journal_details_account_no' => $account->account_number,
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
@@ -493,7 +494,7 @@ class ReportsController extends MainController
         }
 
         try {
-            $data->details()->createMany($journalDetails);
+            $journalEntry->details()->createMany($journalDetails);
             $this->updateMonthlyDepreciation($request->sub_ids);
             return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
