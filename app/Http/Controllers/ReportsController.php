@@ -184,41 +184,62 @@ class ReportsController extends MainController
         $lastEntry = JournalEntry::with('details')->where('source', JournalEntry::DEPRECIATION_SOURCE)->orderBy('journal_date', 'desc')->first();
         $filteredDate = Carbon::parse($date);
         $lastEntryDate = $lastEntry ? Carbon::parse($lastEntry->journal_date) : null;
-        
+
         // Check if the filtered month is the same as the last entry month
         $isSameMonth = $lastEntryDate && $filteredDate->format('Y-m') === $lastEntryDate->format('Y-m');
 
-        
+
         $isPosted = $lastEntryDate && $lastEntryDate->greaterThan($filteredDate) && !$isSameMonth;
-        
+
+
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
+        $data = $result->map(function ($value) use ($isPosted) {
 
-        $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
-            if($isPosted){
-                 // If the date is earlier than the last entry AND not in the same month, subtract 1
-                 $value->sub_no_amort = max(0, $value->sub_no_amort - 1); 
+
+            $subs  = [];
+            if ($value->sub_no_depre == 0) {
+                $value->sub_no_depre = 1;
             }
-           
-            $value['branch'] = $value->branch;
-            $value['branch_code'] = $value->sub_per_branch;
-            $value['branch_id'] = $value->branch_id;
-            $value['description'] = $value->description;
-            $value['sub_cat_name'] = $value->sub_cat_name;
-            $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
-            $value['monthly_amort'] = $value->monthly_amort;
-            $value['salvage'] = $value->salvage;
-            $value['expensed'] = $value->expensed;
-            $value['unexpensed'] = $value->unexpensed;
-            $value['sub_no_amort'] = $value->sub_no_amort; 
-            $value['rem'] = $value->rem;
-            $value['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
-            $value['inv'] = $value->inv;
-            $value['no'] = $value->no;
+            $subs['sub_id'] = $value->sub_id;
+            $subs['branch'] = $value->branch;
+            $subs['branch_code'] = $value->sub_per_branch;
+            $subs['sub_name'] = $value->sub_name;
+            $subs['sub_code'] = $value->sub_code;
+            $subs['sub_tel'] = $value->sub_tel;
+            $subs['sub_acct_no'] = $value->sub_acct_no;
+            $subs['sub_salvage'] = $value->sub_salvage;
+            $subs['sub_life_used'] = $value->sub_life_used;
+            $subs['sub_date'] = $value->sub_date;
+            $subs['sub_no_depre'] = $value->sub_no_depre;
+            $subs['sub_per_branch'] = $value->sub_per_branch;
+            $subs['sub_address'] = $value->sub_address;
+            $subs['sub_date_post'] = $value->sub_date_post;
+            $subs['branch_id'] = $value->branch_id;
+            $subs['description'] = $value->description;
+            $subs['sub_cat_name'] = $value->sub_cat_name;
+            $subs['sub_amount'] = $value->sub_amount;
+            $subs['sub_no_amort'] = $value->sub_no_amort;
+            $subs['sub_cat_id'] = $value->sub_cat_id;
+            $subs['monthly_amort'] = $value->monthly_amort;
+            $subs['salvage'] = $value->salvage;
+            $subs['expensed'] = $value->expensed;
+            $subs['unexpensed'] = $value->unexpensed;
+            $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
+            if ($value->prepaid_expense) {
+                $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
+            }
+            $subs['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
 
-            return $value;
-        })->groupBy('description')->map(function ($value) {
-            return $value->groupBy('branch');
+            $subs['rem'] = $value->rem;
+
+            $subs['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
+            $subs['inv'] = $value->inv;
+            $subs['no'] = $value->no;
+
+            return $subs;
+        })->groupBy('description')->map(function ($subs) {
+            return $subs->groupBy('branch');
         });
 
         $data = [
@@ -229,6 +250,7 @@ class ReportsController extends MainController
             'title' => 'MAC-AMS | Monthly Depreciation',
             'type' => $type,
         ];
+
         return response()->json($data);
     }
 
@@ -343,8 +365,11 @@ class ReportsController extends MainController
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
         $branchCode = $request->branch_code;
-        $subId = Subsidiary::where('sub_code', $branchCode)->pluck('sub_id')->first();
+        $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
+
         $subAccounts = Subsidiary::where('sub_code', $branchCode)->with(['subsidiary_accounts'])->get();
+
+        $subCategory = SubsidiaryCategory::with('accounts')->find($request->category_id);
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
         $journalEntry = new JournalEntry();
@@ -358,6 +383,8 @@ class ReportsController extends MainController
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
+        } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+            $accountName = Accounts::where('account_number', 1415)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
         }
@@ -368,13 +395,14 @@ class ReportsController extends MainController
 
         $subAccounts = [];
         foreach ($subIds as $subId2) {
-            $subsidiary = Subsidiary::whereHas('subsidiary_accounts')->find($subId2);
+            $subsidiary = Subsidiary::find($subId2);
             if ($subsidiary) {
                 $subAccounts[] = $subsidiary->subsidiary_accounts->pluck('account_id')->toArray();
             }
         }
 
-        $data = $journalEntry->create([
+
+        $journalEntry = JournalEntry::create([
             'journal_no' => $journalNumber,
             'journal_date' => $as_of->format('Y-m-d'),
             'branch_id' => $request->branch_id,
@@ -382,20 +410,34 @@ class ReportsController extends MainController
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
-            'amount' => $request->total['total_due_amort'],
+            'amount' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? $request->total['total_expensed'] : $request->total['total_due_amort'],
         ]);
 
 
-
         $journalDetails = [];
+        /*         foreach ($category->accounts as $account) {
+            $journalDetails[] = [
+                'account_id' => $account->account_id,
+                'journal_details_title' => $account->account_name,
+                'subsidiary_id' => $subId,
+                'status' => JournalEntry::STATUS_POSTED,
+                'journal_details_account_no' => $account->account_number,
+                'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
+                'journal_details_debit' => $request->total['total_due_amort'],
+                'journal_details_credit' => 0
 
+            ];
+        } */
+
+
+        $branch = Branch::where('branch_code', $request->branch_code)->first();
         foreach ($subAccounts as $subAccount) {
             foreach ($subAccount as $accountId) {
                 $account = Accounts::find($accountId);
                 $journalDetails[] = [
                     'account_id' => $account->account_id,
                     'journal_details_title' => $account->account_name,
-                    'subsidiary_id' => $subId,
+                    'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
                     'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
@@ -410,7 +452,7 @@ class ReportsController extends MainController
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
-                'subsidiary_id' => $subId,
+                'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
                 'status' => JournalEntry::STATUS_POSTED,
                 'journal_details_account_no' => $account->account_number,
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
@@ -428,6 +470,11 @@ class ReportsController extends MainController
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
                 $details['journal_details_debit'] = $account->account_number == 5280 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_due_amort'] : 0;
+            }
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                /*                 dd($request); */
+                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_expensed'] : 0;
+                $details['journal_details_debit'] =  0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
@@ -453,7 +500,7 @@ class ReportsController extends MainController
         }
 
         try {
-            $data->details()->createMany($journalDetails);
+            $journalEntry->details()->createMany($journalDetails);
             $this->updateMonthlyDepreciation($request->sub_ids);
             return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
