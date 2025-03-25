@@ -399,12 +399,12 @@ class ReportsController extends MainController
         $data = $journalEntry->create([
             'journal_no' => $journalNumber,
             'journal_date' => $as_of->format('Y-m-d'),
-            'branch_id' =>  $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
+            'branch_id' => $request->branch_id,
             'book_id' => $journalEntry::DEPRECIATION_BOOK,
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
-            'amount' => $request->total['total_due_amort'],
+            'amount' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? $request->total['total_expensed'] : $request->total['total_due_amort'],
         ]);
 
 
@@ -430,7 +430,7 @@ class ReportsController extends MainController
                 $journalDetails[] = [
                     'account_id' => $account->account_id,
                     'journal_details_title' => $account->account_name,
-                    'subsidiary_id' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
+                    'subsidiary_id' =>  $request->branch_id === Branch::BRANCH_HEAD_OFFICE_ID ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
                     'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
@@ -445,13 +445,12 @@ class ReportsController extends MainController
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
-                'subsidiary_id' => $request->branch_id,
+                'subsidiary_id' => $request->branch_id === Branch::BRANCH_HEAD_OFFICE_ID ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
                 'status' => JournalEntry::STATUS_POSTED,
                 'journal_details_account_no' => $account->account_number,
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
 
             ];
-
 
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
@@ -467,7 +466,7 @@ class ReportsController extends MainController
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
                 /*                 dd($request); */
-                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_prepaid_exepnse'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_expensed'] : 0;
                 $details['journal_details_debit'] =  0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {

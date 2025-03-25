@@ -12,7 +12,7 @@ class Branch extends Model
     protected $table = 'branch';
     protected $primaryKey = 'branch_id';
     const BRANCH_HEAD_OFFICE = "head office";
-    const BRANCH_HEAD_OFFICE_ID = 5;
+    const BRANCH_HEAD_OFFICE_ID = 4;
 
 
     public function userBranch()
