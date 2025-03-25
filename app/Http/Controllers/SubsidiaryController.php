@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\PrepaidExpense;
 use App\Models\Subsidiary;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -99,13 +100,15 @@ class SubsidiaryController extends Controller
         ]);
         try {
             $subsidiary->update($data);
-
             if ($subsidiary->prepaid_expense) {
-                $subsidiary->prepaid_expense->amount = $data['prepaid_expense'];
-                $subsidiary->prepaid_expense->save();
-            } else {
-                $subsidiary->prepaid_expense()->create([
+                $subsidiary->prepaid_expense->update([
                     'amount' => $data['prepaid_expense']
+                ]);
+            } else {
+
+                PrepaidExpense::create([
+                    'amount' => $data['prepaid_expense'],
+                    'sub_id' => $subsidiary->sub_id
                 ]);
             }
         } catch (Exception $e) {

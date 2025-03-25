@@ -359,8 +359,11 @@ class ReportsController extends MainController
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
         $branchCode = $request->branch_code;
-        $subId = Subsidiary::where('sub_code', $branchCode)->pluck('sub_id')->first();
+        $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
+
         $subAccounts = Subsidiary::where('sub_code', $branchCode)->with(['subsidiary_accounts'])->get();
+
+        $subCategory = SubsidiaryCategory::with('accounts')->find($request->category_id);
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
         $journalEntry = new JournalEntry();
@@ -386,11 +389,13 @@ class ReportsController extends MainController
 
         $subAccounts = [];
         foreach ($subIds as $subId2) {
-            $subsidiary = Subsidiary::whereHas('subsidiary_accounts')->find($subId2);
+            $subsidiary = Subsidiary::find($subId2);
             if ($subsidiary) {
                 $subAccounts[] = $subsidiary->subsidiary_accounts->pluck('account_id')->toArray();
             }
         }
+
+        $category = SubsidiaryCategory::find($request->category_id);
 
         $data = $journalEntry->create([
             'journal_no' => $journalNumber,
@@ -406,6 +411,19 @@ class ReportsController extends MainController
 
 
         $journalDetails = [];
+        /*         foreach ($category->accounts as $account) {
+            $journalDetails[] = [
+                'account_id' => $account->account_id,
+                'journal_details_title' => $account->account_name,
+                'subsidiary_id' => $subId,
+                'status' => JournalEntry::STATUS_POSTED,
+                'journal_details_account_no' => $account->account_number,
+                'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
+                'journal_details_debit' => $request->total['total_due_amort'],
+                'journal_details_credit' => 0
+
+            ];
+        } */
 
         foreach ($subAccounts as $subAccount) {
             foreach ($subAccount as $accountId) {
