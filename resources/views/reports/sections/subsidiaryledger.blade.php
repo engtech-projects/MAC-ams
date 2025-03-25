@@ -1129,6 +1129,7 @@
                 },
                 incomeStatementSummary: {},
                 subsidiaryAll: [],
+                subsidiarySummary: [],
                 balance: 0,
                 url: "{{ route('reports.subsidiary-ledger') }}",
             },
@@ -1150,7 +1151,6 @@
                     } else {
                         this.fetchSubAll();
                     }
-
                 },
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
@@ -1161,21 +1161,19 @@
                             }
                         })
                         .then(response => {
-                            if (this.reportType == 'subsidiary-ledger-listing-report' || this.reportType ==
-                                'subsidiary-ledger-summary-report') {
+                            if (this.reportType == 'subsidiary-ledger-listing-report') {
                                 this.subsidiaryAll = response.data.data;
-
                                 this.balance = response.data.balance;
-
+                            } else if (this.reportType == 'subsidiary-ledger-summary-report') {
+                                this.subsidiarySummary = response.data.data;
+                                this.balance = response.data.balance;
                             } else if (this.reportType == 'income_minus_expense_summary') {
                                 this.incomeStatementSummary = response.data.incomeStatement;
-                            } else {
+                            }  else {
                                 this.subsidiaryAll = response.data.data[0];
                                 let bal = response.data.data[1];
                                 this.balance = parseFloat(bal);
                             }
-
-
 
                         })
                         .catch(error => {
@@ -1336,9 +1334,13 @@
                             const debit = parseFloat(entry.debit.replace(/,/g, ""));
                             totalCredit += credit
                             totalDebit += debit;
-                            currentBalance += debit;
-                            currentBalance -= credit;
-
+                            if(entry.to_increase == 'debit'){
+                                currentBalance += debit;
+                                currentBalance -= credit;
+                            }else{
+                                currentBalance += credit;
+                                currentBalance -= debit;
+                            }
                             var arr = [
                                 entry.journal_date,
                                 entry.journal_no,
@@ -1485,19 +1487,21 @@
                     var data = {};
                     var rows = [];
 
-                    if (this.subsidiaryAll) {
-                        data = this.subsidiaryAll;
+                    if (this.subsidiarySummary) {
+                        data = this.subsidiarySummary;
                     }
 
 
                     var grandTotal = 0;
                     var grandTotalCredit = 0;
                     var grandTotalDebit = 0;
+                    var grandTotalBalance = 0;
+
                     for (var i in data) {
                         var subsidiary = data[i];
 
                         var entries = subsidiary.entries;
-
+                        var totalBalance = 0;
                         for (var d in entries) {
                             var entry = entries[d];
                             var detailsList = entry.data;
@@ -1507,19 +1511,25 @@
                                 var details = detailsList[h];
                                 totalCredit += parseFloat(details.credit);
                                 totalDebit += parseFloat(details.debit);
+                                totalBalance = details.balance;
                             }
                         }
 
-                        rows.push([subsidiary.sub_code, subsidiary.sub_name, this.formatCurrency(totalDebit),
+                        rows.push([
+                            subsidiary.sub_code,
+                            subsidiary.sub_name, 
+                            this.formatCurrency(totalDebit),
                             this.formatCurrency(totalCredit),
-                            this.formatCurrency(totalDebit - totalCredit)
+                            this.formatCurrency(totalBalance)
                         ]);
                         grandTotalDebit += totalDebit;
-                        grandTotalCredit += totalCredit
+                        grandTotalCredit += totalCredit;
+                        grandTotalBalance += totalBalance;
+                        
                     }
                     rows.push(['Grand Total', '', this.formatCurrency(grandTotalDebit), this.formatCurrency(
                             grandTotalCredit),
-                        this.formatCurrency(grandTotalDebit - grandTotalCredit)
+                        this.formatCurrency(grandTotalBalance)
                     ]);
 
                     return rows;
