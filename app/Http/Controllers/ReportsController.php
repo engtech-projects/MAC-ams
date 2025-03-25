@@ -395,12 +395,11 @@ class ReportsController extends MainController
             }
         }
 
-        $category = SubsidiaryCategory::find($request->category_id);
 
         $data = $journalEntry->create([
             'journal_no' => $journalNumber,
             'journal_date' => $as_of->format('Y-m-d'),
-            'branch_id' => $request->branch_id,
+            'branch_id' =>  $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
             'book_id' => $journalEntry::DEPRECIATION_BOOK,
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
@@ -431,7 +430,7 @@ class ReportsController extends MainController
                 $journalDetails[] = [
                     'account_id' => $account->account_id,
                     'journal_details_title' => $account->account_name,
-                    'subsidiary_id' => $request->branch_id,
+                    'subsidiary_id' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
                     'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
