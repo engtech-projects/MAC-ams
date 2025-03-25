@@ -431,7 +431,7 @@ class ReportsController extends MainController
                 $journalDetails[] = [
                     'account_id' => $account->account_id,
                     'journal_details_title' => $account->account_name,
-                    'subsidiary_id' => $subId,
+                    'subsidiary_id' => $request->branch_id,
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
                     'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
@@ -446,7 +446,7 @@ class ReportsController extends MainController
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
-                'subsidiary_id' => $subId,
+                'subsidiary_id' => $request->branch_id,
                 'status' => JournalEntry::STATUS_POSTED,
                 'journal_details_account_no' => $account->account_number,
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
