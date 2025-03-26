@@ -187,15 +187,16 @@ class ReportsController extends MainController
 
         // Check if the filtered month is the same as the last entry month
         $isSameMonth = $lastEntryDate && $filteredDate->format('Y-m') === $lastEntryDate->format('Y-m');
-
-
         $isPosted = $lastEntryDate && $lastEntryDate->greaterThan($filteredDate) && !$isSameMonth;
 
 
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
-        $data = $result->map(function ($value) use ($isPosted) {
+        $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
 
+            if($isPosted){
+                $value->sub_no_amort = max(0, $value->sub_no_amort - 1);
+            }
 
             $subs  = [];
             if ($value->sub_no_depre == 0) {
