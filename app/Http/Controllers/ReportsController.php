@@ -40,6 +40,7 @@ use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Accounting;
 use App\Models\OpeningBalance;
+use App\Models\PrepaidExpensePayment;
 
 class ReportsController extends MainController
 {
@@ -194,7 +195,7 @@ class ReportsController extends MainController
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
         $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
 
-            if($isPosted){
+            if ($isPosted) {
                 $value->sub_no_amort = max(0, $value->sub_no_amort - 1);
             }
 
@@ -227,9 +228,18 @@ class ReportsController extends MainController
             $subs['expensed'] = $value->expensed;
             $subs['unexpensed'] = $value->unexpensed;
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
+            $subs['prepaid_expense_payment'] = 0;
+
+
             if ($value->prepaid_expense) {
                 $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
+                if (count($value->prepaid_expense->prepaid_expense_payments) > 0) {
+                    $payment = $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->last();
+                    $subs['prepaid_expense_payment'] = $payment->amount;
+                    $subs['p_expense_payment_id'] = $payment->id;
+                }
             }
+
             $subs['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
 
             $subs['rem'] = $value->rem;
@@ -362,7 +372,6 @@ class ReportsController extends MainController
 
     public function postMonthlyDepreciation(Request $request)
     {
-
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
         $branchCode = $request->branch_code;
@@ -500,9 +509,17 @@ class ReportsController extends MainController
             continue;
         }
 
+
+
         try {
             $journalEntry->details()->createMany($journalDetails);
             $this->updateMonthlyDepreciation($request->sub_ids);
+            if (count($request->payment_ids) > 0) {
+                foreach ($request->payment_ids as $payment) {
+                    $payment = PrepaidExpensePayment::find($payment);
+                    $payment->update(['status' => PrepaidExpensePayment::STATUS_POSTED]);
+                }
+            }
             return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
             return response()->json(['message' => "Posting unsuccessful"], 500);
@@ -588,7 +605,7 @@ class ReportsController extends MainController
                         'branch_name' => $account->branch_name,
                         'balance' => number_format($balance, 2),
                         'current_balance' => 0,
-                        'total_debit' => 0,                        
+                        'total_debit' => 0,
                         'total_credit' => 0,
                         'to_increase' => $account->to_increase,
                         'entries' => []

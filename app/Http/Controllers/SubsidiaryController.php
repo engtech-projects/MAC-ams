@@ -19,6 +19,7 @@ class SubsidiaryController extends Controller
         Log::info('Incoming subsidiary data:', $request->all());
 
 
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -94,6 +95,7 @@ class SubsidiaryController extends Controller
             'sub_no_depre' => 'numeric|required',
             'sub_per_branch' => 'string',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
+            'prepaid_expense_payment' => 'required_if:sub_cat_id,0',
 
         ], [
             'required_if' => 'Expense is required.'
@@ -103,6 +105,11 @@ class SubsidiaryController extends Controller
             if ($subsidiary->prepaid_expense) {
                 $subsidiary->prepaid_expense->update([
                     'amount' => $data['prepaid_expense']
+                ]);
+                $subsidiary->prepaid_expense->prepaid_expense_payments()->create([
+                    'amount' => $data['prepaid_expense_payment'],
+                    'status' => 'unposted',
+                    'payment_date' => now()
                 ]);
             } else {
 
