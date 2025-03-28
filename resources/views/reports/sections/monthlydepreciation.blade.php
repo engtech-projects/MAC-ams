@@ -967,6 +967,7 @@
                     })
                 },
                 add: function(subsidiary) {
+                    this.resetForm();
                     if (Array.isArray(subsidiary)) {
                         subsidiary = subsidiary[0];
                         this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
@@ -979,7 +980,6 @@
 
                 },
                 closeAction:function(){
-                    alert("sds");
                     this.resetForm();
                 },
                 processAction: function() {
