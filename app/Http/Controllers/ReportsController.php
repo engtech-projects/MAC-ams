@@ -193,6 +193,7 @@ class ReportsController extends MainController
 
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
+
         $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
 
             if ($isPosted) {
