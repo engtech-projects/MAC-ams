@@ -967,6 +967,7 @@
                     })
                 },
                 add: function(subsidiary) {
+                    this.isEdit = false;
                     this.resetForm();
                     if (Array.isArray(subsidiary)) {
                         subsidiary = subsidiary[0];
