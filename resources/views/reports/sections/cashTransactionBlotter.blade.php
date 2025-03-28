@@ -898,7 +898,7 @@
                                         <div class="col-md-12">
                                             <img src="{{ asset('img/mac_header.fw.png') }}" alt="mac_logo"
                                                 class="img img-fluid">
-                                        </div> 
+                                        </div>
                                         <div class="col-md-12">
                                             <h3 style="text-align:center">Cashier's Transaction Blotter</h3>
                                         </div>

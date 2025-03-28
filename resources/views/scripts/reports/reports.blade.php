@@ -919,6 +919,7 @@
                 url: "{{ route('journal.JournalEntryFetch') }}",
                 dataType: "json",
                 success: function(response) {
+                    console.log(response);
                     if (response.message == 'fetch') {
                         var total_debit = 0;
                         var total_credit = 0;
@@ -926,6 +927,7 @@
                         $('#journalVoucherContent').html('');
                         $('#vjournal_remarks').html('');
                         $.each(response.data, function(k, v) {
+                            console.log(v)
                             $('#posted-content').html('');
                             var content = '';
                             $('#vjournal_date, #voucher_date').text(moment(v
@@ -984,7 +986,7 @@
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
 
 									<td class='editable-table-data' value="" >
-										<label class="label-normal" >${vv.subsidiary.sub_name}</label>
+
 									</td>
                                     <td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_debit)}</label> </td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_credit)}</label> </td>
@@ -994,7 +996,7 @@
 								<tr>
 									<td class="center">${vv.account.account_number}</td>
 									<td class="left">${vv.account.account_name}</td>
-									<td class="left">${vv.subsidiary.sub_name}</td>
+
 									<td class="center">${amountConverter(vv.journal_details_debit)}</td>
 									<td class="right">${amountConverter(vv.journal_details_credit)}</td>
 								</tr>`);
@@ -1013,9 +1015,10 @@
                             $('#vtotal_credit, #total_credit_voucher').text(
                                 amountConverter(total_credit))
                             $('#vbalance_debit').text(amountConverter(
-                                    parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
-                                )
-                        )
+                                parseFloat(((parseFloat(total_debit.toFixed(
+                                    2)) - parseFloat(total_credit
+                                    .toFixed(2))).toFixed(2)))
+                            ))
                         });
                     }
                     $('#journalModalView').modal('show')

@@ -53,7 +53,18 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <select name="sub_cat_id"
+                                                                <select v-model="filter.category"
+                                                                    class="form-control form-control-sm" id="branch">
+                                                                    <option :value="null" disabled selected
+                                                                        class="text-uppercase">
+                                                                        SELECT CATEGORY
+                                                                    </option>
+                                                                    <option v-for="sub_cat in sub_categories"
+                                                                        v-bind:value="{ sub_cat_id: sub_cat.sub_cat_id,sub_cat_name: sub_cat.description }">
+                                                                        @{{ sub_cat.description }}
+                                                                    </option>
+                                                                </select>
+                                                                {{-- <select name="sub_cat_id"
                                                                     class="form-control form-control-sm"
                                                                     v-model="filter.sub_cat_id" id="sub_cat_id">
                                                                     <option value="" disabled selected>-Select
@@ -63,7 +74,7 @@
                                                                             {{ $sub_category->description }}
                                                                         </option>
                                                                     @endforeach
-                                                                </select>
+                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -72,7 +83,17 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <select name="branch_id" v-model="filter.branch_id"
+                                                                <select v-model="filter.branch" @change="onSearch()"
+                                                                    class="form-control form-control-sm" id="branch">
+                                                                    <option :value="null" disabled selected>SELECT
+                                                                        BRANCH
+                                                                    </option>
+                                                                    <option v-for="branch in branches"
+                                                                        v-bind:value="{ branch_id: branch.branch_id,branch_code: branch.branch_code, branch_name:branch.branch_name,   branch_alias:`${branch.branch_code}-${branch.branch_name}` }">
+                                                                        @{{ branch.branch_code + '-' + branch.branch_name }}
+                                                                    </option>
+                                                                </select>
+                                                                {{-- <select name="branch_id" v-model="filter.branch_id"
                                                                     class="form-control form-control-sm" id="branch">
                                                                     <option value="" disabled selected>-Select Branch-
                                                                     </option>
@@ -82,7 +103,7 @@
                                                                             {{ $branch->branch_name }}
                                                                         </option>
                                                                     @endforeach
-                                                                </select>
+                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -137,8 +158,10 @@
                         <h1 v-text="type"> </h1>
 
                         <div class="container-fluid">
+
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
+                                    {{--  @{{ subsidiaries[filter.category?.sub_cat_name] }} --}}
                                     <table class="table">
                                         <thead>
                                             <th>No.</th>
@@ -147,8 +170,11 @@
                                             <th>Amount</th>
                                             <th>Monthly</th>
                                             <th>Amort.</th>
-                                            <th>Used</th>
-                                            <th>Expensed</th>
+                                            <th>Used
+                                            </th>
+                                            <th
+                                                v-text="filter.category?.sub_cat_name === 'Additional Prepaid Expense' ? 'Prepaid Expense' : 'Expensed' ">
+                                            </th>
                                             <th>Unexpensed</th>
                                             <th>Due Amort</th>
                                             <th>Salvage</th>
@@ -157,30 +183,48 @@
                                             <th>Action</th>
                                         </thead>
                                         <tbody>
-                                            <tr v-if="subsidiaryAll.length <=0">
-                                                <td colspan="15">
-                                                    <b>
-                                                        <center>No data available in table.</center>
-                                                    </b>
-                                                </td>
-                                                <td
-                                                    v-if="filter.sub_cat_id && filter.branch_id && filter.to && subsidiaryAll.length ==0 ">
-                                                    <button class="btn btn-success" data-toggle="modal"
-                                                        data-target="#createSubsidiaryModal"
-                                                        @click="add(filter.sub_cat_id)">
-                                                        Add
-                                                    </button>
-                                                </td>
-                                            <tr>
+
                                             <tr v-for="(ps,i) in processSubsidiary"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
-                                                <!-- <td><h1 v-text="subsidiaryAll"></h1</td> -->
-                                                <td v-for="p,i in ps" v-if="i<=12"
-                                                    :class="rowStyleSubsidiaryListing(p, i, ps)"
-                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                <td v-for="(p, j) in ps" v-if="j <= 12" :key="j"
+                                                    :class="rowStyleSubsidiaryListing(p, j, ps)"
+                                                    :colspan="ps.length == 2 && j == 1 ? 8 : ''">
+                                                    @{{ p }}
                                                 </td>
+                                                {{-- <template v-if="filter.category?.sub_cat_name === prepaid_expense">
+                                                    <td v-for="(p, j) in ps" v-if="j <= 12" :key="j"
+                                                        :class="rowStyleSubsidiaryListing(p, j, ps)"
+                                                        :colspan="ps.length == 2 && j == 1 ? 8 : ''">
 
-                                                <td v-if="ps[2]"> <!-- Check if journal_no exists -->
+
+                                                        <template v-if="j === 7 && filter.category?.sub_cat_name">
+                                                            @{{ typeof p === 'object' && p !== null ? (p.amount ?? 0) : p }}
+                                                        </template>
+                                                        <template v-else-if="ps[0] === 'BRANCH TOTAL'">
+                                                            @{{ p }}
+                                                        </template>
+                                                        <template v-else-if="Array.isArray(p)">
+                                                            @{{ p.join(', ') }}
+                                                        </template>
+                                                        <template v-else-if="typeof p === 'object' && p !== null">
+                                                            @{{ p.id === null ? 0 : (p.amount ?? p.total?.total_prepaid_exepnse ?? 0) }}
+                                                        </template>
+                                                        <template v-else>
+                                                            @{{ p }}
+                                                        </template>
+
+                                                    </td>
+                                                </template>
+                                                <template v-else>
+                                                    <td v-for="p,i in ps" v-if="i<=12"
+                                                        :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                        :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                    </td>
+                                                </template> --}}
+
+
+
+                                                <td v-if="ps[2]">
                                                     <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'>
                                                         <i class="fa fa-trash fa-xs"></i>
                                                     </button>
@@ -192,16 +236,42 @@
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'">
-                                                    <button class="btn btn-primary" @click="post(ps[14])">
+                                                    <button
+                                                        v-show="processSubsidiary.length >3 && filter.branch && searching"
+                                                        class="btn btn-primary" @click="post(ps[14])">
                                                         Post
                                                     </button>
-                                                    <button class="btn btn-success" data-toggle="modal"
-                                                        data-target="#createSubsidiaryModal" @click="add(ps[13][0])">
+
+
+                                                    <button v-show="ps.length >=13 && filter.branch && searching"
+                                                        class="btn
+                                                        btn-success"
+                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
+                                                        @click="add(ps[13])">
                                                         Add
                                                     </button>
+                                                    {{-- <button v-show="processSubsidiary.length === 0" class="btn btn-success"
+                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
+                                                        @click="add(null)">
+                                                        Add
+                                                    </button> --}}
 
                                                 </td>
                                             </tr>
+                                            {{-- <tr v-show="processSubsidiary === false">
+                                                <td colspan="15">
+                                                    <b>
+                                                        <center>No data available in table.</center>
+                                                    </b>
+                                                </td>
+                                                <td v-if="filter.category && filter.branch && filter.to && searching">
+                                                    <button class="btn btn-success" data-toggle="modal"
+                                                        data-target="#createSubsidiaryModal"
+                                                        @click="add(filter.sub_cat_id)">
+                                                        Add
+                                                    </button>
+                                                </td>
+                                            <tr> --}}
 
 
 
@@ -224,7 +294,9 @@
                                         <thead>
                                             <th>Particular</th>
                                             <th>Amount</th>
-                                            <th>Expensed</th>
+                                            <th
+                                                v-text="filter.category?.sub_cat_name === 'Additional Prepaid Expense' ? 'Prepaid Expense' : 'Expensed' ">
+                                            </th>
                                             <th>Unexpensed</th>
                                             <th>Salvage</th>
                                             <th>Due Amort.</th>
@@ -339,10 +411,26 @@
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
                                             id="sub_no_amort">
                                     </div>
+                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit"
+                                        class="col-md-6">
+                                        <label for="message-text" class="col-form-label">Expense</label>
+                                        <input type="number" v-model="prepaid_amount" class="form-control">
+                                    </div>
+
+                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'"
+                                        class="col-md-12">
+                                        <label for="message-text" class="col-form-label">Expense(Should be less than
+                                            @{{ subsidiary.unexpensed }})</label>
+                                        <input type="number" @change="toAddPrepaidAmount()"
+                                            v-model="to_add_prepaid_amount" class="form-control">
+                                    </div>
+
+
+
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
                                 </div>
 
                             </div>
@@ -363,25 +451,31 @@
         new Vue({
             el: '#app',
             data: {
+                branches: @json($branches),
+                sub_categories: @json($subsidiary_categories),
                 showModal: true,
                 reportType: '',
                 sub_month: '',
                 monthlyAmortization: 0,
+                prepaid_expense: 'Additional Prepaid Expense',
                 rate_percentage: 0,
                 type: '',
                 isEdit: false,
                 subId: null,
                 newSub: null,
+                searching: false,
                 filter: {
-                    branch_id: '',
+                    branch: null,
                     subsidiary_id: '',
-                    sub_cat_id: '',
+                    category: null,
                     from: '',
                     to: '',
                     account_id: '',
                     type: ''
                 },
                 subAmount: 0,
+                prepaid_amount: 0,
+                to_add_prepaid_amount: 0,
                 subsidiary: {
                     sub_name: '',
                     sub_code: null,
@@ -393,6 +487,7 @@
                     sub_salvage: 0,
                     rate_percentage: 0,
                     branch_id: '',
+                    prepaid_expense: null
                 },
                 incomeExpense: {
                     income: [],
@@ -457,7 +552,7 @@
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
                     this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * amount
-                    return this.subsidiary.rate_percentage;
+                    return this.formatCurrency(this.subsidiary.rate_percentage);
                 },
                 processSubsidiary: function() {
                     var data = {};
@@ -468,60 +563,109 @@
                     }
                     var grandTotal = {};
                     var accTotal = {};
+                    var no = 0;
+                    let totalAmount = 0;
+                    let total_monthly_amort = 0;
+                    let total_monthly = 0;
+                    let total_no_depre = 0;
+                    let total_no_amort = 0;
+                    let total_amort = 0;
+                    let total_used = 0;
+                    let total_expensed = 0;
+                    let total_unexpensed = 0;
+                    let total_due_amort = 0;
+                    let total_sub_salvage = 0;
+                    let total_prepaid_exepnse = 0;
+                    let total_rem = 0;
+                    let total_inv = 0;
+                    let gTotalAmount = 0;
+                    let gTotalMonthlyAmort = 0;
+                    let gTotalMonthly = 0;
+                    let gTotalNoDepre = 0;
+                    let gTotalNoAmort = 0;
+                    let gTotalAmort = 0;
+                    let gTotalUsed = 0;
+                    let gTotalExpensed = 0;
+                    let gTotalUnexpensed = 0;
+                    let gTotalDueAmort = 0;
+                    let gTotalSubSalvage = 0;
+                    let gTotalRem = 0;
+                    let gTotalInv = 0;
 
-
-                    for (var i in data) {
+                    for (var i in this.subsidiaryAll) {
                         var branches = data[i];
-                        let gTotalAmount = 0;
-                        let gTotalMonthlyAmort = 0;
-                        let gTotalMonthly = 0;
-                        let gTotalNoDepre = 0;
-                        let gTotalNoAmort = 0;
-                        let gTotalAmort = 0;
-                        let gTotalUsed = 0;
-                        let gTotalExpensed = 0;
-                        let gTotalUnexpensed = 0;
-                        let gTotalDueAmort = 0;
-                        let gTotalSubSalvage = 0;
-                        let gTotalRem = 0;
-                        let gTotalInv = 0;
+
                         rows.push([i]);
 
                         for (var j in branches) {
                             var branch = branches[j];
                             rows.push([j]);
-                            var no = 0;
-                            let totalAmount = 0;
-                            let total_monthly_amort = 0;
-                            let total_monthly = 0;
-                            let total_no_depre = 0;
-                            let total_no_amort = 0;
-                            let total_amort = 0;
-                            let total_used = 0;
-                            let total_expensed = 0;
-                            let total_unexpensed = 0;
-                            let total_due_amort = 0;
-                            let total_sub_salvage = 0;
-                            let total_rem = 0;
-                            let total_inv = 0;
+
+                            totalAmount = 0;
+                            total_monthly_amort = 0;
+                            total_no_depre = 0;
+                            total_no_amort = 0;
+                            total_amort = 0;
+                            total_used = 0;
+                            total_expensed = 0;
+                            total_unexpensed = 0;
+                            total_due_amort = 0;
+                            total_sub_salvage = 0;
+                            total_rem = 0;
+                            total_inv = 0;
+                            total_prepaid_exepnse = 0;
+
                             let branchTotal = [];
                             var sub_ids = [];
 
                             for (var k in branch) {
-
                                 var subsidiary = branch[k];
                                 no += 1;
+                                if (subsidiary.prepaid_expense) {
+                                    total_prepaid_exepnse += parseFloat(subsidiary.prepaid_expense)
+                                }
                                 if (j == subsidiary.branch) {
 
                                     sub_ids.push(subsidiary.sub_id)
-                                    rows.push([no + ' - ' + subsidiary.sub_code,
+                                    let val = [no + ' - ' + subsidiary.sub_code,
                                         subsidiary.sub_name,
                                         subsidiary.sub_date,
                                         this.formatCurrency(subsidiary.sub_amount),
                                         this.formatCurrency(subsidiary.monthly_amort),
                                         subsidiary.sub_no_depre,
                                         subsidiary.sub_no_amort,
-                                        this.formatCurrency(subsidiary.expensed),
+                                    ]
+
+                                    if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                        val.push(this.formatCurrency(subsidiary.prepaid_expense))
+                                    } else {
+                                        val.push(this.formatCurrency(subsidiary.expensed))
+                                    }
+                                    val.push(this.formatCurrency(subsidiary.unexpensed),
+                                        this.formatCurrency(subsidiary.due_amort),
+                                        this.formatCurrency(subsidiary.salvage),
+                                        subsidiary.rem,
+                                        subsidiary.inv,
+                                        subsidiary.sub_id,
+                                        subsidiary.sub_salvage,
+                                        subsidiary.sub_code,
+                                        subsidiary.sub_cat_id,
+                                        subsidiary.sub_per_branch)
+                                    rows.push(val);
+
+
+
+
+                                    /* rows.push([no + ' - ' + subsidiary.sub_code,
+                                        subsidiary.sub_name,
+                                        subsidiary.sub_date,
+                                        this.formatCurrency(subsidiary.sub_amount),
+                                        this.formatCurrency(subsidiary.monthly_amort),
+                                        subsidiary.sub_no_depre,
+                                        subsidiary.sub_no_amort,
+                                        subsidiary.prepaid_expense && this.filter.category
+                                        ?.sub_cat_name === this.prepaid_expense ? subsidiary
+                                        .prepaid_expense : 0,
                                         this.formatCurrency(subsidiary.unexpensed),
                                         this.formatCurrency(subsidiary.due_amort),
                                         this.formatCurrency(subsidiary.salvage),
@@ -533,15 +677,19 @@
                                         subsidiary.sub_cat_id,
                                         subsidiary.sub_per_branch
 
-                                    ]);
+                                    ]); */
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
                                     total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
-                                    total_used += parseFloat(subsidiary.sub_no_amort)
-                                    total_expensed += parseFloat(subsidiary.expensed)
+                                    total_used += parseInt(subsidiary.sub_no_amort)
+                                    if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                        total_expensed += parseFloat(subsidiary.prepaid_expense)
+                                    } else {
+                                        total_expensed += parseFloat(subsidiary.expensed)
+                                    }
                                     total_unexpensed += parseFloat(subsidiary.unexpensed)
                                     total_due_amort += parseFloat(subsidiary.due_amort)
                                     total_sub_salvage += parseFloat(subsidiary.salvage)
@@ -575,23 +723,39 @@
                                     total_due_amort: total_due_amort,
                                     total_sub_salvage: total_sub_salvage,
                                     total_rem: total_rem,
-                                    total_inv: total_inv
+                                    total_inv: total_inv,
+                                    total_prepaid_exepnse: total_prepaid_exepnse,
                                 },
                                 'category_id': branch[0].sub_cat_id,
                                 'branch_id': branch[0].branch_id,
                                 'branch_code': branch[0].branch_code,
                                 'as_of': this.filter.to,
                             }
+                            rows.push(['',
+                                '',
+                                '',
+                                'TOTAL AMOUNT',
+                                'TOTAL MONTHLY',
+                                'TOTAL AMORT',
+                                'TOTAL USED',
+                                this.filter.category && this.filter.category.sub_cat_name === this
+                                .prepaid_expense ? 'TOTAL PREPAID EXP.' : 'TOTAL EXPENSED',
+                                'TOTAL UNEXPENSED',
+                                'TOTAL DUE AMORT',
+                                'TOTAL SALVAGE',
+                                'TOTAL REM.',
+                                'TOTAL INV.',
+                            ]);
                             rows.push(['BRANCH TOTAL', '', '',
                                 this.formatCurrency(totalAmount),
                                 this.formatCurrency(total_monthly_amort),
-                                this.formatCurrency(total_no_depre),
+                                total_no_depre,
                                 total_used,
                                 this.formatCurrency(total_expensed),
                                 this.formatCurrency(total_unexpensed),
                                 this.formatCurrency(total_due_amort),
                                 this.formatCurrency(total_sub_salvage),
-                                this.formatCurrency(total_rem),
+                                total_rem,
                                 total_inv, branch, data
                             ]);
 
@@ -599,18 +763,59 @@
                         rows.push(['GRAND TOTAL', '', '',
                             this.formatCurrency(gTotalAmount),
                             this.formatCurrency(gTotalMonthly),
-                            this.formatCurrency(gTotalNoDepre),
+                            gTotalNoDepre,
                             gTotalUsed,
                             this.formatCurrency(gTotalExpensed),
                             this.formatCurrency(gTotalUnexpensed),
                             this.formatCurrency(gTotalDueAmort),
                             this.formatCurrency(gTotalSubSalvage),
-                            this.formatCurrency(gTotalRem),
+                            gTotalRem,
                             gTotalInv, branch, data
                         ]);
                     }
+                    if (this.subsidiaryAll.length === 0) {
+                        rows.push(['No Data Found.']);
+                        rows.push(['',
+                            '',
+                            '',
+                            'TOTAL AMOUNT',
+                            'TOTAL MONTHLY',
+                            'TOTAL AMORT',
+                            'TOTAL USED',
+                            'TOTAL EXPENSED',
+                            'TOTAL UNEXPENSED',
+                            'TOTAL DUE AMORT',
+                            'TOTAL SALVAGE',
+                            'TOTAL REM.',
+                            'TOTAL INV.',
+                        ]);
+                        rows.push(['BRANCH TOTAL', '', '',
+                            this.formatCurrency(totalAmount),
+                            this.formatCurrency(total_monthly_amort),
+                            total_no_depre,
+                            total_used,
+                            this.formatCurrency(total_expensed),
+                            this.formatCurrency(total_unexpensed),
+                            this.formatCurrency(total_due_amort),
+                            this.formatCurrency(total_sub_salvage),
+                            total_rem,
+                            total_inv
 
+                        ]);
+                        rows.push(['GRAND TOTAL', '', '',
+                            this.formatCurrency(gTotalAmount),
+                            this.formatCurrency(gTotalMonthly),
+                            gTotalNoDepre,
+                            gTotalUsed,
+                            this.formatCurrency(gTotalExpensed),
+                            this.formatCurrency(gTotalUnexpensed),
+                            this.formatCurrency(gTotalDueAmort),
+                            this.formatCurrency(gTotalSubSalvage),
+                            gTotalRem,
+                            gTotalInv
+                        ]);
 
+                    }
                     return rows;
                 },
                 subsidiaryMonthlyDepreciation: function() {
@@ -634,8 +839,11 @@
                             let branchTotalRem = 0;
                             let branchSubSalvage = 0;
                             for (var k in subsidiary) {
-                                console.log(subsidiary[k]);
-                                branchTotalExpensed += parseFloat(subsidiary[k].expensed);
+                                if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                        branchTotalExpensed += parseFloat(subsidiary[k].prepaid_expense);
+                                    } else {
+                                        branchTotalExpensed += parseFloat(subsidiary[k].expensed);
+                                    }
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
@@ -650,7 +858,7 @@
                                 this.formatCurrency(branchTotalUnexpensed.toFixed(2)),
                                 this.formatCurrency(branchSubSalvage.toFixed(2)),
                                 this.formatCurrency(branchTotalDueAmort.toFixed(2)),
-                                this.formatCurrency(branchTotalRem.toFixed(2))
+                                branchTotalRem
                             ]
                             rows.push(result);
                             grandTotalAmount += branchTotalAmount;
@@ -667,24 +875,46 @@
                             this.formatCurrency(grandTotalUnexpensed.toFixed(2)),
                             this.formatCurrency(grandTotalSubSalvage.toFixed(2)),
                             this.formatCurrency(grandTotalDueAmort.toFixed(2)),
-                            this.formatCurrency(grandTotalRem.toFixed(2))
+                            grandTotalRem
                         ];
 
                         rows.push(result);
                     }
                     return rows;
 
-                }
+                },
+
+
+
             },
             methods: {
+                onSearch: function() {
+                    this.searching = false;
+                },
+                toAddPrepaidAmount() {
+                    var unexpensed = Number(this.subsidiary.unexpensed.replace(/[^0-9\.-]+/g, ""))
+                    if (this.to_add_prepaid_amount > unexpensed) {
+                        alert('Value should be less than or equal to unexpensed');
+                    } else {
+                        this.prepaid_amount = parseFloat(this.prepaid_amount) + parseFloat(this
+                            .to_add_prepaid_amount);
+                    }
+                },
                 formatCurrency: function(number) {
                     const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+
+                    });
+
+                    return formatter.format(number)
+                    /* const formatter = new Intl.NumberFormat('en-US', {
                         style: 'decimal',
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                     });
 
-                    return formatter.format(number);
+                    return formatter.format(number); */
                 },
                 rowStyles: function(element) {
                     var style = '';
@@ -704,7 +934,9 @@
                     return style;
                 },
                 submitForm: function() {
+
                     this.fetchSubAll();
+                    this.searching = true;
                 },
 
                 getDate: function() {
@@ -720,6 +952,7 @@
                     return current_month;
                 },
                 post: function(data) {
+                    data.branch_id = this.filter.branch.branch_id;
                     axios.post(this.url, data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -728,38 +961,20 @@
                     }).then(response => {
                         toastr.success(response.data.message);
                         this.newSub = response.data.data;
-                        window.reload();
+                        // window.reload();
                     }).catch(err => {
                         console.error(err)
                     })
                 },
                 add: function(subsidiary) {
-                    let isObject = subsidiary.constructor === Object;
-                    if (isObject) {
+                    if (Array.isArray(subsidiary)) {
+                        subsidiary = subsidiary[0];
                         this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
                         this.subsidiary.sub_per_branch = subsidiary.sub_per_branch
-                    } else {
-                        if (this.filter.branch_id != '') {
-                            this.subsidiary.sub_cat_id = this.filter.sub_cat_id
-                            this.subsidiary.branch_id = this.filter.branch_id
-                        } else {
-                            this.showModal = false;
-                            alert("Please select a branch.")
-                            return false;
-                        }
-                    }
 
-                    this.subsidiary = {
-                        sub_code: '',
-                        sub_name: '',
-                        sub_no_amort: 0,
-                        sub_date: '',
-                        sub_cat_id: subsidiary.sub_cat_id,
-                        sub_salvage: '',
-                        sub_amount: '',
-                        sub_no_depre: '',
-                        sub_per_branch: subsidiary.sub_per_branch,
-                        branch_id: subsidiary.branch_id
+                    } else {
+                        this.subsidiary.sub_cat_id = this.filter.category.sub_cat_id;
+                        this.subsidiary.branch_id = this.filter.branch.branch_id;
                     };
 
                 },
@@ -774,9 +989,11 @@
                 formatTextField() {
                     this.subsidiary.sub_amount = this.formatCurrency(this.subsidiary.sub_amount);
                     this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
+                    this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
+                    this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, ""))
                 },
                 processEdit: function(sub) {
-                    console.log("sub_no_amort value:", sub[1]);
+
                     this.isEdit = true;
                     this.subId = sub[13];
                     this.monthlyAmortization = sub[4];
@@ -789,19 +1006,45 @@
                     this.subsidiary.sub_amount = sub[3];
                     this.subsidiary.sub_salvage = parseInt(sub[14]);
                     this.subsidiary.sub_rate_percentage = sub[6];
-                    this.subsidiary.sub_date_of_depreciation = sub[7];
+                    this.subsidiary.sub_date_of_depreciation = sub[2];
                     this.subsidiary.sub_no_depre = sub[5];
+                    this.subsidiary.prepaid_expense = sub[7];
+                    this.subsidiary.unexpensed = sub[8];
+                    this.prepaid_amount = Number(sub[7].replace(/[^0-9\.-]+/g, ""))
                     // this.subsidiary.sub_no_amort = sub[]
 
+                },
+                resetForm: function() {
+                    this.subsidiary = {
+                        sub_name: '',
+                        sub_code: null,
+                        sub_no_amort: 0,
+                        sub_amount: 0,
+                        sub_no_depre: 0,
+                        sub_per_branch: null,
+                        sub_salvage: 0,
+                        rate_percentage: 0,
+                        prepaid_expense: {
+                            id: null,
+                            amount: 0,
+                            updated_at: null,
+                            created_at: null,
+                            sub_id: null
+                        }
+                    }
+                    this.to_add_prepaid_amount = 0;
+                    this.prepaid_amount = 0;
                 },
                 createSubsidiary: function() {
                     this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
                     var amount = this.subsidiary.sub_amount;
+                    this.subsidiary.prepaid_expense = this.prepaid_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
                     this.subsidiary.sub_amount = amount;
+                    this.subsidiary.branch = this.filter.branch
 
                     /* this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, "")) */
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
@@ -811,7 +1054,9 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        window.reload();
+                        this.addSubsidiary(response.data.data);
+                        $('#createSubsidiaryModal').modal('hide');
+                        this.resetForm();
                     }).catch(err => {
                         var errors = err.response.data.errors;
                         var messages = [];
@@ -825,9 +1070,61 @@
                         toastr.error(messages);
                     })
                 },
+                addSubsidiary: function(data) {
+                    var filters = this.filter;
+                    console.log(data);
+
+                    if (this.subsidiaryAll.length === 0) {
+                        this.subsidiaryAll = {};
+                        if (!this.subsidiaryAll[filters.category.sub_cat_name]) {
+                            this.subsidiaryAll[filters.category.sub_cat_name] = {};
+                        }
+                        if (!this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias]) {
+                            this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] = [];
+                        }
+
+                    }
+
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                        .branch_alias
+                    ].push(data);
+
+                },
+                updateSubsidiary: function(data) {
+                    var filters = this.filter;
+                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                        .branch_alias
+                    ]
+                    subsidiaries = subsidiaries.map(sub =>
+                        sub.sub_id === data.sub_id ? {
+                            ...sub,
+                            ...data,
+                        } : sub
+                    );
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
+                        subsidiaries;
+
+                },
+                deleteSubsidiary: function(subId) {
+                    var filters = this.filter;
+                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                        .branch_alias
+                    ]
+                    subsidiaries.forEach((sub, index) => {
+                        if (sub.sub_id === subId) {
+                            subsidiaries.splice(index, 1);
+                        }
+                    });
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
+                        subsidiaries;
+
+
+                },
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
                     var amount = this.subsidiary.sub_amount;
+                    this.subsidiary.prepaid_expense = this.prepaid_amount;
+
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
@@ -835,13 +1132,19 @@
                     // this.subsidiary.sub_no_amort = 0;
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            'X-CSRF-TOKEN': document.head.querySelector(
+                                    'meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        this.subsidiary = {};
-                        window.reload();
+                        this.updateSubsidiary(response.data.data)
+                        $('#createSubsidiaryModal').modal('hide');
+                        
+                        setTimeout(() => {
+                            this.resetForm();
+                            this.isEdit = false;
+                        }, 100);    
                     }).catch(err => {
                         var errors = err.response.data.errors;
 
@@ -860,11 +1163,13 @@
                     var url = @json(env('APP_URL'));
                     axios.delete('/MAC-ams/subsidiary/' + data, {
                         headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            'X-CSRF-TOKEN': document.head.querySelector(
+                                    'meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        this.deleteSubsidiary(data);
                     }).catch(err => {
                         toastr.success(err);
                     })
@@ -874,7 +1179,8 @@
                     this.filter.type = this.reportType;
                     axios.post(this.search, this.filter, {
                             headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                'X-CSRF-TOKEN': document.head.querySelector(
+                                        'meta[name="csrf-token"]')
                                     .content
                             }
                         })

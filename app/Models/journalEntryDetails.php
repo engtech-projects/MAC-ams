@@ -74,5 +74,6 @@ class journalEntryDetails extends Model
     {
 
     }
+    
 
 }
