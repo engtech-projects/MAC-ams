@@ -199,9 +199,7 @@ class ReportsController extends MainController
             }
 
             $subs  = [];
-            if ($value->sub_no_depre == 0) {
-                $value->sub_no_depre = 1;
-            }
+            
             $subs['sub_id'] = $value->sub_id;
             $subs['branch'] = $value->branch;
             $subs['branch_code'] = $value->sub_per_branch;
@@ -230,7 +228,7 @@ class ReportsController extends MainController
             if ($value->prepaid_expense) {
                 $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
             }
-            $subs['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
+            $subs['sub_no_amort'] =  $value->sub_no_amort;
 
             $subs['rem'] = $value->rem;
 
