@@ -334,7 +334,7 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel"
                             v-text="isEdit ? 'Edit Subsidiary' : 'Add Subsidiary' "></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" @click="closeAction()" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -977,6 +977,10 @@
                         this.subsidiary.branch_id = this.filter.branch.branch_id;
                     };
 
+                },
+                closeAction:function(){
+                    alert("sds");
+                    this.resetForm();
                 },
                 processAction: function() {
                     if (!this.isEdit) {
