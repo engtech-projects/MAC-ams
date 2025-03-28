@@ -334,7 +334,7 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel"
                             v-text="isEdit ? 'Edit Subsidiary' : 'Add Subsidiary' "></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" @click="closeAction()" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -967,6 +967,7 @@
                     })
                 },
                 add: function(subsidiary) {
+                    this.resetForm();
                     if (Array.isArray(subsidiary)) {
                         subsidiary = subsidiary[0];
                         this.subsidiary.sub_cat_id = subsidiary.sub_cat_id
@@ -977,6 +978,9 @@
                         this.subsidiary.branch_id = this.filter.branch.branch_id;
                     };
 
+                },
+                closeAction:function(){
+                    this.resetForm();
                 },
                 processAction: function() {
                     if (!this.isEdit) {
