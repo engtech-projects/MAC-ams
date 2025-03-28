@@ -294,7 +294,9 @@
                                         <thead>
                                             <th>Particular</th>
                                             <th>Amount</th>
-                                            <th>Expensed</th>
+                                            <th
+                                                v-text="filter.category?.sub_cat_name === 'Additional Prepaid Expense' ? 'Prepaid Expense' : 'Expensed' ">
+                                            </th>
                                             <th>Unexpensed</th>
                                             <th>Salvage</th>
                                             <th>Due Amort.</th>
@@ -598,6 +600,21 @@
                         for (var j in branches) {
                             var branch = branches[j];
                             rows.push([j]);
+
+                            totalAmount = 0;
+                            total_monthly_amort = 0;
+                            total_no_depre = 0;
+                            total_no_amort = 0;
+                            total_amort = 0;
+                            total_used = 0;
+                            total_expensed = 0;
+                            total_unexpensed = 0;
+                            total_due_amort = 0;
+                            total_sub_salvage = 0;
+                            total_rem = 0;
+                            total_inv = 0;
+                            total_prepaid_exepnse = 0;
+
                             let branchTotal = [];
                             var sub_ids = [];
 
@@ -627,7 +644,7 @@
                                     val.push(this.formatCurrency(subsidiary.unexpensed),
                                         this.formatCurrency(subsidiary.due_amort),
                                         this.formatCurrency(subsidiary.salvage),
-                                        this.formatCurrency(subsidiary.rem),
+                                        subsidiary.rem,
                                         subsidiary.inv,
                                         subsidiary.sub_id,
                                         subsidiary.sub_salvage,
@@ -663,12 +680,16 @@
                                     ]); */
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
                                     total_used += parseInt(subsidiary.sub_no_amort)
-                                    total_expensed += parseFloat(subsidiary.prepaid_expense)
+                                    if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                        total_expensed += parseFloat(subsidiary.prepaid_expense)
+                                    } else {
+                                        total_expensed += parseFloat(subsidiary.expensed)
+                                    }
                                     total_unexpensed += parseFloat(subsidiary.unexpensed)
                                     total_due_amort += parseFloat(subsidiary.due_amort)
                                     total_sub_salvage += parseFloat(subsidiary.salvage)
@@ -728,13 +749,13 @@
                             rows.push(['BRANCH TOTAL', '', '',
                                 this.formatCurrency(totalAmount),
                                 this.formatCurrency(total_monthly_amort),
-                                this.formatCurrency(total_no_depre),
+                                total_no_depre,
                                 total_used,
                                 this.formatCurrency(total_expensed),
                                 this.formatCurrency(total_unexpensed),
                                 this.formatCurrency(total_due_amort),
                                 this.formatCurrency(total_sub_salvage),
-                                this.formatCurrency(total_rem),
+                                total_rem,
                                 total_inv, branch, data
                             ]);
 
@@ -742,13 +763,13 @@
                         rows.push(['GRAND TOTAL', '', '',
                             this.formatCurrency(gTotalAmount),
                             this.formatCurrency(gTotalMonthly),
-                            this.formatCurrency(gTotalNoDepre),
+                            gTotalNoDepre,
                             gTotalUsed,
                             this.formatCurrency(gTotalExpensed),
                             this.formatCurrency(gTotalUnexpensed),
                             this.formatCurrency(gTotalDueAmort),
                             this.formatCurrency(gTotalSubSalvage),
-                            this.formatCurrency(gTotalRem),
+                            gTotalRem,
                             gTotalInv, branch, data
                         ]);
                     }
@@ -771,26 +792,26 @@
                         rows.push(['BRANCH TOTAL', '', '',
                             this.formatCurrency(totalAmount),
                             this.formatCurrency(total_monthly_amort),
-                            this.formatCurrency(total_no_depre),
+                            total_no_depre,
                             total_used,
                             this.formatCurrency(total_expensed),
                             this.formatCurrency(total_unexpensed),
                             this.formatCurrency(total_due_amort),
                             this.formatCurrency(total_sub_salvage),
-                            this.formatCurrency(total_rem),
+                            total_rem,
                             total_inv
 
                         ]);
                         rows.push(['GRAND TOTAL', '', '',
                             this.formatCurrency(gTotalAmount),
                             this.formatCurrency(gTotalMonthly),
-                            this.formatCurrency(gTotalNoDepre),
+                            gTotalNoDepre,
                             gTotalUsed,
                             this.formatCurrency(gTotalExpensed),
                             this.formatCurrency(gTotalUnexpensed),
                             this.formatCurrency(gTotalDueAmort),
                             this.formatCurrency(gTotalSubSalvage),
-                            this.formatCurrency(gTotalRem),
+                            gTotalRem,
                             gTotalInv
                         ]);
 
@@ -818,7 +839,11 @@
                             let branchTotalRem = 0;
                             let branchSubSalvage = 0;
                             for (var k in subsidiary) {
-                                branchTotalExpensed += parseFloat(subsidiary[k].expensed);
+                                if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                        branchTotalExpensed += parseFloat(subsidiary[k].prepaid_expense);
+                                    } else {
+                                        branchTotalExpensed += parseFloat(subsidiary[k].expensed);
+                                    }
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
@@ -833,7 +858,7 @@
                                 this.formatCurrency(branchTotalUnexpensed.toFixed(2)),
                                 this.formatCurrency(branchSubSalvage.toFixed(2)),
                                 this.formatCurrency(branchTotalDueAmort.toFixed(2)),
-                                this.formatCurrency(branchTotalRem.toFixed(2))
+                                branchTotalRem
                             ]
                             rows.push(result);
                             grandTotalAmount += branchTotalAmount;
@@ -847,10 +872,10 @@
                             'Grand Total',
                             this.formatCurrency(grandTotalAmount.toFixed(2)),
                             this.formatCurrency(grandTotalExpensed.toFixed(2)),
-                            grandTotalUnexpensed,
+                            this.formatCurrency(grandTotalUnexpensed.toFixed(2)),
                             this.formatCurrency(grandTotalSubSalvage.toFixed(2)),
                             this.formatCurrency(grandTotalDueAmort.toFixed(2)),
-                            this.formatCurrency(grandTotalRem.toFixed(2))
+                            grandTotalRem
                         ];
 
                         rows.push(result);
@@ -1115,8 +1140,11 @@
                         toastr.success(response.data.message);
                         this.updateSubsidiary(response.data.data)
                         $('#createSubsidiaryModal').modal('hide');
-                        this.resetForm();
-                        this.isEdit = false;
+                        
+                        setTimeout(() => {
+                            this.resetForm();
+                            this.isEdit = false;
+                        }, 100);    
                     }).catch(err => {
                         var errors = err.response.data.errors;
 
