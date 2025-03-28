@@ -1140,8 +1140,11 @@
                         toastr.success(response.data.message);
                         this.updateSubsidiary(response.data.data)
                         $('#createSubsidiaryModal').modal('hide');
-                        this.resetForm();
-                        this.isEdit = false;
+                        
+                        setTimeout(() => {
+                            this.resetForm();
+                            this.isEdit = false;
+                        }, 100);    
                     }).catch(err => {
                         var errors = err.response.data.errors;
 
