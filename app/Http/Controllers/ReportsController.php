@@ -390,6 +390,8 @@ class ReportsController extends MainController
 
         $accountName = null;
         $subIds = $request->sub_ids;
+        $branch = Branch::where('branch_code', $request->branch_code)->first();
+
 
         if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
@@ -398,6 +400,7 @@ class ReportsController extends MainController
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+            $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
             $accountName = Accounts::where('account_number', 1415)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
@@ -444,7 +447,7 @@ class ReportsController extends MainController
         } */
 
 
-        $branch = Branch::where('branch_code', $request->branch_code)->first();
+
         foreach ($subAccounts as $subAccount) {
             foreach ($subAccount as $accountId) {
                 $account = Accounts::find($accountId);
@@ -518,15 +521,30 @@ class ReportsController extends MainController
         try {
             $journalEntry->details()->createMany($journalDetails);
             $this->updateMonthlyDepreciation($request->sub_ids);
-            if (count($request->payment_ids) > 0) {
-                foreach ($request->payment_ids as $payment) {
-                    $payment = PrepaidExpensePayment::find($payment);
-                    $payment->update(['status' => PrepaidExpensePayment::STATUS_POSTED]);
+            if ($request->category_id === 51) {
+                foreach ($request->sub_ids as $subId) {
+                    $sub = Subsidiary::find($subId);
+                    /* $payment = $sub->prepaid_expenses->prepaid_expense_payments; */
+                    $payments = $sub->prepaid_expense->prepaid_expense_payments;
+
+                    if (count($payments) > 0) {
+                        foreach ($sub->prepaid_expense as $expense) {
+                            $expenseId = $expense->id;
+                            foreach ($payments as $payment) {
+                                dd($payment['sub_id'], $sub->sub_id);
+
+                                if ($payment->sub_id === $sub->sub_id && $payment->status === 'unposted') {
+
+                                    $payment->save(['status' => 'posted']);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => "Posting unsuccessful"], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 

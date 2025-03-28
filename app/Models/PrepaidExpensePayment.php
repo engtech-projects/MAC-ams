@@ -17,4 +17,9 @@ class PrepaidExpensePayment extends Model
         'p_expensse_id'
     ];
     const STATUS_POSTED = 'posted';
+
+    public function scopeUnposted($query)
+    {
+        return $query->where('status', 'unposted');
+    }
 }
