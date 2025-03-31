@@ -2,45 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\PrinterController;
 use App\Http\Requests\BankReconciliationReportsRequest;
 use App\Http\Requests\RevenueMinusExpenseRequest;
-use App\Models\CollectionBreakdown;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Models\Customer;
-use App\Models\Transactions;
-use App\Models\PaymentMethod;
-use App\Models\Accounts;
-use App\Models\AccountOfficer;
 use App\Models\AccountCategory;
-use App\Models\AccountType;
-use App\Models\TransactionType;
-use App\Models\TransactionStatus;
-use App\Models\Subsidiary;
-use App\Models\SubsidiaryCategory;
-use App\Http\Controllers\PrinterController;
-use App\Http\Controllers\AccountsController;
+use App\Models\Accounting;
+use App\Models\AccountOfficer;
 use App\Models\AccountOfficerCollection;
+use App\Models\Accounts;
+use App\Models\AccountType;
 use App\Models\Branch;
 use App\Models\BranchCollection;
 use App\Models\CashBlotter;
 use App\Models\CashBreakdown;
+use App\Models\CollectionBreakdown;
+use App\Models\Customer;
+use App\Models\JournalBook;
 use App\Models\journalEntry;
 use App\Models\journalEntryDetails;
-use App\Models\JournalBook;
+use App\Models\OpeningBalance;
+use App\Models\PaymentMethod;
+use App\Models\PrepaidExpensePayment;
+use App\Models\Subsidiary;
+use App\Models\SubsidiaryCategory;
 use App\Models\TransactionDate;
+use App\Models\Transactions;
+use App\Models\TransactionStatus;
+use App\Models\TransactionType;
+use App\Models\User;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
-use Illuminate\Pagination\LengthAwarePaginator;
-use App\Models\Accounting;
-use App\Models\OpeningBalance;
-use App\Models\PrepaidExpensePayment;
 
 class ReportsController extends MainController
 {
@@ -229,20 +229,18 @@ class ReportsController extends MainController
             $subs['expensed'] = $value->expensed;
             $subs['unexpensed'] = $value->unexpensed;
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
-            $subs['prepaid_expense_payment'] = 0;
 
 
-            if ($value->prepaid_expense) {
-
+            /* if ($value->prepaid_expense) {
                 $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
                 if (count($value->prepaid_expense->prepaid_expense_payments) > 0) {
-                    $payment = $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->last();
-                    if ($payment) {
+                    $payment = $value->prepaid_expense->prepaid_expense_payments;
+                    if (count($payment) > 0) {
                         $subs['prepaid_expense_payment'] = $payment->amount;
                         $subs['p_expense_payment_id'] = $payment->id;
                     }
                 }
-            }
+            } */
 
             $subs['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
 
@@ -527,9 +525,17 @@ class ReportsController extends MainController
                     /* $payment = $sub->prepaid_expenses->prepaid_expense_payments; */
                     $payments = $sub->prepaid_expense->prepaid_expense_payments;
 
-                    if (count($payments) > 0) {
+                    if ($sub->prepaid_expense) {
+                        $payment = $sub->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->first();
+                        if ($payment) {
+                            $sub->prepaid_expense->amount += $payment->amount;
+                            $payment->update(['status' => 'posted']);
+                        }
+                        $sub->prepaid_expense->save();
+                    }
+                    /* if (count($payments) > 0) {
                         foreach ($sub->prepaid_expense as $expense) {
-                            $expenseId = $expense->id;
+                            dd($sub->prepaid_expense);
                             foreach ($payments as $payment) {
                                 dd($payment['sub_id'], $sub->sub_id);
 
@@ -539,7 +545,7 @@ class ReportsController extends MainController
                                 }
                             }
                         }
-                    }
+                    } */
                 }
             }
             return response()->json(['message' => 'Successfully posted.']);
