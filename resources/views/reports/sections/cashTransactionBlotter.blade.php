@@ -624,7 +624,7 @@
                                                     <td>
                                                         <input type="number" v-model="pos_collections.total_amount"
                                                             class="form-control form-control-sm rounded-0 text-right"
-                                                            id="pos_collection_total_amount">
+                                                        id="pos_collection_total_amount">
                                                     </td>
                                                     <td class="text-center">
                                                         <button class="btn btn-xs btn-primary"
