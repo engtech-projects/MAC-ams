@@ -129,7 +129,6 @@ class SubsidiaryController extends Controller
         $subsidiary['salvage'] = $subsidiary->salvage;
         $subsidiary['description'] = $subsidiary->description;
         $subsidiary['expensed'] = $subsidiary->expensed;
-        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $subsidiary->sub_amount - $subsidiary->prepaid_expense->amount : $subsidiary->unexpensed;
         $subsidiary['due_amort'] = $subsidiary->due_amort;
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
@@ -148,6 +147,7 @@ class SubsidiaryController extends Controller
         } else {
             $subsidiary['prepaid_expense'] = 0;
         }
+        /* $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $subsidiary->sub_amount - $subsidiary['prepaid_expense']['amount'] : $subsidiary->unexpensed; */
 
         return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary->getAttributes()], 200);
     }
