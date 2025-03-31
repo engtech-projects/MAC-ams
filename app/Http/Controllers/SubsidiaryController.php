@@ -133,11 +133,10 @@ class SubsidiaryController extends Controller
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
-
+        $prepaid_expense = 0;
         if ($subsidiary->prepaid_expense) {
             if (count($subsidiary->prepaid_expense->prepaid_expense_payments) > 0) {
                 /*              dd($subsidiary->prepaid_expense->prepaid_expense_payments); */
-                $prepaid_expense = 0;
                 foreach ($subsidiary->prepaid_expense->prepaid_expense_payments as $payment) {
 
                     $prepaid_expense += $payment->amount;
@@ -147,7 +146,7 @@ class SubsidiaryController extends Controller
         } else {
             $subsidiary['prepaid_expense'] = 0;
         }
-        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $subsidiary->sub_amount - $subsidiary['prepaid_expense']['amount'] : $subsidiary->unexpensed;
+        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $subsidiary->sub_amount - $prepaid_expense : $subsidiary->unexpensed;
 
         return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary->getAttributes()], 200);
     }
