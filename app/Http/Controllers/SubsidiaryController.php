@@ -146,7 +146,8 @@ class SubsidiaryController extends Controller
         } else {
             $subsidiary['prepaid_expense'] = 0;
         }
-        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $subsidiary->sub_amount - $prepaid_expense : $subsidiary->unexpensed;
+        $prepaidUnexpensed =  $subsidiary->sub_amount - $prepaid_expense;
+        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $prepaidUnexpensed : $subsidiary->unexpensed;
 
         return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary->getAttributes()], 200);
     }

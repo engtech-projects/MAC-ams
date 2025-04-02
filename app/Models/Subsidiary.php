@@ -114,6 +114,7 @@ class Subsidiary extends Model
     }
     public function getUnexpensedAttribute()
     {
+
         return $this->rem * $this->monthly_amort;
     }
     public function getDueAmortAttribute()
