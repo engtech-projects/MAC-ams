@@ -18,8 +18,6 @@ class SubsidiaryController extends Controller
     {
         Log::info('Incoming subsidiary data:', $request->all());
 
-
-
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -36,6 +34,7 @@ class SubsidiaryController extends Controller
         ], [
             'required_if' => 'Expense is required.'
         ]);
+
 
         try {
             if ($data['branch']) {

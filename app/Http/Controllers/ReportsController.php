@@ -227,7 +227,9 @@ class ReportsController extends MainController
             $subs['monthly_amort'] = $value->monthly_amort;
             $subs['salvage'] = $value->salvage;
             $subs['expensed'] = $value->expensed;
-            $subs['unexpensed'] = $value->unexpensed;
+            $prepaiExpense = $value->prepaid_expense->first();
+            $totalPayments = $value->prepaid_expense->prepaid_expense_payments->sum('amount');
+            $subs['unexpensed'] =  $value->prepaid_expense ? max(0, $value->unexpensed - $totalPayments) : $value->unexpensed;
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
 
 
