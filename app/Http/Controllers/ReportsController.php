@@ -530,7 +530,6 @@ class ReportsController extends MainController
                     if ($sub->prepaid_expense) {
                         $payment = $sub->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->first();
                         if ($payment) {
-                            $sub->prepaid_expense->amount += $payment->amount;
                             $payment->update(['status' => 'posted']);
                         }
                         $sub->prepaid_expense->save();
