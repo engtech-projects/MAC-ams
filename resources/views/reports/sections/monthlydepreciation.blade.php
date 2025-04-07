@@ -613,6 +613,7 @@
                     let gTotalSubSalvage = 0;
                     let gTotalRem = 0;
                     let gTotalInv = 0;
+                    let totalUnpostedPayments = 0;
 
                     for (var i in this.subsidiaryAll) {
                         var branches = data[i];
@@ -630,9 +631,12 @@
                                 var subsidiary = branch[k];
                                 no += 1;
 
+
                                 if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
                                     total_expensed += parseFloat(subsidiary
                                         .prepaid_expense);
+                                        totalUnpostedPayments+= parseFloat(subsidiary.unposted_payments);
+                                        console.log(totalUnpostedPayments);
                                 } else {
                                     total_expensed += parseFloat(subsidiary.expensed)
                                 }
@@ -720,6 +724,7 @@
                                 'sub_ids': sub_ids,
                                 'payment_ids': payment_ids,
                                 'total': {
+                                    total_unposted_payments:totalUnpostedPayments,
                                     total_amount: totalAmount,
                                     total_monthly_amort: total_monthly_amort,
                                     total_no_depre: total_no_depre,
@@ -1096,7 +1101,7 @@
                 },
                 addSubsidiary: function(data) {
                     var filters = this.filter;
-                    console.log(data);
+
 
                     if (this.subsidiaryAll.length === 0) {
                         this.subsidiaryAll = {};

@@ -227,9 +227,13 @@ class ReportsController extends MainController
             $subs['monthly_amort'] = $value->monthly_amort;
             $subs['salvage'] = $value->salvage;
             $subs['expensed'] = $value->expensed;
-            $totalPayments = $value->prepaid_expense?->prepaid_expense_payments->sum('amount');
-            $subs['unexpensed'] =  $value->prepaid_expense ? max(0, $value->unexpensed - $totalPayments) : $value->unexpensed;
+            $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status','posted')->sum('amount');
+
+            $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
+            $subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
+            $subs['posted_payment'] = $totalPostedPayment;
+            $subs['unposted_payments'] = $totalUnpostedPayments;
 
 
             /* if ($value->prepaid_expense) {
@@ -426,7 +430,7 @@ class ReportsController extends MainController
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
-            'amount' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? $request->total['total_expensed'] : $request->total['total_due_amort'],
+            'amount' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? $request->total['total_unposted_payments'] : $request->total['total_due_amort'],
         ]);
 
 
@@ -489,7 +493,7 @@ class ReportsController extends MainController
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
                 /*                 dd($request); */
-                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_expensed'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_unposted_payments'] : 0;
                 $details['journal_details_debit'] =  0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
