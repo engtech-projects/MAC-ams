@@ -239,7 +239,7 @@ class ReportsController extends MainController
             /* if ($value->prepaid_expense) {
                 $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
                 if (count($value->prepaid_expense->prepaid_expense_payments) > 0) {
-                    $payment = $value->prepaid_expense->prepaid_expense_payments;
+                    $payment d= $value->prepaid_expense->prepaid_expense_payments;
                     if (count($payment) > 0) {
                         $subs['prepaid_expense_payment'] = $payment->amount;
                         $subs['p_expense_payment_id'] = $payment->id;
