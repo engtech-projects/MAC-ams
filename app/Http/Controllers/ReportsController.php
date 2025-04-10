@@ -201,9 +201,7 @@ class ReportsController extends MainController
             }
 
             $subs  = [];
-            if ($value->sub_no_depre == 0) {
-                $value->sub_no_depre = 1;
-            }
+
             $subs['sub_id'] = $value->sub_id;
             $subs['branch'] = $value->branch;
             $subs['branch_code'] = $value->sub_per_branch;
