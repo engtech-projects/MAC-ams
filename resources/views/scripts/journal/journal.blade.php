@@ -28,29 +28,29 @@
         $("#amount").on("focus", function() {
             let currentValue = this.value.replace(/[₱,]/g, ''); // Remove peso sign and commas
             if (!isNaN(currentValue) && currentValue !== '') {
-                this.value = parseFloat(currentValue);          // Convert to number without formatting
+                this.value = parseFloat(currentValue); // Convert to number without formatting
             }
         });
         $("#amount").on("blur", function() {
-            let currentValue = parseFloat(this.value.replace(/[₱,]/g, ''));  // Remove peso sign and commas
-            if (!isNaN(currentValue)) {                                      // Ensure it's a valid number
-                this.value = amountConverter(currentValue);                  // Format with peso sign and 2 decimals
+            let currentValue = parseFloat(this.value.replace(/[₱,]/g, '')); // Remove peso sign and commas
+            if (!isNaN(currentValue)) { // Ensure it's a valid number
+                this.value = amountConverter(currentValue); // Format with peso sign and 2 decimals
             } else {
-                this.value = '';                                             // Clear if input is invalid
+                this.value = ''; // Clear if input is invalid
             }
         });
 
         $("#edit_amount").on("focus", function() {
             let currentValue = this.value.replace(/[₱,]/g, ''); // Remove peso sign and commas
             if (!isNaN(currentValue) && currentValue !== '') {
-                this.value = parseFloat(currentValue);          // Convert to number without formatting
+                this.value = parseFloat(currentValue); // Convert to number without formatting
             }
         });
 
         $("#edit_amount").on("blur", function() {
-            let currentValue = parseFloat(this.value.replace(/[₱,]/g, ''));  // Remove peso sign and commas
-            if (!isNaN(currentValue)) {                                      // Ensure it's a valid number
-                this.value = amountConverter(currentValue);                  // Format with peso sign and 2 decimals
+            let currentValue = parseFloat(this.value.replace(/[₱,]/g, '')); // Remove peso sign and commas
+            if (!isNaN(currentValue)) { // Ensure it's a valid number
+                this.value = amountConverter(currentValue); // Format with peso sign and 2 decimals
             } else {
                 this.value = '';
             }
@@ -176,7 +176,10 @@
                             $('#vbalance_debit').text(
                                 amountConverter(
                                     parseFloat(
-                                        parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                        parseFloat(((parseFloat(total_debit.toFixed(
+                                                2)) - parseFloat(
+                                                total_credit.toFixed(2)))
+                                            .toFixed(2)))
                                     )
                                 )
                             )
@@ -281,10 +284,13 @@
                                 .toLocaleString("en-US"))
                             $('#vtotal_credit, #total_credit_voucher').text(total_credit
                                 .toLocaleString("en-US"))
-                           $('#vbalance_debit').text(
-                            amountConverter(
+                            $('#vbalance_debit').text(
+                                amountConverter(
                                     parseFloat(
-                                        parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                        parseFloat(((parseFloat(total_debit.toFixed(
+                                                2)) - parseFloat(
+                                                total_credit.toFixed(2)))
+                                            .toFixed(2)))
                                     )
                                 ))
                         });
@@ -406,10 +412,10 @@
         $(document).on('click', '.remove-journalDetails', function(e) {
             $(this).parents('tr').remove();
             $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
+                minimumFractionDigits: 2
             }));
             $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
+                minimumFractionDigits: 2
             }));
             getBalance()
             checkTotalAndAmount()
@@ -452,7 +458,8 @@
                         jefIsLoading = false
                         return alert("Account is required.");
                     }
-                    if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3]).find('.editable-row-item').text() === "₱0.00") {
+                    if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3])
+                        .find('.editable-row-item').text() === "₱0.00") {
                         jefIsLoading = false
                         return alert("Debit or credit amount is required.");
                     }
@@ -556,7 +563,7 @@
             }
         });
         $(document).on('click', '.JnalFetch', function(e) {
-            
+
             e.preventDefault();
             var id = $(this).attr('value');
             $.ajax({
@@ -612,7 +619,8 @@
             e.preventDefault();
             var id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
             var cancelButton = $(this).closest('tr').find(
                 '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this).closest('tr').find('.stStatus');
@@ -649,7 +657,8 @@
         $(document).on('click', '.stStatus', function(e) {
             var journal_id = $(this).attr('value');
             var statusElement = $(this).closest('tr').find('b');
-            var editButton = $(this).closest('tr').find('.JnalEdit'); // Find the edit button within the same row
+            var editButton = $(this).closest('tr').find(
+                '.JnalEdit'); // Find the edit button within the same row
             var cancelButton = $(this).closest('tr').find(
                 '.jnalCancel'); // Find the cancel button within the same row
             var stStatusButton = $(this); // Store reference to the clicked button
@@ -679,8 +688,10 @@
                         toastr.success('Journal entry has been unposted');
                         statusElement.html('<b>Unposted</b>');
                         statusElement.removeClass('text-success').addClass('text-danger');
-                        stStatusButton.text('Post'); // Change the text content of the clicked button
-                        stStatusButton.removeClass('bg-gradient-danger').addClass('bg-gradient-success'); // Change button background color
+                        stStatusButton.text(
+                            'Post'); // Change the text content of the clicked button
+                        stStatusButton.removeClass('bg-gradient-danger').addClass(
+                            'bg-gradient-success'); // Change button background color
                         editButton.prop('disabled', false); // Enable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     }
@@ -742,7 +753,8 @@
                 if ($(field[1]).find('.editable-row-item').val() == null) {
                     return alert("Account is required.");
                 }
-                if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3]).find('.editable-row-item').text() === "₱0.00") {
+                if ($(field[2]).find('.editable-row-item').text() === "₱0.00" && $(field[3]).find(
+                        '.editable-row-item').text() === "₱0.00") {
                     return alert("Debit or credit amount is required.");
                 }
                 if ($(field[4]).find('.editable-row-item').val() == null) {
@@ -873,6 +885,7 @@
             $('#journalModalEdit').modal('show');
             var id = $(this).attr('value');
             $('#tbl-create-edit-container').html('');
+            $('#edit_journal_date').prop('disabled', true);
             isInitialSetup = true;
             $.ajax({
                 headers: {
@@ -937,12 +950,12 @@
                                                     echo '</optgroup><optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
                                                     $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
                                                 }
-
+                                        
                                                 // Add the subsidiary option to the current optgroup
                                                 echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
                                             }
                                         }
-
+                                        
                                         // Close the last optgroup if it exists
                                         if ($temp != '') {
                                             echo '</optgroup>';
@@ -966,7 +979,10 @@
                                     parseFloat(vv.journal_details_debit)
                                 total_credit = parseFloat(total_credit) +
                                     parseFloat(vv.journal_details_credit)
-                                balance = parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                balance = parseFloat(((parseFloat(total_debit
+                                        .toFixed(2)) - parseFloat(
+                                        total_credit.toFixed(2)))
+                                    .toFixed(2)))
                             });
                             $('#edit_total_debit').text(Number(total_debit)
                                 .toLocaleString(undefined, {
@@ -986,12 +1002,14 @@
                         });
                         $(document).on('click', '.remove-journalDetails', function(e) {
                             $(this).parents('tr').remove();
-                            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                                                minimumFractionDigits: 2
-                            }));
-                            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                                                minimumFractionDigits: 2
-                            }));
+                            $('#edit_total_debit').text(getTotal('debit')
+                                .toLocaleString("en-US", {
+                                    minimumFractionDigits: 2
+                                }));
+                            $('#edit_total_credit').text(getTotal('credit')
+                                .toLocaleString("en-US", {
+                                    minimumFractionDigits: 2
+                                }));
                             getBalance()
                             checkTotalAndAmount()
                         })
@@ -1129,7 +1147,9 @@
                                 amountConverter(total_credit))
                             $('#vbalance_debit').text(
                                 amountConverter(
-                                    parseFloat(((parseFloat(total_debit.toFixed(2)) - parseFloat(total_credit.toFixed(2))).toFixed(2)))
+                                    parseFloat(((parseFloat(total_debit.toFixed(
+                                        2)) - parseFloat(total_credit
+                                        .toFixed(2))).toFixed(2)))
                                 )
                             );
                         });
@@ -1205,7 +1225,7 @@
             });
         })
 
-        $('#s_status').change(function () {
+        $('#s_status').change(function() {
             if (["unposted", "cancelled"].includes($('#s_status').val())) {
                 $('#s_from').val('').prop('required', false);
                 $('#s_to').val('').prop('required', false);
@@ -1273,42 +1293,91 @@
                         $('#journalEntryDetailsContent').append(journalListTable)
                     });
 
-                     @if (Gate::allows('manager'))
-                     $('#journalEntryDetails').DataTable({
-                            columnDefs: [
-                                { width: '10%', targets: 0 },  // Set width for column 0
-                                { width: '10%', targets: 1 },  // Set width for column 1
-                                { width: '10%', targets: 2 },   // Set width for column 2
-                                { width: '10%', targets: 3 },   // Set width for column 2
-                                { width: '10%', targets: 4 },   // Set width for column 2
-                                { width: '10%', targets: 5 },   // Set width for column 2
-                                { width: '10%', targets: 6 },   // Set width for column 2
-                                { width: '7%', targets: 7 },   // Set width for column 2
-                                { width: '13%', targets: 8 },   // Set width for column 2
+                    @if (Gate::allows('manager'))
+                        $('#journalEntryDetails').DataTable({
+                            columnDefs: [{
+                                    width: '10%',
+                                    targets: 0
+                                }, // Set width for column 0
+                                {
+                                    width: '10%',
+                                    targets: 1
+                                }, // Set width for column 1
+                                {
+                                    width: '10%',
+                                    targets: 2
+                                }, // Set width for column 2
+                                {
+                                    width: '10%',
+                                    targets: 3
+                                }, // Set width for column 2
+                                {
+                                    width: '10%',
+                                    targets: 4
+                                }, // Set width for column 2
+                                {
+                                    width: '10%',
+                                    targets: 5
+                                }, // Set width for column 2
+                                {
+                                    width: '10%',
+                                    targets: 6
+                                }, // Set width for column 2
+                                {
+                                    width: '7%',
+                                    targets: 7
+                                }, // Set width for column 2
+                                {
+                                    width: '13%',
+                                    targets: 8
+                                }, // Set width for column 2
 
                             ],
                             paging: true,
                             searching: true,
                             ordering: true,
-                            tableLayout: 'fixed'  // Ensure fixed layout to maintain column width
+                            tableLayout: 'fixed' // Ensure fixed layout to maintain column width
                         });
                     @else
-                      $('#journalEntryDetails').DataTable({
-                            columnDefs: [
-                                { width: '10%', targets: 0 },  // Set width for column 0
-                                { width: '10%', targets: 1 },  // Set width for column 1
-                                { width: '10%', targets: 2 },   // Set width for column 2
-                                { width: '10%', targets: 3 },   // Set width for column 2
-                                { width: '10%', targets: 4 },   // Set width for column 2
-                                { width: '10%', targets: 5 },   // Set width for column 2
-                                { width: '7%', targets: 6 },   // Set width for column 2
-                                { width: '13%', targets: 7 },   // Set width for column 2
+                        $('#journalEntryDetails').DataTable({
+                            columnDefs: [{
+                                    width: '10%',
+                                    targets: 0
+                                }, // Set width for column 0
+                                {
+                                    width: '10%',
+                                    targets: 1
+                                }, // Set width for column 1
+                                {
+                                    width: '10%',
+                                    targets: 2
+                                }, // Set width for column 2
+                                {
+                                    width: '10%',
+                                    targets: 3
+                                }, // Set width for column 2
+                                {
+                                    width: '10%',
+                                    targets: 4
+                                }, // Set width for column 2
+                                {
+                                    width: '10%',
+                                    targets: 5
+                                }, // Set width for column 2
+                                {
+                                    width: '7%',
+                                    targets: 6
+                                }, // Set width for column 2
+                                {
+                                    width: '13%',
+                                    targets: 7
+                                }, // Set width for column 2
 
                             ],
                             paging: true,
                             searching: true,
                             ordering: true,
-                            tableLayout: 'fixed'  // Ensure fixed layout to maintain column width
+                            tableLayout: 'fixed' // Ensure fixed layout to maintain column width
                         });
                     @endif
                 },
@@ -1368,20 +1437,20 @@
 				<select fieldName="subsidiary_id" class="select-subsidiary form-control form-control-sm editable-row-item">
 					<option disabled value="" selected>-Select S/L-</option>
 					<?php
-            $temp = '';
-            foreach ($subsidiaries as $subsidiary) {
-                if (is_array($subsidiary->toArray()['subsidiary_category']) && $subsidiary->toArray()['subsidiary_category'] > 0) {
-                    if ($temp == '') {
-                        $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-                        echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-                    } elseif ($temp != $subsidiary->toArray()['subsidiary_category']['sub_cat_name']) {
-                        echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
-                        $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
-                    }
-                    echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
-                }
-            }
-            ?>
+     $temp = '';
+     foreach ($subsidiaries as $subsidiary) {
+         if (is_array($subsidiary->toArray()['subsidiary_category']) && $subsidiary->toArray()['subsidiary_category'] > 0) {
+             if ($temp == '') {
+                 $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
+                 echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
+             } elseif ($temp != $subsidiary->toArray()['subsidiary_category']['sub_cat_name']) {
+                 echo '<optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
+                 $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
+             }
+             echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
+         }
+     }
+     ?>
                         </select>
                     </td>
                     <td>
@@ -1493,7 +1562,7 @@
 
                     $(this).text(amountConverter(value))
                 },
-                success: function () {
+                success: function() {
                     setTimeout(() => {
                         if ($(this).attr('fieldName') == 'subsidiary_id') {
                             // if ($('#subsidiary_id').val() == '') {
@@ -1510,9 +1579,10 @@
                             $('#total_debit').text(getTotal('debit').toLocaleString("en-US", {
                                 minimumFractionDigits: 2
                             }));
-                            $('#edit_total_debit').text(getTotal('debit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
+                            $('#edit_total_debit').text(getTotal('debit').toLocaleString(
+                                "en-US", {
+                                    minimumFractionDigits: 2
+                                }));
                             getBalance()
                             checkTotalAndAmount()
                         }
@@ -1520,9 +1590,10 @@
                             $('#total_credit').text(getTotal('credit').toLocaleString("en-US", {
                                 minimumFractionDigits: 2
                             }));
-                            $('#edit_total_credit').text(getTotal('credit').toLocaleString("en-US", {
-                                minimumFractionDigits: 2
-                            }));
+                            $('#edit_total_credit').text(getTotal('credit').toLocaleString(
+                                "en-US", {
+                                    minimumFractionDigits: 2
+                                }));
                             getBalance()
                             checkTotalAndAmount()
                         }
@@ -1530,6 +1601,7 @@
                 },
             })
         }
+
         function receivedPaymentVoucher() {
             $('.cheque-number').text($('#cheque_no').val());
             $('.cheque-date').text($('#cheque_date').val());
@@ -1638,7 +1710,7 @@
         function getBalance() {
             $('#balance_debit').text(
                 (
-                    parseFloat($('#total_debit').text().replaceAll(",", "")) - 
+                    parseFloat($('#total_debit').text().replaceAll(",", "")) -
                     parseFloat($('#total_credit').text().replaceAll(",", ""))
                 ).toLocaleString("en-US", {
                     minimumFractionDigits: 2
@@ -1646,7 +1718,7 @@
             );
             $('#edit_balance_debit').text(
                 (
-                    parseFloat($('#edit_total_debit').text().replaceAll(",", "")) - 
+                    parseFloat($('#edit_total_debit').text().replaceAll(",", "")) -
                     parseFloat($('#edit_total_credit').text().replaceAll(",", ""))
                 ).toLocaleString("en-US", {
                     minimumFractionDigits: 2

@@ -624,7 +624,7 @@
                                                     <td>
                                                         <input type="number" v-model="pos_collections.total_amount"
                                                             class="form-control form-control-sm rounded-0 text-right"
-                                                        id="pos_collection_total_amount">
+                                                            id="pos_collection_total_amount">
                                                     </td>
                                                     <td class="text-center">
                                                         <button class="btn btn-xs btn-primary"
@@ -869,10 +869,11 @@
                                     <i class="fas fa-xs fa-print print-cashblotter"></i>
                                 </button>
                                 @if (Gate::allows('manager'))
-                                <button class="mr-1 btn btn-xs btn-primary"
-                                    @click="updateStatus(d,'posted')">Post</button>
-                                <button class="mr-1 btn btn-xs btn-warning"
-                                    @click="updateStatus(d,'unposted')">Unpost</button>
+                                    <button class="mr-1 btn btn-xs btn-primary"
+                                        :disabled="d.cash_ending_balance - d.total != 0"
+                                        @click="updateStatus(d,'posted')">Post</button>
+                                    <button class="mr-1 btn btn-xs btn-warning"
+                                        @click="updateStatus(d,'unposted')">Unpost</button>
                                 @endif
                             </td>
                         </tr>
@@ -890,7 +891,7 @@
                             <div id="ui-view">
                                 <div class="card">
                                     <div class="card-body" id="journal_toPrintVouch">
-                                         <link rel="stylesheet"
+                                        <link rel="stylesheet"
                                             href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
                                         <link rel="stylesheet"
                                             href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -1611,6 +1612,8 @@
 
                 },
                 updateStatus: function(collectionBreakdown, status) {
+                    console.log(collectionBreakdown);
+                    return false;
                     this.isUpdateStatus = true;
                     this.collectionBreakdown = collectionBreakdown;
                     this.collectionBreakdown.status = status
@@ -1762,6 +1765,9 @@
                     return this.collections.branch_collections ? this.collections.branch_collections.reduce((
                             sum, item) => sum + item.total_amount,
                         0) : 0;
+                },
+                totalDiff: function() {
+
                 },
                 otherPayment: function() {
                     var collections = this.collections;
