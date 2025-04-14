@@ -869,8 +869,12 @@
                                     <i class="fas fa-xs fa-print print-cashblotter"></i>
                                 </button>
                                 @if (Gate::allows('manager'))
-                                    <button class="mr-1 btn btn-xs btn-primary"
+                                    {{-- <button class="mr-1 btn btn-xs btn-primary"
                                         :disabled="d.cash_ending_balance - d.total != 0"
+                                        @click="updateStatus(d,'posted')">Post</button>
+                                    <button class="mr-1 btn btn-xs btn-warning"
+                                        @click="updateStatus(d,'unposted')">Unpost</button> --}}
+                                    <button class="mr-1 btn btn-xs btn-primary"
                                         @click="updateStatus(d,'posted')">Post</button>
                                     <button class="mr-1 btn btn-xs btn-warning"
                                         @click="updateStatus(d,'unposted')">Unpost</button>
@@ -1612,12 +1616,17 @@
 
                 },
                 updateStatus: function(collectionBreakdown, status) {
-                    console.log(collectionBreakdown);
-                    return false;
-                    this.isUpdateStatus = true;
-                    this.collectionBreakdown = collectionBreakdown;
-                    this.collectionBreakdown.status = status
-                    this.updateCollectionBreakdown();
+
+                    var diff = collectionBreakdown.cash_ending_balance - collectionBreakdown.total;
+                    if (diff <= 0) {
+                        this.isUpdateStatus = true;
+                        this.collectionBreakdown = collectionBreakdown;
+                        this.collectionBreakdown.status = status
+                    } else {
+
+                        alert("Unable to post.");
+                    }
+
                 },
 
                 updateCollectionBreakdown: function() {
