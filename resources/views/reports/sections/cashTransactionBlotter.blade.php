@@ -1399,6 +1399,7 @@
                 processCreateOrUpdate: function() {
                     if (this.isEdit) {
                         this.updateCollectionBreakdown();
+                        this.resetForm();
 
                     } else {
                         this.createValidation()
@@ -1407,6 +1408,7 @@
 
 
                         }
+                        this.resetForm();
                     }
                 },
                 createValidation: function() {
@@ -1623,8 +1625,10 @@
                     }
                 },
                 processCreateCollection: function() {
+                    this.resetForm();
                     this.openModal();
                     this.isEdit = false;
+
 
                 },
                 updateStatus: function(collectionBreakdown, status) {
@@ -1635,7 +1639,7 @@
                         this.collectionBreakdown.status = status
                         this.updateCollectionBreakdown();
                     } else {
-                        toastr.error('Unable to post.');
+                        toastr.error('Unable to update transaction into ' + status + '.');
                     }
 
                 },
