@@ -90,6 +90,7 @@
                                 <select-branch @setselectedbranch="getSelectedBranch" />
                             </div>
                         @endif
+
                         <div class="col-md-4">
                             <label for="branch">Transaction Date</label>
                             <div class="input-group">
@@ -120,10 +121,29 @@
 
             </div>
 
+            <div>
+                <!-- Bootstrap 3 Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" ref="modal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Modal Title</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Hello from the Bootstrap 3 modal!</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <div class="modal fade bd-example-modal-lg" id="Mymodal" tabindex="-1" role="dialog"
+
+            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" ref="modal"
                 aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-
                 <div class="modal-dialog modal-xl">
 
                     <div class="modal-content">
@@ -152,14 +172,6 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                        {{-- <select name="branch_id" id="branch_id" v-model="branch"
-                                                class="select2 form-control form-control-sm" required>
-                                                <option value="" disabled selected v-text="branch"></option>
-                                                @foreach ($branches as $branch)
-                                                    <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select> --}}
                                     </div>
                                 @endif
                                 <div class="col-md-3">
@@ -855,7 +867,7 @@
                                         data-target="#cashBlotterPreviewModal"></i>
                                 </button>
                                 <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
-                                    <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
+                                    <i class="fas fa-xs fa-pen"></i>
                                 </button>
                                 <button @click="deleteCollectionBreakdown(d,d.collection_id, d.branch_id)"
                                     class="mr-1 btn btn-xs btn-danger">
@@ -1194,6 +1206,7 @@
             el: '#app',
             data: {
                 data: @json($cash_blotter),
+                showModal: false,
                 accountOfficers: @json($account_officers),
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
                 branches: null,
@@ -1570,16 +1583,22 @@
 
 
                 },
+                openModal: function() {
+                    $(this.$refs.modal).modal('show')
+                },
+                closeModal: function() {
+                    $(this.$refs.modal).modal('hide')
+                },
                 editCollectionBreakdown: function(collectionBreakdown) {
-
                     this.isEdit = true;
                     this.calculateCashCount(collectionBreakdown)
                     this.collectionBreakdown = collectionBreakdown;
                     this.branch = $('#branchID').find(':selected').val()
                     if (collectionBreakdown.status === 'posted') {
                         toastr.error("Unable to edit posted transaction.");
-                        return false;
+                        this.closeModal();
                     } else {
+                        this.openModal();
                         axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
                                 headers: {
                                     'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1597,6 +1616,7 @@
                                     }
                                 }
                                 this.collectionBreakdown = cb;
+                                this.closeModal();
                             })
                             .catch(error => {
                                 console.error('Error:', error);
