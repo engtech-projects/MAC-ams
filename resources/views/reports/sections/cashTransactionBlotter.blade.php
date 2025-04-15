@@ -1521,6 +1521,20 @@
                         memo_amount: 0,
                         interbranch_amount: 0
                     }
+
+                    this.total = {
+                        grandTotal: null,
+                        p_1000: null,
+                        p_500: null,
+                        p_200: null,
+                        p_100: null,
+                        p_50: null,
+                        p_20: null,
+                        p_10: null,
+                        p_5: null,
+                        p_1: null,
+                        c_25: null,
+                    }
                 },
                 removeAccountOfficerCollection: function(collection) {
                     if (this.isEdit) {
