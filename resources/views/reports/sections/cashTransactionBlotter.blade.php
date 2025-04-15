@@ -109,8 +109,7 @@
                             <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6' : '2' }}"
                                 @click="processCreateCollection()">
                                 <div class="mt-4 text-right">
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#Mymodal">New
+                                    <button type="button" class="btn btn-primary">New
                                         Transaction</button>
                                 </div>
 
@@ -119,26 +118,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            <div>
-                <!-- Bootstrap 3 Modal -->
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" ref="modal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Modal Title</h4>
-                            </div>
-                            <div class="modal-body">
-                                <p>Hello from the Bootstrap 3 modal!</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
 
@@ -1644,6 +1623,7 @@
                     }
                 },
                 processCreateCollection: function() {
+                    this.openModal();
                     this.isEdit = false;
 
                 },
