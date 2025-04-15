@@ -857,7 +857,7 @@
                                 <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
                                     <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
                                 </button>
-                                <button @click="deleteCollectionBreakdown(d.collection_id, d.branch_id)"
+                                <button @click="deleteCollectionBreakdown(d,d.collection_id, d.branch_id)"
                                     class="mr-1 btn btn-xs btn-danger">
                                     <i class="fas fa-xs fa-trash"></i>
                                 </button>
@@ -1571,60 +1571,71 @@
 
                 },
                 editCollectionBreakdown: function(collectionBreakdown) {
+
                     this.isEdit = true;
                     this.calculateCashCount(collectionBreakdown)
                     this.collectionBreakdown = collectionBreakdown;
                     this.branch = $('#branchID').find(':selected').val()
-                    axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
+                    if (collectionBreakdown.status === 'posted') {
+                        toastr.error("Unable to edit posted transaction.");
+                        return false;
+                    } else {
+                        axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
+                                headers: {
+                                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                        .content
+                                }
+                            }).then(response => {
+                                var cb = response.data.data.collections;
+                                if (!cb.other_payment) {
+                                    cb.other_payment = {
+                                        cash_amount: 0,
+                                        check_amount: 0,
+                                        pos_amount: 0,
+                                        memo_amount: 0,
+                                        interbranch_amount: 0
+                                    }
+                                }
+                                this.collectionBreakdown = cb;
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                        this.calculateCashCount(collectionBreakdown);
+                    }
+
+                },
+                deleteCollectionBreakdown: function(collection, collection_id) {
+                    if (collection.status === 'posted') {
+                        toastr.error("Unable to delete posted transaction.");
+                        return false;
+                    } else {
+                        axios.delete('/MAC-ams/collection-breakdown/' + collection_id, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
                             }
                         }).then(response => {
-                            var cb = response.data.data.collections;
-                            if (!cb.other_payment) {
-                                cb.other_payment = {
-                                    cash_amount: 0,
-                                    check_amount: 0,
-                                    pos_amount: 0,
-                                    memo_amount: 0,
-                                    interbranch_amount: 0
-                                }
-                            }
-                            this.collectionBreakdown = cb;
+                            toastr.success(response.data.message);
+                            window.location.reload();
+                        }).catch(err => {
+                            toastr.success(err);
                         })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                    this.calculateCashCount(collectionBreakdown);
-                },
-                deleteCollectionBreakdown: function(collection_id) {
-                    axios.delete('/MAC-ams/collection-breakdown/' + collection_id, {
-                        headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                .content
-                        }
-                    }).then(response => {
-                        toastr.success(response.data.message);
-                        window.location.reload();
-                    }).catch(err => {
-                        toastr.success(err);
-                    })
+                    }
                 },
                 processCreateCollection: function() {
                     this.isEdit = false;
 
                 },
                 updateStatus: function(collectionBreakdown, status) {
-
+                    this.isUpdateStatus = true;
                     var diff = collectionBreakdown.cash_ending_balance - collectionBreakdown.total;
-                    if (diff <= 0) {
-                        this.isUpdateStatus = true;
+                    if (diff == 0) {
                         this.collectionBreakdown = collectionBreakdown;
                         this.collectionBreakdown.status = status
+                        this.updateCollectionBreakdown();
                     } else {
-
-                        alert("Unable to post.");
+                        toastr.error('Unable to post.');
                     }
 
                 },
