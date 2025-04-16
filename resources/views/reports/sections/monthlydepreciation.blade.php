@@ -39,7 +39,7 @@
                     <form @submit.prevent="submitForm">
                         @csrf
                         <div class="row">
-                            <div class="col-md-8 frm-header">
+                            <div class="col-md-12 frm-header">
                                 <h4><b>Monthly Depreciation / Monthly Amortization</b></h4>
                             </div>
                             <div class="row col-md-12">
@@ -116,7 +116,7 @@
                                                                 <input type="date" id="sub_month" v-model="filter.to"
                                                                     class="form-control form-control-sm rounded-0"
                                                                     name="to" id="sub_date" required>
-                                                                <button class='btn btn-success'>Search</button>
+                                                                <button class='btn btn-success' style="margin-left:15px;">Search</button>
                                                             </div>
 
                                                         </div>

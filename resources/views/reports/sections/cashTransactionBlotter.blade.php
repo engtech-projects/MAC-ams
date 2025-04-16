@@ -1675,7 +1675,8 @@
                         }).then(response => {
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
-                        // window.location.reload();
+                        this.closeModal();
+                        this.filterCollections();
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
