@@ -225,7 +225,7 @@ class ReportsController extends MainController
             $subs['monthly_amort'] = $value->monthly_amort;
             $subs['salvage'] = $value->salvage;
             $subs['expensed'] = $value->expensed;
-            $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status','posted')->sum('amount');
+            $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status', 'posted')->sum('amount');
 
             $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
             $subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
@@ -1216,6 +1216,15 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.incomeStatement', $data);
+    }
+
+    public function closingPeriod(Request $request)
+    {
+        $accounts = $request->accounts;
+        return response()->json([
+            "data" => $accounts,
+            "message" => "Closing Period entry successfully created."
+        ]);
     }
 
     public function incomeStatementsummary(Request $request)
