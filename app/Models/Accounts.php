@@ -575,8 +575,8 @@ class Accounts extends Model
                     if (!array_key_exists($value['account_number'], $entries)) {
 
                         $subsidiaryOpeningBalance = $balances->where("sub_id", $subsidiary["sub_id"])
-                        ->where("account_id", $value["account_id"])
-                        ->first();
+                            ->where("account_id", $value["account_id"])
+                            ->first();
                         $entries[$value['account_number']]['account_id'] = $value['account_id'];
                         $entries[$value['account_number']]['account_number'] = $value['account_number'];
                         $entries[$value['account_number']]['account_name'] = $value['account_name'];
@@ -611,7 +611,7 @@ class Accounts extends Model
                             'debit' => $value['journal_details_debit'],
                             'credit' => $value['journal_details_credit'],
                             'branch' => $value['branch_name'],
-                            
+
                         ];
                     }
                 }
@@ -624,7 +624,7 @@ class Accounts extends Model
                     foreach ($entry['data'] as $k => $v) {
                         // add only to fiscal year opening balance the entries after the fiscal year start
                         // or add all entries before fiscal year if it does not have entries after fiscal year start
-                        if(($lastEntryIsAfterCycleStart && $startDate->lt($v["journal_date"])) || !$lastEntryIsAfterCycleStart) {
+                        if (($lastEntryIsAfterCycleStart && $startDate->lt($v["journal_date"])) || !$lastEntryIsAfterCycleStart) {
                             if ($entry['to_increase'] == 'debit') {
                                 $balance = bcadd($balance, $v['debit'], 2);
                                 $balance = bcsub($balance, $v['credit'], 2);
@@ -1159,6 +1159,7 @@ class Accounts extends Model
                 'coa.account_id',
                 'coa.account_number',
                 'coa.account_name',
+                'coa.account_id'
             )
             ->from('chart_of_accounts as coa')
             ->where(['coa.status' => 'active'])
@@ -1241,10 +1242,12 @@ class Accounts extends Model
             // }
 
             $sheet['accounts'][$account->account_category]['types'][$account->account_type_id]['accounts'][$account->account_id] = [
+                'account_id' => $account->account_id,
                 'account_number' => $account->account_number,
                 'account_name' => $account->account_name,
                 'debit' =>  $account->debit,
                 'credit' => $account->credit,
+
                 // 'opening_balance' => $opening_balance,
                 'total' => $subtotal,
                 'computed' => $subtotal

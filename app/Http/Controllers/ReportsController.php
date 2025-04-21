@@ -1220,7 +1220,65 @@ class ReportsController extends MainController
 
     public function closingPeriod(Request $request)
     {
+
         $accounts = $request->accounts;
+        $branchId = Branch::BRANCH_HEAD_OFFICE_ID;
+        $bookId = JournalBook::GENERAL_LEDGER_BOOK;
+        $source = "CLOSING";
+        $journalEntry = new JournalEntry();
+        $year = Carbon::now()->format('Y');
+        $lastDay = Carbon::create($year, 12, 31);
+        $dayOfWeek = $lastDay->format('l');
+        $journalDate = $lastDay->format('Y-m-d');
+        if ($dayOfWeek == 'Saturday' || $dayOfWeek == 'Sunday') {
+            $journalDate = Carbon::create($year + 1, 1, 1)->format('Y-m-d');
+        }
+        $entry = $journalEntry::create([
+            'journal_no' => $journalEntry->generateJournalNumber(JournalBook::GENERAL_LEDGER_BOOK),
+            'journal_date' => $journalDate,
+            'branch_id' => $branchId,
+            'book_id' => $bookId,
+            'source' => $journalEntry::CLOSING_SOURCE,
+            'status' => $journalEntry::STATUS_UNPOSTED,
+            'remarks' => 'TO RECORD CLOSING OF BOOKS FOR THE CALENDAR YEAR ' . $year,
+            'amount' => 0,
+        ]);
+        $details = [];
+
+        foreach ($accounts['revenue']['types'] as $i => $category) {
+            foreach ($category['accounts'] as $account) {
+                $details[] = [
+                    'account_id' => $account['account_id'],
+                    'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
+                    'journal_details_account_no' => $account['account_number'],
+                    'journal_details_title' => $account['account_name'],
+                    'journal_details_debit' => $account['total'],
+                    'journal_details_credit' => 0
+                ];
+            }
+        }
+
+        foreach ($accounts['expense']['types'] as $i => $category) {
+            foreach ($category['accounts'] as $account) {
+                $details[] = [
+                    'account_id' => $account['account_id'],
+                    'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
+                    'journal_details_account_no' => $account['account_number'],
+                    'journal_details_title' => $account['account_name'],
+                    'journal_details_debit' => 0,
+                    'journal_details_credit' =>  $account['total'],
+                ];
+            }
+        }
+        try {
+            $entry->details()->createMany($details);
+        } catch (\Exception $e) {
+            return response()->json([
+                'data' => $e->getMessage(),
+                'message' => 'Failed to create, journal entry details.'
+            ]);
+        }
+
         return response()->json([
             "data" => $accounts,
             "message" => "Closing Period entry successfully created."

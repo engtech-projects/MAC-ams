@@ -12,6 +12,8 @@ class Subsidiary extends Model
     protected $table = 'subsidiary';
     protected $primaryKey = 'sub_id';
 
+    const SUBSIDIARY_OFFICE = 5;
+
     protected $fillable = [
         'sub_code',
         'sub_cat_id',
