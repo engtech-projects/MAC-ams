@@ -1245,29 +1245,18 @@ class ReportsController extends MainController
         ]);
         $details = [];
 
-        foreach ($accounts['revenue']['types'] as $i => $category) {
-            foreach ($category['accounts'] as $account) {
-                $details[] = [
-                    'account_id' => $account['account_id'],
-                    'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
-                    'journal_details_account_no' => $account['account_number'],
-                    'journal_details_title' => $account['account_name'],
-                    'journal_details_debit' => $account['total'],
-                    'journal_details_credit' => 0
-                ];
-            }
-        }
-
-        foreach ($accounts['expense']['types'] as $i => $category) {
-            foreach ($category['accounts'] as $account) {
-                $details[] = [
-                    'account_id' => $account['account_id'],
-                    'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
-                    'journal_details_account_no' => $account['account_number'],
-                    'journal_details_title' => $account['account_name'],
-                    'journal_details_debit' => 0,
-                    'journal_details_credit' =>  $account['total'],
-                ];
+        foreach ($accounts as $i => $category) {
+            foreach ($category['types'] as $type) {
+                foreach ($type['accounts'] as $account) {
+                    $details[] = [
+                        'account_id' => $account['account_id'],
+                        'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
+                        'journal_details_account_no' => $account['account_number'],
+                        'journal_details_title' => $account['account_name'],
+                        'journal_details_debit' => $i == 'revenue' ? $account['total'] : 0,
+                        'journal_details_credit' => $i == 'expense' ? $account['total'] : 0,
+                    ];
+                }
             }
         }
         try {
@@ -1275,7 +1264,7 @@ class ReportsController extends MainController
         } catch (\Exception $e) {
             return response()->json([
                 'data' => $e->getMessage(),
-                'message' => 'Failed to create, journal entry details.'
+                'message' => 'Failed to create journal entry details.'
             ]);
         }
 
