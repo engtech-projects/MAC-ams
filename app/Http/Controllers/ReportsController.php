@@ -1239,23 +1239,26 @@ class ReportsController extends MainController
             'branch_id' => $branchId,
             'book_id' => $bookId,
             'source' => $journalEntry::CLOSING_SOURCE,
-            'status' => $journalEntry::STATUS_UNPOSTED,
+            'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'TO RECORD CLOSING OF BOOKS FOR THE CALENDAR YEAR ' . $year,
             'amount' => 0,
+            'payee' => $journalEntry::CLOSING_SOURCE
         ]);
         $details = [];
 
         foreach ($accounts as $i => $category) {
             foreach ($category['types'] as $type) {
                 foreach ($type['accounts'] as $account) {
-                    $details[] = [
-                        'account_id' => $account['account_id'],
-                        'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
-                        'journal_details_account_no' => $account['account_number'],
-                        'journal_details_title' => $account['account_name'],
-                        'journal_details_debit' => $i == 'revenue' ? $account['total'] : 0,
-                        'journal_details_credit' => $i == 'expense' ? $account['total'] : 0,
-                    ];
+                    if ($account['total'] > 0) {
+                        $details[] = [
+                            'account_id' => $account['account_id'],
+                            'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
+                            'journal_details_account_no' => $account['account_number'],
+                            'journal_details_title' => $account['account_name'],
+                            'journal_details_debit' => $i == 'revenue' ? $account['total'] : 0,
+                            'journal_details_credit' => $i == 'expense' ? $account['total'] : 0,
+                        ];
+                    }
                 }
             }
         }
