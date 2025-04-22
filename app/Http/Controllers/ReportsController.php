@@ -1222,15 +1222,15 @@ class ReportsController extends MainController
     {
 
         $accounts = $request->accounts;
+        $netIncome = $request->net_income['value'];
         $branchId = Branch::BRANCH_HEAD_OFFICE_ID;
         $bookId = JournalBook::GENERAL_LEDGER_BOOK;
-        $source = "CLOSING";
         $journalEntry = new JournalEntry();
         $year = Carbon::now()->format('Y');
         $lastDay = Carbon::create($year, 12, 31);
         $dayOfWeek = $lastDay->format('l');
         $journalDate = $lastDay->format('Y-m-d');
-        if ($dayOfWeek == 'Saturday' || $dayOfWeek == 'Sunday') {
+        if ($dayOfWeek != 'Saturday' || $dayOfWeek != 'Sunday') {
             $journalDate = Carbon::create($year + 1, 1, 1)->format('Y-m-d');
         }
         $entry = $journalEntry::create([
@@ -1248,6 +1248,18 @@ class ReportsController extends MainController
 
         foreach ($accounts as $i => $category) {
             foreach ($category['types'] as $type) {
+                if ($i == 'expense') {
+                    $retainEarningsAccount = Accounts::find(Accounts::RETAINED_EARNING_ACC);
+                    array_push($type['accounts'], [
+                        'account_id' => $retainEarningsAccount->account_id,
+                        'account_number' => $retainEarningsAccount->account_number,
+                        'account_name' => $retainEarningsAccount->account_name,
+                        'debit' => 0,
+                        'credit' => $netIncome,
+                        'total' => $netIncome,
+                        'computed' => $netIncome
+                    ]);
+                }
                 foreach ($type['accounts'] as $account) {
                     if ($account['total'] > 0) {
                         $details[] = [

@@ -30,6 +30,7 @@ class Accounts extends Model
     const CASH_IN_BANK_MYB_ACC = 9;
     const PAYABLE_CHECK_ACC = 58;
     const DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC = 67;
+    const RETAINED_EARNING_ACC = 83;
 
     protected $fillable = [
         'account_number',

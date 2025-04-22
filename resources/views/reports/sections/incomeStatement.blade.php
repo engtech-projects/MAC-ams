@@ -32,7 +32,7 @@
             <div class="row">
 
                 <?php
-
+                
                 // echo '<pre>';
                 // var_export($currentEarnings);
                 // echo '</pre>';
@@ -174,12 +174,17 @@
             el: '#app',
             data: {
                 incomeStatement: @json($incomeStatement),
+                net_income: @json($incomeStatement['net_income']['value'])
             },
             computed: {
 
             },
             methods: {
                 closingPeriod: function() {
+                    var data = {
+                        income_statement: this.incomeStatement,
+                        net_income: this.net_income
+                    }
                     axios.post('/MAC-ams/reports/closing-period', this.incomeStatement, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
