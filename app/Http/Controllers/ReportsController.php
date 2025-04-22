@@ -1278,7 +1278,7 @@ class ReportsController extends MainController
 
         $lastIndex = array_pop($details);
         usort($details, function ($a, $b) {
-            return strcmp($a['journal_details_title'], $b['journal_details_title']);
+            return strcmp($a['journal_details_account_no'], $b['journal_details_account_no']);
         });
         $details[] = $lastIndex;
         try {
