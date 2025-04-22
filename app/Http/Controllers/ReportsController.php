@@ -1248,18 +1248,9 @@ class ReportsController extends MainController
 
         foreach ($accounts as $i => $category) {
             foreach ($category['types'] as $type) {
-                if ($i == 'expense') {
-                    $retainEarningsAccount = Accounts::find(Accounts::RETAINED_EARNING_ACC);
-                    /* array_push($type['accounts'], [
-                        'account_id' => $retainEarningsAccount->account_id,
-                        'account_number' => $retainEarningsAccount->account_number,
-                        'account_name' => $retainEarningsAccount->account_name,
-                        'debit' => 0,
-                        'credit' => $netIncome,
-                        'total' => $netIncome,
-                        'computed' => $netIncome
-                    ]); */
-                }
+
+
+
                 foreach ($type['accounts'] as $account) {
                     if ($account['total'] > 0) {
                         $details[] = [
@@ -1274,6 +1265,16 @@ class ReportsController extends MainController
                 }
             }
         }
+
+        $retainEarningsAccount = Accounts::find(Accounts::RETAINED_EARNING_ACC);
+        array_push($details, [
+            'account_id' => $retainEarningsAccount->account_id,
+            'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
+            'journal_details_account_no' => $account['account_number'],
+            'journal_details_title' => $retainEarningsAccount->account_name,
+            'journal_details_debit' => 0,
+            'journal_details_credit' => $netIncome,
+        ]);
 
         try {
             $entry->details()->createMany($details);
