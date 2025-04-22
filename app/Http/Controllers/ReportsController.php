@@ -1250,7 +1250,7 @@ class ReportsController extends MainController
             foreach ($category['types'] as $type) {
                 if ($i == 'expense') {
                     $retainEarningsAccount = Accounts::find(Accounts::RETAINED_EARNING_ACC);
-                    array_push($type['accounts'], [
+                    /* array_push($type['accounts'], [
                         'account_id' => $retainEarningsAccount->account_id,
                         'account_number' => $retainEarningsAccount->account_number,
                         'account_name' => $retainEarningsAccount->account_name,
@@ -1258,7 +1258,7 @@ class ReportsController extends MainController
                         'credit' => $netIncome,
                         'total' => $netIncome,
                         'computed' => $netIncome
-                    ]);
+                    ]); */
                 }
                 foreach ($type['accounts'] as $account) {
                     if ($account['total'] > 0) {
@@ -1274,6 +1274,7 @@ class ReportsController extends MainController
                 }
             }
         }
+
         try {
             $entry->details()->createMany($details);
         } catch (\Exception $e) {
