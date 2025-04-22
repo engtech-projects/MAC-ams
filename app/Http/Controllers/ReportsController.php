@@ -1276,6 +1276,11 @@ class ReportsController extends MainController
             'journal_details_credit' => $netIncome,
         ]);
 
+        $lastIndex = array_pop($details);
+        usort($details, function ($a, $b) {
+            return strcmp($a['journal_details_title'], $b['journal_details_title']);
+        });
+        $details[] = $lastIndex;
         try {
             $entry->details()->createMany($details);
         } catch (\Exception $e) {
