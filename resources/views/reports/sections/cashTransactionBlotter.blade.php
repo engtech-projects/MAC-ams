@@ -90,6 +90,7 @@
                                 <select-branch @setselectedbranch="getSelectedBranch" />
                             </div>
                         @endif
+
                         <div class="col-md-4">
                             <label for="branch">Transaction Date</label>
                             <div class="input-group">
@@ -108,8 +109,7 @@
                             <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6' : '2' }}"
                                 @click="processCreateCollection()">
                                 <div class="mt-4 text-right">
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#Mymodal">New
+                                    <button type="button" class="btn btn-primary">New
                                         Transaction</button>
                                 </div>
 
@@ -121,14 +121,13 @@
             </div>
 
 
-            <div class="modal fade bd-example-modal-lg" id="Mymodal" tabindex="-1" role="dialog"
+            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" ref="modal"
                 aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-
                 <div class="modal-dialog modal-xl">
 
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Create Transaction</h5>
+                            <h5 class="modal-title" v-text="isEdit ? 'Edit Transaction' : 'Create Transaction'"></h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -152,14 +151,6 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                        {{-- <select name="branch_id" id="branch_id" v-model="branch"
-                                                class="select2 form-control form-control-sm" required>
-                                                <option value="" disabled selected v-text="branch"></option>
-                                                @foreach ($branches as $branch)
-                                                    <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select> --}}
                                     </div>
                                 @endif
                                 <div class="col-md-3">
@@ -855,9 +846,9 @@
                                         data-target="#cashBlotterPreviewModal"></i>
                                 </button>
                                 <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
-                                    <i class="fas fa-xs fa-pen" data-toggle="modal" data-target="#Mymodal"></i>
+                                    <i class="fas fa-xs fa-pen"></i>
                                 </button>
-                                <button @click="deleteCollectionBreakdown(d.collection_id, d.branch_id)"
+                                <button @click="deleteCollectionBreakdown(d,d.collection_id, d.branch_id)"
                                     class="mr-1 btn btn-xs btn-danger">
                                     <i class="fas fa-xs fa-trash"></i>
                                 </button>
@@ -869,10 +860,15 @@
                                     <i class="fas fa-xs fa-print print-cashblotter"></i>
                                 </button>
                                 @if (Gate::allows('manager'))
-                                <button class="mr-1 btn btn-xs btn-primary"
-                                    @click="updateStatus(d,'posted')">Post</button>
-                                <button class="mr-1 btn btn-xs btn-warning"
-                                    @click="updateStatus(d,'unposted')">Unpost</button>
+                                    {{-- <button class="mr-1 btn btn-xs btn-primary"
+                                        :disabled="d.cash_ending_balance - d.total != 0"
+                                        @click="updateStatus(d,'posted')">Post</button>
+                                    <button class="mr-1 btn btn-xs btn-warning"
+                                        @click="updateStatus(d,'unposted')">Unpost</button> --}}
+                                    <button class="mr-1 btn btn-xs btn-primary"
+                                        @click="updateStatus(d,'posted')">Post</button>
+                                    <button class="mr-1 btn btn-xs btn-warning"
+                                        @click="updateStatus(d,'unposted')">Unpost</button>
                                 @endif
                             </td>
                         </tr>
@@ -890,7 +886,7 @@
                             <div id="ui-view">
                                 <div class="card">
                                     <div class="card-body" id="journal_toPrintVouch">
-                                         <link rel="stylesheet"
+                                        <link rel="stylesheet"
                                             href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
                                         <link rel="stylesheet"
                                             href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
@@ -1189,6 +1185,7 @@
             el: '#app',
             data: {
                 data: @json($cash_blotter),
+                showModal: false,
                 accountOfficers: @json($account_officers),
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
                 branches: null,
@@ -1402,6 +1399,7 @@
                 processCreateOrUpdate: function() {
                     if (this.isEdit) {
                         this.updateCollectionBreakdown();
+                        this.resetForm();
 
                     } else {
                         this.createValidation()
@@ -1410,6 +1408,7 @@
 
 
                         }
+                        this.resetForm();
                     }
                 },
                 createValidation: function() {
@@ -1522,6 +1521,20 @@
                         memo_amount: 0,
                         interbranch_amount: 0
                     }
+
+                    this.total = {
+                        grandTotal: null,
+                        p_1000: null,
+                        p_500: null,
+                        p_200: null,
+                        p_100: null,
+                        p_50: null,
+                        p_20: null,
+                        p_10: null,
+                        p_5: null,
+                        p_1: null,
+                        c_25: null,
+                    }
                 },
                 removeAccountOfficerCollection: function(collection) {
                     if (this.isEdit) {
@@ -1565,56 +1578,84 @@
 
 
                 },
+                openModal: function() {
+                    $(this.$refs.modal).modal('show')
+                },
+                closeModal: function() {
+                    $(this.$refs.modal).modal('hide')
+                },
                 editCollectionBreakdown: function(collectionBreakdown) {
                     this.isEdit = true;
                     this.calculateCashCount(collectionBreakdown)
                     this.collectionBreakdown = collectionBreakdown;
                     this.branch = $('#branchID').find(':selected').val()
-                    axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
+                    if (collectionBreakdown.status === 'posted') {
+                        toastr.error("Unable to edit posted transaction.");
+                        this.closeModal();
+                    } else {
+                        this.openModal();
+                        axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
+                                headers: {
+                                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                        .content
+                                }
+                            }).then(response => {
+                                var cb = response.data.data.collections;
+                                if (!cb.other_payment) {
+                                    cb.other_payment = {
+                                        cash_amount: 0,
+                                        check_amount: 0,
+                                        pos_amount: 0,
+                                        memo_amount: 0,
+                                        interbranch_amount: 0
+                                    }
+                                }
+                                this.collectionBreakdown = cb;
+                                this.closeModal();
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                        this.calculateCashCount(collectionBreakdown);
+                    }
+
+                },
+                deleteCollectionBreakdown: function(collection, collection_id) {
+                    if (collection.status === 'posted') {
+                        toastr.error("Unable to delete posted transaction.");
+                        return false;
+                    } else {
+                        axios.delete('/MAC-ams/collection-breakdown/' + collection_id, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
                             }
                         }).then(response => {
-                            var cb = response.data.data.collections;
-                            if (!cb.other_payment) {
-                                cb.other_payment = {
-                                    cash_amount: 0,
-                                    check_amount: 0,
-                                    pos_amount: 0,
-                                    memo_amount: 0,
-                                    interbranch_amount: 0
-                                }
-                            }
-                            this.collectionBreakdown = cb;
+                            toastr.success(response.data.message);
+                            window.location.reload();
+                        }).catch(err => {
+                            toastr.success(err);
                         })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                    this.calculateCashCount(collectionBreakdown);
-                },
-                deleteCollectionBreakdown: function(collection_id) {
-                    axios.delete('/MAC-ams/collection-breakdown/' + collection_id, {
-                        headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                .content
-                        }
-                    }).then(response => {
-                        toastr.success(response.data.message);
-                        window.location.reload();
-                    }).catch(err => {
-                        toastr.success(err);
-                    })
+                    }
                 },
                 processCreateCollection: function() {
+                    this.resetForm();
+                    this.openModal();
                     this.isEdit = false;
+
 
                 },
                 updateStatus: function(collectionBreakdown, status) {
                     this.isUpdateStatus = true;
-                    this.collectionBreakdown = collectionBreakdown;
-                    this.collectionBreakdown.status = status
-                    this.updateCollectionBreakdown();
+                    var diff = collectionBreakdown.cash_ending_balance - collectionBreakdown.total;
+                    if (diff == 0) {
+                        this.collectionBreakdown = collectionBreakdown;
+                        this.collectionBreakdown.status = status
+                        this.updateCollectionBreakdown();
+                    } else {
+                        toastr.error('Unable to update transaction into ' + status + '.');
+                    }
+
                 },
 
                 updateCollectionBreakdown: function() {
@@ -1634,7 +1675,8 @@
                         }).then(response => {
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
-                        // window.location.reload();
+                        this.closeModal();
+                        this.filterCollections();
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
@@ -1762,6 +1804,9 @@
                     return this.collections.branch_collections ? this.collections.branch_collections.reduce((
                             sum, item) => sum + item.total_amount,
                         0) : 0;
+                },
+                totalDiff: function() {
+
                 },
                 otherPayment: function() {
                     var collections = this.collections;

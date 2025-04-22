@@ -18,7 +18,6 @@ class SubsidiaryController extends Controller
     {
         Log::info('Incoming subsidiary data:', $request->all());
 
-
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -35,6 +34,7 @@ class SubsidiaryController extends Controller
         ], [
             'required_if' => 'Expense is required.'
         ]);
+
 
         try {
             if ($data['branch']) {
@@ -94,6 +94,7 @@ class SubsidiaryController extends Controller
             'sub_no_depre' => 'numeric|required',
             'sub_per_branch' => 'string',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
+            'prepaid_expense_payment' => 'required_if:sub_cat_id,0',
 
         ], [
             'required_if' => 'Expense is required.'
@@ -103,6 +104,11 @@ class SubsidiaryController extends Controller
             if ($subsidiary->prepaid_expense) {
                 $subsidiary->prepaid_expense->update([
                     'amount' => $data['prepaid_expense']
+                ]);
+                $subsidiary->prepaid_expense->prepaid_expense_payments()->create([
+                    'amount' => $data['prepaid_expense_payment'],
+                    'status' => 'unposted',
+                    'payment_date' => now()
                 ]);
             } else {
 
@@ -116,18 +122,36 @@ class SubsidiaryController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
+
         $subsidiary['branch'] = $subsidiary->branch;
         $subsidiary['monthly_amort'] = $subsidiary->monthly_amort;
         $subsidiary['rem'] = $subsidiary->rem;
         $subsidiary['salvage'] = $subsidiary->salvage;
         $subsidiary['description'] = $subsidiary->description;
         $subsidiary['expensed'] = $subsidiary->expensed;
-        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $subsidiary->sub_amount - $subsidiary->prepaid_expense->amount : $subsidiary->unexpensed;
         $subsidiary['due_amort'] = $subsidiary->due_amort;
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
-        $subsidiary['prepaid_expense'] = $subsidiary->prepaid_expense ? $subsidiary->prepaid_expense->amount : 0;
+        $prepaid_expense = 0;
+        $prepaid_payments = $subsidiary->prepaid_expense->prepaid_expense_payments;
+        if ($subsidiary->prepaid_expense) {
+            if (count($subsidiary->prepaid_expense->prepaid_expense_payments) > 0) {
+                /*              dd($subsidiary->prepaid_expense->prepaid_expense_payments); */
+                foreach ($subsidiary->prepaid_expense->prepaid_expense_payments as $payment) {
+
+                    $prepaid_expense += $payment->amount;
+                }
+                $subsidiary['prepaid_expense'] = $prepaid_expense;
+            }
+        } else {
+            $subsidiary['prepaid_expense'] = 0;
+        }
+
+        $upostedPaymentsTotal = $prepaid_payments->where('status', 'unposted')->sum('amount');
+        $subsidiary['unposted_payments'] = $subsidiary->prepaid_expense ? $upostedPaymentsTotal : 0;
+        $prepaidUnexpensed =  $subsidiary->sub_amount - $prepaid_expense;
+        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $prepaidUnexpensed : $subsidiary->unexpensed;
 
         return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary->getAttributes()], 200);
     }

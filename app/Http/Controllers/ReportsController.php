@@ -2,44 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\PrinterController;
 use App\Http\Requests\BankReconciliationReportsRequest;
 use App\Http\Requests\RevenueMinusExpenseRequest;
-use App\Models\CollectionBreakdown;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Models\Customer;
-use App\Models\Transactions;
-use App\Models\PaymentMethod;
-use App\Models\Accounts;
-use App\Models\AccountOfficer;
 use App\Models\AccountCategory;
-use App\Models\AccountType;
-use App\Models\TransactionType;
-use App\Models\TransactionStatus;
-use App\Models\Subsidiary;
-use App\Models\SubsidiaryCategory;
-use App\Http\Controllers\PrinterController;
-use App\Http\Controllers\AccountsController;
+use App\Models\Accounting;
+use App\Models\AccountOfficer;
 use App\Models\AccountOfficerCollection;
+use App\Models\Accounts;
+use App\Models\AccountType;
 use App\Models\Branch;
 use App\Models\BranchCollection;
 use App\Models\CashBlotter;
 use App\Models\CashBreakdown;
+use App\Models\CollectionBreakdown;
+use App\Models\Customer;
+use App\Models\JournalBook;
 use App\Models\journalEntry;
 use App\Models\journalEntryDetails;
-use App\Models\JournalBook;
+use App\Models\OpeningBalance;
+use App\Models\PaymentMethod;
+use App\Models\PrepaidExpensePayment;
+use App\Models\Subsidiary;
+use App\Models\SubsidiaryCategory;
 use App\Models\TransactionDate;
+use App\Models\Transactions;
+use App\Models\TransactionStatus;
+use App\Models\TransactionType;
+use App\Models\User;
 use App\Repositories\Reports\ReportsRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
-use Illuminate\Pagination\LengthAwarePaginator;
-use App\Models\Accounting;
-use App\Models\OpeningBalance;
 
 class ReportsController extends MainController
 {
@@ -192,14 +193,15 @@ class ReportsController extends MainController
 
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
+
         $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
 
-            if($isPosted){
+            if ($isPosted) {
                 $value->sub_no_amort = max(0, $value->sub_no_amort - 1);
             }
 
             $subs  = [];
-            
+
             $subs['sub_id'] = $value->sub_id;
             $subs['branch'] = $value->branch;
             $subs['branch_code'] = $value->sub_per_branch;
@@ -223,12 +225,27 @@ class ReportsController extends MainController
             $subs['monthly_amort'] = $value->monthly_amort;
             $subs['salvage'] = $value->salvage;
             $subs['expensed'] = $value->expensed;
-            $subs['unexpensed'] = $value->unexpensed;
+            $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status','posted')->sum('amount');
+
+            $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
+            $subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
-            if ($value->prepaid_expense) {
+            $subs['posted_payment'] = $totalPostedPayment;
+            $subs['unposted_payments'] = $totalUnpostedPayments;
+
+
+            /* if ($value->prepaid_expense) {
                 $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
-            }
-            $subs['sub_no_amort'] =  $value->sub_no_amort;
+                if (count($value->prepaid_expense->prepaid_expense_payments) > 0) {
+                    $payment d= $value->prepaid_expense->prepaid_expense_payments;
+                    if (count($payment) > 0) {
+                        $subs['prepaid_expense_payment'] = $payment->amount;
+                        $subs['p_expense_payment_id'] = $payment->id;
+                    }
+                }
+            } */
+
+            $subs['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
 
             $subs['rem'] = $value->rem;
 
@@ -361,7 +378,6 @@ class ReportsController extends MainController
     public function postMonthlyDepreciation(Request $request)
     {
 
-
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
         $branchCode = $request->branch_code;
         $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
@@ -375,6 +391,8 @@ class ReportsController extends MainController
 
         $accountName = null;
         $subIds = $request->sub_ids;
+        $branch = Branch::where('branch_code', $request->branch_code)->first();
+
 
         if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
@@ -383,6 +401,7 @@ class ReportsController extends MainController
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+            $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
             $accountName = Accounts::where('account_number', 1415)->pluck('account_name')->first();
         } else {
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
@@ -409,7 +428,7 @@ class ReportsController extends MainController
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
-            'amount' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? $request->total['total_expensed'] : $request->total['total_due_amort'],
+            'amount' => $subCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD ? $request->total['total_unposted_payments'] : $request->total['total_due_amort'],
         ]);
 
 
@@ -429,7 +448,7 @@ class ReportsController extends MainController
         } */
 
 
-        $branch = Branch::where('branch_code', $request->branch_code)->first();
+
         foreach ($subAccounts as $subAccount) {
             foreach ($subAccount as $accountId) {
                 $account = Accounts::find($accountId);
@@ -472,7 +491,7 @@ class ReportsController extends MainController
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
                 /*                 dd($request); */
-                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_expensed'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_unposted_payments'] : 0;
                 $details['journal_details_debit'] =  0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
@@ -498,12 +517,42 @@ class ReportsController extends MainController
             continue;
         }
 
+
+
         try {
             $journalEntry->details()->createMany($journalDetails);
             $this->updateMonthlyDepreciation($request->sub_ids);
+            if ($request->category_id === 51) {
+                foreach ($request->sub_ids as $subId) {
+                    $sub = Subsidiary::find($subId);
+                    /* $payment = $sub->prepaid_expenses->prepaid_expense_payments; */
+                    $payments = $sub->prepaid_expense->prepaid_expense_payments;
+
+                    if ($sub->prepaid_expense) {
+                        $payment = $sub->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->first();
+                        if ($payment) {
+                            $payment->update(['status' => 'posted']);
+                        }
+                        $sub->prepaid_expense->save();
+                    }
+                    /* if (count($payments) > 0) {
+                        foreach ($sub->prepaid_expense as $expense) {
+                            dd($sub->prepaid_expense);
+                            foreach ($payments as $payment) {
+                                dd($payment['sub_id'], $sub->sub_id);
+
+                                if ($payment->sub_id === $sub->sub_id && $payment->status === 'unposted') {
+
+                                    $payment->save(['status' => 'posted']);
+                                }
+                            }
+                        }
+                    } */
+                }
+            }
             return response()->json(['message' => 'Successfully posted.']);
         } catch (\Exception $e) {
-            return response()->json(['message' => "Posting unsuccessful"], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -586,7 +635,7 @@ class ReportsController extends MainController
                         'branch_name' => $account->branch_name,
                         'balance' => number_format($balance, 2),
                         'current_balance' => 0,
-                        'total_debit' => 0,                        
+                        'total_debit' => 0,
                         'total_credit' => 0,
                         'to_increase' => $account->to_increase,
                         'entries' => []

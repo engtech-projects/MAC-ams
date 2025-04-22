@@ -39,7 +39,7 @@
                     <form @submit.prevent="submitForm">
                         @csrf
                         <div class="row">
-                            <div class="col-md-8 frm-header">
+                            <div class="col-md-12 frm-header">
                                 <h4><b>Monthly Depreciation / Monthly Amortization</b></h4>
                             </div>
                             <div class="row col-md-12">
@@ -116,7 +116,7 @@
                                                                 <input type="date" id="sub_month" v-model="filter.to"
                                                                     class="form-control form-control-sm rounded-0"
                                                                     name="to" id="sub_date" required>
-                                                                <button class='btn btn-success'>Search</button>
+                                                                <button class='btn btn-success' style="margin-left:15px;">Search</button>
                                                             </div>
 
                                                         </div>
@@ -246,8 +246,8 @@
                                                     <button v-show="ps.length >=13 && filter.branch && searching"
                                                         class="btn
                                                         btn-success"
-                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
-                                                        @click="add(ps[13])">
+                                                        data-toggle="modal" @click="onAdd()"
+                                                        data-target="#createSubsidiaryModal" @click="add(ps[13])">
                                                         Add
                                                     </button>
                                                     {{-- <button v-show="processSubsidiary.length === 0" class="btn btn-success"
@@ -334,7 +334,8 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel"
                             v-text="isEdit ? 'Edit Subsidiary' : 'Add Subsidiary' "></h5>
-                        <button type="button" class="close" @click="closeAction()" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" @click="closeAction()" data-dismiss="modal"
+                            aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -411,26 +412,28 @@
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
                                             id="sub_no_amort">
                                     </div>
-                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit"
+                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'"
                                         class="col-md-6">
                                         <label for="message-text" class="col-form-label">Expense</label>
-                                        <input type="number" v-model="prepaid_amount" class="form-control">
+                                        <input :readonly="isEdit" type="text" @change="formatPrepaidAmountField()"
+                                            v-model="prepaid_amount" class="form-control">
                                     </div>
 
-                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'"
+                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit"
                                         class="col-md-12">
+
                                         <label for="message-text" class="col-form-label">Expense(Should be less than
                                             @{{ subsidiary.unexpensed }})</label>
-                                        <input type="number" @change="toAddPrepaidAmount()"
+                                        <input type="text" @change="formatToPrepaidAmountField()"
                                             v-model="to_add_prepaid_amount" class="form-control">
                                     </div>
 
 
 
                                     <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div> -->
                                 </div>
 
                             </div>
@@ -473,6 +476,25 @@
                     account_id: '',
                     type: ''
                 },
+                /* filter: {
+
+                    "branch": {
+                        "branch_id": 3,
+                        "branch_code": "00003",
+                        "branch_name": "BRANCH 3 - GINGOOG BRANCH",
+                        "branch_alias": "00003-BRANCH 3 - GINGOOG BRANCH"
+                    },
+                    "subsidiary_id": "",
+                    "category": {
+                        "sub_cat_id": 51,
+                        "sub_cat_name": "Additional Prepaid Expense"
+                    },
+                    "from": "",
+                    "to": "2025-04-08",
+                    "account_id": "",
+                    "type": ""
+
+                }, */
                 subAmount: 0,
                 prepaid_amount: 0,
                 to_add_prepaid_amount: 0,
@@ -487,7 +509,8 @@
                     sub_salvage: 0,
                     rate_percentage: 0,
                     branch_id: '',
-                    prepaid_expense: null
+                    prepaid_expense: null,
+                    prepaid_expense_payment: null,
                 },
                 incomeExpense: {
                     income: [],
@@ -576,6 +599,8 @@
                     let total_due_amort = 0;
                     let total_sub_salvage = 0;
                     let total_prepaid_exepnse = 0;
+                    let total_p_exepense_payment = 0;
+                    let prepaid_expensed = 0;
                     let total_rem = 0;
                     let total_inv = 0;
                     let gTotalAmount = 0;
@@ -591,6 +616,7 @@
                     let gTotalSubSalvage = 0;
                     let gTotalRem = 0;
                     let gTotalInv = 0;
+                    let totalUnpostedPayments = 0;
 
                     for (var i in this.subsidiaryAll) {
                         var branches = data[i];
@@ -617,15 +643,22 @@
 
                             let branchTotal = [];
                             var sub_ids = [];
+                            var payment_ids = [];
 
                             for (var k in branch) {
                                 var subsidiary = branch[k];
                                 no += 1;
-                                if (subsidiary.prepaid_expense) {
-                                    total_prepaid_exepnse += parseFloat(subsidiary.prepaid_expense)
+
+
+                                if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                    total_expensed += parseFloat(subsidiary
+                                        .prepaid_expense);
+                                    totalUnpostedPayments += parseFloat(subsidiary.unposted_payments);
+                                    console.log(totalUnpostedPayments);
+                                } else {
+                                    total_expensed += parseFloat(subsidiary.expensed)
                                 }
                                 if (j == subsidiary.branch) {
-
                                     sub_ids.push(subsidiary.sub_id)
                                     let val = [no + ' - ' + subsidiary.sub_code,
                                         subsidiary.sub_name,
@@ -641,6 +674,7 @@
                                     } else {
                                         val.push(this.formatCurrency(subsidiary.expensed))
                                     }
+                                    console.log(subsidiary);
                                     val.push(this.formatCurrency(subsidiary.unexpensed),
                                         this.formatCurrency(subsidiary.due_amort),
                                         this.formatCurrency(subsidiary.salvage),
@@ -652,10 +686,6 @@
                                         subsidiary.sub_cat_id,
                                         subsidiary.sub_per_branch)
                                     rows.push(val);
-
-
-
-
                                     /* rows.push([no + ' - ' + subsidiary.sub_code,
                                         subsidiary.sub_name,
                                         subsidiary.sub_date,
@@ -680,21 +710,18 @@
                                     ]); */
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
                                     total_used += parseInt(subsidiary.sub_no_amort)
-                                    if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                        total_expensed += parseFloat(subsidiary.prepaid_expense)
-                                    } else {
-                                        total_expensed += parseFloat(subsidiary.expensed)
-                                    }
                                     total_unexpensed += parseFloat(subsidiary.unexpensed)
                                     total_due_amort += parseFloat(subsidiary.due_amort)
                                     total_sub_salvage += parseFloat(subsidiary.salvage)
                                     total_rem += parseFloat(subsidiary.rem)
                                     total_inv += parseFloat(subsidiary.inv)
+                                    prepaid_expensed += parseFloat(subsidiary.prepaid_expense)
+
 
                                 }
 
@@ -713,7 +740,9 @@
                             gTotalInv += total_inv
                             var data = {
                                 'sub_ids': sub_ids,
+                                'payment_ids': payment_ids,
                                 'total': {
+                                    total_unposted_payments: totalUnpostedPayments,
                                     total_amount: totalAmount,
                                     total_monthly_amort: total_monthly_amort,
                                     total_no_depre: total_no_depre,
@@ -725,6 +754,7 @@
                                     total_rem: total_rem,
                                     total_inv: total_inv,
                                     total_prepaid_exepnse: total_prepaid_exepnse,
+                                    prepaid_expense_payment: total_p_exepense_payment
                                 },
                                 'category_id': branch[0].sub_cat_id,
                                 'branch_id': branch[0].branch_id,
@@ -840,10 +870,10 @@
                             let branchSubSalvage = 0;
                             for (var k in subsidiary) {
                                 if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                        branchTotalExpensed += parseFloat(subsidiary[k].prepaid_expense);
-                                    } else {
-                                        branchTotalExpensed += parseFloat(subsidiary[k].expensed);
-                                    }
+                                    branchTotalExpensed += parseFloat(subsidiary[k].prepaid_expense);
+                                } else {
+                                    branchTotalExpensed += parseFloat(subsidiary[k].expensed);
+                                }
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
@@ -891,14 +921,20 @@
                 onSearch: function() {
                     this.searching = false;
                 },
+                onAdd: function() {
+                    this.isEdit = false;
+                    this.resetForm();
+                },
                 toAddPrepaidAmount() {
                     var unexpensed = Number(this.subsidiary.unexpensed.replace(/[^0-9\.-]+/g, ""))
-                    if (this.to_add_prepaid_amount > unexpensed) {
+                    var prepaidAmount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g, ""))
+                    if (prepaidAmount > unexpensed) {
                         alert('Value should be less than or equal to unexpensed');
                     } else {
-                        this.prepaid_amount = parseFloat(this.prepaid_amount) + parseFloat(this
-                            .to_add_prepaid_amount);
+                        prepaidAmount = parseFloat(this.prepaid_amount) + prepaidAmount
                     }
+
+                    this.prepaid_amount = this.formatCurrency(prepaidAmount);
                 },
                 formatCurrency: function(number) {
                     const formatter = new Intl.NumberFormat('en-US', {
@@ -952,6 +988,7 @@
                     return current_month;
                 },
                 post: function(data) {
+                    this.resetForm();
                     data.branch_id = this.filter.branch.branch_id;
                     axios.post(this.url, data, {
                         headers: {
@@ -967,6 +1004,7 @@
                     })
                 },
                 add: function(subsidiary) {
+                    this.isEdit = false;
                     this.resetForm();
                     if (Array.isArray(subsidiary)) {
                         subsidiary = subsidiary[0];
@@ -979,12 +1017,11 @@
                     };
 
                 },
-                closeAction:function(){
+                closeAction: function() {
                     this.resetForm();
                 },
                 processAction: function() {
                     if (!this.isEdit) {
-
                         this.createSubsidiary();
                     } else {
                         this.editSubsidiary(this.subId);
@@ -993,8 +1030,23 @@
                 formatTextField() {
                     this.subsidiary.sub_amount = this.formatCurrency(this.subsidiary.sub_amount);
                     this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
+                    /*                     this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
+                                        this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, "")) */
+
+                },
+                formatPrepaidAmountField() {
                     this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
-                    this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, ""))
+                },
+                formatToPrepaidAmountField() {
+                    this.to_add_prepaid_amount = this.formatCurrency(this.to_add_prepaid_amount);
+                    this.toAddPrepaidAmount();
+
+                },
+                formatTextToNumberFormat() {
+                    this.to_add_prepaid_amount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g, ""))
+                    console.log(this.prepaid_amount);
+                    this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, ""));
+                    this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
                 },
                 processEdit: function(sub) {
 
@@ -1049,6 +1101,7 @@
                     }
                     this.subsidiary.sub_amount = amount;
                     this.subsidiary.branch = this.filter.branch
+                    this.subsidiary.sub_cat_id = this.filter.category.sub_cat_id
 
                     /* this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, "")) */
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
@@ -1076,7 +1129,7 @@
                 },
                 addSubsidiary: function(data) {
                     var filters = this.filter;
-                    console.log(data);
+
 
                     if (this.subsidiaryAll.length === 0) {
                         this.subsidiaryAll = {};
@@ -1126,9 +1179,10 @@
                 },
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
+                    this.formatTextToNumberFormat();
                     var amount = this.subsidiary.sub_amount;
                     this.subsidiary.prepaid_expense = this.prepaid_amount;
-
+                    this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
@@ -1144,11 +1198,11 @@
                         toastr.success(response.data.message);
                         this.updateSubsidiary(response.data.data)
                         $('#createSubsidiaryModal').modal('hide');
-                        
+
                         setTimeout(() => {
                             this.resetForm();
                             this.isEdit = false;
-                        }, 100);    
+                        }, 100);
                     }).catch(err => {
                         var errors = err.response.data.errors;
 

@@ -57,9 +57,11 @@ class Subsidiary extends Model
     public function deleteSubsidiary($id) {}
     public function getDepreciation($categoryId, $branch, $date)
     {
-        $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId, $branch) {
+
+
+        $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId) {
             $query->where('sub_cat_id', $categoryId);
-        })->with('prepaid_expense')
+        })->with(['prepaid_expense.prepaid_expense_payments'])
             ->when(isset($branch), function ($query) use ($branch) {
                 $query->where('sub_per_branch', $branch->branch_code);
             })->when(isset($date), function ($query) use ($date) {
@@ -80,7 +82,7 @@ class Subsidiary extends Model
     {
         return ($this->sub_amount * $this->sub_salvage) / 100;
     }
-  
+
     public function getMonthlyAmortAttribute()
     {
         $amount = floatval($this->sub_amount);
@@ -112,6 +114,7 @@ class Subsidiary extends Model
     }
     public function getUnexpensedAttribute()
     {
+
         return $this->rem * $this->monthly_amort;
     }
     public function getDueAmortAttribute()

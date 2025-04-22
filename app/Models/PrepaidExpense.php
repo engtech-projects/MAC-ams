@@ -22,4 +22,8 @@ class PrepaidExpense extends Model
     {
         return $this->belongsTo(Subsidiary::class, 'sub_id');
     }
+    public function prepaid_expense_payments()
+    {
+        return $this->hasMany(PrepaidExpensePayment::class, 'p_expense_id');
+    }
 }
