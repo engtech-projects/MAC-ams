@@ -134,7 +134,7 @@ class SubsidiaryController extends Controller
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
         $prepaid_expense = 0;
-        $prepaid_payments = $subsidiary->prepaid_expense->prepaid_expense_payments;
+        $prepaid_payments = $subsidiary->prepaid_expense?->prepaid_expense_payments;
         if ($subsidiary->prepaid_expense) {
             if (count($subsidiary->prepaid_expense->prepaid_expense_payments) > 0) {
                 /*              dd($subsidiary->prepaid_expense->prepaid_expense_payments); */
