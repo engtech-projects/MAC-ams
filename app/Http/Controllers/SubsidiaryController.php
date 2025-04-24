@@ -134,7 +134,7 @@ class SubsidiaryController extends Controller
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
         $prepaid_expense = 0;
-        $prepaid_payments = $subsidiary->prepaid_expense?->prepaid_expense_payments;
+        $prepaid_payments = $subsidiary->prepaid_expense->prepaid_expense_payments;
         if ($subsidiary->prepaid_expense) {
             if (count($subsidiary->prepaid_expense->prepaid_expense_payments) > 0) {
                 /*              dd($subsidiary->prepaid_expense->prepaid_expense_payments); */
@@ -144,11 +144,12 @@ class SubsidiaryController extends Controller
                 }
                 $subsidiary['prepaid_expense'] = $prepaid_expense;
             }
+            $upostedPaymentsTotal = $prepaid_payments->where('status', 'unposted')->sum('amount');
         } else {
             $subsidiary['prepaid_expense'] = 0;
         }
 
-        $upostedPaymentsTotal = $prepaid_payments->where('status', 'unposted')->sum('amount');
+
         $subsidiary['unposted_payments'] = $subsidiary->prepaid_expense ? $upostedPaymentsTotal : 0;
         $prepaidUnexpensed =  $subsidiary->sub_amount - $prepaid_expense;
         $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $prepaidUnexpensed : $subsidiary->unexpensed;
