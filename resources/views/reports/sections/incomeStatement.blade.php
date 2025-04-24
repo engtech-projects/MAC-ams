@@ -74,7 +74,7 @@
                             <div class="box pt-4">
                                 <input type="submit" class="btn btn-success" value="Search">
 
-                                <input type="button" class="btn btn-primary " @click="closingPeriod()"
+                                <input type="button" class="btn btn-primary " @click="closingPeriodConfirmation()"
                                     value="Closing Period">
                             </div>
 
@@ -166,6 +166,40 @@
                 </div>
             </div>
         </div>
+
+        {{--         <div class="modal fade" id="postingPeriodConfirmation" tabindex="1" role="dialog" aria-labelledby="journalModal"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container-fluid ">
+                            <h6>Are you sure to close the period for year @{{ from }} - @{{ to }}
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> --}}
+
+        <div class="modal fade" id="postingPeriodConfirmation" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p> Are you sure to close the period for year @{{ from }} to {{ $to }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="closingPeriod()">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
 
@@ -174,24 +208,32 @@
             el: '#app',
             data: {
                 incomeStatement: @json($incomeStatement),
-                net_income: @json($incomeStatement['net_income']['value'])
+                net_income: @json($incomeStatement['net_income']['value']),
+                from: @json($from),
+                to: @json($to)
             },
             computed: {
 
             },
             methods: {
+                closingPeriodConfirmation: function() {
+                    $('#postingPeriodConfirmation').modal('show');
+                },
                 closingPeriod: function() {
                     var data = {
                         income_statement: this.incomeStatement,
-                        net_income: this.net_income
+                        net_income: this.net_income,
+                        from: this.from,
+                        to: this.to
                     }
-                    axios.post('/MAC-ams/reports/closing-period', this.incomeStatement, {
+                    axios.post('/MAC-ams/reports/closing-period', data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+                        $('#postingPeriodConfirmation').modal('hide');
                     }).catch(err => {
                         toastr.error(err.response.data.message);
 
