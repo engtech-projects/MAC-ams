@@ -153,7 +153,6 @@ Route::get('reports/journal_entry', [ReportsController::class, 'journalEntry'])-
 Route::post('reports/generalLedgerFetchAccount', [ReportsController::class, 'generalLedgerFetchAccount'])->name('reports.generalLedgerFetchAccount');
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
 Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
-Route::post('reports/closing-period', [ReportsController::class, 'closingPeriod'])->name('reports.closingPeriod');
 Route::get('reports/bankReconcillation', [ReportsController::class, 'bankReconcillation'])->name('reports.bankReconcillation');
 Route::get('reports/journalledger', [ReportsController::class, 'journalLedger'])->name('reports.journalLedger');
 

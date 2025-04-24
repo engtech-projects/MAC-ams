@@ -11,7 +11,6 @@ class JournalBook extends Model
     use HasFactory;
 
 
-    const GENERAL_LEDGER_BOOK = 5;
     const CASH_BLOTTER_BOOKS = [1, 9, 6, 8, 7, 4];
     const LOAN_PAYMENTS_BOOK = 9;
     const CASH_PAID_BOOK = [1, 6, 8, 7, 5];
@@ -19,7 +18,7 @@ class JournalBook extends Model
     const COLLECTION_DEPOSITS_BOOK = 7;
     const INTER_BRANCH_BOOKS = [9, 4];
     const CASH_RECEIPT_BOOK_BOOK = 4;
-    const CASH_RECEIVED_BOOKS = [1, 9, 4, 5, 6];
+    const CASH_RECEIVED_BOOKS = [1, 9, 4, 5,6];
     const BOOK_CREDIT = 'credit';
     const BOOK_DEBIT = 'debit';
 
@@ -101,11 +100,11 @@ class JournalBook extends Model
     public function checkBookCode($code, $id = null)
     {
         $query = $this->where('book_code', $code);
-        if ($id) {
+        if($id){
             $query->where('book_id', '!=', $id);
         }
         $data = $query->get();
-
+        
         return $data->isNotEmpty();
     }
 
