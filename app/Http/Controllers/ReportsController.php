@@ -245,7 +245,7 @@ class ReportsController extends MainController
                 }
             } */
 
-            $subs['sub_no_amort'] =  !$isPosted ? $value->sub_no_amort : $value->sub_no_amort - 1;
+            $subs['sub_no_amort'] =   $value->sub_no_amort;
 
             $subs['rem'] = $value->rem;
 
