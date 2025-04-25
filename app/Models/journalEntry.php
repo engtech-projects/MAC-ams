@@ -18,9 +18,11 @@ class journalEntry extends Model
     public $timestamps = true;
 
     const STATUS_POSTED = 'posted';
+    const STATUS_UNPOSTED = 'unposted';
     const CASH_RECEIVED_ACC = [];
     const DEPRECIATION_BOOK = 5;
     const DEPRECIATION_SOURCE = 'SCHEDULE';
+    const CLOSING_SOURCE = 'CLOSING';
 
     protected $fillable = [
         'journal_no',
@@ -55,6 +57,16 @@ class journalEntry extends Model
     public function journalEntryDetails()
     {
         return $this->hasMany(journalEntryDetails::class, 'journal_id', 'journal_id');
+    }
+
+    public function generateJournalNumber($bookId)
+    {
+        $lastEntry = JournalEntry::where('book_id', $bookId)->orderBy('journal_id', 'DESC')->pluck('journal_no')->first();
+        $series = explode('-', $lastEntry);
+        $lastSeries = (int) $series[1] + 1;
+        $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
+
+        return $journalNumber;
     }
 
     public static function fetch($status = '', $from = '', $to = '', $book_id = '', $branch_id = '', $order = 'ASC', $journal_no = '', $journal_source = '', $journal_payee = '')

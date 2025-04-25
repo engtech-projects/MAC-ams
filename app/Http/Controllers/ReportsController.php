@@ -225,7 +225,7 @@ class ReportsController extends MainController
             $subs['monthly_amort'] = $value->monthly_amort;
             $subs['salvage'] = $value->salvage;
             $subs['expensed'] = $value->expensed;
-            $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status','posted')->sum('amount');
+            $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status', 'posted')->sum('amount');
 
             $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
             $subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
@@ -1216,6 +1216,81 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.incomeStatement', $data);
+    }
+
+    public function closingPeriod(Request $request)
+    {
+
+        $accounts = $request->income_statement['accounts'];
+        $netIncome = $request->net_income;
+        $branchId = Branch::BRANCH_HEAD_OFFICE_ID;
+        $bookId = JournalBook::GENERAL_LEDGER_BOOK;
+        $journalEntry = new JournalEntry();
+        $from = Carbon::createFromFormat('Y-m-d',$request->from);
+        $to = Carbon::createFromFormat('Y-m-d', $request->to);
+        $journalDate = $to->addDay();
+
+        
+        $entry = $journalEntry::create([
+            'journal_no' => $journalEntry->generateJournalNumber(JournalBook::GENERAL_LEDGER_BOOK),
+            'journal_date' => $journalDate,
+            'branch_id' => $branchId,
+            'book_id' => $bookId,
+            'source' => $journalEntry::CLOSING_SOURCE,
+            'status' => $journalEntry::STATUS_POSTED,
+            'remarks' => 'TO RECORD CLOSING OF BOOKS FOR THE CALENDAR YEAR ' . $from->format('F j, Y'). ' TO ' . $to->format('F j, Y'),
+            'amount' => 0,
+            'payee' => $journalEntry::CLOSING_SOURCE
+        ]);
+        $details = [];
+        foreach ($accounts as $i => $category) {
+            foreach ($category['types'] as $type) {
+
+
+
+                foreach ($type['accounts'] as $account) {
+                    if ($account['total'] > 0) {
+                        $details[] = [
+                            'account_id' => $account['account_id'],
+                            'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
+                            'journal_details_account_no' => $account['account_number'],
+                            'journal_details_title' => $account['account_name'],
+                            'journal_details_debit' => $i == 'revenue' ? $account['total'] : 0,
+                            'journal_details_credit' => $i == 'expense' ? $account['total'] : 0,
+                        ];
+                    }
+                }
+            }
+        }
+
+        $retainEarningsAccount = Accounts::find(Accounts::RETAINED_EARNING_ACC);
+        array_push($details, [
+            'account_id' => $retainEarningsAccount->account_id,
+            'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
+            'journal_details_account_no' => $account['account_number'],
+            'journal_details_title' => $retainEarningsAccount->account_name,
+            'journal_details_debit' => 0,
+            'journal_details_credit' => $netIncome,
+        ]);
+
+        $lastIndex = array_pop($details);
+        usort($details, function ($a, $b) {
+            return strcmp($a['journal_details_account_no'], $b['journal_details_account_no']);
+        });
+        $details[] = $lastIndex;
+        try {
+            $entry->details()->createMany($details);
+        } catch (\Exception $e) {
+            return response()->json([
+                'data' => $e->getMessage(),
+                'message' => 'Failed to create journal entry details.'
+            ]);
+        }
+
+        return response()->json([
+            "data" => $accounts,
+            "message" => "Closing Period entry successfully created."
+        ]);
     }
 
     public function incomeStatementsummary(Request $request)

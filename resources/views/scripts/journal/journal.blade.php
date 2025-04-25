@@ -885,7 +885,7 @@
             $('#journalModalEdit').modal('show');
             var id = $(this).attr('value');
             $('#tbl-create-edit-container').html('');
-            $('#edit_journal_date').prop('disabled', true);
+            $('#edit_journal_date').prop('readonly', true);
             isInitialSetup = true;
             $.ajax({
                 headers: {
