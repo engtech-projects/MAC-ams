@@ -1226,8 +1226,11 @@ class ReportsController extends MainController
         $branchId = Branch::BRANCH_HEAD_OFFICE_ID;
         $bookId = JournalBook::GENERAL_LEDGER_BOOK;
         $journalEntry = new JournalEntry();
+        $from = Carbon::createFromFormat('Y-m-d',$request->from);
         $to = Carbon::createFromFormat('Y-m-d', $request->to);
         $journalDate = $to->addDay();
+
+        
         $entry = $journalEntry::create([
             'journal_no' => $journalEntry->generateJournalNumber(JournalBook::GENERAL_LEDGER_BOOK),
             'journal_date' => $journalDate,
@@ -1235,7 +1238,7 @@ class ReportsController extends MainController
             'book_id' => $bookId,
             'source' => $journalEntry::CLOSING_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
-            'remarks' => 'TO RECORD CLOSING OF BOOKS FOR THE CALENDAR YEAR ' . $request->from . 'TO' . $request->to,
+            'remarks' => 'TO RECORD CLOSING OF BOOKS FOR THE CALENDAR YEAR ' . $from->format('F j, Y'). ' TO ' . $to->format('F j, Y'),
             'amount' => 0,
             'payee' => $journalEntry::CLOSING_SOURCE
         ]);
