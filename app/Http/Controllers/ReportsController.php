@@ -195,7 +195,6 @@ class ReportsController extends MainController
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
 
         $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
-
             if ($isPosted) {
                 $value->sub_no_amort = max(0, $value->sub_no_amort - 1);
             }
@@ -229,6 +228,7 @@ class ReportsController extends MainController
 
             $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
             $subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
+            //$value->sub_amount - ($value->monthly_amort - $value->used);
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
             $subs['posted_payment'] = $totalPostedPayment;
             $subs['unposted_payments'] = $totalUnpostedPayments;
