@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Models\PostingPeriod;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
+class PostingPeriodController extends Controller
+{
+    //
+
+    public function index(Request $request)
+    {
+
+        $postingPeriod = PostingPeriod::whereYear('start_date', $request['year'])->get();
+        /* if ($postingPeriod->isEmpty()) {
+            $postingPeriod = [];
+            for ($month = 1; $month <= 12; $month++) {
+                $startDate = Carbon::createFromDate($request['year'], $month, 1);
+                $endDate = $startDate->copy()->endOfMonth();
+                try {
+                    $data = PostingPeriod::create([
+                        'posting_period' => $startDate->format('F Y'),
+                        'start_date'     => $startDate->format('Y-m-d'),
+                        'end_date'       => $endDate->format('Y-m-d'),
+                        'status'         => 'closed',
+                        'created_at'     => now(),
+                        'updated_at'     => now(),
+                    ]);
+                    $postingPeriod[] = $data;
+                } catch (Exception $e) {
+                    return new JsonResponse([
+                        'message' => $e->getMessage(),
+                    ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+        } */
+        return new JsonResponse([
+            'data' => $postingPeriod,
+            'message' => 'Successfully fetched.'
+        ], JsonResponse::HTTP_OK);
+    }
+    public function update(Request $request, PostingPeriod $postingPeriod)
+    {
+        $data = $request->all();
+        $postingPeriod->update([
+            'posting_period' => $data['posting_period'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'status' => $data['status']
+        ]);
+        return new JsonResponse([
+            'message' => 'Successfully updated.'
+        ], JsonResponse::HTTP_OK);
+    }
+
+    public function store(Request $request)
+    {
+        $postingPeriods = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $startDate = Carbon::createFromDate($request['year'], $month, 1);
+            $endDate = $startDate->copy()->endOfMonth();
+            try {
+                $data = PostingPeriod::create([
+                    'posting_period' => $startDate->format('F Y'),
+                    'start_date'     => $startDate->format('Y-m-d'),
+                    'end_date'       => $endDate->format('Y-m-d'),
+                    'status'         => 'closed',
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
+                ]);
+                $postingPeriods[] = $data;
+            } catch (Exception $e) {
+                return new JsonResponse([
+                    'message' => $e->getMessage(),
+                ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+        return new JsonResponse([
+            'data' => $postingPeriods,
+            'message' => 'Successfully created.'
+        ], JsonResponse::HTTP_CREATED);
+    }
+    public function destroy() {}
+}

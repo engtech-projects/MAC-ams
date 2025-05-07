@@ -22,6 +22,7 @@ use App\Http\Controllers\JournalBookController;
 use App\Http\Controllers\SystemSetupController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\GeneralSettingsController;
+use App\Http\Controllers\PostingPeriodController;
 use App\Http\Controllers\ProductsServicesController;
 use App\Models\CollectionBreakdown;
 
@@ -167,6 +168,8 @@ Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'search
 Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
 
 Route::resource('collection-breakdown', CollectionBreakdownController::class);
+
+Route::resource('posting-period', PostingPeriodController::class);
 Route::delete('branch-collection/{branchCollection}', [CollectionBreakdownController::class, 'deleteBranchCollection']);
 Route::delete('account-officer-collection/{accountOfficerCollection}', [CollectionBreakdownController::class, 'deleteAccountOffficerCollection']);
 
