@@ -52,23 +52,33 @@ class ReportsController extends MainController
 
 
         $accounting = Accounting::getFiscalYear();
-        $from = $request->from ? $request->from : $accounting->default_start;
-        $to = $request->to ? $request->to : $accounting->default_end;
+        // $from = $request->from ? $request->from : $accounting->default_start;
+        // $to = $request->to ? $request->to : $accounting->default_end;
         // $from = $request->from ? $request->from : $accounting->start_date;
         // $to = $request->to ? $request->to : $accounting->end_date;
-        $branch_id = $request->branch_id ? $request->branch_id : '';
-        $status = $request->status ? $request->status : null;
-        $book_id = $request->book_id ? $request->book_id : '';
-        $journal_no = $request->journal_no ? $request->journal_no : '';
-        $journal_source = $request->journal_source ? $request->journal_source : '';
-        $journal_payee = $request->journal_payee ? $request->journal_payee : '';
+        $from = $request->from ?? '';
+        $to = $request->to ?? '';
+        $branch_id = $request->branch_id ?? '';
+        $status = $request->status ?? '';
+        $book_id = $request->book_id ?? '';
+        $journal_no = $request->journal_no ?? '';
+        $journal_source = $request->journal_source ?? '';
+        $journal_payee = $request->journal_payee ?? '';
 
         // $branch = Branch::find($branch_id);
-        $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no, $journal_source, $journal_payee);
-        $journal_ledger = [];
+        $journal_entry = [];
+        if ($from || $to || $book_id || $branch_id || $journal_no || $journal_source || $journal_payee || $status) {
+            $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no, $journal_source, $journal_payee);
+        }
 
+        $filtered_journal_entry = collect($journal_entry)->filter(function ($entry) {
+            // Only include entries where journal_date is not null
+            return !is_null($entry->journal_date);
+        });
+
+        $journal_ledger = [];
         $page = [];
-        foreach ($journal_entry as $entry) {
+        foreach ($filtered_journal_entry as $entry) {
 
             $entries = [];
 
@@ -129,8 +139,17 @@ class ReportsController extends MainController
             'journalBooks' => JournalBook::getBookWithJournalCount(),
             'jLedger' => $journal_ledger,
             // 'paginated' => $paginated,
-            'requests' => ['from' => $from, 'to' => $to],
-            'paginationLinks' => $journal_entry
+            'requests' => [
+                'from' => $from,
+                'to' => $to,
+                'branch_id' => $branch_id,
+                'book_id' => $book_id,
+                'status' => $status,
+                'journal_no' => $journal_no,
+                'journal_source' => $journal_source,
+                'journal_payee' => $journal_payee
+            ],
+            'paginationLinks' => $filtered_journal_entry
         ];
 
         return view('reports.sections.journalledger', $data);
