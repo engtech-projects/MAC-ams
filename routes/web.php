@@ -146,6 +146,7 @@ Route::get('reports/subsidiary-ledger-listing', [ReportsController::class, 'subs
 
 
 Route::get('reports/subsidiaryViewInfo', [ReportsController::class, 'subsidiaryViewInfo'])->name('reports.subsidiaryViewInfo');
+Route::get('subsidiary/{subsidiary}', [SubsidiaryController::class, 'show']);
 Route::get('reports/subsidiaryDelete', [ReportsController::class, 'subsidiaryDelete'])->name('reports.subsidiaryDelete');
 Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');
 Route::get('reports/balance-sheet', [ReportsController::class, 'balanceSheet'])->name('reports.balancesheet');

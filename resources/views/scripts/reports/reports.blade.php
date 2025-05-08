@@ -855,7 +855,7 @@
                 success: function(data) {
                     if (data != false) {
                         $('#sub_id').val(data[0].sub_id);
-                        $('#sub_acct_no').val(data[0].sub_acct_no);
+                        $('#sub_acct_no').val(data[0].sub_code);
                         $('#sub_cat_id').val(data[0].sub_cat_id);
                         $('#sub_name').val(data[0].sub_name);
                         $('#sub_address').val(data[0].sub_address);
@@ -868,6 +868,7 @@
                         $('#sub_salvage').val(data[0].sub_salvage);
                         $('#sub_date_post').val(data[0].sub_date_post);
                     }
+
                 }
             });
         });
@@ -888,8 +889,7 @@
                     success: function(data) {
                         if (data.message == 'delete') {
                             toastr.success('Subsidiary Successfully Remove');
-                            subsidiaryTbl.row($("a[value ='" + id + "']").parents('tr'))
-                                .remove().draw();
+                            window.reload();
                         }
                     },
                     error: function() {

@@ -79,18 +79,30 @@ class SubsidiaryController extends Controller
         ], JsonResponse::HTTP_CREATED);
     }
 
+    public function show(Subsidiary $subsidiary)
+    {
+        /*         $branch = Branch::where('branch_code', $subsidiary->sub_per_branch)->first();
+        if ($branch) {
+            $subsidiary['sub_per_branch'] = $branch->branch_name;
+        } */
+        return new JsonResponse([
+            'data' => $subsidiary,
+            'message' => "Successfully fetched."
+        ], JsonResponse::HTTP_OK);
+    }
+
     public function update(Subsidiary $subsidiary, Request $request)
     {
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
             'sub_no_amort' => 'required',
-            'sub_date' => 'date|required',
+            'sub_date' => 'date|nullable',
             'sub_cat_id' => 'integer|required',
-            'sub_salvage' => 'numeric|required',
-            'sub_amount' => 'numeric|required',
-            'sub_no_depre' => 'numeric|required',
-            'sub_per_branch' => 'string',
+            'sub_salvage' => 'numeric|nullable',
+            'sub_amount' => 'numeric|nullable',
+            'sub_no_depre' => 'numeric|nullable',
+            'sub_per_branch' => 'string|nullable',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
             'prepaid_expense_payment' => 'required_if:sub_cat_id,0',
 
@@ -98,24 +110,25 @@ class SubsidiaryController extends Controller
             'required_if' => 'Expense is required.'
         ]);
         try {
-
             $subsidiary->update($data);
-            if ($request->category['sub_cat_name'] === SubsidiaryCategory::ADDTIONAL_PREPAID_EXP) {
-                if ($subsidiary->prepaid_expense) {
-                    $subsidiary->prepaid_expense->update([
-                        'amount' => $data['prepaid_expense']
-                    ]);
-                    $subsidiary->prepaid_expense->prepaid_expense_payments()->create([
-                        'amount' => $data['prepaid_expense_payment'],
-                        'status' => 'unposted',
-                        'payment_date' => now()
-                    ]);
-                } else {
+            if ($request->category) {
+                if ($request->category['sub_cat_name'] === SubsidiaryCategory::ADDTIONAL_PREPAID_EXP) {
+                    if ($subsidiary->prepaid_expense) {
+                        $subsidiary->prepaid_expense->update([
+                            'amount' => $data['prepaid_expense']
+                        ]);
+                        $subsidiary->prepaid_expense->prepaid_expense_payments()->create([
+                            'amount' => $data['prepaid_expense_payment'],
+                            'status' => 'unposted',
+                            'payment_date' => now()
+                        ]);
+                    } else {
 
-                    PrepaidExpense::create([
-                        'amount' => $data['prepaid_expense'],
-                        'sub_id' => $subsidiary->sub_id
-                    ]);
+                        PrepaidExpense::create([
+                            'amount' => $data['prepaid_expense'],
+                            'sub_id' => $subsidiary->sub_id
+                        ]);
+                    }
                 }
             }
         } catch (Exception $e) {
