@@ -28,6 +28,9 @@
 	.select2 {
   	width: 100% !important
   }
+  [v-cloak] {
+    display: none;
+  }
 </style>
 
 <!-- Main content -->
@@ -37,7 +40,6 @@
 		<div class="col-md-12">
 			<form id="bookJournalForm" method="get">
 				@csrf
-				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div style="display:flex;margin-bottom:32px;">
 					<div style="display:flex;flex:1;flex-direction:column;margin-right:32px;">
 						<div class="form-group" style="display:flex;align-items:center">
@@ -92,7 +94,7 @@
 							<div class="input-group" style="flex:3">
 								<select v-model="filter.status" name="status" class="select2 form-control form-control-sm" id="jlStatus">
 									<option value="" disabled selected>-Select Status-</option>
-									<option value="posted" selected>Posted</option>
+									<option value="posted">Posted</option>
 									<option value="unposted">Unposted</option>
 									<option value="cancelled">Cancelled</option>
 								</select>
@@ -124,8 +126,9 @@
 								<input v-model="filter.to" name="to" type="date" value="" class="form-control form-control-sm">
 							</div>
 						</div>
-						<div class="form-group" style="display:flex;align-items:center;justify-content:right;">
-							<button class="btn btn-success" style="padding-left:32px;padding-right:32px;">Search</button>
+						<div class="form-group" style="display: flex; align-items: center; justify-content: right; gap: 10px;">
+              <span v-if="warningMessage" v-cloak style="color: #d9534f; font-size: 0.725rem;">@{{ warningMessage }}</span>
+              <button class="btn btn-success" style="padding:8px 32px;">Search</button>
 						</div>
 					</div>
 				</div>
@@ -286,17 +289,30 @@
 				journal_source: @json(request('journal_source', '')),
 				journal_payee: @json(request('journal_payee', ''))
 			},
-			// baseUrl: window.location.protocol + "//" + window.location.host
+			warningMessage: ''
 		},
-	// 	methods: {
-	// 		search:function(){
-	// 			// console.log(this.filter);
-	// 			window.location.href = this.baseUrl + "/reports/journalledger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&branch_id=' +  this.filter.branch_id + '&&status=' +  this.filter.status + '&&book_id=' +  this.filter.book_id + '&&journal_no=' +  this.filter.journal_no;
-	// 		},
-	// 		logbook:function(e){
-	// 			console.log(e);
-	// 		}
-	// 	},
+		watch: {
+      'filter.from': 'checkDateRange',
+      'filter.to': 'checkDateRange'
+    },
+    methods: {
+      checkDateRange() {
+        if (!this.filter.from || !this.filter.to) {
+            this.warningMessage = '⚠️ You’ve selected a large date range. This may take a while to load.';
+            return null;
+        }
+        const from = new Date(this.filter.from);
+		    const to = new Date(this.filter.to);
+		    const years = to.getFullYear() - from.getFullYear();
+		    const months = (years * 12) + (to.getMonth() - from.getMonth());
+
+		    if (months > 6 || (months === 6 && to.getDate() >= from.getDate())) {
+		      this.warningMessage = '⚠️ You’ve selected a large date range. This may take a while to load.';
+		    } else {
+		      this.warningMessage = '';
+		    }
+      }
+    },
 		mounted() {
 		  const urlParams = new URLSearchParams(window.location.search);
 		  const hasFrom = urlParams.has('from');
@@ -320,7 +336,10 @@
 		      document.getElementById('bookJournalForm').submit();
 		    });
 		  }
-		}
+		},
+		created() {
+	    window.app = this;
+	  }
 	});
 </script>
 @endsection
