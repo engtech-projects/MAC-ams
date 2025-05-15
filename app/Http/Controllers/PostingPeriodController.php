@@ -16,8 +16,56 @@ class PostingPeriodController extends Controller
 
     public function index(Request $request)
     {
+        $year = $request['year'];
 
-        $postingPeriod = PostingPeriod::whereYear('start_date', $request['year'])->get();
+        $query = PostingPeriod::query();
+
+        $query->when($year, function ($query) use ($year) {
+            return $query->where('posting_period', 'like', "$year-%");
+        });
+        $postingPeriod = $query->get();
+        /* if ($postingPeriod->isEmpty()) {
+            $postingPeriod = [];
+            for ($month = 1; $month <= 12; $month++) {
+                $startDate = Carbon::createFromDate($request['year'], $month, 1);
+                $endDate = $startDate->copy()->endOfMonth();
+                try {
+                    $data = PostingPeriod::create([
+                        'posting_period' => $startDate->format('F Y'),
+                        'start_date'     => $startDate->format('Y-m-d'),
+                        'end_date'       => $endDate->format('Y-m-d'),
+                        'status'         => 'closed',
+                        'created_at'     => now(),
+                        'updated_at'     => now(),
+                    ]);
+                    $postingPeriod[] = $data;
+                } catch (Exception $e) {
+                    return new JsonResponse([
+                        'message' => $e->getMessage(),
+                    ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+        } */
+        return new JsonResponse([
+            'data' => $postingPeriod,
+            'message' => 'Successfully fetched.'
+        ], JsonResponse::HTTP_OK);
+    }
+
+    public function getYears()
+    {
+        $years = PostingPeriod::selectRaw('DISTINCT LEFT(posting_period, 4) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+        return new JsonResponse([
+            'data' => $years,
+            'message' => 'Successfully fetched.'
+        ], JsonResponse::HTTP_OK);
+    }
+    public function search(Request $request)
+    {
+
+        $postingPeriod = PostingPeriod::whereYear('posting_period', $request['year'])->get();
         /* if ($postingPeriod->isEmpty()) {
             $postingPeriod = [];
             for ($month = 1; $month <= 12; $month++) {
@@ -67,7 +115,7 @@ class PostingPeriodController extends Controller
             $endDate = $startDate->copy()->endOfMonth();
             try {
                 $data = PostingPeriod::create([
-                    'posting_period' => $startDate->format('F Y'),
+                    'posting_period' => $startDate->format('Y-m'),
                     'start_date'     => $startDate->format('Y-m-d'),
                     'end_date'       => $endDate->format('Y-m-d'),
                     'status'         => 'closed',
