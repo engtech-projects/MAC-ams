@@ -1395,44 +1395,49 @@
     });
 
     $(document).ready(function() {
-        // Access the Vue instance
-        const vueApp = window.app; // Assuming your Vue instance is assigned to window.app
+        const hasJournalForm = $('#bookJournalForm').length > 0;
+        const hasVueApp = window.app && window.app.filter;
 
-        // Set initial values from Vue model to select2
-        if (vueApp.filter.book_id) {
-            $('#select-jl-bybook').val(vueApp.filter.book_id).trigger('change');
-        }
-        if (vueApp.filter.branch_id) {
-            $('#jlBranch').val(vueApp.filter.branch_id).trigger('change');
-        }
-        if (vueApp.filter.status) {
-            $('#jlStatus').val(vueApp.filter.status).trigger('change');
-        }
+        if (hasJournalForm && hasVueApp) {
+            // Access the Vue instance
+            const vueApp = window.app; // Assuming your Vue instance is assigned to window.app
 
-        // Add change event listeners to update Vue model when select2 changes
-        $('#select-jl-bybook').on('select2:select', function(e) {
-            vueApp.filter.book_id = $(this).val();
-        });
-
-        $('#jlBranch').on('select2:select', function(e) {
-            vueApp.filter.branch_id = $(this).val();
-        });
-
-        $('#jlStatus').on('select2:select', function(e) {
-            vueApp.filter.status = $(this).val();
-        });
-        
-        // Also handle clear events
-        $('#select-jl-bybook, #jlBranch, #jlStatus').on('select2:clear', function(e) {
-            const id = $(this).attr('id');
-            if (id === 'select-jl-bybook') {
-                vueApp.filter.book_id = '';
-            } else if (id === 'jlBranch') {
-                vueApp.filter.branch_id = '';
-            } else if (id === 'jlStatus') {
-                vueApp.filter.status = '';
+            // Set initial values from Vue model to select2
+            if (vueApp.filter.book_id) {
+                $('#select-jl-bybook').val(vueApp.filter.book_id).trigger('change');
             }
-        });
+            if (vueApp.filter.branch_id) {
+                $('#jlBranch').val(vueApp.filter.branch_id).trigger('change');
+            }
+            if (vueApp.filter.status) {
+                $('#jlStatus').val(vueApp.filter.status).trigger('change');
+            }
+
+            // Add change event listeners to update Vue model when select2 changes
+            $('#select-jl-bybook').on('select2:select', function(e) {
+                vueApp.filter.book_id = $(this).val();
+            });
+
+            $('#jlBranch').on('select2:select', function(e) {
+                vueApp.filter.branch_id = $(this).val();
+            });
+
+            $('#jlStatus').on('select2:select', function(e) {
+                vueApp.filter.status = $(this).val();
+            });
+            
+            // Also handle clear events
+            $('#select-jl-bybook, #jlBranch, #jlStatus').on('select2:clear', function(e) {
+                const id = $(this).attr('id');
+                if (id === 'select-jl-bybook') {
+                    vueApp.filter.book_id = '';
+                } else if (id === 'jlBranch') {
+                    vueApp.filter.branch_id = '';
+                } else if (id === 'jlStatus') {
+                    vueApp.filter.status = '';
+                }
+            });
+        }
     });
 
     // $('.select-jl-branch').select2({
