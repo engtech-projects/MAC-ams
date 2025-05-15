@@ -2,6 +2,48 @@
 
 @section('content')
     <style type="text/css">
+        .select2-container {
+            position: relative;
+            width: 250px;
+        }
+
+        .select2-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .select2-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-radius: 4px;
+            list-style: none;
+            padding: 0;
+            margin-top: 2px;
+        }
+
+        .select2-option {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .select2-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .no-results {
+            padding: 8px;
+            color: #888;
+        }
+
         .dataTables_filter {
             float: left !important;
         }
@@ -129,13 +171,35 @@
                                 <div class="tab-pane fade" id="v-pills-posting-period" role="tabpanel"
                                     aria-labelledby="v-pills-Accounting-tab">
                                     <div class="row mb-5">
-                                        <div class="col-md-2">
-                                            <input @change="validateYear()" type="text" v-model="filterYear"
-                                                class="form-control">
-                                            <p class="text-red" v-if="!isValidYear && filterYear">Invalid year</p>
-                                        </div>
 
-                                        <div class="col-md-2">
+                                        <div class="col-md-4 select2-container">
+                                            <input type="text" class="form-control" v-model="postingPeriodYear"
+                                                @focus="open = true" @input="filterOptions"
+                                                placeholder="Select a year..." class="select2-input" />
+
+                                            <ul v-if="open" class="select2-dropdown">
+                                                <li v-for="year in postingPeriodYears" :key="year"
+                                                    @click="selectYear(year)" class="select2-option">
+                                                    @{{ year }}
+                                                </li>
+                                                <li v-if="filteredYears.length === 0" class="text-red no-results">No
+                                                    results
+                                                    found, click search to proceed for creating posting period.
+                                                    <div class="container">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            @click="createPostingPeriod()">Create</button>
+                                                        <button class="btn btn btn-warning"
+                                                            @click="reload()">Cancel</button>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        {{-- <input type="number" @change="validateYear()" :min="minYear"
+                                                :max="maxYear" v-model="year" class="form-control">
+                                            <p v-if="error" class="text-red">@{{ error }}</p> --}}
+
+
+                                        {{-- <div class="col-md-2">
                                             <select @change="handleChange()" class="form-control"
                                                 v-model="postingPeriodYear">
                                                 <option value="">Select Year</option>
@@ -144,34 +208,13 @@
                                                     @{{ postingYear }}
                                                 </option>
                                             </select>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <button @click="search()" class="btn btn-primary"> Search</button>
-                                        </div>
-
-                                    </div>
-
-                                    <div v-if="isCreate" class="alert alert-success" role="alert">
-                                        <h4 class="alert-heading text-white">No data found</h4>
-                                        <p>You want to create posting periods for the year of @{{ filterYear }}?</p>
-                                        <hr>
-                                        <p class="mb-0">Click <span class="text-blue text-bold">CREATE</span> to
-                                            proceed.</p>
-                                        <div class="d-flex justify-content-end">
-                                            <div class="mr-auto p-2"></div>
-                                            <div class="p-2"></div>
-                                            <div class="p-2">
-                                                <div class="container">
-
-                                                    <button class="btn btn-sm btn-primary"
-                                                        @click="createPostingPeriod()">Create</button>
-                                                    <button class="btn btn btn-default" @click="reload()">Cancel</button>
-                                                </div>
-                                            </div>
+                                        </> --}} <div class="col-md-2">
+                                            <button @click="searchPostingPeriod()" class="btn btn-primary">
+                                                Search</button>
                                         </div>
 
                                     </div>
-                                    <table v-if="!isCreate" class="table table-striped">
+                                    <table class="table table-striped">
                                         <thead>
                                             <tr>
                                                 <th>Posting Period</th>
@@ -184,12 +227,11 @@
                                         <tbody>
                                             <tr v-for="(row, index) in postingPeriods" :key="index">
                                                 <td>
-                                                    <input class="form-control" v-if="editIndex === index" type="month"
-                                                        v-model="editRow.posting_period" />
-                                                    <span v-else>@{{ formatPostingPeriod(row.posting_period) }}</span>
+
+                                                    <span>@{{ formatPostingPeriod(row.posting_period) }}</span>
                                                 </td>
                                                 <td>
-                                                    <h1>@{{ dateRange }}</h1>
+
                                                     <input class="form-control" v-if="editIndex === index" type="date"
                                                         v-model="editRow.start_date" :min="getMinYear(row.posting_period)"
                                                         :max="getMaxYear(row.posting_period)" />
@@ -239,19 +281,25 @@
             el: '#app',
             data: {
                 postingPeriods: [],
-                filterYear: null,
+                year: null,
                 postingPeriodYears: null,
                 isCreate: false,
                 dateRange: null,
+                minYear: 2000,
+                error: '',
+                maxYear: new Date().getFullYear(),
+                postingPeriodYear: "", //new Date().getFullYear(),
+                selectedYear: null,
+                open: false,
+                allYears: [],
+                filteredYears: [],
                 postingPeriod: {
                     posting_period: null,
                     start_date: null,
                     end_date: null,
                     status: null,
                 },
-                title: 'Hello World',
                 isEdit: false,
-                postingPeriodYear: "",
                 currentYear: new Date().getFullYear(),
                 editIndex: null,
                 editIndex: null,
@@ -261,39 +309,73 @@
             computed: {
 
             },
+            created() {
+                for (let y = this.currentYear; y >= 1900; y--) {
+                    this.allYears.push(y);
+                }
+                this.filteredYears = this.allYears;
+            },
+            watch: {
+
+                postingPeriodYear(newVal) {
+                    console.log(newVal);
+                    if (!newVal) this.filteredYears = this.allYears;
+                }
+            },
             methods: {
+                filterOptions() {
+                    const term = this.postingPeriodYear.toLowerCase();
+                    this.filteredYears = this.postingPeriodYears.filter(year =>
+                        year.toString().includes(term)
+                    );
+                },
+                selectYear(year) {
+                    this.selectedYear = year;
+                    this.postingPeriodYear = year.toString();
+                    this.open = false;
+                },
+                handleClickOutside(event) {
+                    const dropdown = this.$el.querySelector('.select2-container');
+                    if (!dropdown.contains(event.target)) {
+                        this.open = false;
+                    }
+                },
+                filterYears() {
+                    const term = this.postingPeriodYear.toLowerCase();
+                    this.filteredYears = this.allYears.filter(year =>
+                        year.toString().includes(term)
+                    );
+                },
+                selectYear(year) {
+                    this.selectedYear = year;
+                    this.postingPeriodYear = year.toString();
+                    this.open = false;
+                },
                 validateYear() {
-                    const input = this.filterYear.trim();
-                    const yearPattern = /^\d{4}$/;
-                    const currentYear = new Date().getFullYear();
-                    this.isValidYear = yearPattern.test(input) && +input >= 1900 && +input <= currentYear + 10;
+                    if (this.year < this.minYear) {
+                        this.error = `Year must be at least ${this.minYear}.`;
+                    } else if (this.year > this.maxYear) {
+                        this.error = `Year must be no later than ${this.maxYear}.`;
+                    } else {
+                        this.error = '';
+                    }
                 },
                 handleChange(event) {
                     if (this.postingPeriodYear != "") {
-                        this.filterYear = "";
+                        this.year = "";
                     }
                 },
                 getMinYear(period) {
-                    const year = period.split("-")
-                    return `${year[0]}-01-01`;
+                    return `${period}-01`;
                 },
                 getMaxYear(period) {
-                    const year = period.split("-")
-                    return `${year[0]}-12-31`;
+                    return `${period}-31`;
                 },
-                search() {
-                    if (this.filterYear) {
-                        if (this.postingPeriodYears.includes(this.filterYear)) {
-                            this.postingPeriodYear = this.filterYear;
-                            this.fetchPostingPeriods();
-                        } else {
-                            this.isCreate = true;
-                        }
-                    } else {
+                searchPostingPeriod() {
+                    if (this.postingPeriodYear) {
                         this.fetchPostingPeriods();
+
                     }
-
-
 
                 },
                 startEdit(index) {
@@ -329,7 +411,7 @@
                 },
                 createPostingPeriod() {
                     axios.post('/MAC-ams/posting-period', {
-                        year: this.filterYear
+                        year: this.postingPeriodYear
                     }, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -405,6 +487,10 @@
             mounted() {
                 this.fetchPostingPeriods();
                 this.fetchPostingPeriodYears();
+                document.addEventListener('click', this.handleClickOutside);
+            },
+            beforeDestroy() {
+                document.removeEventListener('click', this.handleClickOutside);
             }
 
         });

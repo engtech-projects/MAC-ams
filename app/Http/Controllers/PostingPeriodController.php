@@ -18,12 +18,8 @@ class PostingPeriodController extends Controller
     {
         $year = $request['year'];
 
-        $query = PostingPeriod::query();
+        $postingPeriod = PostingPeriod::where('posting_period', 'like', "$year-%")->get();
 
-        $query->when($year, function ($query) use ($year) {
-            return $query->where('posting_period', 'like', "$year-%");
-        });
-        $postingPeriod = $query->get();
         /* if ($postingPeriod->isEmpty()) {
             $postingPeriod = [];
             for ($month = 1; $month <= 12; $month++) {
