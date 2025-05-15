@@ -130,11 +130,19 @@
                                     aria-labelledby="v-pills-Accounting-tab">
                                     <div class="row mb-5">
                                         <div class="col-md-2">
-                                            <select class="form-control" v-model="currentYear">
-                                                <option value="2025">2025</option>
-                                                <option value="2024">2024</option>
-                                                <option value="2023">2023</option>
-                                                <option value="2022">2022</option>
+                                            <input @change="validateYear()" type="text" v-model="filterYear"
+                                                class="form-control">
+                                            <p class="text-red" v-if="!isValidYear && filterYear">Invalid year</p>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <select @change="handleChange()" class="form-control"
+                                                v-model="postingPeriodYear">
+                                                <option value="">Select Year</option>
+                                                <option v-for="(postingYear,i) in postingPeriodYears"
+                                                    :key="i" :value="postingYear">
+                                                    @{{ postingYear }}
+                                                </option>
                                             </select>
                                         </div>
                                         <div class="col-md-2">
@@ -143,9 +151,9 @@
 
                                     </div>
 
-                                    <div v-if="postingPeriods.length === 0" class="alert alert-success" role="alert">
+                                    <div v-if="isCreate" class="alert alert-success" role="alert">
                                         <h4 class="alert-heading text-white">No data found</h4>
-                                        <p>You wish to create posting periods for the year of @{{ currentYear }}?</p>
+                                        <p>You want to create posting periods for the year of @{{ filterYear }}?</p>
                                         <hr>
                                         <p class="mb-0">Click <span class="text-blue text-bold">CREATE</span> to
                                             proceed.</p>
@@ -163,7 +171,7 @@
                                         </div>
 
                                     </div>
-                                    <table v-if="postingPeriods.length >=1" class="table table-striped">
+                                    <table v-if="!isCreate" class="table table-striped">
                                         <thead>
                                             <tr>
                                                 <th>Posting Period</th>
@@ -176,18 +184,21 @@
                                         <tbody>
                                             <tr v-for="(row, index) in postingPeriods" :key="index">
                                                 <td>
-                                                    <input class="form-control" v-if="editIndex === index" type="text"
+                                                    <input class="form-control" v-if="editIndex === index" type="month"
                                                         v-model="editRow.posting_period" />
-                                                    <span v-else>@{{ row.posting_period }}</span>
+                                                    <span v-else>@{{ formatPostingPeriod(row.posting_period) }}</span>
                                                 </td>
                                                 <td>
+                                                    <h1>@{{ dateRange }}</h1>
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.start_date" />
+                                                        v-model="editRow.start_date" :min="getMinYear(row.posting_period)"
+                                                        :max="getMaxYear(row.posting_period)" />
                                                     <span v-else>@{{ row.start_date }}</span>
                                                 </td>
                                                 <td>
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.end_date" />
+                                                        v-model="editRow.end_date" :min="getMinYear(row.posting_period)"
+                                                        :max="getMaxYear(row.posting_period)" />
                                                     <span v-else>@{{ row.end_date }}</span>
                                                 </td>
                                                 <td>
@@ -227,43 +238,78 @@
         new Vue({
             el: '#app',
             data: {
-                postingPeriods: {},
+                postingPeriods: [],
+                filterYear: null,
+                postingPeriodYears: null,
+                isCreate: false,
+                dateRange: null,
+                postingPeriod: {
+                    posting_period: null,
+                    start_date: null,
+                    end_date: null,
+                    status: null,
+                },
                 title: 'Hello World',
                 isEdit: false,
+                postingPeriodYear: "",
                 currentYear: new Date().getFullYear(),
                 editIndex: null,
-
-                rows: [{
-                        posting_date: '2025-05-01',
-                        start_date: '2025-05-05',
-                        end_date: '2025-05-10',
-                        status: 'active'
-                    },
-                    {
-                        posting_date: '2025-06-01',
-                        start_date: '2025-06-03',
-                        end_date: '2025-06-08',
-                        status: 'inactive'
-                    }
-                ],
                 editIndex: null,
-                editRow: {}
+                editRow: {},
+                isValidYear: false
+            },
+            computed: {
+
             },
             methods: {
+                validateYear() {
+                    const input = this.filterYear.trim();
+                    const yearPattern = /^\d{4}$/;
+                    const currentYear = new Date().getFullYear();
+                    this.isValidYear = yearPattern.test(input) && +input >= 1900 && +input <= currentYear + 10;
+                },
+                handleChange(event) {
+                    if (this.postingPeriodYear != "") {
+                        this.filterYear = "";
+                    }
+                },
+                getMinYear(period) {
+                    const year = period.split("-")
+                    return `${year[0]}-01-01`;
+                },
+                getMaxYear(period) {
+                    const year = period.split("-")
+                    return `${year[0]}-12-31`;
+                },
                 search() {
-                    this.fetchPostingPeriods();
+                    if (this.filterYear) {
+                        if (this.postingPeriodYears.includes(this.filterYear)) {
+                            this.postingPeriodYear = this.filterYear;
+                            this.fetchPostingPeriods();
+                        } else {
+                            this.isCreate = true;
+                        }
+                    } else {
+                        this.fetchPostingPeriods();
+                    }
+
+
+
                 },
                 startEdit(index) {
                     this.editIndex = index
+
                     this.editRow = {
                         ...this.postingPeriods[index]
                     }
+                    console.log(this.editRow);
                 },
                 cancelEdit() {
                     this.editIndex = null
                     this.editRow = {}
                 },
                 saveEdit(index) {
+                    console.log(this.editRow);
                     this.rows[index] = {
                         ...this.editRow
                     }
@@ -272,17 +318,26 @@
                 reload() {
                     location.reload();
                 },
+                formatPostingPeriod(monthVal) {
+                    if (!monthVal) return '';
+                    const [year, month] = monthVal.split('-');
+                    const date = new Date(year, month - 1);
+                    return date.toLocaleString('default', {
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                },
                 createPostingPeriod() {
                     axios.post('/MAC-ams/posting-period', {
-                        year: this.currentYear
+                        year: this.filterYear
                     }, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
                         },
                     }).then(response => {
-                        this.postingPeriods = response.data.data
                         toastr.success(response.data.message);
+                        window.location.reload();
                     }).catch(err => {
                         console.error(err)
                     })
@@ -294,7 +349,7 @@
                                 .content
                         }
                     }).then(response => {
-                        console.log(this.rows[index])
+                        console.log(this.postingPeriods[index]);
                         this.postingPeriods[index] = {
                             ...this.editRow
                         }
@@ -310,6 +365,27 @@
                         ...this.postingPeriods[index]
                     }
                 },
+                /*                 minYear(postingPeriod) {
+                                    const period = postingPeriod.split(" ");
+                                    return '01-01-' + period[1]
+                                },
+                                maxYear(postingPeriod) {
+                                    const period = postingPeriod.split(" ");
+                                    return '12-31-' + period[1]
+                                }, */
+
+                fetchPostingPeriodYears: function() {
+                    axios.get('/MAC-ams/posting-period-years', {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        this.postingPeriodYears = response.data.data
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                },
                 fetchPostingPeriods: function() {
                     axios.get('/MAC-ams/posting-period', {
                         headers: {
@@ -317,7 +393,7 @@
                                 .content
                         },
                         params: {
-                            year: this.currentYear
+                            year: this.postingPeriodYear
                         }
                     }).then(response => {
                         this.postingPeriods = response.data.data
@@ -328,6 +404,7 @@
             },
             mounted() {
                 this.fetchPostingPeriods();
+                this.fetchPostingPeriodYears();
             }
 
         });
