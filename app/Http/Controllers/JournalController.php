@@ -23,6 +23,7 @@ use App\Models\JournalBook;
 use App\Models\journalEntry;
 use App\Models\journalEntryDetails;
 use App\Models\Accounting;
+use App\Models\PostingPeriod;
 use Carbon\Carbon;
 
 class JournalController extends MainController
@@ -86,12 +87,22 @@ class JournalController extends MainController
         //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
         // ], $customMessages);
 
-        try {
-            $journalEntry = $journalEntry->createJournalEntry($request->input());
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+        $period = new PostingPeriod();
+        $posting_period = $period->openStatus()->first();
+        if ($posting_period) {
+            $isOpen = $period->isInPostingPeriod($journalEntry->journal_date, $posting_period);
+            if ($isOpen && !$journalEntry->postedStatus()) {
+                try {
+                    $journalEntry = $journalEntry->createJournalEntry($request->input());
+                } catch (Exception $e) {
+                    return response()->json(['message' => $e->getMessage()]);
+                }
+            } else {
+                return response()->json([
+                    'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
+                ], 201);
+            }
         }
-
         return response()->json([
             'message' => 'Journal Entry successfully saved.',
         ], 201);
@@ -136,37 +147,46 @@ class JournalController extends MainController
         // ], $customMessages);
 
         // Retrieve the existing journal entry
+
         $journalEntry = JournalEntry::findOrFail($request->journal_entry['edit_journal_id']);
 
-        try {
-            // Update the journal entry with the provided data
-            DB::transaction(function () use ($request, $journalEntry) {
-                $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
-                $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
+        $period = new PostingPeriod();
+        $posting_period = $period->openStatus()->first();
+        if ($posting_period) {
+            $isOpen = $period->isInPostingPeriod($journalEntry->journal_date, $posting_period);
+            if ($isOpen && $journalEntry->status === 'unposted') {
+                try {
+                    DB::transaction(function () use ($request, $journalEntry) {
+                        $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
+                        $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
 
-                $journalEntry->update([
-                    'journal_no' => $request->journal_entry['edit_journal_no'],
-                    'journal_date' => $request->journal_entry['edit_journal_date'],
-                    'branch_id' => $request->journal_entry['edit_branch_id'],
-                    'book_id' => $request->journal_entry['edit_book_id'],
-                    'source' => $request->journal_entry['edit_source'],
-                    'cheque_no' => $request->journal_entry['edit_cheque_no'],
-                    'cheque_date' => $request->journal_entry['edit_cheque_date'],
-                    'amount' => $amount,
-                    'status' => $request->journal_entry['edit_status'],
-                    'payee' => $request->journal_entry['edit_payee'],
-                    'remarks' => $request->journal_entry['edit_remarks'],
-                ]);
+                        $journalEntry->update([
+                            'journal_no' => $request->journal_entry['edit_journal_no'],
+                            'journal_date' => $request->journal_entry['edit_journal_date'],
+                            'branch_id' => $request->journal_entry['edit_branch_id'],
+                            'book_id' => $request->journal_entry['edit_book_id'],
+                            'source' => $request->journal_entry['edit_source'],
+                            'cheque_no' => $request->journal_entry['edit_cheque_no'],
+                            'cheque_date' => $request->journal_entry['edit_cheque_date'],
+                            'amount' => $amount,
+                            'status' => $request->journal_entry['edit_status'],
+                            'payee' => $request->journal_entry['edit_payee'],
+                            'remarks' => $request->journal_entry['edit_remarks'],
+                        ]);
 
-                // Update journal entry details
-                $journalEntry->details()->delete();
-                $journalEntry->details()->createMany($request->details);
-            });
-
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+                        // Update journal entry details
+                        $journalEntry->details()->delete();
+                        $journalEntry->details()->createMany($request->details);
+                    });
+                } catch (Exception $e) {
+                    return response()->json(['message' => $e->getMessage()], 500);
+                }
+            } else {
+                return response()->json([
+                    'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
+                ], 500);
+            }
         }
-
         return response()->json([
             'message' => 'Journal Entry updated successfully.',
         ], 200);
@@ -228,10 +248,6 @@ class JournalController extends MainController
         // echo '</pre>';
         return view('journal.sections.journalEntryList', $data);
     }
-    public function show($id)
-    {
-    }
-    public function populate()
-    {
-    }
+    public function show($id) {}
+    public function populate() {}
 }

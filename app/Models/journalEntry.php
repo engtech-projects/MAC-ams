@@ -110,6 +110,11 @@ class journalEntry extends Model
 
         return $query->get();
     }
+    public function scopePostedStatus($query)
+    {
+        $query->where('status', 'posted');
+    }
+    public function isPostingPeriod() {}
 
     public function details()
     {
