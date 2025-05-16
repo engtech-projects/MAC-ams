@@ -18,6 +18,7 @@ class SubsidiaryCategory extends Model
     const DEPRE = 'DEPRE';
     const INSUR_ADD = 'INSUR-ADD';
     const ADDTIONAL_PREPAID_EXP = 'Additional Prepaid Expense';
+    const LEASE = "LEASE";
 
     protected $fillable = [
         'sub_cat_name',

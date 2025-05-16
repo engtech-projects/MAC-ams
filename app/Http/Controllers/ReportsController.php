@@ -417,6 +417,9 @@ class ReportsController extends MainController
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
         } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
+        } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::LEASE) {
+            $accountName = Accounts::where('account_number', 1555)->pluck('account_name')->first();
+
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
@@ -442,7 +445,7 @@ class ReportsController extends MainController
         $journalEntry = JournalEntry::create([
             'journal_no' => $journalNumber,
             'journal_date' => $as_of->format('Y-m-d'),
-            'branch_id' => $request->branch_id,
+            'branch_id' => 4,
             'book_id' => $journalEntry::DEPRECIATION_BOOK,
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
@@ -513,6 +516,13 @@ class ReportsController extends MainController
                 $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_unposted_payments'] : 0;
                 $details['journal_details_debit'] =  0;
             }
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::LEASE) {
+                $details['journal_details_debit'] = $account->account_number == 1555 ? $request->total['total_due_amort'] : 0;
+                $details['journal_details_credit'] = $account->account_number == 1560 ? $request->total['total_due_amort'] : 0;
+            }
+
+
+
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
                     $details['journal_details_debit'] = $request->total['total_due_amort'];
