@@ -17,7 +17,6 @@ class PostingPeriodController extends Controller
     public function index(Request $request)
     {
         $year = $request['year'];
-
         $postingPeriod = PostingPeriod::where('posting_period', 'like', "$year-%")->get();
 
         /* if ($postingPeriod->isEmpty()) {

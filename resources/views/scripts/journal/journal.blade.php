@@ -522,6 +522,7 @@
                                 dataType: "json",
                                 success: function(data) {
                                     toastr.success(data.message);
+                                    alert("ads");
                                     reload();
                                 },
                                 error: function(jqXHR) {
@@ -835,7 +836,7 @@
                                             alert('An unknown validation error occurred.');
                                         }
                                     } else {
-                                        toastr.error('Error');
+                                        toastr.error(jqXHR.responseJSON.message);
                                     }
                                 }
                             });
