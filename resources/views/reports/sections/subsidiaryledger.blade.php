@@ -27,6 +27,17 @@
         .buttons-html5 {
             display: none;
         }
+
+        .dropdown-item.btn-edit-account:not(.subsid-delete):hover {
+            background-color: #e8f4fe !important;
+            color: #0d6efd !important;
+        }
+        
+        /* Hover effect for Delete button */
+        .dropdown-item.subsid-delete:hover {
+            background-color: #ffebee !important;
+            color: #dc3545 !important;
+        }
     </style>
 
     <!-- Main content -->
@@ -67,23 +78,23 @@
                                 </div>
                             </div>
                             <div v-if="reportType==''" class="row col-md-12">
-                                <div class="col-md-2 col-xs-12">
+                                <div class="col-md-1 col-xs-12">
                                     <div class="box">
                                         <div class="form-group">
                                             <label class="label-normal" for="sub_acct_no">Code</label>
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm rounded-0"
-                                                    v-model="subsidiary.sub_code" placeholder="Subsidiary Account No."
+                                                    v-model="subsidiary.sub_code" placeholder="Code"
                                                     required>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-3 col-xs-12">
+                                <div class="col-md-5 col-xs-12">
                                     <div class="box">
                                         <div class="form-group">
-                                            <label class="label-normal" for="sub_name">Account Name</label>
+                                            <label class="label-normal" for="sub_name">Subsidiary Name</label>
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm rounded-0"
                                                     v-model="subsidiary.sub_name" name="sub_name" id="sub_name"
@@ -100,7 +111,7 @@
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm rounded-0"
                                                     v-model="subsidiary.sub_address" name="sub_address" id="sub_address"
-                                                    placeholder="Address (Optional)">
+                                                    placeholder="Address">
                                             </div>
                                         </div>
                                     </div>
@@ -113,7 +124,7 @@
                                             <div class="input-group">
                                                 <input type="Number" class="form-control form-control-sm rounded-0"
                                                     v-model="subsidiary.sub_tel" name="sub_tel" id="sub_tel"
-                                                    placeholder="Subsidiary Telephone Number (Optional)">
+                                                    placeholder="Phone Number">
                                             </div>
                                         </div>
                                     </div>
@@ -124,8 +135,8 @@
                                         <div class="form-group">
                                             <label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
                                             <div class="input-group">
-                                                <select name="sub_cat_id" v-model="subsidiary.sub_cat_id"
-                                                    class="form-control form-control-sm" required id="sub_cat_id">
+                                                <select name="sub_cat_id" class="form-control form-control-sm"
+                                                    id="sub_cat_id">
                                                     <option value="" disabled selected>-Select Category-</option>
                                                     @foreach ($sub_categories as $sub_category)
                                                         <option value="{{ $sub_category->sub_cat_id }}">
@@ -143,60 +154,38 @@
                                         <div class="form-group">
                                             <label class="label-normal" for="sub_per_branch">Branch</label>
                                             <div class="input-group">
-                                                <select v-model="subsidiary.sub_per_branch"
-                                                    class="form-control form-control-sm" required>
-                                                    <option v-for="branch in branches" :key="branch.branch_id"
-                                                        :value="branch.branch_code">
-                                                        @{{ branch.branch_name }}</option>
+                                                <select v-model="subsidiary.sub_per_branch" name="branch_id" class="select2 form-control form-control-sm" id="jlBranch" required>
+                                                    <option value="" disabled selected>-Select Branch-</option>
+                                                    <option value="00001">MAIN BRANCH - BUTUAN BRANCH</option>
+                                                    <option value="00002">BRANCH 2 - NASIPIT BRANCH</option>
+                                                    <option value="00003">BRANCH 3 - GINGOOG BRANCH</option>
+                                                    <option value="00000">HEAD OFFICE</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        {{--
-                                            <div class="input-group">
-                                                <input type="text" class="form-control form-control-sm rounded-0"
-                                                    name="sub_per_branch" id="sub_per_branch" placeholder="Branch"
-                                                    required>
-                                            </div> --}}
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-md-3 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_amount">Amount</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control form-control-sm rounded-0"
-                                                v-model="subsidiary.sub_amount" name="sub_amount" id="sub_amount"
-                                                placeholder="Amount">
+                                <div class="col-md-3 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_amount">Amount</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control form-control-sm rounded-0"
+                                                    name="sub_amount" id="sub_amount" placeholder="Amount" required>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3 col-xs-12">
-                                <div class="box">
-                                    <div class="form-group">
-                                        <label class="label-normal" for="sub_no_amort">Amort</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control form-control-sm rounded-0"
-                                                v-model="subsidiary.sub_no_amort" name="sub_no_amort" id="sub_no_amort"
-                                                required>
-                                        </div>
-                                    </div>
+                                <div class="col-md-1 text-right">
+                                    <button type="button" class="btn btn-success px-4 py-2 mt-4"
+                                        @click="saveSubsidiary(subsidiary.sub_id)">
+                                        Save/Update</button>
                                 </div>
-                            </div>
-                            <div class="col-md-12 text-right" style="padding-bottom:20px">
-                                <button type="button" class="btn btn-sm btn-success"
-                                    @click="saveSubsidiary(subsidiary.sub_id)">
-                                    Save/Update</button>
                             </div>
                         </div>
-
-
-                </div>
-
-                </form>
-                <form @submit.prevent="submitForm" action="">
+                    </form>
+                    <form @submit.prevent="submitForm" action="">
                     <div v-show="['subsidiary_all_account', 'subsidiary_per_account', 'income_minus_expense', 'subsidiary-ledger-listing-report', 'subsidiary-ledger-summary-report', 'income_minus_expense_summary'].includes(reportType)"
                         class="row col-md-12 no-print">
                         <div class="col-md-2 col-xs-12"
@@ -400,13 +389,12 @@
                                 <table v-if="reportType==''" id="subsidiaryledgerTbl" class="table ">
                                     <thead>
                                         <th>Code</th>
-                                        <th>Account Name</th>
+                                        <th>Subsidiary Name</th>
                                         <th>Address</th>
-                                        <th>Tel No.</th>
-                                        <th>Branch</th>
+                                        <th style="width:10%;">Phone No.</th>
+                                        <th style="width:10%;">Branch</th>
                                         <th>Date</th>
                                         <th>Amount</th>
-                                        <th>Amort</th>
                                         <th>Action</th>
                                     </thead>
                                     <tbody>
@@ -416,26 +404,19 @@
                                                 <td>{{ $data->sub_name }}</td>
                                                 <td>{{ $data->sub_address }}</td>
                                                 <td>{{ $data->sub_tel }}</td>
-                                                <td>{{ $data->sub_per_branch }}</td>
-                                                <td>{{ Carbon::parse($data->sub_dat)->format('m/d/Y') }}</td>
-                                                <td>{{ $data->sub_amount }}</td>
-                                                <td>{{ $data->sub_no_amort }}</td>
+                                                <td>{{ Str::after($data->branch, '-') }}</td>
+                                                <td>{{ isset($data->sub_date) ? Carbon::parse($data->sub_date)->format('m/d/Y') : '' }}</td>
+                                                <td>₱{{ number_format((float)$data->sub_amount, 2) }}</td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <button type="button"
-                                                            class="btn btn-xs btn-default btn-flat coa-action">Action</button>
-                                                        <a type="button"
-                                                            class="btn btn-xs btn-default btn-flat dropdown-toggle dropdown-icon coa-action"
-                                                            data-toggle="dropdown" aria-expanded="false">
-                                                            <span class="sr-only">Toggle Dropdown</span>
-                                                        </a>
-                                                        <div class="dropdown-menu dropdown-menu-right" role="menu"
-                                                            style="left:0;">
-                                                            <a class="dropdown-item btn-edit-account"
-                                                                data-value="{{ $data->sub_id }}" @click="show"
-                                                                href="#">Edit</a>
-                                                            <a class="dropdown-item btn-edit-account subsid-delete"
-                                                                value="{{ $data->sub_id }}" href="#">delete</a>
+                                                        <button type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fas fa-filter"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            <a class="dropdown-item btn-edit-account" data-value="{{ $data->sub_id }}" @click="show" href="#" 
+                                                               style="transition: background-color 0.2s;">Edit</a>
+                                                            <a class="dropdown-item btn-edit-account subsid-delete" value="{{ $data->sub_id }}" href="#"
+                                                               style="transition: background-color 0.2s;">Delete</a>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1757,18 +1738,18 @@
                 }
             },
             mounted() {
-                axios.get('/MAC-ams/branch', {
-                        headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                .content
-                        }
-                    })
-                    .then(response => {
-                        this.branches = response.data.data;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
+                // axios.get('/MAC-ams/branches/all', {
+                //         headers: {
+                //             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                //                 .content
+                //         }
+                //     })
+                //     .then(response => {
+                //         this.branches = response.data.data;
+                //     })
+                //     .catch(error => {
+                //         console.error('Error:', error);
+                //     });
                 // for(var i in this.data){
                 // 	if(this.data[i]){
                 // 		console.log(this.data[i]);
