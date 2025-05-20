@@ -89,6 +89,7 @@
     <section class="content" id="app">
         <div class="container-fluid">
             <div class="row">
+                @{{ open_period }}
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="spacer" style="margin-top:10px;"></div>
                     <div class="card">
@@ -233,14 +234,14 @@
                                                 <td>
 
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.start_date" :min="getMinYear(row.posting_period)"
-                                                        :max="getMaxYear(row.posting_period)" />
+                                                        v-model="editRow.start_date" :min="open_period.start_date"
+                                                        :max="open_period.end_date" />
                                                     <span v-else>@{{ row.start_date }}</span>
                                                 </td>
                                                 <td>
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.end_date" :min="getMinYear(row.posting_period)"
-                                                        :max="getMaxYear(row.posting_period)" />
+                                                        v-model="editRow.end_date" :min="open_period.start_date"
+                                                        :max="open_period.end_date" />
                                                     <span v-else>@{{ row.end_date }}</span>
                                                 </td>
                                                 <td>
@@ -291,6 +292,7 @@
                 postingPeriodYear: "", //new Date().getFullYear(),
                 selectedYear: null,
                 open: false,
+                open_period: {},
                 allYears: [],
                 filteredYears: [],
                 postingPeriod: {
@@ -463,11 +465,13 @@
                                 .content
                         }
                     }).then(response => {
-                        this.postingPeriodYears = response.data.data
+                        this.postingPeriodYears = response.data.data.years
+                        this.open_period = response.data.data.open_period
                     }).catch(err => {
                         console.error(err)
                     })
                 },
+
                 fetchPostingPeriods: function() {
                     axios.get('/MAC-ams/posting-period', {
                         headers: {
@@ -487,6 +491,7 @@
             mounted() {
                 this.fetchPostingPeriods();
                 this.fetchPostingPeriodYears();
+
                 document.addEventListener('click', this.handleClickOutside);
             },
             beforeDestroy() {

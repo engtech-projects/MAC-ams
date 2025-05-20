@@ -17,7 +17,8 @@ class PostingPeriodController extends Controller
     public function index(Request $request)
     {
         $year = $request['year'];
-        $postingPeriod = PostingPeriod::where('posting_period', 'like', "$year-%")->get();
+        $postingPeriods = PostingPeriod::where('posting_period', 'like', "$year-%")->get();
+
 
         /* if ($postingPeriod->isEmpty()) {
             $postingPeriod = [];
@@ -42,18 +43,24 @@ class PostingPeriodController extends Controller
             }
         } */
         return new JsonResponse([
-            'data' => $postingPeriod,
+            'data' => $postingPeriods,
             'message' => 'Successfully fetched.'
         ], JsonResponse::HTTP_OK);
     }
 
     public function getYears()
     {
-        $years = PostingPeriod::selectRaw('DISTINCT LEFT(posting_period, 4) as year')
+        $postingPeriod = new PostingPeriod();
+
+        $open = $postingPeriod->openStatus()->first();
+        $years = $postingPeriod::selectRaw('DISTINCT LEFT(posting_period, 4) as year')
             ->orderBy('year', 'desc')
             ->pluck('year');
         return new JsonResponse([
-            'data' => $years,
+            'data' => [
+                'years' => $years,
+                'open_period' => $open
+            ],
             'message' => 'Successfully fetched.'
         ], JsonResponse::HTTP_OK);
     }
