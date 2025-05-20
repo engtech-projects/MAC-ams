@@ -1258,7 +1258,7 @@ class ReportsController extends MainController
         $from = Carbon::createFromFormat('Y-m-d',$request->from);
         $toRemarks = Carbon::createFromFormat('Y-m-d',$request->to);
         $to = Carbon::createFromFormat('Y-m-d', $request->to);
-        $journalDate = $to->addDay();
+        $journalDate = Carbon::createFromFormat('Y-m-d',$request->journalDate);
 
         $entry = $journalEntry::create([
             'journal_no' => $journalEntry->generateJournalNumber(JournalBook::GENERAL_LEDGER_BOOK),
@@ -1293,13 +1293,18 @@ class ReportsController extends MainController
         }
 
         $retainEarningsAccount = Accounts::find(Accounts::RETAINED_EARNING_ACC);
+
+        // Determine if NetIncome is negative (debit) or positive (credit)
+        $debitAmount = ($netIncome < 0 ) ? abs($netIncome) : 0;
+        $creditAmount = ($netIncome > 0) ? $netIncome : 0;
+
         array_push($details, [
             'account_id' => $retainEarningsAccount->account_id,
             'subsidiary_id' => Subsidiary::SUBSIDIARY_OFFICE,
             'journal_details_account_no' => $account['account_number'],
             'journal_details_title' => $retainEarningsAccount->account_name,
-            'journal_details_debit' => 0,
-            'journal_details_credit' => $netIncome,
+            'journal_details_debit' => $debitAmount,
+            'journal_details_credit' => $creditAmount,
         ]);
 
         $lastIndex = array_pop($details);
