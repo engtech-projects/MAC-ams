@@ -319,7 +319,6 @@
             watch: {
 
                 postingPeriodYear(newVal) {
-                    console.log(newVal);
                     if (!newVal) this.filteredYears = this.allYears;
                 }
             },
