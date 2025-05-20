@@ -89,7 +89,6 @@
     <section class="content" id="app">
         <div class="container-fluid">
             <div class="row">
-                @{{ open_period }}
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="spacer" style="margin-top:10px;"></div>
                     <div class="card">
