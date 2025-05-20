@@ -122,7 +122,7 @@
 
 
             <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" ref="modal"
-                aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                aria-labelledby="myLargeModalLabel" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog modal-xl">
 
                     <div class="modal-content">
@@ -1611,12 +1611,14 @@
                                     }
                                 }
                                 this.collectionBreakdown = cb;
-                                this.closeModal();
+                                this.calculateCashCount(cb);
                             })
                             .catch(error => {
                                 console.error('Error:', error);
+                                this.closeModal();
                             });
-                        this.calculateCashCount(collectionBreakdown);
+                       
+                       
                     }
 
                 },
