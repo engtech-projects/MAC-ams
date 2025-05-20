@@ -67,11 +67,11 @@
 
             /* Apply custom styles for printed pages */
             /* body {
-                                   font-size: 12pt;
-                                   line-height: 1.5;
-                                   margin: 0;
-                                   padding: 0;
-                                  } */
+                                                                                                                                                                                                                                           font-size: 12pt;
+                                                                                                                                                                                                                                           line-height: 1.5;
+                                                                                                                                                                                                                                           margin: 0;
+                                                                                                                                                                                                                                           padding: 0;
+                                                                                                                                                                                                                                          } */
 
             /* Add page breaks if needed */
             .page-break {
@@ -112,9 +112,11 @@
                             <input type="hidden" name="journal_no" id="journal_no">
                             <div class="col-md-4 frm-header">
                                 <label class="label-normal" for="date">Journal Date</label>
+
                                 <div class="input-group">
-                                    <input type="date" class="form-control form-control-sm rounded-0" name="journal_date"
-                                        id="journal_date" placeholder="Journal Date" required onfocus="this.max = new Date().toISOString().split('T')[0]">
+                                    <input type="date" class="form-control form-control-sm rounded-0"
+                                        :max="posting_period?.end_date" :min="posting_period.start_date" name="journal_date"
+                                        id="journal_date" placeholder="Journal Date">
                                 </div>
                             </div>
                             @if (Gate::allows('manager'))
@@ -497,7 +499,7 @@
                                                         of
                                                         sum
                                                         <span
-                                                        class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
+                                                            class="journal_voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
                                                     </h6>
                                                 </div>
                                                 <div class="col-md-12">
@@ -529,16 +531,16 @@
                                             <div class="col-lg-4 col-sm-5 ml-auto">
 
                                                 <!-- <table class="table table-clear" style="padding-right:232px">
-                                          <tbody>
-                                          <tr>
-                                           <td class="left">
-                                           <strong>TOTAL</strong>
-                                           </td>
-                                           <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
-                                           <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
-                                          </tr>
-                                          </tbody>
-                                         </table> -->
+                                                                                                                                                                                                                                                  <tbody>
+                                                                                                                                                                                                                                                  <tr>
+                                                                                                                                                                                                                                                   <td class="left">
+                                                                                                                                                                                                                                                   <strong>TOTAL</strong>
+                                                                                                                                                                                                                                                   </td>
+                                                                                                                                                                                                                                                   <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
+                                                                                                                                                                                                                                                   <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
+                                                                                                                                                                                                                                                  </tr>
+                                                                                                                                                                                                                                                  </tbody>
+                                                                                                                                                                                                                                                 </table> -->
                                                 <div>
                                                     <button @click="print" class="btn btn-success float-right no-print"
                                                         data-dismiss="modal" style="padding:5px 32px">Print</button>
@@ -561,11 +563,25 @@
         new Vue({
             el: '#app',
             data: {
-                baseUrl: window.location.protocol + "//" + window.location.host
+                baseUrl: window.location.protocol + "//" + window.location.host,
+                posting_period: {}
             },
             methods: {
                 search: function() {
                     window.location.href = this.baseUrl + "/reports/trialBalance?asof=" + this.filter.asof;
+                },
+                getOpenPostingPeriod: function() {
+                    axios.get('/MAC-ams/open-posting-period', {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        },
+                    }).then(response => {
+                        this.posting_period = response.data.data
+
+                    }).catch(err => {
+                        console.error(err)
+                    })
                 },
                 print: function() {
                     var content = document.getElementById('printContent').innerHTML;
@@ -577,7 +593,8 @@
                 },
             },
             mounted() {
-                // console.log(this.baseUrl);
+                this.getOpenPostingPeriod();
+                console.log(this.baseUrl);
             }
         });
         // Function to auto-resize textarea based on content

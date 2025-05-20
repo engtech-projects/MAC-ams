@@ -172,6 +172,7 @@ Route::resource('collection-breakdown', CollectionBreakdownController::class);
 Route::resource('posting-period', PostingPeriodController::class);
 Route::get('posting-period-years', [PostingPeriodController::class, "getYears"]);
 Route::get('posting-period/search', [PostingPeriodController::class, 'search']);
+Route::get('open-posting-period', [PostingPeriodController::class, 'openPostingPeriod']);
 Route::delete('branch-collection/{branchCollection}', [CollectionBreakdownController::class, 'deleteBranchCollection']);
 Route::delete('account-officer-collection/{accountOfficerCollection}', [CollectionBreakdownController::class, 'deleteAccountOffficerCollection']);
 

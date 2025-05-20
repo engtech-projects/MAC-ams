@@ -57,6 +57,7 @@ class PostingPeriodController extends Controller
             'message' => 'Successfully fetched.'
         ], JsonResponse::HTTP_OK);
     }
+
     public function search(Request $request)
     {
 
@@ -128,6 +129,33 @@ class PostingPeriodController extends Controller
             'data' => $postingPeriods,
             'message' => 'Successfully created.'
         ], JsonResponse::HTTP_CREATED);
+    }
+    public function show(PostingPeriod $postingPeriod)
+    {
+        if (!$postingPeriod) {
+            $postingPeriod = new PostingPeriod();
+
+            return new JsonResponse([
+                'data' => $postingPeriod->openStatus(),
+                'message' => 'Successfully fetched.'
+            ], JsonResponse::HTTP_OK);
+        }
+        return $postingPeriod;
+    }
+    public function openPostingPeriod()
+    {
+        $postingPeriod = new PostingPeriod();
+
+        $open = $postingPeriod->openStatus()->first();
+        /* $open->start_date = Carbon::parse($open->start_date)->format('m-d-Y');
+        $open->end_date = Carbon::parse($open->end_date)->format('m-d-Y'); */
+
+        /*
+        dd($open); */
+        return new JsonResponse([
+            'data' => $open,
+            'message' => 'Successfully fetched.'
+        ], JsonResponse::HTTP_OK);
     }
     public function destroy() {}
 }

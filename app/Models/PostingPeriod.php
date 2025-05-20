@@ -18,6 +18,8 @@ class PostingPeriod extends Model
         'posting_period'
     ];
 
+    const OPEN_STATUS = 'open';
+
     public function scopeOpenStatus(Builder $query): void
     {
         $query->where('status', 'open');
