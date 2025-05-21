@@ -522,7 +522,6 @@
                                 dataType: "json",
                                 success: function(data) {
                                     toastr.success(data.message);
-                                    alert("ads");
                                     reload();
                                 },
                                 error: function(jqXHR) {
@@ -819,7 +818,7 @@
                                     toastr.success(data.message);
                                     saveJournalEntryDetails(data.id, 'update')
                                     $('#journalModalEdit').modal('hide');
-                                    $('#SearchJournalForm').submit();
+                                    /* $('#SearchJournalForm').submit(); */
                                 },
                                 error: function(jqXHR) {
                                     if (jqXHR.status === 422) {
@@ -951,12 +950,12 @@
                                                     echo '</optgroup><optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
                                                     $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
                                                 }
-                                        
+
                                                 // Add the subsidiary option to the current optgroup
                                                 echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
                                             }
                                         }
-                                        
+
                                         // Close the last optgroup if it exists
                                         if ($temp != '') {
                                             echo '</optgroup>';

@@ -153,7 +153,7 @@ class PostingPeriodController extends Controller
     {
         $postingPeriod = new PostingPeriod();
 
-        $open = $postingPeriod->openStatus()->first();
+        $open = $postingPeriod->openStatus()->get();
         /* $open->start_date = Carbon::parse($open->start_date)->format('m-d-Y');
         $open->end_date = Carbon::parse($open->end_date)->format('m-d-Y'); */
 

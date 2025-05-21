@@ -313,7 +313,7 @@
 
         $(document).on('submit', '#filter-cash-blotter', function(e) {
             event.preventDefault();
-            return alert("asd");
+            return alert(e);
         })
 
 

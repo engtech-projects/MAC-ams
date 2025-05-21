@@ -74,7 +74,7 @@
                     }
                 });
             } else {
-                alert('no student selected');
+                alert('Error');
             }
 
         });

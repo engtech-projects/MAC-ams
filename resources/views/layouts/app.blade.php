@@ -7,6 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@0.24.0/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <title> {{ $title }} </title>
     <style type="text/css">
         .flex {
@@ -60,19 +62,19 @@
             @include('includes.topbar')
 
             @include('includes.sidebar')
-         @endauth
+        @endauth
 
         <!-- Content Wrapper. Contains page content -->
         @guest
-        <div class="login-page">
-            @yield('content')
-        </div>
+            <div class="login-page">
+                @yield('content')
+            </div>
         @endguest
 
         @auth
-        <div class="content-wrapper">
-            @yield('content')
-        </div>
+            <div class="content-wrapper">
+                @yield('content')
+            </div>
         @endauth
 
 
