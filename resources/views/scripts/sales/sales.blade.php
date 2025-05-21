@@ -236,7 +236,6 @@ var Toast = Swal.mixin({
                   ).initialize();
       break;
       default:
-      alert('Error pa ni');
     }
 
   });

@@ -25,12 +25,13 @@ class PostingPeriod extends Model
         $query->where('status', 'open');
     }
 
-    public function isInPostingPeriod($date, $posting_period)
+    public function isInPostingPeriod($journal_date, $posting_period)
     {
-        $transaction_date = Carbon::parse($date);
+
+
+        $transaction_date = Carbon::parse($journal_date);
         $start_date = Carbon::parse($posting_period->start_date);
         $end_date = Carbon::parse($posting_period->end_date);
-
         return $transaction_date->between($start_date, $end_date, false);
     }
 }

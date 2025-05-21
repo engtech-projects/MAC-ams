@@ -88,16 +88,18 @@ class JournalController extends MainController
         // ], $customMessages);
 
         $period = new PostingPeriod();
-        $posting_period = $period->openStatus()->first();
-        if ($posting_period) {
-            $isOpen = $period->isInPostingPeriod($journalEntry->journal_date, $posting_period);
-            if ($isOpen && !$journalEntry->postedStatus()) {
-                try {
+        $open_periods = $period->openStatus()->get();
+        if (count($open_periods) >= 1) {
+            $matchFound = false;
+            foreach ($open_periods as $open) {
+                $journal_date = $request->journal_entry['journal_date'];
+                $isOpen = $period->isInPostingPeriod($journal_date, $open);
+                if ($isOpen) {
                     $journalEntry = $journalEntry->createJournalEntry($request->input());
-                } catch (Exception $e) {
-                    return response()->json(['message' => $e->getMessage()]);
+                    $matchFound = true;
                 }
-            } else {
+            }
+            if (!$matchFound) {
                 return response()->json([
                     'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
                 ], 201);
