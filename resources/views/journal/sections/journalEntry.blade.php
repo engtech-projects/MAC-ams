@@ -67,11 +67,11 @@
 
             /* Apply custom styles for printed pages */
             /* body {
-                                                                                                                                                                                                                                           font-size: 12pt;
-                                                                                                                                                                                                                                           line-height: 1.5;
-                                                                                                                                                                                                                                           margin: 0;
-                                                                                                                                                                                                                                           padding: 0;
-                                                                                                                                                                                                                                          } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   font-size: 12pt;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   line-height: 1.5;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   margin: 0;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   padding: 0;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  } */
 
             /* Add page breaks if needed */
             .page-break {
@@ -103,6 +103,7 @@
         <div class="container-fluid no-print" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
+
                     <form id="journalEntryForm" class="no-print" method="POST">
                         @csrf
                         <div class="row">
@@ -114,9 +115,8 @@
                                 <label class="label-normal" for="date">Journal Date</label>
 
                                 <div class="input-group">
-                                    <input type="date" class="form-control form-control-sm rounded-0"
-                                        :max="posting_period?.end_date" :min="posting_period.start_date" name="journal_date"
-                                        id="journal_date" placeholder="Journal Date">
+                                    <input type="date" ref="datepicker" class="form-control form-control-sm rounded-0"
+                                        name="journal_date">
                                 </div>
                             </div>
                             @if (Gate::allows('manager'))
@@ -531,16 +531,16 @@
                                             <div class="col-lg-4 col-sm-5 ml-auto">
 
                                                 <!-- <table class="table table-clear" style="padding-right:232px">
-                                                                                                                                                                                                                                                  <tbody>
-                                                                                                                                                                                                                                                  <tr>
-                                                                                                                                                                                                                                                   <td class="left">
-                                                                                                                                                                                                                                                   <strong>TOTAL</strong>
-                                                                                                                                                                                                                                                   </td>
-                                                                                                                                                                                                                                                   <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
-                                                                                                                                                                                                                                                   <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
-                                                                                                                                                                                                                                                  </tr>
-                                                                                                                                                                                                                                                  </tbody>
-                                                                                                                                                                                                                                                 </table> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <tbody>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <tr>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <td class="left">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <strong>TOTAL</strong>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           </td>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <td class="left">₱ <strong id="journal_total_debit_voucher"></strong></td>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <td class="left">₱ <strong id="journal_total_credit_voucher"></strong></td>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </tr>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </tbody>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         </table> -->
                                                 <div>
                                                     <button @click="print" class="btn btn-success float-right no-print"
                                                         data-dismiss="modal" style="padding:5px 32px">Print</button>
@@ -592,10 +592,56 @@
                     }, 500);
                 },
             },
-            mounted() {
-                this.getOpenPostingPeriod();
-                console.log(this.baseUrl);
+            async mounted() {
+                try {
+                    const response = await axios.get('/MAC-ams/open-posting-period');
+                    this.posting_period = response.data.data;
+                } catch (error) {
+                    console.err('Error:', error);
+                }
+                var dates = this.posting_period;
+                var date_range = dates.map((period) => {
+                    return {
+                        from: period.start_date,
+                        to: period.end_date
+                    }
+                })
+                flatpickr(this.$refs.datepicker, {
+                    enable: date_range,
+                    dateFormat: 'Y-m-d'
+                })
             }
+            /* mounted() {
+                var data = {}
+                this.getOpenPostingPeriod();
+                axios.get('/MAC-ams/open-posting-period', {
+                    headers: {
+                        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            .content
+                    },
+                }).then(response => {
+                    this.posting_period = response.data.data
+
+                }).catch(err => {
+                    console.error(err)
+                })
+                console.log(data);
+
+                flatpickr(this.$refs.datepicker, {
+                    enable: [{
+                            from: "2025-01-01",
+                            to: "2025-01-31"
+                        },
+                        {
+                            from: "2025-03-01",
+                            to: "2025-03-30"
+                        }
+                    ],
+                    dateFormat: 'Y-m-d'
+                })
+
+                console.log(this.baseUrl);
+            } */
         });
         // Function to auto-resize textarea based on content
         function autoResizeTextarea() {

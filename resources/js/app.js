@@ -2,6 +2,8 @@ require('axios');
 
 require('./bootstrap');
 
-axios.axiosdefaults.baseURL  = 'http://localhost/MAC-ams'
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
+axios.axiosdefaults.baseURL = 'http://localhost/MAC-ams'
 
 
