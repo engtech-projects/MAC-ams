@@ -233,15 +233,15 @@
                                                 <td>
 
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.start_date" :min="open_period.start_date"
-                                                        :max="open_period.end_date" />
+                                                        v-model="editRow.start_date" :min="row.start_date"
+                                                        :max="row.end_date" />
                                                     <span v-else>@{{ row.start_date }}</span>
                                                 </td>
                                                 <td>
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.end_date" :min="open_period.start_date"
-                                                        :max="open_period.end_date" />
-                                                    <span v-else>@{{ row.end_date }}</span>
+                                                        v-model="editRow.end_date" :min="editRow.start_date"
+                                                        :max="editRow.end_date" />
+                                                    <span v-else>@{{ editRow.end_date }}</span>
                                                 </td>
                                                 <td>
                                                     <select class="form-control" v-if="editIndex === index"
