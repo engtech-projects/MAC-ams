@@ -38,13 +38,21 @@
             background-color: #ffebee !important;
             color: #dc3545 !important;
         }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .dataTables_filter {
+            display: block !important;
+        }
     </style>
 
     <!-- Main content -->
     <section class="content" id="app">
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12 mb-4">
                     <form id="subsidiaryForm" method="post">
                         @csrf
                         <input type="hidden" class="form-control form-control-sm rounded-0" name="sub_id" id="sub_id"
@@ -55,10 +63,10 @@
 
                             </div>
                             <div class="col-md-4 frm-header">
-                                <label class="label-normal" for="gender">Select Report</label>
+                                <label class="label-normal" for="reportType">Select Report</label>
                                 <div class="input-group">
-                                    <select v-model="reportType" name="gender" class="form-control form-control-sm"
-                                        id="gender">
+                                    <select v-model="reportType" name="reportType" class="form-control form-control-sm"
+                                        id="reportType">
                                         <option value="" disabled selected>-Select Report-</option>
                                         <option value="income_minus_expense">Income Minus Expense</option>
                                         <option value="income_minus_expense_summary">Income Minus Expense (Summary)</option>
@@ -81,11 +89,10 @@
                                 <div class="col-md-1 col-xs-12">
                                     <div class="box">
                                         <div class="form-group">
-                                            <label class="label-normal" for="sub_acct_no">Code</label>
+                                            <label class="label-normal" for="sub_code">Code</label>
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm rounded-0"
-                                                    v-model="subsidiary.sub_code" placeholder="Code"
-                                                    required>
+                                                    v-model="subsidiary.sub_code" placeholder="Code" name="sub_code" id="sub_code" required>
                                             </div>
                                         </div>
                                     </div>
@@ -97,8 +104,7 @@
                                             <label class="label-normal" for="sub_name">Subsidiary Name</label>
                                             <div class="input-group">
                                                 <input type="text" class="form-control form-control-sm rounded-0"
-                                                    v-model="subsidiary.sub_name" name="sub_name" id="sub_name"
-                                                    placeholder="Subsidiary Name" required>
+                                                    v-model="subsidiary.sub_name" placeholder="Subsidiary Name" name="sub_name" id="sub_name" required>
                                             </div>
                                         </div>
                                     </div>
@@ -135,9 +141,8 @@
                                         <div class="form-group">
                                             <label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
                                             <div class="input-group">
-                                                <select name="sub_cat_id" class="form-control form-control-sm"
-                                                    id="sub_cat_id">
-                                                    <option value="" disabled selected>-Select Category-</option>
+                                                <select v-model="subsidiary.sub_cat_id" name="sub_cat_id" class="form-control form-control-sm" id="sub_cat_id" required>
+                                                    <option value="" disabled>-Select Category-</option>
                                                     @foreach ($sub_categories as $sub_category)
                                                         <option value="{{ $sub_category->sub_cat_id }}">
                                                             {{ $sub_category->sub_cat_code }} -
@@ -154,7 +159,7 @@
                                         <div class="form-group">
                                             <label class="label-normal" for="sub_per_branch">Branch</label>
                                             <div class="input-group">
-                                                <select v-model="subsidiary.sub_per_branch" name="branch_id" class="select2 form-control form-control-sm" id="jlBranch" required>
+                                                <select v-model="subsidiary.sub_per_branch" name="sub_per_branch" class="form-control form-control-sm" id="sub_per_branch" required>
                                                     <option value="" disabled selected>-Select Branch-</option>
                                                     <option value="00001">MAIN BRANCH - BUTUAN BRANCH</option>
                                                     <option value="00002">BRANCH 2 - NASIPIT BRANCH</option>
@@ -172,15 +177,33 @@
                                             <label class="label-normal" for="sub_amount">Amount</label>
                                             <div class="input-group">
                                                 <input type="number" class="form-control form-control-sm rounded-0"
-                                                    name="sub_amount" id="sub_amount" placeholder="Amount" required>
+                                                    v-model="subsidiary.sub_amount" name="sub_amount" id="sub_amount" placeholder="Amount">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-1 text-right">
-                                    <button type="button" class="btn btn-success px-4 py-2 mt-4"
-                                        @click="saveSubsidiary(subsidiary.sub_id)">
-                                        Save/Update</button>
+                                    <div class="d-flex align-items-center mt-4">
+                                      <button
+                                        v-cloak
+                                        type="submit"
+                                        class="btn btn-success px-4 py-2"
+                                        :style="{ width: isEdit ? '100px' : '120px' }"
+                                      >
+                                        @{{ isEdit ? 'Update' : 'Save' }}
+                                      </button>
+
+                                      <button
+                                        v-cloak
+                                        type="button"
+                                        class="btn btn-danger"
+                                        @click="cancelEdit"
+                                        v-if="isEdit"
+                                        style="width: 40px; height: 38px; padding: 0; flex-shrink: 0;"
+                                      >
+                                        &times;
+                                      </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -288,11 +311,11 @@
                     </div>
                 </form>
             </div>
-            <div class="co-md-12" style="height:10px;"></div>
-            <div class="col-md-12">
+            <div class="co-md-12"></div>
+            <!-- <div class="col-md-12">
                 <button class="btn btn-success" id="subsidiaryPrintExcel" type="subsidiary_ledger">Print
                     Excel</button>
-            </div>
+            </div> -->
             <div class="col-md-12">
                 <div v-if="reportType=='income_minus_expense_summary'">
                     <section class="content">
@@ -388,14 +411,16 @@
                             <div class="col-md-12 table-responsive">
                                 <table v-if="reportType==''" id="subsidiaryledgerTbl" class="table ">
                                     <thead>
-                                        <th>Code</th>
-                                        <th>Subsidiary Name</th>
-                                        <th>Address</th>
-                                        <th style="width:10%;">Phone No.</th>
-                                        <th style="width:10%;">Branch</th>
-                                        <th>Date</th>
-                                        <th>Amount</th>
-                                        <th>Action</th>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Subsidiary Name</th>
+                                            <th>Address</th>
+                                            <th style="width:10%;">Phone No.</th>
+                                            <th style="width:10%;">Branch</th>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($subsidiaryData as $data)
@@ -413,7 +438,7 @@
                                                             <i class="fas fa-filter"></i>
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-right" role="menu">
-                                                            <a class="dropdown-item btn-edit-account" data-value="{{ $data->sub_id }}" @click="show" href="#" 
+                                                            <a class="dropdown-item btn-edit-account subsid-edit" data-value="{{ $data->sub_id }}" href="#" 
                                                                style="transition: background-color 0.2s;">Edit</a>
                                                             <a class="dropdown-item btn-edit-account subsid-delete" value="{{ $data->sub_id }}" href="#"
                                                                style="transition: background-color 0.2s;">Delete</a>
@@ -649,6 +674,24 @@
                             </div>
                         </div>
                 </section>
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteSubsidiaryModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        Are you sure you want to delete this Subsidiary?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmDeleteSubsidiary" class="btn btn-danger">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <!-- /.Table -->
             </div>
         </div>
@@ -1064,19 +1107,20 @@
         </div>
     </section>
     <!-- /.content -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
-        new Vue({
+        window.app = new Vue({
             el: '#app',
             data: {
                 subsidiary: {
                     sub_name: '',
-                    sub_cat_id: null,
+                    sub_cat_id: '',
                     sub_code: '',
                     sub_address: '',
                     sub_per_branch: '',
                     sub_amount: null,
                     sub_tel: '',
-                    sub_no_amort: null,
                 },
                 balance: '',
                 branches: [],
@@ -1099,25 +1143,11 @@
                 subsidiarySummary: [],
                 balance: 0,
                 url: "{{ route('reports.subsidiary-ledger') }}",
+                isEdit: false,
             },
             methods: {
-                saveSubsidiary(id) {
-                    axios.post('/MAC-ams/subsidiary/' + id, this.subsidiary, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        })
-                        .then(response => {
-                            this.subsidiary = response.data.data
-                            toastr.success(response.data.message);
-                            window.reload();
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                },
                 show(event) {
+                    this.isEdit = true;
                     const value = event.target.dataset.value;
                     axios.get('/MAC-ams/subsidiary/' + value, {
                             headers: {
@@ -1127,11 +1157,28 @@
                         })
                         .then(response => {
                             this.subsidiary = response.data.data
+                            document.getElementById('sub_id').value = this.subsidiary.sub_id;
                         })
                         .catch(error => {
                             console.error('Error:', error);
                         });
-
+                },
+                resetForm() {
+                    this.isEdit = false;
+                    this.subsidiary = {
+                        sub_code: '',
+                        sub_name: '',
+                        sub_address: '',
+                        sub_tel: '',
+                        sub_cat_id: '',
+                        sub_per_branch: '',
+                        sub_amount: ''
+                    };
+                },
+                cancelEdit() {
+                    this.resetForm();
+                    $('#subsidiaryForm').trigger('reset');
+                    $('[name="sub_id"]').val('');
                 },
                 getCurrentDate() {
                     const date = new Date();
@@ -1738,6 +1785,17 @@
                 }
             },
             mounted() {
+                this.$nextTick(() => {
+                    $('#reportType').select2({
+                        placeholder: 'Report Type'
+                    });
+
+                    // Event listeners
+                    $('#reportType').on('change', (e) => {
+                        this.reportType = e.target.value;
+                    });
+
+                });
                 // axios.get('/MAC-ams/branches/all', {
                 //         headers: {
                 //             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
