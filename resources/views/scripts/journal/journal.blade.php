@@ -648,8 +648,8 @@
                             stStatusButton.text('Post');
                         }
                     },
-                    error: function() {
-                        toastr.error('Error');
+                    error: function(response) {
+                        toastr.error(response.responseJSON.message);
                     }
                 });
             }
@@ -697,8 +697,8 @@
                     }
                     // $('#journalEntryDetails').DataTable().ajax.reload(null, false);
                 },
-                error: function(data) {
-                    toastr.error('Error occurred');
+                error: function(response) {
+                    toastr.error(response.responseJSON.message);
                 }
             });
         });
@@ -950,12 +950,12 @@
                                                     echo '</optgroup><optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
                                                     $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
                                                 }
-
+                                        
                                                 // Add the subsidiary option to the current optgroup
                                                 echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
                                             }
                                         }
-
+                                        
                                         // Close the last optgroup if it exists
                                         if ($temp != '') {
                                             echo '</optgroup>';

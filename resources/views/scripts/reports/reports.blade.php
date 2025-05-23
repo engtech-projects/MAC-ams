@@ -1425,7 +1425,7 @@
             $('#jlStatus').on('select2:select', function(e) {
                 vueApp.filter.status = $(this).val();
             });
-            
+
             // Also handle clear events
             $('#select-jl-bybook, #jlBranch, #jlStatus').on('select2:clear', function(e) {
                 const id = $(this).attr('id');
