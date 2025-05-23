@@ -1788,13 +1788,21 @@
                 this.$nextTick(() => {
                     $('#reportType').select2({
                         placeholder: 'Report Type'
-                    });
-
-                    // Event listeners
-                    $('#reportType').on('change', (e) => {
+                    }).on('change', (e) => {
                         this.reportType = e.target.value;
                     });
+                    
+                    $('#sub_cat_id').select2({
+                        placeholder: 'Select Category'
+                    }).on('change', (e) => {
+                        this.$set(this.subsidiary, 'sub_cat_id', e.target.value);
+                    });
 
+                    $('#sub_per_branch').select2({
+                        placeholder: 'Select Branch'
+                    }).on('change', (e) => {
+                        this.$set(this.subsidiary, 'sub_per_branch', e.target.value);
+                    });
                 });
                 // axios.get('/MAC-ams/branches/all', {
                 //         headers: {
@@ -1813,6 +1821,26 @@
                 // 		console.log(this.data[i]);
                 // 	}
                 // }
+            }
+        });
+    </script>
+    <script>
+        // Watch for reportType changes to manage DataTable
+        $(document).on('change', '#reportType', function() {
+            var reportType = $(this).val();
+            
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
+                $('#subsidiaryledgerTbl').DataTable().destroy();
+            }
+            
+            // Reinitialize DataTable only for the main table (empty reportType)
+            if (reportType === '' && $('#subsidiaryledgerTbl').length) {
+                setTimeout(function() {
+                    $('#subsidiaryledgerTbl').DataTable({
+                        "searching": true
+                    });
+                }, 100);
             }
         });
     </script>
