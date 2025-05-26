@@ -19,6 +19,15 @@ class SubsidiaryController extends Controller
     {
         Log::info('Incoming subsidiary data:', $request->all());
 
+        if (Subsidiary::where('sub_code', $request->sub_code)->exists()) {
+            return response()->json([
+                'message' => 'The subsidiary code already exists. Please choose a different code.',
+                'errors' => [
+                    'sub_code' => ['The subsidiary code already exists.']
+                ]
+            ], 422); // 422 Unprocessable Entity
+        }
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -103,6 +112,17 @@ class SubsidiaryController extends Controller
 
     public function update(Subsidiary $subsidiary, Request $request)
     {
+        if (Subsidiary::where('sub_code', $request->sub_code)
+                 ->where('sub_id', '!=', $subsidiary->sub_id)
+                 ->exists()) {
+        return response()->json([
+            'message' => 'The subsidiary code already exists. Please choose a different code.',
+            'errors' => [
+                'sub_code' => ['The subsidiary code already exists.']
+            ]
+        ], 422);
+    }
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',

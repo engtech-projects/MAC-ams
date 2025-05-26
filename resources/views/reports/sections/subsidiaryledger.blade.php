@@ -1158,6 +1158,10 @@
                         .then(response => {
                             this.subsidiary = response.data.data
                             document.getElementById('sub_id').value = this.subsidiary.sub_id;
+                            this.$nextTick(() => {
+                                $('#sub_cat_id').val(this.subsidiary.sub_cat_id).trigger('change');
+                                $('#sub_per_branch').val(this.subsidiary.sub_per_branch).trigger('change');
+                            });
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -1174,11 +1178,16 @@
                         sub_per_branch: '',
                         sub_amount: ''
                     };
+                    this.clearSelect2Values();
                 },
                 cancelEdit() {
                     this.resetForm();
                     $('#subsidiaryForm').trigger('reset');
                     $('[name="sub_id"]').val('');
+                },
+                clearSelect2Values() {
+                    $('#sub_cat_id').val('').trigger('change');
+                    $('#sub_per_branch').val('').trigger('change');
                 },
                 getCurrentDate() {
                     const date = new Date();
@@ -1786,62 +1795,108 @@
             },
             mounted() {
                 this.$nextTick(() => {
-                    $('#reportType').select2({
-                        placeholder: 'Report Type'
-                    }).on('change', (e) => {
-                        this.reportType = e.target.value;
-                    });
-                    
-                    $('#sub_cat_id').select2({
-                        placeholder: 'Select Category'
-                    }).on('change', (e) => {
-                        this.$set(this.subsidiary, 'sub_cat_id', e.target.value);
-                    });
-
-                    $('#sub_per_branch').select2({
-                        placeholder: 'Select Branch'
-                    }).on('change', (e) => {
-                        this.$set(this.subsidiary, 'sub_per_branch', e.target.value);
-                    });
+                    setTimeout(() => {
+                        // Use namespaced events to avoid conflicts
+                        $(document).on('reportTypeChanged.subsidiaryReport', (event, value) => {
+                            this.reportType = value;
+                        });
+                        
+                        $(document).on('subCatChanged.subsidiaryReport', (event, value) => {
+                            this.subsidiary.sub_cat_id = value;
+                        });
+                        
+                        $(document).on('subBranchChanged.subsidiaryReport', (event, value) => {
+                            this.subsidiary.sub_per_branch = value;
+                        });
+                    }, 100);
                 });
-                // axios.get('/MAC-ams/branches/all', {
-                //         headers: {
-                //             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                //                 .content
-                //         }
-                //     })
-                //     .then(response => {
-                //         this.branches = response.data.data;
-                //     })
-                //     .catch(error => {
-                //         console.error('Error:', error);
-                //     });
-                // for(var i in this.data){
-                // 	if(this.data[i]){
-                // 		console.log(this.data[i]);
-                // 	}
-                // }
+            },
+            beforeDestroy() {
+                $(document).off('.subsidiaryReport');
+                
+                if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
+                    $('#subsidiaryledgerTbl').DataTable().destroy();
+                }
             }
         });
     </script>
     <script>
-        // Watch for reportType changes to manage DataTable
-        $(document).on('change', '#reportType', function() {
-            var reportType = $(this).val();
-            
-            // Destroy existing DataTable if it exists
-            if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
-                $('#subsidiaryledgerTbl').DataTable().destroy();
+        $(document).ready(function() {
+            if ($('#reportType').length === 0) {
+                return;
             }
             
-            // Reinitialize DataTable only for the main table (empty reportType)
-            if (reportType === '' && $('#subsidiaryledgerTbl').length) {
-                setTimeout(function() {
-                    $('#subsidiaryledgerTbl').DataTable({
-                        "searching": true
-                    });
-                }, 100);
+            if ($.fn.select2) {
+                $('#reportType, #sub_cat_id, #sub_per_branch').each(function() {
+                    if ($(this).hasClass('select2-hidden-accessible')) {
+                        $(this).select2('destroy');
+                    }
+                });
             }
+            
+            $('#reportType').select2({
+                placeholder: "Select Report Type",
+                allowClear: true,
+                width: '100%'
+            });
+            
+            $('#sub_cat_id').select2({
+                placeholder: "Select Category",
+                allowClear: true,
+                width: '100%'
+            });
+            
+            $('#sub_per_branch').select2({
+                placeholder: "Select Branch",
+                allowClear: true,
+                width: '100%'
+            });
+            
+            setTimeout(function() {
+                $('#reportType').on('change.subsidiaryReport', function() {
+                    $(document).trigger('reportTypeChanged', [$(this).val()]);
+                });
+                
+                $('#sub_cat_id').on('change.subsidiaryReport', function() {
+                    $(document).trigger('subCatChanged', [$(this).val()]);
+                });
+                
+                $('#sub_per_branch').on('change.subsidiaryReport', function() {
+                    $(document).trigger('subBranchChanged', [$(this).val()]);
+                });
+            }, 500);
+            
+            $('#reportType').on('change.subsidiaryReport', function() {
+                var reportType = $(this).val();
+                
+                if ($('#subsidiaryledgerTbl').length === 0) {
+                    return;
+                }
+                
+                if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
+                    $('#subsidiaryledgerTbl').DataTable().destroy();
+                }
+                
+                if (reportType === '') {
+                    setTimeout(function() {
+                        if ($('#subsidiaryledgerTbl').length) {
+                            $('#subsidiaryledgerTbl').DataTable({
+                                "searching": true,
+                                "destroy": true
+                            });
+                        }
+                    }, 100);
+                }
+            });
+            
+            $(window).on('beforeunload.subsidiaryReport', function() {
+                $(document).off('.subsidiaryReport');
+                $('#reportType, #sub_cat_id, #sub_per_branch').off('.subsidiaryReport');
+                
+                if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
+                    $('#subsidiaryledgerTbl').DataTable().destroy();
+                }
+            });
         });
     </script>
 @endsection

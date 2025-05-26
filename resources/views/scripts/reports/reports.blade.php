@@ -1164,8 +1164,39 @@
                     $('[name="sub_id"]').val('');
                 },
                 error: function(xhr, status, error) {
-                    console.error('AJAX Error:', xhr.responseText);
-                    toastr.error('An error occurred: ' + error);
+                    // Handle validation errors (422 status code)
+                    if (xhr.status === 422) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            
+                            // Show toastr notification for duplicate sub_code or other validation errors
+                            if (response.message) {
+                                toastr.error(response.message);
+                            } else if (response.errors) {
+                                // If there are specific field errors, show the first one
+                                const firstError = Object.values(response.errors)[0][0];
+                                toastr.error(firstError);
+                            } else {
+                                toastr.error('Validation error occurred');
+                            }
+                        } catch (parseError) {
+                            console.error('Error parsing response:', parseError);
+                            toastr.error('An error occurred while processing the request');
+                        }
+                    } 
+                    // Handle server errors (500 status code)
+                    else if (xhr.status === 500) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            toastr.error(response.message || 'Server error occurred');
+                        } catch (parseError) {
+                            toastr.error('Server error occurred');
+                        }
+                    }
+                    // Handle other errors
+                    else {
+                        toastr.error('An unexpected error occurred: ' + error);
+                    }
                 }
             });
         });
