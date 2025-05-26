@@ -241,13 +241,13 @@
                                                     <input class="form-control" v-if="editIndex === index" type="date"
                                                         v-model="editRow.end_date" :min="editRow.start_date"
                                                         :max="editRow.end_date" />
-                                                    <span v-else>@{{ editRow.end_date }}</span>
+                                                    <span v-else>@{{ row.end_date }}</span>
                                                 </td>
                                                 <td>
                                                     <select class="form-control" v-if="editIndex === index"
                                                         v-model="editRow.status">
-                                                        <option value="Closed">Closed</option>
-                                                        <option value="Open">Open</option>
+                                                        <option value="closed">closed</option>
+                                                        <option value="open">open</option>
                                                     </select>
                                                     <span v-else>@{{ row.status }}</span>
                                                 </td>

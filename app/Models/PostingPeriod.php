@@ -27,11 +27,14 @@ class PostingPeriod extends Model
 
     public function isInPostingPeriod($journal_date, $posting_period)
     {
-
-
         $transaction_date = Carbon::parse($journal_date);
         $start_date = Carbon::parse($posting_period->start_date);
         $end_date = Carbon::parse($posting_period->end_date);
-        return $transaction_date->between($start_date, $end_date, false);
+        /* dd($start_date,$end_date); */
+        if($transaction_date->gt($start_date) || $transaction_date->eq($start_date) && $transaction_date->lt($end_date) || $transaction_date->eq($end_date)) {
+            return true;
+        }
+        return false;
+        /* return $transaction_date->between($start_date, $end_date, false); */
     }
 }
