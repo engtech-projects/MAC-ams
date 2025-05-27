@@ -139,8 +139,11 @@ class JournalController extends MainController
             $matchFound = false;
             foreach ($open_periods as $open) {
                 $journal_date = $request->journal_entry['journal_date'];
+
                 $isOpen = $period->isInPostingPeriod($journal_date, $open);
-                /*                 dd($open, $journal_date, $isOpen); */
+                if ($journalEntry->journal_date == $journal_date) {
+                    $isOpen = true;
+                }
                 if ($isOpen) {
                     try {
                         DB::transaction(function () use ($request, $journalEntry) {
