@@ -87,6 +87,9 @@ class JournalController extends MainController
         //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
         // ], $customMessages);
 
+        $request->validate([
+            'journal_entry.journal_date' => 'required|date'
+        ]);
         $period = new PostingPeriod();
         $open_periods = $period->openStatus()->get();
         if (count($open_periods) >= 1) {

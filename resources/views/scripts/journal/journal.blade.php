@@ -526,19 +526,32 @@
                                 },
                                 error: function(jqXHR) {
                                     // Check if it's a validation error
-                                    if (jqXHR.status === 422) {
-                                        $('#LrefNo').text('')
-                                        $('#book_id').val('');
-                                        $('#book_id').select2({
-                                            placeholder: 'Select',
-                                            allowClear: true,
-                                        });
-                                        const errors = jqXHR.responseJSON.errors;
-                                        // Display the validation error in an alert
-                                        alert(errors['journal_entry.journal_no'][0]);
-                                    } else {
-                                        toastr.error('Error');
+                                    var response = jqXHR.responseJSON
+                                    var errors = response?.errors || {}
+
+                                    toastr.error(response?.message || "An error occured.");
+
+
+                                    for (const field in errors) {
+                                        if (errors.hasOwnProperty(field)) {
+                                            errors[field].forEach(message => {
+                                                toastr.error(message)
+                                            })
+                                        }
                                     }
+                                    /*                                     if (jqXHR.status === 422) {
+                                                                            $('#LrefNo').text('')
+                                                                            $('#book_id').val('');
+                                                                            $('#book_id').select2({
+                                                                                placeholder: 'Select',
+                                                                                allowClear: true,
+                                                                            });
+                                                                            const errors = jqXHR.responseJSON.errors;
+                                                                            // Display the validation error in an alert
+                                                                            alert(errors['journal_entry.journal_no'][0]);
+                                                                        } else {
+                                                                            toastr.error('Error');
+                                                                        } */
                                     jefIsLoading = false
                                 }
                             });
