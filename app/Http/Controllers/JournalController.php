@@ -135,14 +135,14 @@ class JournalController extends MainController
 
         $period = new PostingPeriod();
         $open_periods = $period->openStatus()->get();
-        if ($open_periods) {
+        if (count($open_periods) >= 1) {
             $matchFound = false;
             foreach ($open_periods as $open) {
                 $journal_date = $request->journal_entry['journal_date'];
                 $isOpen = $period->isInPostingPeriod($journal_date, $open);
+                /*                 dd($open, $journal_date, $isOpen); */
                 if ($isOpen) {
                     try {
-                        $matchFound = true;
                         DB::transaction(function () use ($request, $journalEntry) {
                             $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
                             $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
@@ -165,6 +165,7 @@ class JournalController extends MainController
                             $journalEntry->details()->delete();
                             $journalEntry->details()->createMany($request->details);
                         });
+                        $matchFound = true;
                     } catch (Exception $e) {
                         return response()->json(['message' => $e->getMessage()], 500);
                     }
