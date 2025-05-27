@@ -77,7 +77,7 @@ class Subsidiary extends Model
     public function getBranchAttribute()
     {
         $branch = Branch::where('branch_code', $this->sub_per_branch)->first();
-        return $branch->branch_code . '-' . $branch->branch_name;
+        return $branch ? $branch->branch_code . '-' . $branch->branch_name : '';
     }
 
     public function getSalvageAttribute()

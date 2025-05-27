@@ -19,15 +19,26 @@ class SubsidiaryController extends Controller
     {
         Log::info('Incoming subsidiary data:', $request->all());
 
+        if (Subsidiary::where('sub_code', $request->sub_code)->exists()) {
+            return response()->json([
+                'message' => 'The subsidiary code already exists. Please choose a different code.',
+                'errors' => [
+                    'sub_code' => ['The subsidiary code already exists.']
+                ]
+            ], 422); // 422 Unprocessable Entity
+        }
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
-            'sub_no_amort' => 'required',
-            'sub_date' => 'date|required',
+            'sub_address' => 'nullable',
+            'sub_tel' => 'nullable',
+            'sub_no_amort' => 'sometimes',
+            'sub_date' => 'date|sometimes',
             'sub_cat_id' => 'integer|required',
-            'sub_salvage' => 'numeric|required',
-            'sub_amount' => 'numeric|required',
-            'sub_no_depre' => 'numeric|required',
+            'sub_salvage' => 'numeric|sometimes',
+            'sub_amount' => 'nullable|numeric|sometimes',
+            'sub_no_depre' => 'numeric|sometimes',
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
             'branch' => 'nullable',
@@ -35,15 +46,16 @@ class SubsidiaryController extends Controller
         ], ['required_if' => 'Expense is required.']);
 
         try {
-            if ($data['branch']) {
+            if (isset($data['branch']) && isset($data['branch']['branch_id'])) {
                 $data['sub_per_branch'] = Branch::where('branch_id', $data['branch']['branch_id'])->pluck('branch_code')->first();
             }
             $subsidiary = Subsidiary::create($data);
-
-            $subsidiary->prepaid_expense()->create([
-                'amount' => $data['prepaid_expense'],
-                'sub_id' => $subsidiary->sub_id
-            ]);
+            if (isset($data['prepaid_expense'])) {
+                $subsidiary->prepaid_expense()->create([
+                    'amount' => $data['prepaid_expense'],
+                    'sub_id' => $subsidiary->sub_id
+                ]);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -53,14 +65,21 @@ class SubsidiaryController extends Controller
             return $query->pluck('amount');
         }, 'subsidiary_accounts'])->find($subsidiary->sub_id);
 
-        $branch = Branch::find($data['branch']['branch_id']);
-        $branchAlias = $branch->branch_code . '-' . $branch->branch_name;
-        $subsidiary->branch = $branchAlias;
+        $branch = null;
+        if (!empty($data['branch']['branch_id'])) {
+            $branch = Branch::find($data['branch']['branch_id']);
+            $branchAlias = $branch->branch_code . '-' . $branch->branch_name;
+            $subsidiary->branch = $branchAlias;
+        }
         if ($subsidiary->sub_no_depre == 0) {
             $subsidiary->sub_no_depre = 1;
         }
 
-        $subsidiary['branch_code'] = $branch->branch_code;
+        if ($branch) {
+            $subsidiary['branch_code'] = $branch->branch_code;
+        } else {
+            $subsidiary['branch_code'] = null; // or some default value if needed
+        }
 
         $subsidiary['monthly_amort'] = $subsidiary->monthly_amort;
         $subsidiary['rem'] = $subsidiary->rem;
@@ -93,10 +112,21 @@ class SubsidiaryController extends Controller
 
     public function update(Subsidiary $subsidiary, Request $request)
     {
+        if (Subsidiary::where('sub_code', $request->sub_code)
+                 ->where('sub_id', '!=', $subsidiary->sub_id)
+                 ->exists()) {
+        return response()->json([
+            'message' => 'The subsidiary code already exists. Please choose a different code.',
+            'errors' => [
+                'sub_code' => ['The subsidiary code already exists.']
+            ]
+        ], 422);
+    }
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
-            'sub_no_amort' => 'required',
+            'sub_no_amort' => 'sometimes',
             'sub_date' => 'date|nullable',
             'sub_cat_id' => 'integer|required',
             'sub_salvage' => 'numeric|nullable',
