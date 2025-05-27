@@ -65,14 +65,15 @@
             table-layout: fixed;
             width: 100%;
         }
-        th:nth-child(6), td:nth-child(6) {
+
+        th:nth-child(6),
+        td:nth-child(6) {
             width: 20%;
             overflow-wrap: break-word;
         }
-
     </style>
     <!-- Main content -->
-    <section class="content">
+    <section class="content" id="app">
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -86,25 +87,27 @@
                             <div class="col-md-12" style="height:20px;"></div>
                             <div class="container-fluid">
                                 <div class="row">
-                                    @if(Gate::allows('manager'))
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="label-normal" for="branch_id">Branch</label>
-                                            <div class="input-group">
-                                                <select name="s_branch_id" class="form-control form-control-sm select2"
-                                                    id="s_branch_id">
-                                                    <option value="" disabled selected>-All-</option>
-                                                    <option value="1">Butuan City Branch</option>
-                                                    <option value="2">Nasipit Branch</option>
-                                                    <option value="3">Gingoog Branch</option>
-                                                    <option value="4">Head Office</option>
-                                                </select>
-                                            </div>
+                                    <input type="date" ref="datepicker" class="form-control form-control-sm rounded-0"
+                                        name="journal_date">
+                                    @if (Gate::allows('manager'))
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="label-normal" for="branch_id">Branch</label>
+                                                <div class="input-group">
+                                                    <select name="s_branch_id" class="form-control form-control-sm select2"
+                                                        id="s_branch_id">
+                                                        <option value="" disabled selected>-All-</option>
+                                                        <option value="1">Butuan City Branch</option>
+                                                        <option value="2">Nasipit Branch</option>
+                                                        <option value="3">Gingoog Branch</option>
+                                                        <option value="4">Head Office</option>
+                                                    </select>
+                                                </div>
 
+                                            </div>
                                         </div>
-                                    </div>
                                     @endif
-                                    <div class="col-md-{{ Gate::allows('manager') ? '4':'6' }}">
+                                    <div class="col-md-{{ Gate::allows('manager') ? '4' : '6' }}">
                                         <div class="form-group">
                                             <label class="label-normal" for="branch_id">Book Reference</label>
                                             <div class="input-group">
@@ -121,7 +124,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-{{ Gate::allows('manager') ? '4':'6' }}">
+                                    <div class="col-md-{{ Gate::allows('manager') ? '4' : '6' }}">
                                         <div class="form-group">
                                             <label class="label-normal" for="s_status">Status</label>
                                             <div class="input-group">
@@ -143,7 +146,8 @@
                                             <label class="label-normal" for="s_from">From</label>
                                             <div class="input-group">
                                                 <input type="date" class="form-control form-control-sm rounded-0"
-                                                    name="s_from" id="s_from" value="{{ $default_date_start }}" required>
+                                                    name="s_from" id="s_from" value="{{ $default_date_start }}"
+                                                    required>
                                             </div>
                                         </div>
                                     </div>
@@ -152,7 +156,8 @@
                                             <label class="label-normal" for="s_to">To</label>
                                             <div class="input-group">
                                                 <input type="date" class="form-control form-control-sm rounded-0"
-                                                    name="s_to" value="{{ $default_date_start }}" id="s_to" required>
+                                                    name="s_to" value="{{ $default_date_start }}" id="s_to"
+                                                    required>
                                             </div>
                                         </div>
                                     </div>
@@ -192,8 +197,8 @@
                                         <th style="width: 10%;">Source</th>
                                         <th style="width: 10%;">Amount</th>
                                         <th>Remarks</th>
-                                        @if(Gate::allows('manager'))
-                                        <th style="width: 10%;">Branch</th>
+                                        @if (Gate::allows('manager'))
+                                            <th style="width: 10%;">Branch</th>
                                         @endif
                                         <th style="width: 7%;">Status</th>
                                         <th style="width: 13%;">Action</th>
@@ -201,7 +206,8 @@
                                     <tbody id="journalEntryDetailsContent">
                                         @foreach ($journalEntryList as $journal)
                                             <tr class="tbl-row" data-id="{{ $journal->journal_id }}">
-                                                <td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('M d, Y') }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('M d, Y') }}
+                                                </td>
                                                 <td class="font-weight-bold">{{ $journal->bookDetails->book_code }}</td>
                                                 <td class="font-weight-bold">{{ $journal->journal_no }}</td>
                                                 <td>{{ $journal->source }}</td>
@@ -212,8 +218,8 @@
                                                         <li> {{ $remark }}</li>
                                                     @endforeach
                                                 </td>
-                                                @if(Gate::allows('manager'))
-                                                <td class="font-weight-bold">{{ $journal->branch_id }}</td>
+                                                @if (Gate::allows('manager'))
+                                                    <td class="font-weight-bold">{{ $journal->branch_id }}</td>
                                                 @endif
                                                 <td
                                                     class="nav-link {{ $journal->status == 'posted' ? 'text-success' : 'text-danger">Journal Entry</a>' }}">
@@ -241,46 +247,46 @@
                                     </tbody>
                                 </table>
                                 <!-- <div id="account-details">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <table class="table table-bordered table-sm" id="tbl-create-journal">
-                                                    <thead>
-                                                        <tr class="text-center">
-                                                            <th>Account #</th>
-                                                            <th>Account Name</th>
+                                                                                                                                                                                                                                                <div class="row">
+                                                                                                                                                                                                                                                    <div class="col-md-12">
+                                                                                                                                                                                                                                                        <table class="table table-bordered table-sm" id="tbl-create-journal">
+                                                                                                                                                                                                                                                            <thead>
+                                                                                                                                                                                                                                                                <tr class="text-center">
+                                                                                                                                                                                                                                                                    <th>Account #</th>
+                                                                                                                                                                                                                                                                    <th>Account Name</th>
 
-                                                            <th>S/L</th>
-                                                            <th width="150">Debit</th>
-                                                            <th width="150">Credit</th>
+                                                                                                                                                                                                                                                                    <th>S/L</th>
+                                                                                                                                                                                                                                                                    <th width="150">Debit</th>
+                                                                                                                                                                                                                                                                    <th width="150">Credit</th>
 
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="tbl-preview-container">
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr class="text-center">
-                                                            <th></th>
-                                                            <th width="200"></th>
-                                                            <th width="200">TOTAL</th>
-                                                            <th width="150" id="vtotal_debit">0</th>
-                                                            <th width="150" id="vtotal_credit">0</th>
+                                                                                                                                                                                                                                                                </tr>
+                                                                                                                                                                                                                                                            </thead>
+                                                                                                                                                                                                                                                            <tbody id="tbl-preview-container">
+                                                                                                                                                                                                                                                            </tbody>
+                                                                                                                                                                                                                                                            <tfoot>
+                                                                                                                                                                                                                                                                <tr class="text-center">
+                                                                                                                                                                                                                                                                    <th></th>
+                                                                                                                                                                                                                                                                    <th width="200"></th>
+                                                                                                                                                                                                                                                                    <th width="200">TOTAL</th>
+                                                                                                                                                                                                                                                                    <th width="150" id="vtotal_debit">0</th>
+                                                                                                                                                                                                                                                                    <th width="150" id="vtotal_credit">0</th>
 
-                                                        </tr>
-                                                        <tr class="text-center">
-                                                            <th></th>
-                                                            <th width="200"></th>
-                                                            <th width="200">BALANCE</th>
-                                                            <th width="150" id="vbalance_debit">0</th>
-                                                            <th width="150" id="vbalance_credit">0</th>
+                                                                                                                                                                                                                                                                </tr>
+                                                                                                                                                                                                                                                                <tr class="text-center">
+                                                                                                                                                                                                                                                                    <th></th>
+                                                                                                                                                                                                                                                                    <th width="200"></th>
+                                                                                                                                                                                                                                                                    <th width="200">BALANCE</th>
+                                                                                                                                                                                                                                                                    <th width="150" id="vbalance_debit">0</th>
+                                                                                                                                                                                                                                                                    <th width="150" id="vbalance_credit">0</th>
 
 
-                                                        </tr>
+                                                                                                                                                                                                                                                                </tr>
 
-                                                    </tfoot>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div> -->
+                                                                                                                                                                                                                                                            </tfoot>
+                                                                                                                                                                                                                                                        </table>
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                            </div> -->
                             </div>
                         </div>
                     </section>
@@ -298,6 +304,7 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-8 frm-header">
+
                                         <h4><b>Journal Entry (Preview)</b></h4>
                                     </div>
                                     <div class="col-md-4 frm-header">
@@ -468,9 +475,15 @@
                                         <div class="col-md-4 frm-header">
                                             <label class="label-normal" for="date">Journal Date</label>
                                             <div class="input-group">
-                                                <input type="date" class="form-control form-control-sm rounded-0"
+                                                <input model="journal_date" name="journal_date"
+                                                    type="text" id="edit_journal_date"
+                                                    class="form-control form-control-sm rounded-0">
+                                                {{-- <input type="date" class="form-control form-control-sm rounded-0"
                                                     name="edit_journal_date" id="edit_journal_date"
-                                                    placeholder="Journal Date" required>
+                                                    placeholder="Journal Date" required> --}}
+
+                                                {{--  <input type="date" ref="datepicker"
+                                                    class="form-control form-control-sm rounded-0" name="journal_date"> --}}
                                             </div>
                                         </div>
                                         <div class="col-md-2 col-xs-12">
@@ -478,7 +491,8 @@
                                                 <div class="form-group">
                                                     <label class="label-normal" for="edit_branch_id">Branch</label>
                                                     <div class="input-group">
-                                                        <select name="edit_branch_id" class="select2 form-control form-control-sm"
+                                                        <select name="edit_branch_id"
+                                                            class="select2 form-control form-control-sm"
                                                             id="edit_branch_id" required>
                                                             <option value="" disabled>-Select Branch-
                                                             </option>
@@ -497,12 +511,18 @@
                                                     <label class="label-normal" for="">Book Reference</label>
                                                     <div class="input-group">
 
-                                                        <select required name="edit_book_id" class="select2 form-control form-control-sm" id="edit_book_id">
-										<option id="edit_book_id" value="" disabled></option>
-										@foreach($journalBooks as $journalBook)
-											<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
-										@endforeach
-									</select>
+                                                        <select required name="edit_book_id"
+                                                            class="select2 form-control form-control-sm"
+                                                            id="edit_book_id">
+                                                            <option id="edit_book_id" value="" disabled></option>
+                                                            @foreach ($journalBooks as $journalBook)
+                                                                <option value="{{ $journalBook->book_id }}"
+                                                                    _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
+                                                                    book-src="{{ $journalBook->book_src }}">
+                                                                    {{ $journalBook->book_code }} -
+                                                                    {{ $journalBook->book_name }}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -512,7 +532,8 @@
                                                 <div class="form-group">
                                                     <label class="label-normal" for="">Reference No.</label>
                                                     <div class="input-group">
-                                                        <input type="hidden" name="edit_journal_no" id="edit_journal_no">
+                                                        <input type="hidden" name="edit_journal_no"
+                                                            id="edit_journal_no">
                                                         <label class="label-normal" id="edit_LrefNo"></label>
                                                     </div>
                                                 </div>
@@ -763,7 +784,8 @@
                                             </div>
                                         </div>
                                         <div class="table-responsive-sm" style="padding-top:5px;">
-                                            <table class="table table-striped" style="margin-bottom:0; border-top:4px dashed black;">
+                                            <table class="table table-striped"
+                                                style="margin-bottom:0; border-top:4px dashed black;">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Account</th>
@@ -779,23 +801,30 @@
                                             </table>
                                         </div>
                                         <div class="row" style="border-top: 10px solid gray; ">
-                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Prepared By:</h6>
-                                            <p>______________________________________________________</p></div>
-                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Certified Correct By:</h6><p>______________________________________________________</p></div>
-                                            <div class="col-md-4" style="margin-top: 20px;"><h6 style="margin-bottom: 40px;">Approved By:</h6><p>______________________________________________________</p></div>
+                                            <div class="col-md-4" style="margin-top: 20px;">
+                                                <h6 style="margin-bottom: 40px;">Prepared By:</h6>
+                                                <p>______________________________________________________</p>
+                                            </div>
+                                            <div class="col-md-4" style="margin-top: 20px;">
+                                                <h6 style="margin-bottom: 40px;">Certified Correct By:</h6>
+                                                <p>______________________________________________________</p>
+                                            </div>
+                                            <div class="col-md-4" style="margin-top: 20px;">
+                                                <h6 style="margin-bottom: 40px;">Approved By:</h6>
+                                                <p>______________________________________________________</p>
+                                            </div>
                                         </div>
                                         <div class="received-payment">
                                             <div class="row">
                                                 <br>
                                                 <br>
-                                                <div class="col-md-12" >
+                                                <div class="col-md-12">
                                                     <h6
                                                         style="text-align: justify;text-justify:inter-word;text-transform:uppercase">
                                                         Received payment from MICRO ACCESS LOANS CORPORATION CORPORATION the
                                                         of
                                                         sum
-                                                        <span
-                                                            class="voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
+                                                        <span class="voucher_amount_in_words">&nbsp;&nbsp;&nbsp;</span>
                                                     </h6>
                                                 </div>
                                                 <div class="col-md-12">
@@ -808,7 +837,7 @@
                                                     <h6>Cheque Date: <span class="vjournal_cheque_date"></span></h6>
                                                 </div>
                                             </div>
-                                        <br><br>
+                                            <br><br>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <h6>Received By:________________________________________</h6>
@@ -825,23 +854,24 @@
                                             <div class="col-lg-4 col-sm-5 ml-auto">
 
                                                 <!-- <table class="table table-clear">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="left">
-                                                                    <strong>TOTAL</strong>
-                                                                </td>
-                                                                <td class="left"><strong id="total_debit_voucher"></strong>
-                                                                </td>
-                                                                <td class="left"><strong id="total_credit_voucher"></strong>
-                                                                </td>
-                                                            </tr>
+                                                                                                                                                                                                                                                                <tbody>
+                                                                                                                                                                                                                                                                    <tr>
+                                                                                                                                                                                                                                                                        <td class="left">
+                                                                                                                                                                                                                                                                            <strong>TOTAL</strong>
+                                                                                                                                                                                                                                                                        </td>
+                                                                                                                                                                                                                                                                        <td class="left"><strong id="total_debit_voucher"></strong>
+                                                                                                                                                                                                                                                                        </td>
+                                                                                                                                                                                                                                                                        <td class="left"><strong id="total_credit_voucher"></strong>
+                                                                                                                                                                                                                                                                        </td>
+                                                                                                                                                                                                                                                                    </tr>
 
-                                                        </tbody>
-                                                    </table> -->
+                                                                                                                                                                                                                                                                </tbody>
+                                                                                                                                                                                                                                                            </table> -->
 
                                             </div>
                                             <div class="col-lg-4 col-sm-5" style="text-align:right;">
-                                                <button  class="btn btn-flat btn-sm bg-gradient-success" id="printVoucher"><i class="fa fa-print"></i> Print</button>`
+                                                <button class="btn btn-flat btn-sm bg-gradient-success"
+                                                    id="printVoucher"><i class="fa fa-print"></i> Print</button>`
                                             </div>
                                         </div>
                                     </div>
@@ -854,7 +884,87 @@
             </div>
         </div>
 
-        <!-- /.content -->
+    </section>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                posting_period: {}
+            },
+            methods: {
+                getOpenPostingPeriod: function() {
+                    axios.get('/MAC-ams/open-posting-period', {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        },
+                    }).then(response => {
+                        this.posting_period = response.data.data
+
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                },
+                print: function() {
+                    var content = document.getElementById('printContent').innerHTML;
+                    var toPrint = document.getElementById('to-print');
+                    toPrint.innerHTML = content;
+                    setTimeout(() => {
+                        window.print();
+                    }, 500);
+                },
+                openModal: function() {
+                    alert("asd");
+                    axios.get('/MAC-ams/open-posting-period', {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        },
+                    }).then(response => {
+                        this.posting_period = response.data.data
+
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                    var dates = this.posting_period;
+                    var date_range = dates.map((period) => {
+                        return {
+                            from: period.start_date,
+                            to: period.end_date
+                        }
+                    })
+                    this.$nextTick(() => {
+                        flatpickr(this.$refs.datepicker, {
+                            enable: date_range,
+                            dateFormat: 'Y-m-d'
+                        });
+                    });
+                },
+
+            },
+            async created() {
+                /* try {
+                    const response = await axios.get('/MAC-ams/open-posting-period');
+                    this.posting_period = response.data.data;
+                } catch (error) {
+                    console.err('Error:', error);
+                }
+                var dates = this.posting_period;
+                var date_range = dates.map((period) => {
+                    return {
+                        from: period.start_date,
+                        to: period.end_date
+                    }
+                })
+                flatpickr(this.$refs.datepicker, {
+                    enable: date_range,
+                    dateFormat: 'Y-m-d'
+                }) */
+            }
+        });
+    </script>
+
+    <!-- /.content -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -871,7 +981,7 @@
             });
         });
     </script>
-    @endsection
-    @section('footer-scripts')
-        @include('scripts.journal.journal')
-    @endsection
+@endsection
+@section('footer-scripts')
+    @include('scripts.journal.journal')
+@endsection

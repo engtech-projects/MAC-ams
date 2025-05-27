@@ -888,6 +888,29 @@
             $('#edit_journal_date').prop('readonly', true);
             isInitialSetup = true;
             $.ajax({
+                url: '/MAC-ams/open-posting-period',
+                method: 'GET',
+                success: function(response) {
+                    const dates = response.data || [];
+
+                    const date_ranges = dates.map(function(period) {
+                        return {
+                            from: period.start_date,
+                            to: period.end_date
+                        };
+                    });
+
+                    // Initialize Flatpickr with enabled date ranges
+                    flatpickr("#edit_journal_date", {
+                        enable: date_ranges,
+                        dateFormat: "Y-m-d"
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching dates:", error);
+                }
+            });
+            $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
