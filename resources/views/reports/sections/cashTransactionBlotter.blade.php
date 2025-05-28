@@ -87,14 +87,14 @@
                         @if (Gate::allows('manager'))
                             <div class="col-md-4">
                                 <label for="branch">Select Branch</label>
-                                <select-branch @setselectedbranch="getSelectedBranch" />
+                                <select-branch @setselectedbranch="getSelectedBranch" ref="branchFilter"/>
                             </div>
                         @endif
 
                         <div class="col-md-4">
                             <label for="branch">Transaction Date</label>
                             <div class="input-group">
-                                <input type="date" v-model="filter.transaction_date" id="transaction_date"
+                                <input type="date" v-model="selectedDate" id="transaction_date"
                                     name="transaction_date" class="form-control form-control-sm">
                             </div>
 
@@ -144,7 +144,8 @@
                                     <div class="col-md-3">
                                         <label for="branch">Select Branch</label>
                                         <select name="branch_id" v-model="collectionBreakdown.branch_id"
-                                            class="select2 form-control form-control-sm" style="width:100%" id="branchID">
+                                            class="form-control form-control-sm" style="width:100%" id="branchID">
+                                            <option value="" disabled selected>-Select Branch-</option>
                                             @foreach ($branches as $branch)
                                                 <option value="{{ $branch->branch_id }}">
                                                     {{ $branch->branch_name }}
@@ -479,7 +480,7 @@
                                                         <td>
                                                             <select class="form-control form-control-sm rounded-0"
                                                                 id="branch_id_collection"
-                                                                v-model="branch_collection.branch_name">
+                                                                v-model="branch_collection.branch_id">
                                                                 <option value="" disabled selected>-Select
                                                                     Branch-</option>
                                                                 @foreach ($branches as $branch)
@@ -508,7 +509,7 @@
                                                                 value="branchCollection.branch.branch_id"></h6>
                                                         </td>
                                                         <td class="text-right">
-                                                            <h6 v-text="branchCollection.total_amount"></h6>
+                                                            <h6>@{{ formatCurrency(branchCollection.total_amount) }}
                                                         </td>
                                                         <td class="text-center">
                                                             <button class="btn btn-xs btn-danger"
@@ -831,8 +832,15 @@
                         <th>Status</th>
                         <th>Action</th>
                     </thead>
-                    <tbody>
-                        <tr v-for="d in collectionsBreakdown">
+                    <tbody v-if="loading">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                <i class="fas fa-spinner fa-spin"></i> Loading collections...
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else-if="collectionsBreakdown && collectionsBreakdown.length > 0">
+                        <tr v-for="d in collectionsBreakdown" :key="d.collection_id">
                             <td>@{{ getBranchName(d.branch_id) }}</td>
                             <td>@{{ d.transaction_date }}</td>
                             <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
@@ -870,6 +878,13 @@
                                     <button class="mr-1 btn btn-xs btn-warning"
                                         @click="updateStatus(d,'unposted')">Unpost</button>
                                 @endif
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                No records found.
                             </td>
                         </tr>
                     </tbody>
@@ -1190,10 +1205,6 @@
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
                 branches: null,
                 branch: null,
-                filter: {
-                    transaction_date: "", //'2024-11-30',
-                    branch_id: null,
-                },
                 isEdit: false,
                 isEditing: false,
                 isUpdateStatus: false,
@@ -1218,7 +1229,7 @@
                 },
                 branch_collection: {
                     total_amount: null,
-                    branch_id: null,
+                    branch_id: '',
                     branch: ''
                 },
                 pos_collections: {
@@ -1237,7 +1248,7 @@
                 collectionBreakdown: {
                     total: 0,
                     collection_id: 0,
-                    branch_id: null,
+                    branch_id: '',
                     transaction_date: "",
                     p_1000: null, //34,
                     p_500: null, //1,
@@ -1283,6 +1294,9 @@
                     transaction_date: ''
                 },
                 statusUpdate: false,
+                loading: false,
+                selectedBranch: '',
+                selectedDate: ''   
             },
             methods: {
                 nextTextField: function(textField) {
@@ -1318,29 +1332,33 @@
                 },
                 addBranchCollection() {
                     this.isEditing = false;
-                    if ($('#branch_id_collection').val() == "") {
-                        alert("Please add branch");
+                    let missingField = !this.branch_collection.branch_id ? "Branch" :
+                                        !this.branch_collection.total_amount ? "Total Amount" : null;
+                    if (missingField) {
+                            toastr.error(`Please add ${missingField}`);
                     } else {
-                        var branch = $('#branch_id_collection option:selected').text().trim();
+                        const branch = this.branches.find(b => b.branch_id == this.branch_collection.branch_id);
                         this.collectionBreakdown.branch_collections.push({
                             branch: {
-                                branch_id: $('#branch_id_collection').val(),
-                                branch_name: branch
+                                branch_id: this.branch_collection.branch_id,
+                                branch_name: branch.branch_name
                             },
                             total_amount: this.branch_collection.total_amount,
                             isEditing: false,
                         });
 
-                        $('#branch_id_collection option:selected').val("");
-
+                        this.branch_collection.branch_id = "";
                         this.branch_collection.total_amount = null;
 
                     }
                 },
 
                 addAccountOfficerCollection: function() {
-                    if ($('#remarks').val() == "") {
-                        alert("Please add account officer collection");
+                    let missingField = !this.officer_collection.representative ? "Account Officer" :
+                                       !this.officer_collection.note ? "Remarks" :
+                                       !this.officer_collection.total ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
                     } else {
 
                         this.collectionBreakdown.account_officer_collections.push({
@@ -1360,8 +1378,10 @@
                 },
                 addPosCollection() {
                     this.isEditing = false;
-                    if (this.pos_collections.or_no == null) {
-                        alert("Please enter or no.");
+                    let missingField = !this.pos_collections.or_no ? "OR no." :
+                                       !this.pos_collections.total_amount ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
                     } else {
                         this.collectionBreakdown.pos_collections.push({
                             or_no: this.pos_collections.or_no,
@@ -1370,16 +1390,13 @@
                         });
 
 
-                        this.pos_collections.total_amount = 0;
+                        this.pos_collections.or_no = null;
+                        this.pos_collections.total_amount = null;
 
                     }
-                    this.pos_collections.or_no = null;
-                    this.pos_collections.total_amount = null;
                 },
                 editPosCollection: function(index) {
-                    var or_no = this.collectionBreakdown.pos_collections[index].or_no;
                     this.collectionBreakdown.pos_collections[index].isEditing = true;
-                    /* this.pos_collections.or_no = or_no; */
                     this.isEditing = true;
 
                 },
@@ -1388,18 +1405,48 @@
                     this.isEditing = true;
 
                 },
+                editBranchCollection: function(index, branchCollection) {
+                    this.collectionBreakdown.branch_collections[index].isEditing = true;
+                    this.isEditing = true;
+
+                },
+                saveBranchCollection: function(index, branch_id) {
+                    const branchCollection = this.collectionBreakdown.branch_collections[index];
+                    if (!branchCollection.total_amount) {
+                        toastr.error('Please add Total Amount');
+                        return;
+                    }
+                    const branch = $('#branch_id_collection_edit option:selected').text().trim();
+                    branchCollection.branch.branch_name = branch;
+                    branchCollection.isEditing = false;
+                    this.isEditing = false;
+                },
                 savePosCollection: function(index) {
-                    this.collectionBreakdown.pos_collections[index].isEditing = false;
+                    let pos = this.collectionBreakdown.pos_collections[index];
+                    let missingField = !pos.or_no ? "OR no." :
+                                       !pos.total_amount ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
+                        return;
+                    }
+                    pos.isEditing = false;
                     this.isEditing = false;
                 },
                 saveOfficerCollection: function(index) {
-                    this.collectionBreakdown.account_officer_collections[index].isEditing = false;
+                    let officer = this.collectionBreakdown.account_officer_collections[index];
+                    let missingField = !officer.representative ? "Account Officer" :
+                                       !officer.note ? "Remarks" :
+                                       !officer.total ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
+                        return;
+                    }
+                    officer.isEditing = false;
                     this.isEditing = false;
                 },
                 processCreateOrUpdate: function() {
                     if (this.isEdit) {
                         this.updateCollectionBreakdown();
-                        this.resetForm();
 
                     } else {
                         this.createValidation()
@@ -1408,7 +1455,6 @@
 
 
                         }
-                        this.resetForm();
                     }
                 },
                 createValidation: function() {
@@ -1443,64 +1489,9 @@
 
                     })
                 },
-                editBranchCollection: function(index, branchCollection) {
-                    this.collectionBreakdown.branch_collections[index].isEditing = true;
-                    this.isEditing = true;
-
-                },
-                saveBranchCollection: function(index, branch_id) {
-                    this.collectionBreakdown.branch_collections[index].isEditing = false;
-                    var branch = $('#branch_id_collection_edit option:selected').text().trim();
-                    this.collectionBreakdown.branch_collections[index].branch.branch_name = branch;
-                    this.isEditing = false;
-                },
-                removePosCollection: function(collection, index) {
-                    this.collectionBreakdown.pos_collections[index].isEditing = false;
-                    if (index !== -1) {
-                        console.log(collection);
-                        this.collectionBreakdown.pos_collections.splice(index, 1);
-                    }
-
-
-                    /* const isEqual = (obj1, obj2) =>
-                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.branch_collections.filter(
-                        element => !
-                        isEqual(element, collection)); */
-
-                },
-                removeBranchCollection: function(collection, index) {
-                    this.collectionBreakdown.branch_collections[index].isEditing = false;
-                    if (this.isEdit) {
-                        axios.delete('/MAC-ams/branch-collection/' + collection.id, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        }).then(response => {
-                            toastr.success(response.data.message);
-
-                            this.collectionBreakdown.branch_collections = updatedArray;
-                        }).catch(err => {
-                            toastr.error(err.data.message);
-                        })
-                    } else {
-                        if (index !== -1) {
-                            this.collectionBreakdown.branch_collections.splice(index, 1);
-                        }
-                    }
-
-
-                    /* const isEqual = (obj1, obj2) =>
-                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.branch_collections.filter(
-                        element => !
-                        isEqual(element, collection)); */
-
-                },
                 resetForm: function() {
-                    this.collectionBreakdown.collection_id = null,
-                        this.collectionBreakdown.branch_id = null;
+                    this.collectionBreakdown.collection_id = null;
+                    this.collectionBreakdown.branch_id = '';
                     this.collectionBreakdown.transaction_date = '';
                     this.collectionBreakdown.p_1000 = 0;
                     this.collectionBreakdown.p_500 = 0;
@@ -1514,6 +1505,7 @@
                     this.collectionBreakdown.c_25 = 0;
                     this.collectionBreakdown.branch_collections = [];
                     this.collectionBreakdown.account_officer_collections = [];
+                    this.collectionBreakdown.pos_collections = [];
                     this.collectionBreakdown.other_payment = {
                         cash_amount: 0,
                         check_amount: 0,
@@ -1521,7 +1513,21 @@
                         memo_amount: 0,
                         interbranch_amount: 0
                     }
+                    this.branch_collection = {
+                        branch_id: "",
+                        total_amount: null
+                    };
 
+                    this.officer_collection = {
+                        representative: "",
+                        note: "",
+                        total: null
+                    };
+
+                    this.pos_collections = {
+                        or_no: "",
+                        total_amount: null
+                    };
                     this.total = {
                         grandTotal: null,
                         p_1000: null,
@@ -1536,32 +1542,24 @@
                         c_25: null,
                     }
                 },
-                removeAccountOfficerCollection: function(collection) {
-                    if (this.isEdit) {
-                        axios.delete('/MAC-ams/account-officer-collection/' + collection.collection_ao_id, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        }).then(response => {
-                            toastr.success(response.data.message);
-
-                        }).catch(err => {
-                            toastr.error(err.data.message);
-                        })
+                removePosCollection: function(collection, index) {
+                    this.collectionBreakdown.pos_collections[index].isEditing = false;
+                    if (index !== -1) {
+                        this.collectionBreakdown.pos_collections.splice(index, 1);
                     }
-                    const isEqual = (obj1, obj2) =>
-                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.account_officer_collections
-                        .filter(element =>
-                            !
-                            isEqual(element, collection));
-                    this.collectionBreakdown.account_officer_collections = updatedArray;
-
-
-
                 },
-
+                removeBranchCollection: function(collection, index) {
+                    this.collectionBreakdown.branch_collections[index].isEditing = false;
+                    if (index !== -1) {
+                        this.collectionBreakdown.branch_collections.splice(index, 1);
+                    }
+                },
+                removeAccountOfficerCollection(collection) {
+                    const idx = this.collectionBreakdown.account_officer_collections.findIndex(c => c.id === collection.id);
+                    if (idx !== -1) {
+                        this.collectionBreakdown.account_officer_collections.splice(idx, 1);
+                    }
+                },
                 calculateCashCount: function(collectionBreakdown) {
                     this.total.p_1000 = collectionBreakdown.p_1000 * 1000;
                     this.total.p_500 = collectionBreakdown.p_500 * 500
@@ -1678,7 +1676,17 @@
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
                         this.closeModal();
-                        this.filterCollections();
+
+                        this.selectedBranch = this.collectionBreakdown.branch_id;
+                        this.selectedDate = this.collectionBreakdown.transaction_date;
+
+                        if (this.$refs.branchFilter) {
+                          this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
+                        }
+
+                        this.$nextTick(() => {
+                            this.filterCollections();
+                        });
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
@@ -1691,7 +1699,7 @@
                     return branch ? branch.branch_name : 'N/A'; // Return 'N/A' if no branch found
                 },
                 getSelectedBranch(branchId) {
-                    this.filter.branch_id = branchId
+                    this.selectedBranch = branchId;
                 },
                 print: function() {
                     var content = document.getElementById('printContent').innerHTML;
@@ -1703,9 +1711,10 @@
                     }, 500);
                 },
                 filterCollections: function() {
+                    this.loading = true;
                     var data = {
-                        transaction_date: this.filter.transaction_date,
-                        branch_id: this.filter.branch_id
+                        transaction_date: this.selectedDate,
+                        branch_id: this.selectedBranch
                     }
                     var url = "{{ route('reports.cashTransactionBlotter') }}"
                     axios.post(url, data)
@@ -1715,7 +1724,9 @@
                         }).catch(error => {
                             console.error(error);
                         })
-
+                        .finally(() => {
+                            this.loading = false;
+                        });
 
                 },
                 showCashBlotter: function(id, branch_id) {
@@ -2024,12 +2035,6 @@
                 this.data = @json($cash_blotter);
                 this.branches = @json($branches);
             }
-        });
-    </script>
-    <script>
-        // Disable keyboard input for the date field
-        document.getElementById('transactionDate').addEventListener('keydown', function(e) {
-            e.preventDefault();
         });
     </script>
 @endsection
