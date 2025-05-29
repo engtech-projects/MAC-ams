@@ -141,9 +141,9 @@ class JournalController extends MainController
                 $journal_date = $request->journal_entry['journal_date'];
 
                 $isOpen = $period->isInPostingPeriod($journal_date, $open);
-                if ($journalEntry->journal_date == $journal_date) {
-                    $isOpen = true;
-                }
+                // if ($journalEntry->journal_date == $journal_date) {
+                //     $isOpen = true;
+                // }
                 if ($isOpen) {
                     try {
                         DB::transaction(function () use ($request, $journalEntry) {
@@ -170,18 +170,23 @@ class JournalController extends MainController
                         });
                         $matchFound = true;
                     } catch (Exception $e) {
-                        return response()->json(['message' => $e->getMessage()], 500);
+                        return response()->json([
+                            'success' => true,
+                            'message' => $e->getMessage()
+                        ], 500);
                     }
                 }
             }
             if (!$matchFound) {
                 return response()->json([
                     'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
+                    'success' => false,
                 ], 201);
             }
         }
         return response()->json([
             'message' => 'Journal Entry updated successfully.',
+            'success' => true,
         ], 200);
     }
 

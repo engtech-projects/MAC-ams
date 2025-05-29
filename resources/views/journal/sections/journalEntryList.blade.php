@@ -202,7 +202,7 @@
                                         <th style="width: 13%;">Action</th>
                                     </thead>
                                     <tbody id="journalEntryDetailsContent">
-                                        @foreach ($journalEntryList as $journal)
+                                        <!-- @foreach ($journalEntryList as $journal)
                                             <tr class="tbl-row" data-id="{{ $journal->journal_id }}">
                                                 <td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('M d, Y') }}
                                                 </td>
@@ -241,7 +241,7 @@
                                                             class="fa fa-check"></i></button>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach -->
                                     </tbody>
                                 </table>
                                 <!-- <div id="account-details">
@@ -609,7 +609,7 @@
                                                         <input type="text"
                                                             class="form-control form-control-sm rounded-0"
                                                             name="edit_payee" id="edit_payee" placeholder="Payee"
-                                                            required>
+                                                            >
                                                     </div>
                                                 </div>
                                             </div>
@@ -965,6 +965,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('#SearchJournalForm').submit();
             $(document).on('click', '#printVoucher', function(e) {
                 var winPrint = window.open('', '',
                     'left=0,top=0,width=800,height=600,toolbar=0,scrollbars=0,status=0');

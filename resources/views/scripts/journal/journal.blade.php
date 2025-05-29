@@ -325,30 +325,30 @@
 
         $('form').attr('autocomplete', 'off');
         var journalEntryDetails = $('#journalEntryDetails').DataTable({
-            dom: 'Bftrip',
+            dom: 'lftrip',
             pageLength: 10,
-            buttons: ['print', 'csv',
-                {
-                    text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
-                    className: 'btn btn-flat btn-sm btn-default',
-                    titleAttr: 'Export',
-                    action: function(e, dt, node, config) {
-                        var exportBtn = document.getElementsByClassName(
-                            'btn btn-secondary buttons-csv buttons-html5')[0];
-                        exportBtn.click();
-                    }
-                },
-                {
-                    text: '<i class="fas fa-print" aria-hidden="true"></i>',
-                    className: 'btn btn-flat btn-sm btn-default',
-                    titleAttr: 'Print',
-                    action: function(e, dt, node, config) {
-                        var printBtn = document.getElementsByClassName(
-                            'btn btn-secondary buttons-print')[0];
-                        printBtn.click();
-                    }
-                },
-            ],
+            // buttons: ['print', 'csv',
+            //     {
+            //         text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
+            //         className: 'btn btn-flat btn-sm btn-default',
+            //         titleAttr: 'Export',
+            //         action: function(e, dt, node, config) {
+            //             var exportBtn = document.getElementsByClassName(
+            //                 'btn btn-secondary buttons-csv buttons-html5')[0];
+            //             exportBtn.click();
+            //         }
+            //     },
+            //     {
+            //         text: '<i class="fas fa-print" aria-hidden="true"></i>',
+            //         className: 'btn btn-flat btn-sm btn-default',
+            //         titleAttr: 'Print',
+            //         action: function(e, dt, node, config) {
+            //             var printBtn = document.getElementsByClassName(
+            //                 'btn btn-secondary buttons-print')[0];
+            //             printBtn.click();
+            //         }
+            //     },
+            // ],
         });
         var Toast = Swal.mixin({
             toast: true,
@@ -827,11 +827,16 @@
                                 url: "{{ route('journal.JournalEntryEdit') }}",
                                 data: data,
                                 dataType: "json",
-                                success: function(data) {
-                                    toastr.success(data.message);
-                                    saveJournalEntryDetails(data.id, 'update')
-                                    $('#journalModalEdit').modal('hide');
-                                    /* $('#SearchJournalForm').submit(); */
+                                success: function(response) {
+                                    if (response.success) {
+                                            toastr.success(response.message);
+                                            saveJournalEntryDetails(response.id, 'update');
+                                             $('body').focus();
+                                            $('#journalModalEdit').modal('hide');
+                                        } else {
+                                            toastr.error(response.message);
+                                            $('#journalModalEdit').find('button[type="submit"]').focus();
+                                        }
                                 },
                                 error: function(jqXHR) {
                                     if (jqXHR.status === 422) {
