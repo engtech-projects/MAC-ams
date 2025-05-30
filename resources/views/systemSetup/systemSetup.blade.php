@@ -239,8 +239,8 @@
                                                 </td>
                                                 <td>
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.end_date" :min="editRow.start_date"
-                                                        :max="editRow.end_date" />
+                                                        v-model="editRow.end_date" :min="editRow.start_date" />
+                                                        <!-- :max="editRow.end_date" /> -->
                                                     <span v-else>@{{ row.end_date }}</span>
                                                 </td>
                                                 <td>

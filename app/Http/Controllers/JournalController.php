@@ -135,6 +135,16 @@ class JournalController extends MainController
 
         $period = new PostingPeriod();
         $open_periods = $period->openStatus()->get();
+
+
+        if(count ($open_periods) < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot update journal entry - no posting periods are currently open.',
+            ], 403);
+        }
+
+
         if (count($open_periods) >= 1) {
             $matchFound = false;
             foreach ($open_periods as $open) {
