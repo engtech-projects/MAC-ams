@@ -233,14 +233,15 @@
                                                 <td>
 
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.start_date" :min="row.start_date"
-                                                        :max="row.end_date" />
+                                                        v-model="editRow.start_date"
+                                                        :min="getStartMonth(editRow.start_date)"
+                                                        :max="getEndMonth(row.end_date)" />
                                                     <span v-else>@{{ row.start_date }}</span>
                                                 </td>
                                                 <td>
                                                     <input class="form-control" v-if="editIndex === index" type="date"
-                                                        v-model="editRow.end_date" :min="editRow.start_date" />
-                                                        <!-- :max="editRow.end_date" /> -->
+                                                        v-model="editRow.end_date" :min="getStartMonth(editRow.start_date)"
+                                                        :max="getEndMonth(editRow.end_date)">
                                                     <span v-else>@{{ row.end_date }}</span>
                                                 </td>
                                                 <td>
@@ -378,13 +379,22 @@
                     }
 
                 },
+                getStartMonth(date) {
+                    var date = date.split("-");
+                    /*     console.log(date[0] + "-" + date[1] + "-01"); */
+                    return date[0] + "-" + date[1] + "-01";
+                },
+                getEndMonth(date) {
+                    var date = date.split("-");
+                    return date[0] + "-" + date[1] + "-31";
+                },
                 startEdit(index) {
                     this.editIndex = index
 
                     this.editRow = {
                         ...this.postingPeriods[index]
                     }
-                    console.log(this.editRow);
+
                 },
                 cancelEdit() {
                     this.editIndex = null
