@@ -125,14 +125,15 @@ class Subsidiary extends Model
 
     public function getTotalDepreciableAmountAttribute()
     {
-        return $this->sub_amount - $this->salvage;
+        return round($this->sub_amount - $this->salvage);
     }
     public function getExpensedAttribute()
     {
-        return $this->depreciation_payments()->sum("amount");
+        return round($this->depreciation_payments()->sum("amount"));
     }
     public function getUnexpensedAttribute()
     {
-        return $this->total_depreciable_amount - $this->expensed;
+        return round($this->sub_no_depre != 0 ?  $this->total_depreciable_amount - $this->expensed : 0.00);
+        /* return $this->total_depreciable_amount - $this->expensed; */
     }
 }

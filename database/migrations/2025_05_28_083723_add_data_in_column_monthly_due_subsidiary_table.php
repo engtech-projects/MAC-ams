@@ -17,9 +17,7 @@ class AddDataInColumnMonthlyDueSubsidiaryTable extends Migration
         $subsidiaries = Subsidiary::all();
         Subsidiary::withoutEvents(function () use ($subsidiaries) {
             foreach ($subsidiaries as $subsidiary) {
-                /* $result = $denominator != 0 ? $numerator / $denominator : null; */
-
-                $monthlyDue = $subsidiary['sub_no_depre'] != 0 ? $subsidiary['sub_amount'] - $subsidiary['sub_salvage'] / $subsidiary['sub_no_depre'] : 0.00;
+                $monthlyDue = $subsidiary['sub_no_depre'] != 0 ? ($subsidiary['sub_amount'] - $subsidiary['sub_salvage']) / $subsidiary['sub_no_depre'] : 0.00;
                 Subsidiary::where('sub_id', $subsidiary['sub_id'])->update(['monthly_due' => $monthlyDue]);
             }
         });
