@@ -1023,7 +1023,7 @@
                                                 <tbody class="text-uppercase">
                                                     <tr v-for="bc in collections.branch_collections">
                                                         <td class="text-bold" v-text="bc.branch.branch_name"></td>
-                                                        <td v-text="bc.total_amount"></td>
+                                                        <td>@{{ formatCurrency(bc.total_amount) }}</td>
                                                     </tr>
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
@@ -1364,8 +1364,18 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        window.location.reload();
-                        //  this.resetForm();
+                        this.closeModal();
+
+                        this.selectedBranch = this.collectionBreakdown.branch_id;
+                        this.selectedDate = this.collectionBreakdown.transaction_date;
+
+                        if (this.$refs.branchFilter) {
+                          this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
+                        }
+
+                        this.$nextTick(() => {
+                            this.filterCollections();
+                        });
                     }).catch(err => {
                         toastr.error(err.response.data.message);
 
@@ -1483,7 +1493,6 @@
                         toastr.error("Unable to edit posted transaction.");
                         this.closeModal();
                     } else {
-                        this.openModal();
                         axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
@@ -1505,6 +1514,7 @@
                             
                             this.collectionBreakdown = cb;
                             this.calculateCashCount(cb);
+                            this.openModal();
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -1550,9 +1560,19 @@
                             }
                         }).then(response => {
                             toastr.success(response.data.message);
-                            window.location.reload();
+
+                            this.selectedBranch = collection.branch_id;
+                            this.selectedDate = collection.transaction_date;
+                            
+                            if (this.$refs.branchFilter) {
+                                this.$refs.branchFilter.branch_id = collection.branch_id;
+                            }
+
+                            this.$nextTick(() => {
+                                this.filterCollections();
+                            });
                         }).catch(err => {
-                            toastr.success(err);
+                            toastr.error(err.response?.data?.message || 'Failed to delete collection breakdown.');
                         })
                     }
                 },
@@ -1581,8 +1601,9 @@
                         var totalCash = parseFloat(this.totalCash);
                         this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
                             .branchCollectionTotal);
-                        this.collectionBreakdown.total = totalCash
                         this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
+                        this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
+                        this.collectionBreakdown.total = totalCash;
                     }
                     axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
