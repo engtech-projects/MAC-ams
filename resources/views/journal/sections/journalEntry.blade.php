@@ -599,6 +599,7 @@
                     const response = await axios.get('/MAC-ams/open-posting-period');
                     this.posting_period = response.data.data;
                 } catch (error) {
+                    
                     console.err('Error:', error);
                 }
                 var dates = this.posting_period;

@@ -19,11 +19,11 @@ use App\Http\Resources\InvoiceCollection;
 
 class SalesController extends MainController
 {
-	
+
  	public function index() {
- 		
+
  		$transactionType = TransactionType::where('transaction_type', 'invoice')->first();
-		
+
  		$data = [
             'title' => 'Sales Transactions',
             'customers' => Customer::all(),
@@ -32,16 +32,15 @@ class SalesController extends MainController
 
     	return view('sales.sales', $data);
 
- 	}   
+ 	}
 
  	public function create($type, Request $request) {
  		$transactionType = TransactionType::where('transaction_type', $type)->first();
 		$invoice = null;
 		if(isset($request->id) && $type == 'invoice'){
 			$invoice = (new Invoice())->with(['customer', 'transaction', 'transaction.items', 'transaction.details', 'transaction.items.item','transaction.type'])->where('transaction_id', $request->id)->first();
-			// dd($invoice);
 		}
-        
+
  		$data = [
  			'customers' => Customer::all(),
  			'terms' => Terms::all(),
@@ -50,7 +49,6 @@ class SalesController extends MainController
     		'transactionStatus' => TransactionStatus::where(['default' => 1, 'transaction_type_id' => $transactionType->transaction_type_id])->first(),
 			'invoice' => $invoice
  		];
-		// dd($data);
  		return view('sales.create'.$type, $data);
  	}
 
@@ -68,28 +66,28 @@ class SalesController extends MainController
  		if( $request->type == 'sales' ){
  			return $transactions->sales(
                 [
-                    'status' => $request->status, 
-                    'customer' =>  $request->customer, 
+                    'status' => $request->status,
+                    'customer' =>  $request->customer,
                     'dateRange' => array(
-                        'from' => $request->from, 
-                        'to' => $request->to 
-                    )  
-                ]);	
+                        'from' => $request->from,
+                        'to' => $request->to
+                    )
+                ]);
  		}
 
  		if( $request->type == 'invoice' ){
  			return new InvoiceCollection($transactions->invoice(
                 [
-                    'status' => $request->status, 
+                    'status' => $request->status,
                     'customer' =>  $request->customer,
                     'dateRange' => array(
-                        'from' => $request->from, 
-                        'to' => $request->to 
-                    )  
+                        'from' => $request->from,
+                        'to' => $request->to
+                    )
                 ], true));
  		}
  	}
- 	
+
  	// invoice
  	public function invoice() {
 

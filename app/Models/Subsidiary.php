@@ -125,7 +125,6 @@ class Subsidiary extends Model
 
     public function getTotalDepreciableAmountAttribute()
     {
-        dd($this->salvage);
         return $this->sub_amount - $this->salvage;
     }
     public function getExpensedAttribute()

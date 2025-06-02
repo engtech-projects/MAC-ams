@@ -509,7 +509,6 @@ class ReportsController extends MainController
                 $details['journal_details_credit'] = $account->account_number == 1570 ? $request->total['total_due_amort'] : 0;
             }
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
-                /*                 dd($request); */
                 $details['journal_details_credit'] = $account->account_number == 1415  ? $request->total['total_unposted_payments'] : 0;
                 $details['journal_details_debit'] =  0;
             }
@@ -561,19 +560,6 @@ class ReportsController extends MainController
                         }
                         $sub->prepaid_expense->save();
                     }
-                    /* if (count($payments) > 0) {
-                        foreach ($sub->prepaid_expense as $expense) {
-                            dd($sub->prepaid_expense);
-                            foreach ($payments as $payment) {
-                                dd($payment['sub_id'], $sub->sub_id);
-
-                                if ($payment->sub_id === $sub->sub_id && $payment->status === 'unposted') {
-
-                                    $payment->save(['status' => 'posted']);
-                                }
-                            }
-                        }
-                    } */
                 }
             }
             return response()->json(['message' => 'Successfully posted.']);

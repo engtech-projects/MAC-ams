@@ -182,7 +182,6 @@ class SubsidiaryController extends Controller
         if ($subsidiary->prepaid_expense) {
             $prepaid_payments = $subsidiary->prepaid_expense->prepaid_expense_payments;
             if (count($subsidiary->prepaid_expense->prepaid_expense_payments) > 0) {
-                /*              dd($subsidiary->prepaid_expense->prepaid_expense_payments); */
                 foreach ($subsidiary->prepaid_expense->prepaid_expense_payments as $payment) {
 
                     $prepaid_expense += $payment->amount;
