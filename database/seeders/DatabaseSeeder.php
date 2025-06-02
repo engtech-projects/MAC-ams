@@ -30,15 +30,18 @@ class DatabaseSeeder extends Seeder
 
         $this->call(AccessListSeeder::class);
         $this->call(SubModuleSeeder::class);
+        $this->call(MonthlyDueSeeder::class);
 
-		$currency =	['PHP' => 'Philippine Peso',
-					'USD' => 'US Dollars'];
+        $currency =    [
+            'PHP' => 'Philippine Peso',
+            'USD' => 'US Dollars'
+        ];
 
-		foreach ($currency as $key => $value) {
-			$cc = new Currency;
-			$cc->currency = $value;
-			$cc->abbreviation = $key;
-			$cc->save();
-		}
+        foreach ($currency as $key => $value) {
+            $cc = new Currency;
+            $cc->currency = $value;
+            $cc->abbreviation = $key;
+            $cc->save();
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Subsidiary extends Model
 {
@@ -59,8 +60,6 @@ class Subsidiary extends Model
     public function deleteSubsidiary($id) {}
     public function getDepreciation($categoryId, $branch, $date)
     {
-
-
         $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId) {
             $query->where('sub_cat_id', $categoryId);
         })->with(['prepaid_expense.prepaid_expense_payments'])
@@ -106,19 +105,6 @@ class Subsidiary extends Model
     {
         return $this->subsidiary_category->sub_cat_name;
     }
-    /*     public function getSubCatIdAttribute()
-    {
-        return $this->subsidiary_category->sub_cat_id;
-    } */
-    public function getExpensedAttribute()
-    {
-        return floatval($this->monthly_amort) * intVal($this->sub_no_amort);
-    }
-    public function getUnexpensedAttribute()
-    {
-
-        return $this->rem * $this->monthly_amort;
-    }
     public function getDueAmortAttribute()
     {
         return $this->rem > 0 ? ($this->monthly_amort) : 0;
@@ -130,5 +116,24 @@ class Subsidiary extends Model
     public function getNoAttribute()
     {
         return 0;
+    }
+
+    public function depreciation_payments(): HasMany
+    {
+        return $this->hasMany(DepreciationPayment::class, 'sub_id', 'sub_id');
+    }
+
+    public function getTotalDepreciableAmountAttribute()
+    {
+        return round($this->sub_amount - $this->salvage);
+    }
+    public function getExpensedAttribute()
+    {
+        return round($this->depreciation_payments()->sum("amount"));
+    }
+    public function getUnexpensedAttribute()
+    {
+        return round($this->sub_no_depre != 0 ?  $this->total_depreciable_amount - $this->expensed : 0.00);
+        /* return $this->total_depreciable_amount - $this->expensed; */
     }
 }
