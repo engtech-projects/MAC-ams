@@ -159,7 +159,7 @@ class ReportsController extends MainController
     {
         return new LengthAwarePaginator(array_slice($items, ($currentPage - 1) * $perPage, $perPage), count($items), $perPage, $currentPage, ['path' => url()->current()]);
     }
-    // invoice
+    // invoiceF
     public function subsidiaryLedger()
     {
 
@@ -240,14 +240,12 @@ class ReportsController extends MainController
             $subs['sub_amount'] = $value->sub_amount;
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
-            $subs['monthly_amort'] = $value->monthly_amort;
-            $subs['salvage'] = $value->salvage;
+            $subs['monthly_amort'] = $value->monthly_due;
+            $subs['unexpensed'] = $value->unexpensed;
             $subs['expensed'] = $value->expensed;
+            $subs['salvage'] = $value->salvage;
             $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status', 'posted')->sum('amount');
-
             $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
-            $subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
-            //$value->sub_amount - ($value->monthly_amort - $value->used);
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
             $subs['posted_payment'] = $totalPostedPayment;
             $subs['unposted_payments'] = $totalUnpostedPayments;
@@ -419,7 +417,6 @@ class ReportsController extends MainController
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
         } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::LEASE) {
             $accountName = Accounts::where('account_number', 1555)->pluck('account_name')->first();
-
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
             $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
@@ -1255,10 +1252,10 @@ class ReportsController extends MainController
         $branchId = Branch::BRANCH_HEAD_OFFICE_ID;
         $bookId = JournalBook::GENERAL_LEDGER_BOOK;
         $journalEntry = new JournalEntry();
-        $from = Carbon::createFromFormat('Y-m-d',$request->from);
-        $toRemarks = Carbon::createFromFormat('Y-m-d',$request->to);
+        $from = Carbon::createFromFormat('Y-m-d', $request->from);
+        $toRemarks = Carbon::createFromFormat('Y-m-d', $request->to);
         $to = Carbon::createFromFormat('Y-m-d', $request->to);
-        $journalDate = Carbon::createFromFormat('Y-m-d',$request->journalDate);
+        $journalDate = Carbon::createFromFormat('Y-m-d', $request->journalDate);
 
         $entry = $journalEntry::create([
             'journal_no' => $journalEntry->generateJournalNumber(JournalBook::GENERAL_LEDGER_BOOK),
@@ -1267,7 +1264,7 @@ class ReportsController extends MainController
             'book_id' => $bookId,
             'source' => $journalEntry::CLOSING_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
-            'remarks' => 'TO RECORD CLOSING OF BOOKS FOR THE CALENDAR YEAR ' . $from->format('F j, Y'). ' TO ' . $toRemarks->format('F j, Y'),
+            'remarks' => 'TO RECORD CLOSING OF BOOKS FOR THE CALENDAR YEAR ' . $from->format('F j, Y') . ' TO ' . $toRemarks->format('F j, Y'),
             'amount' => 0,
             'payee' => $journalEntry::CLOSING_SOURCE
         ]);
@@ -1295,7 +1292,7 @@ class ReportsController extends MainController
         $retainEarningsAccount = Accounts::find(Accounts::RETAINED_EARNING_ACC);
 
         // Determine if NetIncome is negative (debit) or positive (credit)
-        $debitAmount = ($netIncome < 0 ) ? abs($netIncome) : 0;
+        $debitAmount = ($netIncome < 0) ? abs($netIncome) : 0;
         $creditAmount = ($netIncome > 0) ? $netIncome : 0;
 
         array_push($details, [
