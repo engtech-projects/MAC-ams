@@ -33,8 +33,6 @@ class SubsidiaryController extends Controller
         $request->merge([
             'monthly_due' => $monthlyDue
         ]);
-        dd($request);
-
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
