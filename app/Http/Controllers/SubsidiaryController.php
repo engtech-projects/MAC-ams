@@ -28,6 +28,13 @@ class SubsidiaryController extends Controller
             ], 422); // 422 Unprocessable Entity
         }
 
+        $monthlyDue = $request['sub_no_depre'] != 0 ? ($request['sub_amount'] - ($request['sub_amount'] * ($request['sub_salvage'] / 100))) / $request['sub_no_depre'] : 0.00;
+
+        $request->merge([
+            'monthly_due' => $monthlyDue
+        ]);
+        dd($request);
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -45,6 +52,9 @@ class SubsidiaryController extends Controller
             'monthly_due' => 'required|numeric',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
         ], ['required_if' => 'Expense is required.']);
+
+
+        dd($data);
 
         try {
             if (isset($data['branch']) && isset($data['branch']['branch_id'])) {
@@ -125,6 +135,11 @@ class SubsidiaryController extends Controller
             ], 422);
         }
 
+        $monthlyDue = $request['sub_no_depre'] != 0 ? ($request['sub_amount'] - ($request['sub_amount'] * ($request['sub_salvage'] / 100))) / $request['sub_no_depre'] : 0.00;
+        $request->merge([
+            'monthly_due' => $monthlyDue
+        ]);
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -137,6 +152,7 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'string|nullable',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
             'prepaid_expense_payment' => 'required_if:sub_cat_id,0',
+            'monthly_due' => 'required|numeric',
 
         ], [
             'required_if' => 'Expense is required.'
