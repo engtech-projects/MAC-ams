@@ -241,6 +241,7 @@ class ReportsController extends MainController
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
+            $subs['monthly_due'] = $value->monthly_due;
             $subs['unexpensed'] = $value->unexpensed;
             $subs['expensed'] = $value->expensed;
             $subs['salvage'] = $value->salvage;
