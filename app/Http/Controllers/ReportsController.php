@@ -415,7 +415,7 @@ class ReportsController extends MainController
 
         if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
-        } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
+        } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
             $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
         } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::LEASE) {
             $accountName = Accounts::where('account_number', 1555)->pluck('account_name')->first();
