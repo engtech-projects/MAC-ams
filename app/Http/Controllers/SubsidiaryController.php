@@ -42,6 +42,7 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
             'branch' => 'nullable',
+            'monthly_due' => 'required|numeric',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
         ], ['required_if' => 'Expense is required.']);
 
@@ -113,15 +114,16 @@ class SubsidiaryController extends Controller
     public function update(Subsidiary $subsidiary, Request $request)
     {
         if (Subsidiary::where('sub_code', $request->sub_code)
-                 ->where('sub_id', '!=', $subsidiary->sub_id)
-                 ->exists()) {
-        return response()->json([
-            'message' => 'The subsidiary code already exists. Please choose a different code.',
-            'errors' => [
-                'sub_code' => ['The subsidiary code already exists.']
-            ]
-        ], 422);
-    }
+            ->where('sub_id', '!=', $subsidiary->sub_id)
+            ->exists()
+        ) {
+            return response()->json([
+                'message' => 'The subsidiary code already exists. Please choose a different code.',
+                'errors' => [
+                    'sub_code' => ['The subsidiary code already exists.']
+                ]
+            ], 422);
+        }
 
         $data = $request->validate([
             'sub_code' => 'string|required',

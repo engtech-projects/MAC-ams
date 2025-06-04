@@ -244,6 +244,7 @@ class ReportsController extends MainController
             $subs['unexpensed'] = $value->unexpensed;
             $subs['expensed'] = $value->expensed;
             $subs['salvage'] = $value->salvage;
+            $subs['monthly_due'] = $value->monthly_due;
             $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status', 'posted')->sum('amount');
             $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
             $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
