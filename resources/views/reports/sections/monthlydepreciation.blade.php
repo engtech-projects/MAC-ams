@@ -512,6 +512,8 @@
                     branch_id: '',
                     prepaid_expense: null,
                     prepaid_expense_payment: null,
+                    expensed: 0,
+                    unexpensed: 0,
                 },
                 incomeExpense: {
                     income: [],
@@ -550,10 +552,11 @@
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
-                    this.monthlyAmortization = amount / this.subsidiary.sub_no_depre;
+                    let salvage = 0;
                     if (this.subsidiary.sub_salvage > 0) {
-                        this.ratePercentage / this.subsidiary.sub_no_depre;
+                        salvage = amount * (this.subsidiary.sub_salvage / 100);
                     }
+                    this.monthlyAmortization = (amount - salvage) / this.subsidiary.sub_no_depre;
 
                     return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
                 },
