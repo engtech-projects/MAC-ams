@@ -51,9 +51,6 @@ class SubsidiaryController extends Controller
             'prepaid_expense' => 'required_if:sub_cat_id,0',
         ], ['required_if' => 'Expense is required.']);
 
-
-        dd($data);
-
         try {
             if (isset($data['branch']) && isset($data['branch']['branch_id'])) {
                 $data['sub_per_branch'] = Branch::where('branch_id', $data['branch']['branch_id'])->pluck('branch_code')->first();
