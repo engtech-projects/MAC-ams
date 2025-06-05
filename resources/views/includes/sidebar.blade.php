@@ -142,7 +142,8 @@
                         request()->is('reports/cashPosition') ||
                         request()->is('reports/cheque') ||
                         request()->is('reports/postDatedCheque') ||
-                        request()->is('reports/chartOfAccounts')
+                        request()->is('reports/chartOfAccounts') ||
+                        request()->is('reports/monthly-depreciation-report')
                             ? 'menu-open'
                             : '' }}">
                         <a class="nav-link {{ request()->is('reports/subsidiary-ledger') ? 'active' : '' }}">

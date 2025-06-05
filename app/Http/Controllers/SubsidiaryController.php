@@ -47,7 +47,7 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
             'branch' => 'nullable',
-            'monthly_due' => 'required|numeric',
+            'monthly_due' => 'sometimes|numeric',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
         ], ['required_if' => 'Expense is required.']);
 
@@ -148,7 +148,7 @@ class SubsidiaryController extends Controller
             'sub_per_branch' => 'string|nullable',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
             'prepaid_expense_payment' => 'required_if:sub_cat_id,0',
-            'monthly_due' => 'required|numeric',
+            'monthly_due' => 'sometimes|numeric',
 
         ], [
             'required_if' => 'Expense is required.'
