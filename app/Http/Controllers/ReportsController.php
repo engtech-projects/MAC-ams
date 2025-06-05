@@ -433,9 +433,13 @@ class ReportsController extends MainController
         $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
 
         $subAccounts = [];
-        foreach ($subIds as $subId2) {
-            $subsidiary = Subsidiary::find($subId2);
+        foreach ($subIds as $id) {
+            $subsidiary = Subsidiary::find($id);
             if ($subsidiary) {
+                $subsidiary->depreciation_payments()->create([
+                    'amount' => $subsidiary->monthly_due,
+                    'date_paid' => now(),
+                ]);
                 $subAccounts[] = $subsidiary->subsidiary_accounts->pluck('account_id')->toArray();
             }
         }
