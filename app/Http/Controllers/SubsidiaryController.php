@@ -130,7 +130,8 @@ class SubsidiaryController extends Controller
             ], 422);
         }
 
-        $monthlyDue = $request['sub_no_depre'] != 0 ? ($request['sub_amount'] - ($request['sub_amount'] * ($request['sub_salvage'] / 100))) / $request['sub_no_depre'] : 0.00;
+
+        $monthlyDue = $subsidiary['sub_no_depre'] != 0 ? ($request['sub_amount'] - ($request['sub_amount'] * ($request['sub_salvage'] / 100))) / $request['sub_no_depre'] : 0.00;
         $request->merge([
             'monthly_due' => $monthlyDue
         ]);
