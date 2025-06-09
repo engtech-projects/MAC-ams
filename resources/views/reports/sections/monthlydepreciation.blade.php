@@ -366,11 +366,25 @@
                                         <input type="date" v-model="subsidiary.sub_date" class="form-control"
                                             id="sub_code" required>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-3" v-if="isEdit">
+                                        <label for="message-text" class="col-form-label"> Original Life: </label>
+                                        <input type="text" :value="subsidiary.sub_no_depre" class="form-control" id="original_life" readonly>
+                                    </div>
+
+                                    <div class="col-md-3" v-if="isEdit">
+                                        <label for="message-text" class="col-form-label">New Life: </label>
+                                        <input type="number" v-model="subsidiary.new_life" class="form-control" id="new_life" required>
+                                        <small v-if="validationErrors.newLifeTooSmall" class="text-danger">
+                                            ❌ New life must be greater than or equal to used value.
+                                        </small>
+                                    </div>
+
+                                    <div class="col-md-6" v-else>
                                         <label for="message-text" class="col-form-label">Number of Terms: </label>
                                         <input type="text" v-model="subsidiary.sub_no_depre" class="form-control"
-                                            id="sub_address" required>
+                                        id="sub_address" required>
                                     </div>
+
                                 </div>
 
                             </div>
@@ -429,6 +443,11 @@
                                             v-model="to_add_prepaid_amount" class="form-control">
                                     </div>
 
+                                    <div class="col-md-6" v-if="isEdit">
+                                        <label for="message-text" class="col-form-label"> Remaining Life </label>
+                                        <input type="text" :value="remaining_life" class="form-control" readonly>
+                                    </div>
+
 
 
                                     <!-- <div class="col-md-6">
@@ -436,6 +455,23 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <input type="text" v-model="ratePercentage" class="form-control">
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             </div> -->
                                 </div>
+
+                            </div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6" v-if="isEdit">
+                                            <label for="expensed" class="col-form-label"> Total Expensed: </label>
+                                            <input type="text" v-model="subsidiary.expensed" class="form-control"
+                                                id="expensed" readonly>
+                                    </div>
+                                    <div class="col-md-6" v-if="isEdit">
+                                            <label for="unexpensed-text" class="col-form-label"> Total Unexpensed: </label>
+                                            <input type="text" v-model="subsidiary.unexpensed" class="form-control"
+                                                id="unexpensed" readonly>
+                                    </div>
+                                    
+                                            
+                                </div>
+                            <div >
 
                             </div>
                         </form>
@@ -510,8 +546,14 @@
                     branch_id: '',
                     prepaid_expense: null,
                     prepaid_expense_payment: null,
-                    expensed: null
+                    expensed: 0,
+                    unexpensed: 0,
+                    new_life: '',
+                    used: ''
                 },
+                validationErrors: {
+                    newLifeTooSmall: false
+                    },
                 incomeExpense: {
                     income: [],
                     expense: []
@@ -557,6 +599,15 @@
                     }
                     return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
                 },
+                remaining_life: function(){
+                    var new_life = Number(this.subsidiary.new_life) || 0;
+                    var used = Number(this.subsidiary.sub_no_amort) || 0;
+                    var remaining = new_life - used;
+                    return remaining > 0 ? remaining : 0;
+                
+
+                },
+
                 amort: function() {
                     var amount = this.subsidiary.sub_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
@@ -894,6 +945,19 @@
 
 
             },
+            watch: {
+                'subsidiary.new_life'(newVal) {
+                    const newLife = Number(newVal);
+                    const used = Number(this.subsidiary.sub_no_amort);
+                    this.validationErrors.newLifeTooSmall = newLife < used;
+                },
+                'subsidiary.used'(newVal) {
+                    const newLife = Number(this.subsidiary.new_life);
+                    const used = Number(newVal);
+                    this.validationErrors.newLifeTooSmall = newLife < used;
+                }
+                },
+
             methods: {
                 onSearch: function() {
                     this.searching = false;
@@ -1011,6 +1075,7 @@
                                         this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, "")) */
 
                 },
+               
                 formatPrepaidAmountField() {
                     this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
                 },
@@ -1032,7 +1097,9 @@
                     return typeof val === 'string' || val instanceof String;
                 },
                 processEdit: function(sub) {
-
+                    // sub.forEach((value, index) => {
+                    //     console.log(`sub[${index}]:`, value);
+                    // });
                     this.isEdit = true;
                     this.subId = sub[13];
                     this.monthlyAmortization = sub[4];
@@ -1050,8 +1117,11 @@
                     this.subsidiary.prepaid_expense = sub[7];
                     this.subsidiary.unexpensed = sub[8];
                     this.prepaid_amount = Number(sub[7].replace(/[^0-9\.-]+/g, ""))
+                    this.subsidiary.expensed = sub[7];
                     // this.subsidiary.sub_no_amort = sub[]
-
+                    console.log("expensed:", sub[7]);
+                    console.log("unxpensed:", sub[8]);
+                   
                 },
                 resetForm: function() {
                     this.subsidiary = {
@@ -1167,8 +1237,23 @@
                     this.subsidiary.prepaid_expense = this.prepaid_amount;
                     this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount
                     this.subsidiary.category = this.filter.category;
+                    
+                   
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    }
+
+                    const newLife = Number(this.subsidiary.new_life);
+                    const used = Number(this.subsidiary.sub_no_amort) || 0;
+
+                    if (newLife < used) {
+                        toastr.error("New life cannot be less than the used value.");
+                        return; // 🛑 Prevent saving
+                    }
+
+                    // If not yet edited, set new_life to original sub_no_depre
+                    if (!this.subsidiary.new_life) {
+                        this.subsidiary.new_life = this.subsidiary.sub_no_depre;
                     }
                     this.subsidiary.sub_amount = amount;
                     // this.subsidiary.sub_no_amort = 0;
