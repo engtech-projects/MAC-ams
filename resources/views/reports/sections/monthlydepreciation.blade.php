@@ -854,7 +854,7 @@
                                 total_no_depre,
                                 total_used,
                                 this.formatCurrency(total_expensed),
-                                total_unexpensed,
+                                 this.formatCurrency(total_unexpensed),
                                 this.formatCurrency(total_due_amort),
                                 this.formatCurrency(total_sub_salvage),
                                 total_rem,
