@@ -130,12 +130,6 @@ class SubsidiaryController extends Controller
             ], 422);
         }
 
-
-        $monthlyDue = $subsidiary['sub_no_depre'] != 0 ? ($request['sub_amount'] - ($request['sub_amount'] * ($request['sub_salvage'] / 100))) / $request['sub_no_depre'] : 0.00;
-        $request->merge([
-            'monthly_due' => $monthlyDue
-        ]);
-
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -149,12 +143,50 @@ class SubsidiaryController extends Controller
             'prepaid_expense' => 'required_if:sub_cat_id,0',
             'prepaid_expense_payment' => 'required_if:sub_cat_id,0',
             'monthly_due' => 'sometimes|numeric',
+            'new_life' => 'nullable|numeric|min:0'
 
         ], [
             'required_if' => 'Expense is required.'
         ]);
+
+        $oldDepre = $subsidiary->sub_no_depre;
+        $amount = $request['sub_amount'] ?? $subsidiary->sub_amount;
+        $salvageRate = $request['sub_salvage'] ?? $subsidiary->sub_salvage;
+        $salvage = ($salvageRate / 100) * $amount;
+        $unexpensed = $subsidiary->unexpensed ?? ($amount ?? 0); // fallback
+    
+        $newLife = (int)$request->input('new_life', 0);
+        $monthsRemaining = max($newLife - $oldDepre, 1); // avoid division by 0
+        $monthlyDue = 0;
+
+    //    dd([
+    //         'oldDepre' => $oldDepre,
+    //         'amount' => $amount,
+    //         'salvageRate' => $salvageRate,
+    //         'salvage' => $salvage,
+    //         'unexpensed' => $unexpensed,
+    //         'newLife' => $newLife,
+    //         'monthlyDue (initial)' => $monthlyDue,
+    //         'remaining' =>$monthsRemaining
+    //         ]);
+      
+
+         if ($newLife > 0) {
+            $data['sub_no_depre'] = $newLife;
+            $monthlyDue = ($unexpensed - $salvage) / $monthsRemaining;
+           // dd(['monthlyDue (recalculated)' => $monthlyDue]);
+
+        } else {
+            $monthlyDue = ($oldDepre != 0) ? $amount / $oldDepre : 0.00;
+             dd(['monthlyDue (recalculated)' => $monthlyDue]);
+           // $data['sub_no_depre'] = $oldDepre; // preserve existing value
+        }
+
+        $data['monthly_due'] = round($monthlyDue, 2);
+
         try {
             $subsidiary->update($data);
+
             if ($request->category) {
                 if ($request->category['sub_cat_name'] === SubsidiaryCategory::ADDTIONAL_PREPAID_EXP) {
                     if ($subsidiary->prepaid_expense) {
@@ -191,8 +223,10 @@ class SubsidiaryController extends Controller
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
         $subsidiary['sub_cat_name'] = $subsidiary->sub_cat_name;
+
         $prepaid_expense = 0;
         $prepaid_payments = [];
+
         if ($subsidiary->prepaid_expense) {
             $prepaid_payments = $subsidiary->prepaid_expense->prepaid_expense_payments;
             if (count($subsidiary->prepaid_expense->prepaid_expense_payments) > 0) {

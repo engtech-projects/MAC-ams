@@ -395,9 +395,18 @@
                                         <input type="text" v-model="subsidiary.sub_amount" class="form-control"
                                             @change="formatTextField()" id="sub_tel" required>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Monthly Amortization</label>
-                                        <input type="text" disabled v-model="monthlyAmort" class="form-control"
+                                    <div class="col-md-6" v-if="!isEdit">
+                                         <label for="message-text" class="col-form-label">Monthly Amortization</label>
+                                        <input type="text" disabled :value="monthlyAmort" class="form-control"
+                                            id="sub_acct_no" required>
+                                    </div>
+                                     <div class="col-md-6" v-if="isEdit">
+                                       
+                                        <label for="message-text" class="col-form-label">
+                                        Monthly Amortization
+                                        <span class="text-danger ms-2" style="font-size: 0.875rem;">*note:(unexpensed - salvage) / remaining life)*</span>
+                                        </label>
+                                        <input type="text" disabled :value="newAmort" class="form-control"
                                             id="sub_acct_no" required>
                                     </div>
 
@@ -411,11 +420,16 @@
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage" required>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Salvage:</label>
-
-
+                                    <div class="col-md-6" v-if="isEdit">
+                                        <label for="message-text" class="col-form-label">Salvage:
+                                        <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life expand (rate/ 100) * unexpensed</span>
+                                        </label>
                                         <input type="text" v-model="ratePercentage" class="form-control">
+                                    </div>
+                                     <div class="col-md-6" v-if="!isEdit">
+                                        <label for="message-text" class="col-form-label">Salvage:
+                                        </label>
+                                        <input type="text" v-model="ratePercentageAmount" class="form-control">
                                     </div>
                                 </div>
 
@@ -445,18 +459,12 @@
 
                                     <div class="col-md-6" v-if="isEdit">
                                         <label for="message-text" class="col-form-label"> Remaining Life </label>
-                                        <input type="text" :value="remaining_life" class="form-control" readonly>
+                                        <input type="text" :value="remaining_life" class="form-control" readonly>       
                                     </div>
-
-
-
-                                    <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div> -->
                                 </div>
+                            </div>
 
-                            </div class="form-group">
+                            <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6" v-if="isEdit">
                                             <label for="expensed" class="col-form-label"> Total Expensed: </label>
@@ -471,7 +479,7 @@
                                     
                                             
                                 </div>
-                            <div >
+                                
 
                             </div>
                         </form>
@@ -548,8 +556,9 @@
                     prepaid_expense_payment: null,
                     expensed: 0,
                     unexpensed: 0,
-                    new_life: '',
-                    used: ''
+                    new_life: 0,
+                    used: '',
+                    remaining_life:0,
                 },
                 validationErrors: {
                     newLifeTooSmall: false
@@ -586,29 +595,56 @@
 
                     return this.type
                 },
-                monthlyAmort: function() {
-                    var amount = this.subsidiary.sub_amount;
-                    if (typeof this.subsidiary.sub_amount === 'string') {
-                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
-                    }
-                    this.subsidiary.expensed = this.subsidiary.expensed == null ? 0 : this.subsidiary.expensed
-                    this.monthlyAmortization = ((amount - this.subsidiary.expensed) - this.subsidiary
-                        .sub_salvage) / this.subsidiary.sub_no_depre;
-                    if (this.subsidiary.sub_salvage > 0) {
-                        salvage = amount * (this.subsidiary.sub_salvage / 100);
-                    }
-                    return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
-                },
-                remaining_life: function(){
-                    var new_life = Number(this.subsidiary.new_life) || 0;
-                    var used = Number(this.subsidiary.sub_no_amort) || 0;
-                    var remaining = new_life - used;
-                    return remaining > 0 ? remaining : 0;
-                
+                monthlyAmort() {
+                let amount = this.subsidiary.sub_amount;
 
+                if (typeof amount === 'string') {
+                amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
+                }
+
+                const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
+                const salvage =  (salvageRate / 100) * amount;
+                const months = Number(this.subsidiary.sub_no_depre) || 1;
+
+                const amort = (amount - salvage) / months;
+                return isNaN(amort) ? 0 : this.formatCurrency(amort);
+                 },
+                newAmort: function() {
+
+                  const newLife = Number(this.subsidiary.new_life) || 0;
+                    if (newLife === 0) {
+                    return this.formatCurrency(this.subsidiary.monthlydue || 0);
+                    }else
+                    {
+                   let amount = this.subsidiary.sub_amount;
+                    if (typeof amount === 'string') {
+                    amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
+                    }
+
+                    let unexpensed = this.subsidiary.unexpensed;
+                    console.log("unexpensed:", unexpensed);
+                    if (typeof unexpensed === 'string') {
+                        unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
+                    }
+                    console.log("unexpensed:", unexpensed);
+                    const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
+                    const salvage =  (salvageRate / 100) * unexpensed;
+
+                    const remaining = this.remaining_life || 1; // computed property or fallback to 1!
+                    
+                    const amort = (unexpensed - salvage) / remaining;
+                    return isNaN(amort) ? 0 : this.formatCurrency(amort);
+                
+                }},
+                remaining_life() {
+                    const new_life = Number(this.subsidiary.new_life) || 0;
+                    const used = Number(this.subsidiary.sub_no_amort) || 0;
+                    const remaining = new_life - used;
+                    return remaining > 0 ? remaining : 0;
                 },
 
                 amort: function() {
+                
                     var amount = this.subsidiary.sub_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
@@ -622,6 +658,14 @@
 
 
                 ratePercentage: function() {
+                    var unexpensed = this.subsidiary.unexpensed;
+                    if (typeof this.subsidiary.unexpensed === 'string') {
+                        var unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * unexpensed
+                    return this.formatCurrency(this.subsidiary.rate_percentage);
+                },
+                ratePercentageAmount: function() {
                     var amount = this.subsidiary.sub_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
@@ -738,7 +782,7 @@
                                     rows.push(val);
 
                                     totalAmount += parseFloat(subsidiary.sub_amount),
-                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
                                     total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                     total_amort += parseFloat(subsidiary.total_amort)
@@ -1044,6 +1088,45 @@
                         console.error(err)
                     })
                 },
+
+                getRawNewAmort() {
+                 
+                    let amount = this.subsidiary.sub_amount;
+                    if (typeof amount === 'string') {
+                    amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
+                    }
+
+                    let unexpensed = this.subsidiary.unexpensed;
+                    console.log("unexpensed:", unexpensed);
+                    if (typeof unexpensed === 'string') {
+                        unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
+                    }
+                    console.log("unexpensed:", unexpensed);
+                    const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
+                    const salvage =  (salvageRate / 100) * unexpensed;
+
+                    const remaining = this.remaining_life || 1; // computed property or fallback to 1!
+                    
+                    const amort = (unexpensed - salvage) / remaining;
+                    console.log("due:", amort);
+                    return isNaN(amort) ? 0 : amort;
+                },
+                calculateMonthlyAmort() {
+                    let amount = this.subsidiary.sub_amount;
+
+                    // Convert string to number if needed
+                    if (typeof amount === 'string') {
+                    amount = Number(amount.replace(/[^0-9\.-]+/g, ''));
+                    }
+
+                    const salvage = Number(this.subsidiary.sub_salvage) || 0;
+                    const months = Number(this.subsidiary.sub_no_depre) || 1;
+
+                    const amort = (amount - salvage) / months;
+
+                    // ✅ Assign value to data property
+                    this.monthlyAmortization = isNaN(amort) ? 0 : amort;
+                } , 
                 add: function(subsidiary) {
                     this.isEdit = false;
                     this.resetForm();
@@ -1234,29 +1317,23 @@
                     this.isEdit = true;
                     this.formatTextToNumberFormat();
                     var amount = this.subsidiary.sub_amount;
+                    var unexpensed = this.subsidiary.unexpensed;
+                    if (typeof this.subsidiary.unexpensed === 'string') {
+                        var unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""))
+                    }
+
                     this.subsidiary.prepaid_expense = this.prepaid_amount;
-                    this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount
+                    this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount;
                     this.subsidiary.category = this.filter.category;
                     
-                   
+                  
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
-
-                    const newLife = Number(this.subsidiary.new_life);
-                    const used = Number(this.subsidiary.sub_no_amort) || 0;
-
-                    if (newLife < used) {
-                        toastr.error("New life cannot be less than the used value.");
-                        return; // 🛑 Prevent saving
-                    }
-
-                    // If not yet edited, set new_life to original sub_no_depre
-                    if (!this.subsidiary.new_life) {
-                        this.subsidiary.new_life = this.subsidiary.sub_no_depre;
-                    }
+                    
                     this.subsidiary.sub_amount = amount;
-                    // this.subsidiary.sub_no_amort = 0;
+                    this.subsidiary.unexpensed = unexpensed;
+                    console.log("Subsidiary:", this.subsidiary);
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
@@ -1265,7 +1342,7 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        this.updateSubsidiary(response.data.data)
+                       this.updateSubsidiary(response.data.data)
                         $('#createSubsidiaryModal').modal('hide');
 
                         setTimeout(() => {
@@ -1320,6 +1397,9 @@
                 },
 
             },
+            mounted() {
+                 this.calculateMonthlyAmort();
+            }
 
         });
     </script>
