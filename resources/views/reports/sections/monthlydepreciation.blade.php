@@ -1421,6 +1421,9 @@
     },
             mounted() {
                  this.calculateMonthlyAmort();
+                 $('#createSubsidiaryModal').on('hidden.bs.modal', () => {
+                    this.resetForm();
+                });
             }
 
         });
