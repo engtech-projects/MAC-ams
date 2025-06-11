@@ -380,7 +380,7 @@
                                     </div>
 
                                     <div class="col-md-6" v-else>
-                                        <label for="message-text" class="col-form-label">Number of Terms: </label>
+                                        <label for="message-text" class="col-form-label">Life: </label>
                                         <input type="text" v-model="subsidiary.sub_no_depre" class="form-control"
                                         id="sub_address" required>
                                     </div>
@@ -436,10 +436,10 @@
                             </div>
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" v-if="isEdit">
                                         <label for="message-text" class="col-form-label">Used:</label>
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
-                                            id="sub_no_amort">
+                                            id="sub_no_amort" readonly>
                                     </div>
                                     <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'"
                                         class="col-md-6">
@@ -1330,10 +1330,20 @@
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
+
+                    
+                    const newLife = parseInt(this.subsidiary.new_life ?? 0);
+                    const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
+
+                    if (newLife > 0 && newLife < used) {
+                        toastr.error("New life must be greater than or equal to months already used.");
+                        return; // stop the update
+                    }
                     
                     this.subsidiary.sub_amount = amount;
                     this.subsidiary.unexpensed = unexpensed;
-                    console.log("Subsidiary:", this.subsidiary);
+                   
+
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
@@ -1342,12 +1352,15 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
+
                        this.updateSubsidiary(response.data.data)
                         $('#createSubsidiaryModal').modal('hide');
-
+                        this.fetchSubAll();
                         setTimeout(() => {
                             this.resetForm();
                             this.isEdit = false;
+                        
+                            this.getSubsidiaries();
                         }, 100);
                     }).catch(err => {
                         var errors = err.response.data.errors;
@@ -1397,6 +1410,15 @@
                 },
 
             },
+             getSubsidiaries() {
+                axios.get('/MAC-ams/subsidiaries')
+                    .then(res => {
+                        this.subsidiaries = res.data.data;
+                    })
+                    .catch(err => {
+                        toastr.error("Failed to load subsidiaries.");
+                    });
+    },
             mounted() {
                  this.calculateMonthlyAmort();
             }

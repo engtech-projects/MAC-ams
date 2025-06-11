@@ -129,7 +129,7 @@ class SubsidiaryController extends Controller
                 ]
             ], 422);
         }
-
+        
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -149,37 +149,20 @@ class SubsidiaryController extends Controller
             'required_if' => 'Expense is required.'
         ]);
 
-        $oldDepre = $subsidiary->sub_no_depre;
+        $used = $subsidiary->sub_no_amort;
+        $newLife = (int)$request->input('new_life', 0);
         $amount = $request['sub_amount'] ?? $subsidiary->sub_amount;
         $salvageRate = $request['sub_salvage'] ?? $subsidiary->sub_salvage;
         $salvage = ($salvageRate / 100) * $amount;
         $unexpensed = $subsidiary->unexpensed ?? ($amount ?? 0); // fallback
     
-        $newLife = (int)$request->input('new_life', 0);
-        $monthsRemaining = max($newLife - $oldDepre, 1); // avoid division by 0
+        $monthsRemaining = max($newLife - $used, 1); // avoid division by 0
         $monthlyDue = 0;
 
-    //    dd([
-    //         'oldDepre' => $oldDepre,
-    //         'amount' => $amount,
-    //         'salvageRate' => $salvageRate,
-    //         'salvage' => $salvage,
-    //         'unexpensed' => $unexpensed,
-    //         'newLife' => $newLife,
-    //         'monthlyDue (initial)' => $monthlyDue,
-    //         'remaining' =>$monthsRemaining
-    //         ]);
-      
 
          if ($newLife > 0) {
             $data['sub_no_depre'] = $newLife;
             $monthlyDue = ($unexpensed - $salvage) / $monthsRemaining;
-           // dd(['monthlyDue (recalculated)' => $monthlyDue]);
-
-        } else {
-            $monthlyDue = ($oldDepre != 0) ? $amount / $oldDepre : 0.00;
-             dd(['monthlyDue (recalculated)' => $monthlyDue]);
-           // $data['sub_no_depre'] = $oldDepre; // preserve existing value
         }
 
         $data['monthly_due'] = round($monthlyDue, 2);
@@ -246,7 +229,13 @@ class SubsidiaryController extends Controller
         $prepaidUnexpensed =  $subsidiary->sub_amount - $prepaid_expense;
         $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $prepaidUnexpensed : $subsidiary->unexpensed;
 
-        return response()->json(['message' => 'Successfully updated.', 'data' => $subsidiary->getAttributes()], 200);
+        return response()->json([
+            'message' => 'Successfully updated.',
+            'data' => $subsidiary->getAttributes(),
+            'data' => array_merge(
+            $subsidiary->getAttributes(),
+            ['due_amort' => $monthlyDue]),
+        ],200);
     }
 
     public function destroy(Subsidiary $subsidiary)
