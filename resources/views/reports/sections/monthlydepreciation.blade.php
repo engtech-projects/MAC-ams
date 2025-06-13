@@ -395,28 +395,20 @@
                                         <input type="text" v-model="subsidiary.sub_amount" class="form-control"
                                             @change="formatTextField()" id="sub_tel" required>
                                     </div>
-                                    <div class="col-md-6" v-if="!isEdit">
-                                         <label for="message-text" class="col-form-label">Monthly Amortization</label>
-                                        <input type="text" disabled :value="monthlyAmort" class="form-control"
+                                    <div class="col-md-6">
+                                         <label for="message-text" class="col-form-label">Monthly Amortization
+                                            <span v-if="isEdit" class="text-danger ms-2" style="font-size: 0.875rem;">*note:(unexpensed - salvage) / remaining life)*</span>
+                                         </label>
+                                        <input type="text" disabled :value="amortToDisplay" class="form-control"
                                             id="sub_acct_no" required>
                                     </div>
-                                     <div class="col-md-6" v-if="isEdit">
-                                       
-                                        <label for="message-text" class="col-form-label">
-                                        Monthly Amortization
-                                        <span class="text-danger ms-2" style="font-size: 0.875rem;">*note:(unexpensed - salvage) / remaining life)*</span>
-                                        </label>
-                                        <input type="text" disabled :value="newAmort" class="form-control"
-                                            id="sub_acct_no" required>
-                                    </div>
-
                                 </div>
 
                             </div>
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                        <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage" required>
                                     </div>
@@ -496,7 +488,6 @@
     </section>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- /.content -->
-
     <script>
         new Vue({
             el: '#app',
@@ -514,7 +505,7 @@
                 subId: null,
                 newSub: null,
                 searching: false,
-                /* filter: {
+                filter: {
                     branch: null,
                     subsidiary_id: '',
                     category: null,
@@ -522,24 +513,7 @@
                     to: '',
                     account_id: '',
                     type: ''
-                }, */
-                filter: {
-                    "branch": {
-                        "branch_id": 4,
-                        "branch_code": "00000",
-                        "branch_name": "HEAD OFFICE",
-                        "branch_alias": "00000-HEAD OFFICE"
-                    },
-                    "subsidiary_id": "",
-                    "category": {
-                        "sub_cat_id": 45,
-                        "sub_cat_name": "OTHER INTANGIBLE ASSET"
-                    },
-                    "from": "",
-                    "to": "2025-06-05",
-                    "account_id": "",
-                    "type": ""
-                },
+                }, 
                 subAmount: 0,
                 prepaid_amount: 0,
                 to_add_prepaid_amount: 0,
@@ -575,6 +549,15 @@
                 search: "{{ route('reports.monthly-depreciation-report-search') }}",
             },
             computed: {
+                amortToDisplay() {
+                    const isEditing = this.isEdit;
+                    const newLife = Number(this.subsidiary.new_life);
+                    
+                    if (isEditing && newLife > 0) {
+                        return this.newAmort;
+                    }
+                    return this.monthlyAmort;
+                },
                 monthlyDepreciationReportType: function() {
                     var branch = this.filter.branch_id;
                     if (this.type == '') {
@@ -624,11 +607,9 @@
                     }
 
                     let unexpensed = this.subsidiary.unexpensed;
-                    console.log("unexpensed:", unexpensed);
                     if (typeof unexpensed === 'string') {
                         unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
                     }
-                    console.log("unexpensed:", unexpensed);
                     const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
                     const salvage =  (salvageRate / 100) * unexpensed;
 
@@ -639,10 +620,13 @@
                 
                 }},
                 remaining_life() {
-                    const new_life = Number(this.subsidiary.new_life) || 0;
-                    const used = Number(this.subsidiary.sub_no_amort) || 0;
-                    const remaining = new_life - used;
-                    return remaining > 0 ? remaining : 0;
+                    if (this.subsidiary.new_life) {
+                        const new_life = Number(this.subsidiary.new_life) || 0;
+                        const used = Number(this.subsidiary.sub_no_amort) || 0;
+                        const remaining = new_life - used;
+                        return remaining > 0 ? remaining : 0;
+                    }
+                    return this.subsidiary.sub_no_depre - this.subsidiary.sub_no_amort;
                 },
 
                 amort: function() {
@@ -1108,11 +1092,9 @@
                     }
 
                     let unexpensed = this.subsidiary.unexpensed;
-                    console.log("unexpensed:", unexpensed);
                     if (typeof unexpensed === 'string') {
                         unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
                     }
-                    console.log("unexpensed:", unexpensed);
                     const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
                     const salvage =  (salvageRate / 100) * unexpensed;
 
@@ -1213,8 +1195,6 @@
                     this.prepaid_amount = Number(sub[7].replace(/[^0-9\.-]+/g, ""))
                     this.subsidiary.expensed = sub[7];
                     // this.subsidiary.sub_no_amort = sub[]
-                    console.log("expensed:", sub[7]);
-                    console.log("unxpensed:", sub[8]);
                    
                 },
                 resetForm: function() {
