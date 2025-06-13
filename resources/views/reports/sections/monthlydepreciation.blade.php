@@ -439,7 +439,7 @@
                                     <div class="col-md-6" v-if="isEdit">
                                         <label for="message-text" class="col-form-label">Used:</label>
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
-                                            id="sub_no_amort" readonly>
+                                            id="sub_no_amort">
                                     </div>
                                     <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'"
                                         class="col-md-6">
@@ -494,7 +494,9 @@
         </div>
 
     </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- /.content -->
+
     <script>
         new Vue({
             el: '#app',
@@ -769,8 +771,12 @@
                                     } else {
                                         val.push(this.formatCurrency(subsidiary.expensed))
                                     }
-                                    val.push(this.formatCurrency(subsidiary.unexpensed),
-                                        this.formatCurrency(subsidiary.due_amort),
+                                    val.push(
+                                        this.formatCurrency(subsidiary.unexpensed),
+                                        this.formatCurrency(
+                                            parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary.sub_no_depre)
+                                            ? 0.00
+                                            : parseFloat(subsidiary.monthly_due)),
                                         this.formatCurrency(subsidiary.salvage),
                                         subsidiary.rem,
                                         subsidiary.inv,
@@ -781,6 +787,7 @@
                                         subsidiary.sub_per_branch)
                                     rows.push(val);
 
+
                                     totalAmount += parseFloat(subsidiary.sub_amount),
                                     total_monthly_amort += parseFloat(subsidiary.monthly_amort)
                                     total_no_depre += parseInt(subsidiary.sub_no_depre)
@@ -788,7 +795,11 @@
                                     total_amort += parseFloat(subsidiary.total_amort)
                                     total_used += parseInt(subsidiary.sub_no_amort)
                                     total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                    total_due_amort += parseFloat(subsidiary.due_amort)
+                                    if (parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary.sub_no_depre)) {
+                                            total_due_amort += 0.00;
+                                    } else {
+                                            total_due_amort += parseFloat(subsidiary.monthly_due);
+                                    }
                                     total_sub_salvage += parseFloat(subsidiary.salvage)
                                     total_rem += parseFloat(subsidiary.rem)
                                     total_inv += parseFloat(subsidiary.inv)
@@ -1231,7 +1242,17 @@
                     this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
                     var amount = this.subsidiary.sub_amount;
-                    this.subsidiary.prepaid_expense = this.prepaid_amount;
+                    
+
+                    let prepaid = this.prepaid_amount ?? '';
+                        this.subsidiary.prepaid_expense = parseFloat(
+                        String(prepaid).replace(/[₱,]/g, '') || '0'
+                        );
+                    //this.subsidiary.prepaid_expense = parseFloat(String(this.prepaid_amount).replace(/[₱,]/g, ''))
+                    // this.subsidiary.prepaid_expense = parseFloat(
+                    //             this.prepaid_amount.replace(/[₱,]/g, '')
+                    //             );
+
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }

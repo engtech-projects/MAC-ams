@@ -48,7 +48,7 @@ class SubsidiaryController extends Controller
             'branch_id' => 'nullable',
             'branch' => 'nullable',
             'monthly_due' => 'sometimes|numeric',
-            'prepaid_expense' => 'required_if:sub_cat_id,0',
+            'prepaid_expense' => 'required_if:sub_cat_id,0|numeric',
         ], ['required_if' => 'Expense is required.']);
 
         try {
@@ -92,7 +92,7 @@ class SubsidiaryController extends Controller
         $subsidiary['salvage'] = $subsidiary->salvage;
         $subsidiary['description'] = $subsidiary->description;
         $subsidiary['expensed'] = $subsidiary->expensed;
-        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $subsidiary->sub_amount - $subsidiary->prepaid_expense->amount : $subsidiary->unexpensed;
+        $subsidiary['unexpensed'] = $subsidiary->unexpensed;
         $subsidiary['due_amort'] = $subsidiary->due_amort;
         $subsidiary['inv'] = $subsidiary->inv;
         $subsidiary['no'] = $subsidiary->no;
