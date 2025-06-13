@@ -160,16 +160,16 @@
                                         </tbody>
                                     </table>
                                     <!-- <div v-if="processedData.entries.length" class="d-flex" style="width:100%;justify-content:space-between;margin-top:45px;">
-                                                                                                                                                                                        <div class="d-flex flex-column">
-                                                                                                                                                                                         <b>MICRO ACCESS LOANS CORPORATION</b>
-                                                                                                                                                                                         <span>Bank Reconciliation (@{{ processedData.account_name }})</span>
-                                                                                                                                                                                         <span>From @{{ filter.date_from }} To @{{ filter.date_to }}</span>
-                                                                                                                                                                                        </div>
-                                                                                                                                                                                        <div class="d-flex flex-column">
-                                                                                                                                                                                         <span>Monday, 11/22/2023 GLS</span>
-                                                                                                                                                                                         <span>1:58 PM</span>
-                                                                                                                                                                                        </div>
-                                                                                                                                                                                       </div> -->
+                                                                                                                                                                                                                                                                                                    <div class="d-flex flex-column">
+                                                                                                                                                                                                                                                                                                     <b>MICRO ACCESS LOANS CORPORATION</b>
+                                                                                                                                                                                                                                                                                                     <span>Bank Reconciliation (@{{ processedData.account_name }})</span>
+                                                                                                                                                                                                                                                                                                     <span>From @{{ filter.date_from }} To @{{ filter.date_to }}</span>
+                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                    <div class="d-flex flex-column">
+                                                                                                                                                                                                                                                                                                     <span>Monday, 11/22/2023 GLS</span>
+                                                                                                                                                                                                                                                                                                     <span>1:58 PM</span>
+                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                   </div> -->
                                     <table v-if="processedData.length" class="table"
                                         style="margin-top:45px;border-top:4px dashed #000">
                                         <thead>
@@ -234,9 +234,9 @@
             el: '#app',
             data: {
                 filter: {
-                    account_id: '',
-                    date_from: '',
-                    date_to: ''
+                    account_id: 154,
+                    date_from: '2025-05-26',
+                    date_to: '2025-05-31'
                 },
                 accounts: @json($chartOfAccount),
                 balance: 0,

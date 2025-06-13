@@ -961,7 +961,6 @@ class Accounts extends Model
                 'remarks' => $value->remarks
             ];
         }
-
         return $ledger;
     }
 
