@@ -437,14 +437,17 @@ class journalEntry extends Model
         return $subsidiaryListing;
     }
 
-    public function getBankReconciliationReport(array $filter)
+public function getBankReconciliationReport(array $filter)
     {
+        $glAccounts = new Accounts();
+        $balance = $glAccounts->getAccountBalance($filter['date_from'], $filter['date_to'], $filter['account_id']);
         $collections = collect($this->getJournalEntry($filter));
-        $journalEntries = $collections->map(function ($item, $key) {
+        $journalEntries = $collections->map(function ($item, $key) use ($balance) {
             $data = [
                 "account_id" => $item["account_id"],
                 "account_name" => $item["account_name"],
                 "account_number" => $item["account_number"],
+                "balance" => $balance,
                 "entries" => collect($item["entries"])->map(function ($item) {
                     return [
 
