@@ -1587,10 +1587,6 @@
                     this.total.p_5 = collectionBreakdown.p_5 * 5;
                     this.total.p_1 = collectionBreakdown.p_1 * 1;
                     this.total.c_25 = collectionBreakdown.c_25 * 0.25;
-
-
-
-
                 },
                 openModal: function() {
                     $(this.$refs.modal).modal('show')
@@ -1662,7 +1658,7 @@
                 updateStatus: function(collectionBreakdown, status) {
                     this.isUpdateStatus = true;
                     var diff = collectionBreakdown.cash_ending_balance - collectionBreakdown.total;
-                    if (diff == 0) {
+                    if ((Math.abs(diff) < 0.01)) {
                         this.collectionBreakdown = collectionBreakdown;
                         this.collectionBreakdown.status = status
                         this.updateCollectionBreakdown();
