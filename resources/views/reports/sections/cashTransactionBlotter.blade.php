@@ -837,13 +837,8 @@
                             <td>@{{ d.transaction_date }}</td>
                             <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
                             <td>@{{ formatCurrency(d.total) }}</td>
-<<<<<<< Updated upstream
                             <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
                             <td>@{{ d.status }}</td>
-=======
-                            <td>@{{ formatDifference(d.cash_ending_balance - d.total) }}</td>
-                            <td style="text-transform: capitalize;">@{{ d.status }}</td>
->>>>>>> Stashed changes
                             <td>
                                 <button @click="showCashBlotter(d.collection_id, d.branch_id)"
                                     class="mr-1 btn btn-xs btn-success">
@@ -1778,23 +1773,6 @@
 
                     return amount;
                 },
-                formatDifference(value) {
-                // Round to two decimal places
-                let rounded = Math.round(value * 100) / 100;
-
-                // Normalize -0 to 0
-                if (Math.abs(rounded) < 0.01) {
-                    rounded = 0;
-                }
-
-                // Format as currency (e.g., PHP style)
-                return rounded.toLocaleString('en-PH', {
-                    style: 'currency',
-                    currency: 'PHP',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-            },
                 formatDate: function(inputDate) {
                     const months = [
                         "January", "February", "March", "April", "May", "June", "July",
