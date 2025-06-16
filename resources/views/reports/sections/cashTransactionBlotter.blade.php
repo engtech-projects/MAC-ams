@@ -837,7 +837,7 @@
                             <td>@{{ d.transaction_date }}</td>
                             <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
                             <td>@{{ formatCurrency(d.total) }}</td>
-                            <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
+                            <td>@{{ formatDifference(d.cash_ending_balance - d.total) }}</td>
                             <td>@{{ d.status }}</td>
                             <td>
                                 <button @click="showCashBlotter(d.collection_id, d.branch_id)"
@@ -1500,7 +1500,7 @@
                 },
                 resetForm: function() {
                     this.collectionBreakdown.collection_id = null,
-                        this.collectionBreakdown.branch_id = null;
+                    this.collectionBreakdown.branch_id = null;
                     this.collectionBreakdown.transaction_date = '';
                     this.collectionBreakdown.p_1000 = 0;
                     this.collectionBreakdown.p_500 = 0;
@@ -1557,9 +1557,23 @@
                             !
                             isEqual(element, collection));
                     this.collectionBreakdown.account_officer_collections = updatedArray;
+                },
+                    formatDifference(value) {
+                    // Normalize -0 to 0 before rounding
+                    if (Math.abs(value) < 0.005) {
+                        value = 0;
+                    }
 
+                    // Round to two decimal places
+                    let rounded = Math.round(value * 100) / 100;
 
-
+                    // Format as currency (e.g., PHP style)
+                    return rounded.toLocaleString('en-PH', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
                 },
 
                 calculateCashCount: function(collectionBreakdown) {
