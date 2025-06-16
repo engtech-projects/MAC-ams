@@ -413,6 +413,7 @@ class ReportsController extends MainController
         $branch = Branch::where('branch_code', $request->branch_code)->first();
 
 
+
         if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
             $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
         } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
@@ -436,10 +437,12 @@ class ReportsController extends MainController
         foreach ($subIds as $id) {
             $subsidiary = Subsidiary::find($id);
             if ($subsidiary) {
-                $subsidiary->depreciation_payments()->create([
-                    'amount' => $subsidiary->monthly_due,
-                    'date_paid' => now(),
-                ]);
+                if ($subsidiary->due_amort > 0) {
+                    $subsidiary->depreciation_payments()->create([
+                        'amount' => $subsidiary->monthly_due,
+                        'date_paid' => now(),
+                    ]);
+                }
                 $subAccounts[] = $subsidiary->subsidiary_accounts->pluck('account_id')->toArray();
             }
         }
@@ -477,10 +480,11 @@ class ReportsController extends MainController
         foreach ($subAccounts as $subAccount) {
             foreach ($subAccount as $accountId) {
                 $account = Accounts::find($accountId);
+                /* dd($branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id); */
                 $journalDetails[] = [
                     'account_id' => $account->account_id,
                     'journal_details_title' => $account->account_name,
-                    'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
+                    'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Subsidiary::SUBSIDIARY_OFFICE : $request->branch_id,
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
                     'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
@@ -495,7 +499,7 @@ class ReportsController extends MainController
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
-                'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id,
+                'subsidiary_id' =>  $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Subsidiary::SUBSIDIARY_OFFICE : $request->branch_id,
                 'status' => JournalEntry::STATUS_POSTED,
                 'journal_details_account_no' => $account->account_number,
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,

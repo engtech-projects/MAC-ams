@@ -368,12 +368,14 @@
                                     </div>
                                     <div class="col-md-3" v-if="isEdit">
                                         <label for="message-text" class="col-form-label"> Original Life: </label>
-                                        <input type="text" :value="subsidiary.sub_no_depre" class="form-control" id="original_life" readonly>
+                                        <input type="text" :value="subsidiary.sub_no_depre" class="form-control"
+                                            id="original_life" readonly>
                                     </div>
 
                                     <div class="col-md-3" v-if="isEdit">
                                         <label for="message-text" class="col-form-label">New Life: </label>
-                                        <input type="number" v-model="subsidiary.new_life" class="form-control" id="new_life" required>
+                                        <input type="number" v-model="subsidiary.new_life" class="form-control"
+                                            id="new_life" required>
                                         <small v-if="validationErrors.newLifeTooSmall" class="text-danger">
                                             ❌ New life must be greater than or equal to used value.
                                         </small>
@@ -382,7 +384,7 @@
                                     <div class="col-md-6" v-else>
                                         <label for="message-text" class="col-form-label">Life: </label>
                                         <input type="text" v-model="subsidiary.sub_no_depre" class="form-control"
-                                        id="sub_address" required>
+                                            id="sub_address" required>
                                     </div>
 
                                 </div>
@@ -396,9 +398,11 @@
                                             @change="formatTextField()" id="sub_tel" required>
                                     </div>
                                     <div class="col-md-6">
-                                         <label for="message-text" class="col-form-label">Monthly Amortization
-                                            <span v-if="isEdit" class="text-danger ms-2" style="font-size: 0.875rem;">*note:(unexpensed - salvage) / remaining life)*</span>
-                                         </label>
+                                        <label for="message-text" class="col-form-label">Monthly Amortization
+                                            <span v-if="isEdit" class="text-danger ms-2"
+                                                style="font-size: 0.875rem;">*note:(unexpensed - salvage) / remaining
+                                                life)*</span>
+                                        </label>
                                         <input type="text" disabled :value="amortToDisplay" class="form-control"
                                             id="sub_acct_no" required>
                                     </div>
@@ -414,11 +418,12 @@
                                     </div>
                                     <div class="col-md-6" v-if="isEdit">
                                         <label for="message-text" class="col-form-label">Salvage:
-                                        <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life expand (rate/ 100) * unexpensed</span>
+                                            <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
+                                                expand (rate/ 100) * unexpensed</span>
                                         </label>
                                         <input type="text" v-model="ratePercentage" class="form-control">
                                     </div>
-                                     <div class="col-md-6" v-if="!isEdit">
+                                    <div class="col-md-6" v-if="!isEdit">
                                         <label for="message-text" class="col-form-label">Salvage:
                                         </label>
                                         <input type="text" v-model="ratePercentageAmount" class="form-control">
@@ -451,7 +456,7 @@
 
                                     <div class="col-md-6" v-if="isEdit">
                                         <label for="message-text" class="col-form-label"> Remaining Life </label>
-                                        <input type="text" :value="remaining_life" class="form-control" readonly>       
+                                        <input type="text" :value="remaining_life" class="form-control" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -459,19 +464,19 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6" v-if="isEdit">
-                                            <label for="expensed" class="col-form-label"> Total Expensed: </label>
-                                            <input type="text" v-model="subsidiary.expensed" class="form-control"
-                                                id="expensed" readonly>
+                                        <label for="expensed" class="col-form-label"> Total Expensed: </label>
+                                        <input type="text" v-model="subsidiary.expensed" class="form-control"
+                                            id="expensed" readonly>
                                     </div>
                                     <div class="col-md-6" v-if="isEdit">
-                                            <label for="unexpensed-text" class="col-form-label"> Total Unexpensed: </label>
-                                            <input type="text" v-model="subsidiary.unexpensed" class="form-control"
-                                                id="unexpensed" readonly>
+                                        <label for="unexpensed-text" class="col-form-label"> Total Unexpensed: </label>
+                                        <input type="text" v-model="subsidiary.unexpensed" class="form-control"
+                                            id="unexpensed" readonly>
                                     </div>
-                                    
-                                            
+
+
                                 </div>
-                                
+
 
                             </div>
                         </form>
@@ -513,7 +518,7 @@
                     to: '',
                     account_id: '',
                     type: ''
-                }, 
+                },
                 subAmount: 0,
                 prepaid_amount: 0,
                 to_add_prepaid_amount: 0,
@@ -534,11 +539,11 @@
                     unexpensed: 0,
                     new_life: 0,
                     used: '',
-                    remaining_life:0,
+                    remaining_life: 0,
                 },
                 validationErrors: {
                     newLifeTooSmall: false
-                    },
+                },
                 incomeExpense: {
                     income: [],
                     expense: []
@@ -552,7 +557,7 @@
                 amortToDisplay() {
                     const isEditing = this.isEdit;
                     const newLife = Number(this.subsidiary.new_life);
-                    
+
                     if (isEditing && newLife > 0) {
                         return this.newAmort;
                     }
@@ -581,44 +586,44 @@
                     return this.type
                 },
                 monthlyAmort() {
-                let amount = this.subsidiary.sub_amount;
+                    let amount = this.subsidiary.sub_amount;
 
-                if (typeof amount === 'string') {
-                amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
-                }
+                    if (typeof amount === 'string') {
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
+                    }
 
-                const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
-                const salvage =  (salvageRate / 100) * amount;
-                const months = Number(this.subsidiary.sub_no_depre) || 1;
+                    const salvageRate = Number(this.subsidiary.sub_salvage) || 0;
+                    const salvage = (salvageRate / 100) * amount;
+                    const months = Number(this.subsidiary.sub_no_depre) || 1;
 
-                const amort = (amount - salvage) / months;
-                return isNaN(amort) ? 0 : this.formatCurrency(amort);
-                 },
+                    const amort = (amount - salvage) / months;
+                    return isNaN(amort) ? 0 : this.formatCurrency(amort);
+                },
                 newAmort: function() {
 
-                  const newLife = Number(this.subsidiary.new_life) || 0;
+                    const newLife = Number(this.subsidiary.new_life) || 0;
                     if (newLife === 0) {
-                    return this.formatCurrency(this.subsidiary.monthlydue || 0);
-                    }else
-                    {
-                   let amount = this.subsidiary.sub_amount;
-                    if (typeof amount === 'string') {
-                    amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
-                    }
+                        return this.formatCurrency(this.subsidiary.monthlydue || 0);
+                    } else {
+                        let amount = this.subsidiary.sub_amount;
+                        if (typeof amount === 'string') {
+                            amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
+                        }
 
-                    let unexpensed = this.subsidiary.unexpensed;
-                    if (typeof unexpensed === 'string') {
-                        unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
-                    }
-                    const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
-                    const salvage =  (salvageRate / 100) * unexpensed;
+                        let unexpensed = this.subsidiary.unexpensed;
+                        if (typeof unexpensed === 'string') {
+                            unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
+                        }
+                        const salvageRate = Number(this.subsidiary.sub_salvage) || 0;
+                        const salvage = (salvageRate / 100) * unexpensed;
 
-                    const remaining = this.remaining_life || 1; // computed property or fallback to 1!
-                    
-                    const amort = (unexpensed - salvage) / remaining;
-                    return isNaN(amort) ? 0 : this.formatCurrency(amort);
-                
-                }},
+                        const remaining = this.remaining_life || 1; // computed property or fallback to 1!
+
+                        const amort = (unexpensed - salvage) / remaining;
+                        return isNaN(amort) ? 0 : this.formatCurrency(amort);
+
+                    }
+                },
                 remaining_life() {
                     if (this.subsidiary.new_life) {
                         const new_life = Number(this.subsidiary.new_life) || 0;
@@ -630,7 +635,7 @@
                 },
 
                 amort: function() {
-                
+
                     var amount = this.subsidiary.sub_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
@@ -731,65 +736,68 @@
                                 var subsidiary = branch[k];
                                 no += 1;
 
-
-                                if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                    total_expensed += parseFloat(subsidiary
-                                        .prepaid_expense);
-                                    totalUnpostedPayments += parseFloat(subsidiary.unposted_payments);
-                                } else {
-                                    total_expensed += parseFloat(subsidiary.expensed)
-                                }
-                                if (j == subsidiary.branch) {
-                                    sub_ids.push(subsidiary.sub_id)
-                                    let val = [no + ' - ' + subsidiary.sub_code,
-                                        subsidiary.sub_name,
-                                        subsidiary.sub_date,
-                                        this.formatCurrency(subsidiary.sub_amount),
-                                        this.formatCurrency(subsidiary.monthly_amort),
-                                        subsidiary.sub_no_depre,
-                                        subsidiary.sub_no_amort,
-                                    ]
-
+                                if (subsidiary.total_amort != 0) {
                                     if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                        val.push(this.formatCurrency(subsidiary.prepaid_expense))
+                                        total_expensed += parseFloat(subsidiary
+                                            .prepaid_expense);
+                                        totalUnpostedPayments += parseFloat(subsidiary.unposted_payments);
                                     } else {
-                                        val.push(this.formatCurrency(subsidiary.expensed))
+                                        total_expensed += parseFloat(subsidiary.expensed)
                                     }
-                                    val.push(
-                                        this.formatCurrency(subsidiary.unexpensed),
-                                        this.formatCurrency(
-                                            parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary.sub_no_depre)
-                                            ? 0.00
-                                            : parseFloat(subsidiary.monthly_due)),
-                                        this.formatCurrency(subsidiary.salvage),
-                                        subsidiary.rem,
-                                        subsidiary.inv,
-                                        subsidiary.sub_id,
-                                        subsidiary.sub_salvage,
-                                        subsidiary.sub_code,
-                                        subsidiary.sub_cat_id,
-                                        subsidiary.sub_per_branch)
-                                    rows.push(val);
+                                    if (j == subsidiary.branch) {
+                                        sub_ids.push(subsidiary.sub_id)
+                                        let val = [no + ' - ' + subsidiary.sub_code,
+                                            subsidiary.sub_name,
+                                            subsidiary.sub_date,
+                                            this.formatCurrency(subsidiary.sub_amount),
+                                            this.formatCurrency(subsidiary.monthly_amort),
+                                            subsidiary.sub_no_depre,
+                                            subsidiary.sub_no_amort,
+                                        ]
+
+                                        if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                            val.push(this.formatCurrency(subsidiary.prepaid_expense))
+                                        } else {
+                                            val.push(this.formatCurrency(subsidiary.expensed))
+                                        }
+                                        val.push(
+                                            this.formatCurrency(subsidiary.unexpensed),
+                                            this.formatCurrency(
+                                                parseFloat(subsidiary.sub_no_amort) === parseFloat(
+                                                    subsidiary.sub_no_depre) ?
+                                                0.00 :
+                                                parseFloat(subsidiary.monthly_due)),
+                                            this.formatCurrency(subsidiary.salvage),
+                                            subsidiary.rem,
+                                            subsidiary.inv,
+                                            subsidiary.sub_id,
+                                            subsidiary.sub_salvage,
+                                            subsidiary.sub_code,
+                                            subsidiary.sub_cat_id,
+                                            subsidiary.sub_per_branch)
+                                        rows.push(val);
 
 
-                                    totalAmount += parseFloat(subsidiary.sub_amount),
-                                    total_monthly_amort += parseFloat(subsidiary.monthly_amort)
-                                    total_no_depre += parseInt(subsidiary.sub_no_depre)
-                                    total_no_amort += parseFloat(subsidiary.sub_no_amort)
-                                    total_amort += parseFloat(subsidiary.total_amort)
-                                    total_used += parseInt(subsidiary.sub_no_amort)
-                                    total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                    if (parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary.sub_no_depre)) {
+                                        totalAmount += parseFloat(subsidiary.sub_amount),
+                                            total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                        total_no_depre += parseInt(subsidiary.sub_no_depre)
+                                        total_no_amort += parseFloat(subsidiary.sub_no_amort)
+                                        total_amort += parseFloat(subsidiary.total_amort)
+                                        total_used += parseInt(subsidiary.sub_no_amort)
+                                        total_unexpensed += parseFloat(subsidiary.unexpensed)
+                                        if (parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary
+                                                .sub_no_depre)) {
                                             total_due_amort += 0.00;
-                                    } else {
+                                        } else {
                                             total_due_amort += parseFloat(subsidiary.monthly_due);
+                                        }
+                                        total_sub_salvage += parseFloat(subsidiary.salvage)
+                                        total_rem += parseFloat(subsidiary.rem)
+                                        total_inv += parseFloat(subsidiary.inv)
+                                        prepaid_expensed += parseFloat(subsidiary.prepaid_expense)
+
+
                                     }
-                                    total_sub_salvage += parseFloat(subsidiary.salvage)
-                                    total_rem += parseFloat(subsidiary.rem)
-                                    total_inv += parseFloat(subsidiary.inv)
-                                    prepaid_expensed += parseFloat(subsidiary.prepaid_expense)
-
-
                                 }
 
 
@@ -849,7 +857,7 @@
                                 total_no_depre,
                                 total_used,
                                 this.formatCurrency(total_expensed),
-                                 this.formatCurrency(total_unexpensed),
+                                this.formatCurrency(total_unexpensed),
                                 this.formatCurrency(total_due_amort),
                                 this.formatCurrency(total_sub_salvage),
                                 total_rem,
@@ -995,7 +1003,7 @@
                     const used = Number(newVal);
                     this.validationErrors.newLifeTooSmall = newLife < used;
                 }
-                },
+            },
 
             methods: {
                 onSearch: function() {
@@ -1085,21 +1093,21 @@
                 },
 
                 getRawNewAmort() {
-                 
+
                     let amount = this.subsidiary.sub_amount;
                     if (typeof amount === 'string') {
-                    amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
                     }
 
                     let unexpensed = this.subsidiary.unexpensed;
                     if (typeof unexpensed === 'string') {
                         unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
                     }
-                    const salvageRate  = Number(this.subsidiary.sub_salvage) || 0;
-                    const salvage =  (salvageRate / 100) * unexpensed;
+                    const salvageRate = Number(this.subsidiary.sub_salvage) || 0;
+                    const salvage = (salvageRate / 100) * unexpensed;
 
                     const remaining = this.remaining_life || 1; // computed property or fallback to 1!
-                    
+
                     const amort = (unexpensed - salvage) / remaining;
                     console.log("due:", amort);
                     return isNaN(amort) ? 0 : amort;
@@ -1109,7 +1117,7 @@
 
                     // Convert string to number if needed
                     if (typeof amount === 'string') {
-                    amount = Number(amount.replace(/[^0-9\.-]+/g, ''));
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ''));
                     }
 
                     const salvage = Number(this.subsidiary.sub_salvage) || 0;
@@ -1119,7 +1127,7 @@
 
                     // ✅ Assign value to data property
                     this.monthlyAmortization = isNaN(amort) ? 0 : amort;
-                } , 
+                },
                 add: function(subsidiary) {
                     this.isEdit = false;
                     this.resetForm();
@@ -1151,7 +1159,7 @@
                                         this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, "")) */
 
                 },
-               
+
                 formatPrepaidAmountField() {
                     this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
                 },
@@ -1195,7 +1203,7 @@
                     this.prepaid_amount = Number(sub[7].replace(/[^0-9\.-]+/g, ""))
                     this.subsidiary.expensed = sub[7];
                     // this.subsidiary.sub_no_amort = sub[]
-                   
+
                 },
                 resetForm: function() {
                     this.subsidiary = {
@@ -1222,12 +1230,12 @@
                     this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
                     var amount = this.subsidiary.sub_amount;
-                    
+
 
                     let prepaid = this.prepaid_amount ?? '';
-                        this.subsidiary.prepaid_expense = parseFloat(
+                    this.subsidiary.prepaid_expense = parseFloat(
                         String(prepaid).replace(/[₱,]/g, '') || '0'
-                        );
+                    );
                     //this.subsidiary.prepaid_expense = parseFloat(String(this.prepaid_amount).replace(/[₱,]/g, ''))
                     // this.subsidiary.prepaid_expense = parseFloat(
                     //             this.prepaid_amount.replace(/[₱,]/g, '')
@@ -1326,13 +1334,13 @@
                     this.subsidiary.prepaid_expense = this.prepaid_amount;
                     this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount;
                     this.subsidiary.category = this.filter.category;
-                    
-                  
+
+
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
 
-                    
+
                     const newLife = parseInt(this.subsidiary.new_life ?? 0);
                     const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
 
@@ -1340,10 +1348,10 @@
                         toastr.error("New life must be greater than or equal to months already used.");
                         return; // stop the update
                     }
-                    
+
                     this.subsidiary.sub_amount = amount;
                     this.subsidiary.unexpensed = unexpensed;
-                   
+
 
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
@@ -1354,13 +1362,13 @@
                     }).then(response => {
                         toastr.success(response.data.message);
 
-                       this.updateSubsidiary(response.data.data)
+                        this.updateSubsidiary(response.data.data)
                         $('#createSubsidiaryModal').modal('hide');
                         this.fetchSubAll();
                         setTimeout(() => {
                             this.resetForm();
                             this.isEdit = false;
-                        
+
                             this.getSubsidiaries();
                         }, 100);
                     }).catch(err => {
@@ -1411,7 +1419,7 @@
                 },
 
             },
-             getSubsidiaries() {
+            getSubsidiaries() {
                 axios.get('/MAC-ams/subsidiaries')
                     .then(res => {
                         this.subsidiaries = res.data.data;
@@ -1419,10 +1427,10 @@
                     .catch(err => {
                         toastr.error("Failed to load subsidiaries.");
                     });
-    },
+            },
             mounted() {
-                 this.calculateMonthlyAmort();
-                 $('#createSubsidiaryModal').on('hidden.bs.modal', () => {
+                this.calculateMonthlyAmort();
+                $('#createSubsidiaryModal').on('hidden.bs.modal', () => {
                     this.resetForm();
                 });
             }
