@@ -242,7 +242,14 @@ class ReportsController extends MainController
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
             $subs['monthly_due'] = $value->monthly_due;
-            $subs['unexpensed'] = $value->unexpensed;
+            
+            
+           // $subs['unexpensed'] = $value->unexpensed;
+           //$subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
+            $subs['unexpensed'] = $value->prepaid_expense 
+            ? $value->monthly_amort - $value->prepaid_expense->amount 
+            : $value->unexpensed;
+
             $subs['expensed'] = $value->expensed;
             $subs['salvage'] = $value->salvage;
             $subs['monthly_due'] = $value->monthly_due;
@@ -461,13 +468,25 @@ class ReportsController extends MainController
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
 
             ];
-            if ($accountCategory->to_increase === 'debit') {
-                $details['journal_details_debit'] = round($request->total['total_due_amort'], 2);
-                $details['journal_details_credit'] = 0;
+
+           
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                $details['journal_details_debit'] = $account->account_number == 5210 
+                    ? $request->total['total_unposted_payments'] 
+                    : 0;
+                $details['journal_details_credit'] = $account->account_number == 1415 
+                    ? $request->total['total_unposted_payments'] 
+                    : 0;
             } else {
-                $details['journal_details_debit'] = 0;
-                $details['journal_details_credit'] = round($request->total['total_due_amort'], 2);
+                if ($accountCategory->to_increase === 'debit') {
+                    $details['journal_details_debit'] = round($request->total['total_due_amort'], 2);
+                    $details['journal_details_credit'] = 0;
+                } else {
+                    $details['journal_details_debit'] = 0;
+                    $details['journal_details_credit'] = round($request->total['total_due_amort'], 2);
+                }
             }
+
 
             /* if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
 
@@ -521,7 +540,9 @@ class ReportsController extends MainController
             'source' => $journalEntry::DEPRECIATION_SOURCE,
             'status' => $journalEntry::STATUS_POSTED,
             'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
-            'amount' => $request->total['total_due_amort'],
+            'amount' => $subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD
+                ? $request->total['total_unposted_payments']
+                : $request->total['total_due_amort'],
         ]);
         try {
             $journalEntry->details()->createMany($journalDetails);
