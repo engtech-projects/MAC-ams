@@ -129,7 +129,7 @@ class SubsidiaryController extends Controller
                 ]
             ], 422);
         }
-        
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -155,16 +155,15 @@ class SubsidiaryController extends Controller
         $salvageRate = $request['sub_salvage'] ?? $subsidiary->sub_salvage;
         $salvage = ($salvageRate / 100) * $amount;
         $unexpensed = $subsidiary->unexpensed ?? ($amount ?? 0); // fallback
-    
+
         $monthsRemaining = max($newLife - $used, 1); // avoid division by 0
-        $monthlyDue = 0;
+        $monthlyDue = $subsidiary->monthly_due;
 
 
-         if ($newLife > 0) {
+        if ($newLife > 0) {
             $data['sub_no_depre'] = $newLife;
             $monthlyDue = ($unexpensed - $salvage) / $monthsRemaining;
         }
-
         $data['monthly_due'] = round($monthlyDue, 2);
 
         try {
@@ -233,9 +232,10 @@ class SubsidiaryController extends Controller
             'message' => 'Successfully updated.',
             'data' => $subsidiary->getAttributes(),
             'data' => array_merge(
-            $subsidiary->getAttributes(),
-            ['due_amort' => $monthlyDue]),
-        ],200);
+                $subsidiary->getAttributes(),
+                ['due_amort' => $monthlyDue]
+            ),
+        ], 200);
     }
 
     public function destroy(Subsidiary $subsidiary)
