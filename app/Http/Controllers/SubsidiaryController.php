@@ -133,6 +133,8 @@ class SubsidiaryController extends Controller
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
+            'sub_address' => 'nullable',
+            'sub_tel' => 'nullable',
             'sub_no_amort' => 'sometimes',
             'sub_date' => 'date|nullable',
             'sub_cat_id' => 'integer|required',
