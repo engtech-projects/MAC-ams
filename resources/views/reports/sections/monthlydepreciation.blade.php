@@ -345,6 +345,7 @@
                             <div class="form-group">
                                 <div class="row">
 
+
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Inventory Number: </label>
                                         <input type="text" v-model="subsidiary.sub_code" class="form-control"
@@ -356,11 +357,6 @@
                                             id="sub_name" required>
                                         <input v-if="isEdit" type="hidden" name="_method" value="PUT">
                                     </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Date Obtained: </label>
                                         <input type="date" v-model="subsidiary.sub_date" class="form-control"
@@ -383,23 +379,21 @@
                                         </small>
                                     </div>
 
-                                    <div class="col-md-6" v-else>
+                                    <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Life: </label>
                                         <input type="text" v-model="subsidiary.sub_no_depre" class="form-control"
                                             id="sub_address" required>
                                     </div>
 
-                                </div>
-
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
+                                    <div
+                                        :class="filter.category?.sub_cat_name == 'Additional Prepaid Expense' ? 'col-md-6' :
+                                            'col-md-6'">
                                         <label for="message-text" class="col-form-label">Amount:</label>
                                         <input type="text" v-model="subsidiary.sub_amount" class="form-control"
                                             @change="formatTextField()" id="sub_tel" required>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6"
+                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Monthly Amortization
                                             <span v-if="isEdit" class="text-danger ms-2"
                                                 style="font-size: 0.875rem;">*note:(unexpensed - salvage) / remaining
@@ -408,17 +402,15 @@
                                         <input type="text" disabled :value="amortToDisplay" class="form-control"
                                             id="sub_acct_no" required>
                                     </div>
-                                </div>
 
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6"
+                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage" required>
                                     </div>
-                                    <div class="col-md-6" v-if="isEdit">
+                                    <div class="col-md-6" v-if="isEdit"
+                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Salvage:
                                             <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
                                                 expand (rate/ 100) * unexpensed</span>
@@ -430,12 +422,10 @@
                                         </label>
                                         <input type="text" v-model="ratePercentageAmount" class="form-control">
                                     </div>
-                                </div>
 
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6" v-if="isEdit">
+
+                                    <div class="col-md-6" v-if="isEdit"
+                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Used:</label>
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
                                             id="sub_no_amort">
@@ -456,16 +446,13 @@
                                             v-model="to_add_prepaid_amount" class="form-control">
                                     </div>
 
-                                    <div class="col-md-6"
+                                    <div :class="filter.category?.sub_cat_name == 'Additional Prepaid Expense' ? 'col-md-12' :
+                                        'col-md-6'"
                                         v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label"> Remaining Life </label>
                                         <input type="text" :value="remaining_life" class="form-control" readonly>
                                     </div>
-                                </div>
-                            </div>
 
-                            <div class="form-group">
-                                <div class="row">
                                     <div class="col-md-6"
                                         v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
                                         <label for="expensed" class="col-form-label"> Total Expensed: </label>
@@ -479,10 +466,7 @@
                                             id="unexpensed" readonly>
                                     </div>
 
-
                                 </div>
-
-
                             </div>
                         </form>
                     </div>
