@@ -393,7 +393,7 @@
                                             @change="formatTextField()" id="sub_tel" required>
                                     </div>
                                     <div class="col-md-6"
-                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
+                                        v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Monthly Amortization
                                             <span v-if="isEdit" class="text-danger ms-2"
                                                 style="font-size: 0.875rem;">*note:(unexpensed - salvage) / remaining
@@ -404,13 +404,14 @@
                                     </div>
 
                                     <div class="col-md-6"
-                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
+                                        v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="mt-4">Rate
+                                            Percentage(%):</label>
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage" required>
                                     </div>
                                     <div class="col-md-6" v-if="isEdit"
-                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
+                                        v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Salvage:
                                             <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
                                                 expand (rate/ 100) * unexpensed</span>
@@ -425,8 +426,8 @@
 
 
                                     <div class="col-md-6" v-if="isEdit"
-                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
-                                        <label for="message-text" class="col-form-label">Used:</label>
+                                        v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label mt-4">Used:</label>
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
                                             id="sub_no_amort">
                                     </div>
