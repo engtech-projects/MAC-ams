@@ -53,9 +53,9 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <select v-model="filter.category"
+                                                                <select v-model="filter.category" required
                                                                     class="form-control form-control-sm" id="branch">
-                                                                    <option :value="null" disabled selected
+                                                                    <option :value="null" disabled selected 
                                                                         class="text-uppercase">
                                                                         SELECT CATEGORY
                                                                     </option>
@@ -226,11 +226,11 @@
 
 
                                                 <td v-if="ps[2]">
-                                                    <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'>
+                                                    <button class="btn btn-danger btn-xs"  v-show="filter.branch" @click='deleteSub(ps[13])'> 
                                                         <i class="fa fa-trash fa-xs"></i>
                                                     </button>
 
-                                                    <button class="btn btn-warning btn-xs" data-toggle="modal"
+                                                    <button class="btn btn-warning btn-xs" data-toggle="modal" v-show="filter.branch"
                                                         data-target="#createSubsidiaryModal" @click='processEdit(ps)'>
                                                         <i class="fa fa-pen fa-xs text-white"></i>
                                                     </button>
@@ -1364,7 +1364,7 @@
                             this.resetForm();
                             this.isEdit = false;
 
-                            this.getSubsidiaries();
+                            // this.getSubsidiaries();
                         }, 100);
                     }).catch(err => {
                         var errors = err.response.data.errors;
