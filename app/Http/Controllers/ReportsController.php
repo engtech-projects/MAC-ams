@@ -242,13 +242,13 @@ class ReportsController extends MainController
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
             $subs['monthly_due'] = $value->monthly_due;
-            
-            
-           // $subs['unexpensed'] = $value->unexpensed;
-           //$subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
-            $subs['unexpensed'] = $value->prepaid_expense 
-            ? $value->monthly_amort - $value->prepaid_expense->amount 
-            : $value->unexpensed;
+
+
+            // $subs['unexpensed'] = $value->unexpensed;
+            //$subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
+            $subs['unexpensed'] = $value->prepaid_expense
+                ? $value->monthly_amort - $value->prepaid_expense->amount
+                : $value->unexpensed;
 
             $subs['expensed'] = $value->expensed;
             $subs['salvage'] = $value->salvage;
@@ -457,7 +457,6 @@ class ReportsController extends MainController
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
         }
         foreach ($subsidiaryCategory->accounts as $account) {
-            $accountCategory = $account->accountType->accountCategory;
 
             $details = [
                 'account_id' => $account->account_id,
@@ -468,14 +467,12 @@ class ReportsController extends MainController
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
 
             ];
-
-           
-            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
-                $details['journal_details_debit'] = $account->account_number == 5210 
-                    ? $request->total['total_unposted_payments'] 
+            /*             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                $details['journal_details_debit'] = $account->account_number == 5210
+                    ? $request->total['total_unposted_payments']
                     : 0;
-                $details['journal_details_credit'] = $account->account_number == 1415 
-                    ? $request->total['total_unposted_payments'] 
+                $details['journal_details_credit'] = $account->account_number == 1415
+                    ? $request->total['total_unposted_payments']
                     : 0;
             } else {
                 if ($accountCategory->to_increase === 'debit') {
@@ -485,10 +482,10 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = 0;
                     $details['journal_details_credit'] = round($request->total['total_due_amort'], 2);
                 }
-            }
+            } */
 
 
-            /* if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
 
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_due_amort'] : 0;
@@ -509,9 +506,6 @@ class ReportsController extends MainController
                 $details['journal_details_debit'] = $account->account_number == 1555 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1560 ? $request->total['total_due_amort'] : 0;
             }
-
-
-
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
                     $details['journal_details_debit'] = $request->total['total_due_amort'];
@@ -520,7 +514,7 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = 0.0;
                     $details['journal_details_credit'] = $request->total['total_due_amort'];
                 }
-            } */
+            }
             if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
                 $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                 $details["subsidiary_id"] = 1;
@@ -544,6 +538,7 @@ class ReportsController extends MainController
                 ? $request->total['total_unposted_payments']
                 : $request->total['total_due_amort'],
         ]);
+
         try {
             $journalEntry->details()->createMany($journalDetails);
             $this->updateMonthlyDepreciation($request->sub_ids);
