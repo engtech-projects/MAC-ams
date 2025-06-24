@@ -479,7 +479,7 @@ class ReportsController extends MainController
             ];
 
            
-            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+            /* if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
                 $details['journal_details_debit'] = $account->account_number == 5210 
                     ? $request->total['total_unposted_payments'] 
                     : 0;
@@ -494,10 +494,10 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = 0;
                     $details['journal_details_credit'] = round($request->total['total_due_amort'], 2);
                 }
-            }
+            } */
 
 
-            /* if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
+             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
 
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_due_amort'] : 0;
@@ -529,7 +529,7 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = 0.0;
                     $details['journal_details_credit'] = $request->total['total_due_amort'];
                 }
-            } */
+            } 
             if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
                 $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                 $details["subsidiary_id"] = 1;
