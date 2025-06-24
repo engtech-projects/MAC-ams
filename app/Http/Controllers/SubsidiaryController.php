@@ -134,6 +134,25 @@ class SubsidiaryController extends Controller
             ], 422);
         }
 
+        // Check for additional prepaid expense restriction (assuming category_id 51 is for additional prepaid expense)
+        if ($request->sub_cat_id == 51 && isset($request->prepaid_expense)) {
+            // Check if there's already a subsidiary with the same code that has unposted prepaid expense payments
+            $existingSubsidiary = Subsidiary::where('sub_code', $request->sub_code)
+                ->whereHas('prepaid_expense.prepaid_expense_payments', function($query) {
+                    $query->unposted(); // Using the scope method
+                })
+                ->first();
+
+            if ($existingSubsidiary) {
+                return response()->json([
+                    'message' => 'Cannot create additional prepaid expense. This account still has unposted payments.',
+                    'errors' => [
+                        'sub_code' => ['This account has pending unposted payments that must be posted first.']
+                    ]
+                ], 422);
+            }
+        }
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -147,7 +166,7 @@ class SubsidiaryController extends Controller
             'sub_no_depre' => 'numeric|nullable',
             'sub_per_branch' => 'string|nullable',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
-            'prepaid_expense_payment' => 'required_if:sub_cat_id,0',
+            'prepaid_expense_payment' => 'required_if:sub_cat_id,0|gt:0',
             'monthly_due' => 'sometimes|numeric',
             'new_life' => 'nullable|numeric|min:0'
 

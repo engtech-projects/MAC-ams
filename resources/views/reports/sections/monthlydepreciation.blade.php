@@ -328,8 +328,8 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" v-show="showModal" id="createSubsidiaryModal" tabindex="-1" role="dialog"
-            aria-labelledby="createSubsidiaryModalLabel" aria-hidden="true">
+        <div class="modal fade" id="createSubsidiaryModal" tabindex="-1" role="dialog"
+            aria-labelledby="createSubsidiaryModalLabel">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -386,14 +386,14 @@
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Amount:</label>
                                         <input type="text" v-model="subsidiary.sub_amount" class="form-control"
-                                            @change="formatTextField()" id="sub_tel" required>
+                                            @change="formatTextField()" id="sub_tel" :readonly="isEdit" required>
                                     </div>
 
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Monthly Amortization 
                                             <span v-if="isEdit" class="text-success ms-2"
-                                                style="font-size: 0.875rem;">*Note: (unexpensed - salvage) / remaining
+                                                style="font-size: 0.875rem;">*Note: unexpensed / remaining
                                                 life)*</span>
                                         </label>
                                         <input type="text" disabled :value="amortToDisplay" class="form-control"
@@ -422,7 +422,7 @@
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Used:</label>
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
-                                            id="sub_no_amort">
+                                            id="sub_no_amort" readonly>
                                     </div>
                                     <div class="col-md-6"
                                         v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
@@ -430,7 +430,7 @@
                                         <input type="text" :value="remaining_life" class="form-control" readonly>
                                     </div>
                                     <div class="col-md-6"
-                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'">
+                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit">
                                         <label for="message-text" class="col-form-label">Expensed</label>
                                         <input type="text" :value="displayPrepaidAmount" class="form-control" :readonly="isEdit">
                                     </div>
@@ -478,7 +478,6 @@
             data: {
                 branches: @json($branches),
                 sub_categories: @json($subsidiary_categories),
-                showModal: true,
                 reportType: '',
                 sub_month: '',
                 monthlyAmortization: 0,
@@ -1350,7 +1349,7 @@
                 processEdit: function(sub) {
                     this.isInitializing = true;
                     this.isEdit = true;
-                    console.log(sub);
+                    this.to_add_prepaid_amount = '';
                     this.subId = sub[13];
                     this.subsidiary = {
                         sub_code: sub[15],
@@ -1375,9 +1374,6 @@
                     this.prepaid_amount = sub[7];
                     this.$nextTick(() => {
                         this.isInitializing = false;
-                        console.log('Initialization complete. Final values:');
-                        console.log('subsidiary:', this.subsidiary);
-                        console.log('this.prepaid_amount:', this.prepaid_amount);
                     });
                 },
                 resetForm: function() {
@@ -1398,7 +1394,7 @@
                             sub_id: null
                         }
                     }
-                    this.to_add_prepaid_amount = 0;
+                    this.to_add_prepaid_amount = '';
                     this.prepaid_amount = 0;
                 },
                 createSubsidiary: function() {
@@ -1432,8 +1428,10 @@
                     }).then(response => {
                         toastr.success(response.data.message);
                         this.addSubsidiary(response.data.data);
+                        document.activeElement.blur();
                         $('#createSubsidiaryModal').modal('hide');
                         this.resetForm();
+                        this.fetchSubAll();
                     }).catch(err => {
                         var errors = err.response.data.errors;
                         var messages = [];
@@ -1534,8 +1532,6 @@
                     this.subsidiary.original_life = parseInt(this.subsidiary.sub_no_depre ?? 1);
 
                     this.recomputeExpUnexp();
-                    console.log("this.subsidiary");
-                    console.log(this.subsidiary);
 
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
@@ -1547,6 +1543,7 @@
                         toastr.success(response.data.message);
 
                         this.updateSubsidiary(response.data.data)
+                        document.activeElement.blur();
                         $('#createSubsidiaryModal').modal('hide');
                         this.fetchSubAll();
                         setTimeout(() => {
@@ -1567,6 +1564,10 @@
                             }
                         }
                         toastr.error(messages);
+                        this.$nextTick(() => {
+                            this.formatTextField();
+                            this.formatToPrepaidAmountField();
+                        });
                     })
                 },
                 deleteSub: function(data) {
@@ -1596,8 +1597,6 @@
                         })
                         .then(response => {
                             this.subsidiaryAll = response.data.data;
-                            console.log("fetchSubAll");
-                            console.log(this.subsidiaryAll);
                         })
                         .catch(error => {
                             console.error('Error:', error);
