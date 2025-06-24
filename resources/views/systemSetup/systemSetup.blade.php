@@ -193,7 +193,11 @@
                                                 <div class="box">
                                                     <div class="form-group">
                                                         <label class="label-normal" for="sub_cat_type"> Category
-                                                            Type</label>
+                                                            Type <span class="text-red text-bold">(NOTE: Enter "depre" in
+                                                                the field
+                                                                if
+                                                                for depreciation
+                                                                else leave it blank.)</span></label>
                                                         <div class="input-group">
                                                             <input type="text" v-model="category.sub_cat_type"
                                                                 class="form-control form-control-sm rounded-0"
