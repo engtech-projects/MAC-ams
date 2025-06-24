@@ -1181,7 +1181,7 @@
                 statusUpdate: false,
                 loading: false,
                 selectedBranch: '',
-                selectedDate: ''   
+                selectedDate: ''
             },
             methods: {
                 nextTextField: function(textField) {
@@ -1474,7 +1474,7 @@
                 editCollectionBreakdown: function(collectionBreakdown) {
                     this.isEdit = true;
                     this.calculateCashCount(collectionBreakdown);
-                    
+
                     // Ensure other_payment exists before assigning
                     if (!collectionBreakdown.other_payment) {
                         collectionBreakdown.other_payment = {
@@ -1485,10 +1485,10 @@
                             interbranch_amount: 0
                         };
                     }
-                    
+
                     this.collectionBreakdown = collectionBreakdown;
                     this.branch = $('#branchID').find(':selected').val();
-                    
+
                     if (collectionBreakdown.status.toLowerCase() === 'posted') {
                         toastr.error("Unable to edit posted transaction.");
                         this.closeModal();
@@ -1499,7 +1499,7 @@
                             }
                         }).then(response => {
                             var cb = response.data.data.collections;
-                            
+
                             if (!cb.other_payment) {
                                 cb.other_payment = {
                                     cash_amount: 0,
@@ -1511,7 +1511,7 @@
                             }
 
                             this.initializeEditingState(cb);
-                            
+
                             this.collectionBreakdown = cb;
                             this.calculateCashCount(cb);
                             this.openModal();
@@ -1563,7 +1563,7 @@
 
                             this.selectedBranch = collection.branch_id;
                             this.selectedDate = collection.transaction_date;
-                            
+
                             if (this.$refs.branchFilter) {
                                 this.$refs.branchFilter.branch_id = collection.branch_id;
                             }

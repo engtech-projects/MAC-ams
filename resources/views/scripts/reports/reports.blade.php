@@ -1092,15 +1092,15 @@
         $(document).on('submit', '#subsidiaryForm', function(e) {
             e.preventDefault();
             const subId = $('[name="sub_id"]').val();
-            
-            const url = subId ? 
-                "{{ route('subsidiary.update', ':id') }}".replace(':id', subId) : 
+
+            const url = subId ?
+                "{{ route('subsidiary.update', ':id') }}".replace(':id', subId) :
                 "{{ route('subsidiary.store') }}";
-            
+
             let formData = $(this).serialize();
-            
+
             $.ajax({
-                headers: { 
+                headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'POST',
@@ -1109,8 +1109,9 @@
                 data: formData,
                 success: function(data) {
                     const subAmount = parseFloat($('#sub_amount').val() || 0);
-                    const formattedAmount = `₱${subAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                    
+                    const formattedAmount =
+                        `₱${subAmount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
                     if (data.message === 'Successfully created.') {
                         subsidiaryTblAPI.row.add([
                             $('#sub_code').val(),
@@ -1131,16 +1132,17 @@
                             </div>`
                         ]).draw(false);
                         toastr.success('Successfully Added');
-                    }
-                    else if (data.message === 'Successfully updated.') {
+                    } else if (data.message === 'Successfully updated.') {
                         const subId = data.data.sub_id;
-                        
+
                         // Find the row by the subsid-delete element with the matching value
-                        const rowIndex = subsidiaryTblAPI.rows().indexes().filter(function(idx) {
+                        const rowIndex = subsidiaryTblAPI.rows().indexes().filter(function(
+                            idx) {
                             const rowNode = subsidiaryTblAPI.row(idx).node();
-                            return $(rowNode).find('a.subsid-delete[value="' + subId + '"]').length > 0;
+                            return $(rowNode).find('a.subsid-delete[value="' + subId +
+                                '"]').length > 0;
                         });
-                        
+
                         if (rowIndex.length > 0) {
                             // Update the row with new values
                             subsidiaryTblAPI.row(rowIndex[0]).data([
@@ -1151,10 +1153,11 @@
                                 $('#sub_per_branch option:selected').text(),
                                 '',
                                 formattedAmount,
-                                subsidiaryTblAPI.row(rowIndex[0]).data()[7] // Keep the existing actions column
+                                subsidiaryTblAPI.row(rowIndex[0]).data()[
+                                    7] // Keep the existing actions column
                             ]).draw(false);
                         }
-                        
+
                         toastr.success('Successfully Updated');
                     }
                     if (window.app && typeof window.app.resetForm === 'function') {
@@ -1168,7 +1171,7 @@
                     if (xhr.status === 422) {
                         try {
                             const response = JSON.parse(xhr.responseText);
-                            
+
                             // Show toastr notification for duplicate sub_code or other validation errors
                             if (response.message) {
                                 toastr.error(response.message);
@@ -1183,7 +1186,7 @@
                             console.error('Error parsing response:', parseError);
                             toastr.error('An error occurred while processing the request');
                         }
-                    } 
+                    }
                     // Handle server errors (500 status code)
                     else if (xhr.status === 500) {
                         try {
@@ -1203,7 +1206,7 @@
 
         let selectedSubsidiaryId = null;
 
-        $(document).on('click', '.subsid-edit', function (event) {
+        $(document).on('click', '.subsid-edit', function(event) {
             event.preventDefault();
             selectedSubsidiaryId = $(this).data('value');
 
@@ -1245,14 +1248,17 @@
                 },
                 type: "GET",
                 url: "{{ route('reports.subsidiaryDelete') }}",
-                data: { id: selectedSubsidiaryId },
+                data: {
+                    id: selectedSubsidiaryId
+                },
                 dataType: "json",
                 success: function(data) {
                     if (data.message === 'delete') {
                         toastr.success('Successfully Removed');
                         // Remove row manually
                         subsidiaryTblAPI
-                            .row($(`a.subsid-delete[value="${selectedSubsidiaryId}"]`).closest('tr'))
+                            .row($(`a.subsid-delete[value="${selectedSubsidiaryId}"]`).closest(
+                                'tr'))
                             .remove()
                             .draw(false);
                     }

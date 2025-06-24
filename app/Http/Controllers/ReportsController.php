@@ -775,7 +775,6 @@ class ReportsController extends MainController
         $transactions = $glAccounts->ledger([$from, $to], $account_id);
         $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
         $balance = $glAccounts->getAccountBalance($from, $to, $account_id);
-        $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
         $data = [
             'title' => 'MAC-AMS | General Ledger',
             'chartOfAccount' => $accounts,

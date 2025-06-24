@@ -23,7 +23,8 @@ class SubsidiaryCategory extends Model
     protected $fillable = [
         'sub_cat_name',
         'sub_cat_type',
-        'description'
+        'description',
+        'sub_cat_code'
     ];
 
     public function accounts()
