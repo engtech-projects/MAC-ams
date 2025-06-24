@@ -246,9 +246,18 @@ class ReportsController extends MainController
             
            // $subs['unexpensed'] = $value->unexpensed;
            //$subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
-            $subs['unexpensed'] = $value->prepaid_expense 
-            ? $value->monthly_amort - $value->prepaid_expense->amount 
-            : $value->unexpensed;
+            if (
+                $value->sub_cat_name === "INSURANCE-ADD" &&
+                $value->prepaid_expense
+            ) {
+                // Use the same logic as in update method
+                $totalPostedPayments = $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount');
+                $totalUnpostedPayments = $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount');
+                $totalPayments = $totalPostedPayments + $totalUnpostedPayments;
+                $subs['unexpensed'] = $value->sub_amount - $totalPayments;
+            } else {
+                $subs['unexpensed'] = $value->unexpensed;
+            }
 
             $subs['expensed'] = $value->expensed;
             $subs['salvage'] = $value->salvage;

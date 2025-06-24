@@ -19,6 +19,10 @@ class SubsidiaryController extends Controller
     {
         Log::info('Incoming subsidiary data:', $request->all());
 
+        if (!$request->has('sub_no_depre') || $request->sub_no_depre === null || $request->sub_no_depre === '') {
+            $request->merge(['sub_no_depre' => 1]);
+        }
+
         if (Subsidiary::where('sub_code', $request->sub_code)->exists()) {
             return response()->json([
                 'message' => 'The subsidiary code already exists. Please choose a different code.',
@@ -42,7 +46,7 @@ class SubsidiaryController extends Controller
             'sub_date' => 'date|sometimes',
             'sub_cat_id' => 'integer|required',
             'sub_salvage' => 'numeric|sometimes',
-            'sub_amount' => 'nullable|numeric|sometimes',
+            'sub_amount' => 'nullable|numeric|sometimes|gt:0',
             'sub_no_depre' => 'numeric|sometimes',
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
@@ -139,7 +143,7 @@ class SubsidiaryController extends Controller
             'sub_date' => 'date|nullable',
             'sub_cat_id' => 'integer|required',
             'sub_salvage' => 'numeric|nullable',
-            'sub_amount' => 'numeric|nullable',
+            'sub_amount' => 'numeric|nullable|gt:0',
             'sub_no_depre' => 'numeric|nullable',
             'sub_per_branch' => 'string|nullable',
             'prepaid_expense' => 'required_if:sub_cat_id,0',
@@ -151,22 +155,84 @@ class SubsidiaryController extends Controller
             'required_if' => 'Expense is required.'
         ]);
 
-        $used = $subsidiary->sub_no_amort;
-        $newLife = (int)$request->input('new_life', 0);
-        $amount = $request['sub_amount'] ?? $subsidiary->sub_amount;
-        $salvageRate = $request['sub_salvage'] ?? $subsidiary->sub_salvage;
-        $salvage = ($salvageRate / 100) * $amount;
-        $unexpensed = $subsidiary->unexpensed ?? ($amount ?? 0); // fallback
-
-        $monthsRemaining = max($newLife - $used, 1); // avoid division by 0
-        $monthlyDue = $subsidiary->monthly_due;
-
-
+        $used = (int) $subsidiary->sub_no_amort;
+        $newLife = (int) $request->input('new_life', 0);
+        $lifeToUse = $newLife > 0 ? $newLife : (int) $subsidiary->sub_no_depre;
+        $amount = (float) $request->input('sub_amount', $subsidiary->sub_amount);
+        
+        // Get rates - handle empty strings as 0
+        $oldRate = (float) ($subsidiary->sub_salvage ?? 0) ?: 0;
+        $newRate = (float) ($request->input('sub_salvage') ?? 0) ?: 0;
+        
+        $monthlyDue = 0;
+        $unexpensed = 0;
+        
+        if ($used === 0) {
+            // NEW ITEM: Standard calculation
+            $salvageValue = ($newRate / 100) * $amount;
+            $depreciableAmount = $amount - $salvageValue;
+            $monthlyDue = $depreciableAmount / $lifeToUse;
+            $unexpensed = $depreciableAmount;
+            
+        } else {
+            // USED ITEM: Complex calculation based on your requirements
+            
+            if ($oldRate == 0 && $newRate > 0) {
+                // Case: No prior rate → New rate (only subtract from unexpensed)
+                $originalMonthlyBase = $amount / $lifeToUse;
+                $expensed = $used * $originalMonthlyBase;
+                $remainingAmount = $amount - $expensed;
+                $newSalvageOnRemaining = ($newRate / 100) * $remainingAmount;
+                $unexpensed = $remainingAmount - $newSalvageOnRemaining;
+                
+            } else if ($oldRate > 0 && $newRate != $oldRate) {
+                // Case: Existing rate → Different rate (including going to 0)
+                $originalSalvage = ($oldRate / 100) * $amount;
+                $newSalvage = ($newRate / 100) * $amount;
+                $originalDepreciableAmount = $amount - $originalSalvage;
+                
+                // Expensed based on original calculation
+                $expensed = $used * ($originalDepreciableAmount / $lifeToUse);
+                $remainingAmount = $amount - $expensed;
+                
+                if ($newRate == 0) {
+                    // Rate cleared: no salvage on remaining amount
+                    $unexpensed = $remainingAmount;
+                } else {
+                    // Rate changed: apply new rate to remaining amount
+                    $unexpensed = $remainingAmount - ($newRate / 100) * $remainingAmount;
+                }
+                
+            } else {
+                // Case: Same rate or life change only
+                if ($newLife > 0 && $newLife != $subsidiary->sub_no_depre) {
+                    // Life changed: use current expensed and unexpensed values
+                    $expensed = $subsidiary->expensed;
+                    $unexpensed = $subsidiary->unexpensed;
+                } else {
+                    // No changes: recalculate normally
+                    $salvageValue = ($newRate / 100) * $amount;
+                    $depreciableAmount = $amount - $salvageValue;
+                    $originalMonthlyDue = $depreciableAmount / $lifeToUse;
+                    
+                    $expensed = $used * $originalMonthlyDue;
+                    $unexpensed = $depreciableAmount - $expensed;
+                }
+            }
+            
+            // Calculate monthly due for remaining months
+            $monthsRemaining = max($lifeToUse - $used, 1);
+            $monthlyDue = $unexpensed / $monthsRemaining;
+        }
+        
+        // Ensure no negative values
+        $monthlyDue = max(0, $monthlyDue);
+        $unexpensed = max(0, $unexpensed);
+        
+        $data['monthly_due'] = round($monthlyDue, 2);
         if ($newLife > 0) {
             $data['sub_no_depre'] = $newLife;
-            $monthlyDue = ($unexpensed - $salvage) / $monthsRemaining;
         }
-        $data['monthly_due'] = round($monthlyDue, 2);
 
         try {
             $subsidiary->update($data);
@@ -227,12 +293,25 @@ class SubsidiaryController extends Controller
 
 
         $subsidiary['unposted_payments'] = $subsidiary->prepaid_expense ? $upostedPaymentsTotal : 0;
-        $prepaidUnexpensed =  $subsidiary->sub_amount - $prepaid_expense;
-        $subsidiary['unexpensed'] = $subsidiary->prepaid_expense ? $prepaidUnexpensed : $subsidiary->unexpensed;
+        $prepaidUnexpensed = $subsidiary->sub_amount - $prepaid_expense;
+        
+        if (
+            optional($request->category)['sub_cat_name'] === SubsidiaryCategory::ADDTIONAL_PREPAID_EXP &&
+            optional($subsidiary->prepaid_expense)->amount > 0
+        ) {
+            $subsidiary['unexpensed'] = $prepaidUnexpensed;
+        } else {
+            $subsidiary['unexpensed'] = $subsidiary->unexpensed;
+        }
+
+        \Log::info('Original Attributes', $subsidiary->getAttributes());
+        \Log::info('Merged Attributes with due_amort', array_merge(
+            $subsidiary->getAttributes(),
+            ['due_amort' => $monthlyDue]
+        ));
 
         return response()->json([
             'message' => 'Successfully updated.',
-            'data' => $subsidiary->getAttributes(),
             'data' => array_merge(
                 $subsidiary->getAttributes(),
                 ['due_amort' => $monthlyDue]
