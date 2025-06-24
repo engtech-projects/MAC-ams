@@ -242,39 +242,40 @@ class ReportsController extends MainController
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
             $subs['monthly_due'] = $value->monthly_due;
+            
+            // Calculate prepaid expense payments first
+            $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
 
-
-            // $subs['unexpensed'] = $value->unexpensed;
-            //$subs['unexpensed'] =  $value->prepaid_expense ? $value->monthly_amort - $value->prepaid_expense->amount : $value->unexpensed;
-            $subs['unexpensed'] = $value->prepaid_expense
-                ? $value->monthly_amort - $value->prepaid_expense->amount
-                : $value->unexpensed;
-
-            $subs['expensed'] = $value->expensed;
-            $subs['salvage'] = $value->salvage;
-            $subs['monthly_due'] = $value->monthly_due;
-            $totalPostedPayment = $value->prepaid_expense?->prepaid_expense_payments->where('status', 'posted')->sum('amount');
             $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
-            $subs['prepaid_expense'] = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
-            $subs['posted_payment'] = $totalPostedPayment;
+            $totalAllPayments = $totalPostedPayments + $totalUnpostedPayments;
+
+            // Get the original prepaid expense amount from PrepaidExpense model
+            $originalPrepaidAmount = $value->prepaid_expense ? $value->prepaid_expense->amount : 0;
+
+            // Now you have both values available
+            $subs['prepaid_expense_original'] = $originalPrepaidAmount; // original amount from prepaid_amount input
+            $subs['prepaid_expense'] = $totalAllPayments; // total payments (for current display behavior)
+            $subs['prepaid_balance'] = $originalPrepaidAmount + $totalAllPayments; // remaining balance
+            $subs['posted_payment'] = $totalPostedPayments;
             $subs['unposted_payments'] = $totalUnpostedPayments;
-
-
-            /* if ($value->prepaid_expense) {
-                $subs['unexpensed'] = $value->sub_amount - $value->prepaid_expense->amount;
-                if (count($value->prepaid_expense->prepaid_expense_payments) > 0) {
-                    $payment d= $value->prepaid_expense->prepaid_expense_payments;
-                    if (count($payment) > 0) {
-                        $subs['prepaid_expense_payment'] = $payment->amount;
-                        $subs['p_expense_payment_id'] = $payment->id;
-                    }
-                }
-            } */
-
-            $subs['sub_no_amort'] =   $value->sub_no_amort;
-
+            
+            // Calculate unexpensed based on category type
+            if (
+                $value->sub_cat_name === "INSURANCE-ADD" &&
+                $value->prepaid_expense
+            ) {
+                // For INSURANCE-ADD, use payment-based calculation
+                $subs['unexpensed'] = $value->sub_amount - $totalAllPayments;
+                $subs['expensed'] = $totalAllPayments;
+            } else {
+                // For other categories, use the model's unexpensed attribute
+                $subs['unexpensed'] = $value->unexpensed;
+                $subs['expensed'] = $value->expensed;
+            }
+            
+            $subs['salvage'] = $value->salvage;
+            $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['rem'] = $value->rem;
-
             $subs['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
             $subs['inv'] = $value->inv;
             $subs['no'] = $value->no;
@@ -467,9 +468,13 @@ class ReportsController extends MainController
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
 
             ];
-            /*             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
-                $details['journal_details_debit'] = $account->account_number == 5210
-                    ? $request->total['total_unposted_payments']
+
+
+           
+            /* if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                $details['journal_details_debit'] = $account->account_number == 5210 
+                    ? $request->total['total_unposted_payments'] 
+
                     : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415
                     ? $request->total['total_unposted_payments']
@@ -485,7 +490,10 @@ class ReportsController extends MainController
             } */
 
 
-            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
+
+             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
+
+
 
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_due_amort'] : 0;
@@ -514,7 +522,10 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = 0.0;
                     $details['journal_details_credit'] = $request->total['total_due_amort'];
                 }
-            }
+
+            } 
+
+ 
             if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
                 $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                 $details["subsidiary_id"] = 1;
