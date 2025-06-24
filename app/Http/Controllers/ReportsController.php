@@ -245,6 +245,7 @@ class ReportsController extends MainController
             
             // Calculate prepaid expense payments first
             $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
+
             $totalUnpostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->sum('amount') : 0;
             $totalAllPayments = $totalPostedPayments + $totalUnpostedPayments;
 
@@ -457,7 +458,6 @@ class ReportsController extends MainController
             $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
         }
         foreach ($subsidiaryCategory->accounts as $account) {
-            $accountCategory = $account->accountType->accountCategory;
 
             $details = [
                 'account_id' => $account->account_id,
@@ -469,13 +469,15 @@ class ReportsController extends MainController
 
             ];
 
+
            
             /* if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
                 $details['journal_details_debit'] = $account->account_number == 5210 
                     ? $request->total['total_unposted_payments'] 
+
                     : 0;
-                $details['journal_details_credit'] = $account->account_number == 1415 
-                    ? $request->total['total_unposted_payments'] 
+                $details['journal_details_credit'] = $account->account_number == 1415
+                    ? $request->total['total_unposted_payments']
                     : 0;
             } else {
                 if ($accountCategory->to_increase === 'debit') {
@@ -488,7 +490,10 @@ class ReportsController extends MainController
             } */
 
 
+
              if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
+
+
 
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_due_amort'] : 0;
@@ -509,9 +514,6 @@ class ReportsController extends MainController
                 $details['journal_details_debit'] = $account->account_number == 1555 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1560 ? $request->total['total_due_amort'] : 0;
             }
-
-
-
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::DEPRE) {
                 if ($account->account_number == 5285) {
                     $details['journal_details_debit'] = $request->total['total_due_amort'];
@@ -520,7 +522,10 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = 0.0;
                     $details['journal_details_credit'] = $request->total['total_due_amort'];
                 }
+
             } 
+
+ 
             if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
                 $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                 $details["subsidiary_id"] = 1;
@@ -544,6 +549,7 @@ class ReportsController extends MainController
                 ? $request->total['total_unposted_payments']
                 : $request->total['total_due_amort'],
         ]);
+
         try {
             $journalEntry->details()->createMany($journalDetails);
             $this->updateMonthlyDepreciation($request->sub_ids);
@@ -780,7 +786,6 @@ class ReportsController extends MainController
         $transactions = $glAccounts->ledger([$from, $to], $account_id);
         $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
         $balance = $glAccounts->getAccountBalance($from, $to, $account_id);
-        $accounts = Accounts::whereIn('type', ['L', 'R'])->where(['status' => 'active'])->get();
         $data = [
             'title' => 'MAC-AMS | General Ledger',
             'chartOfAccount' => $accounts,

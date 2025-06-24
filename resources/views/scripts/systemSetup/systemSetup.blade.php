@@ -2,6 +2,15 @@
 
 <script type="text/javascript">
     (function($) {
+        $('#select-account-credit').select2({
+            placeholder: 'Account',
+            allowClear: true,
+        });
+        $('#select-account-debit').select2({
+            placeholder: 'Account',
+            allowClear: true,
+        });
+
         $('#systemSetupAccessibility').DataTable({
             pageLength: 1000
         });
@@ -78,7 +87,6 @@
             }
 
         });
-
 
         $(document).on('submit', '#userMasterFileForm', function(e) {
             e.preventDefault();
