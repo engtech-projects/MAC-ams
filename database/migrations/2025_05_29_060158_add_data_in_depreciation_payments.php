@@ -23,7 +23,7 @@ class AddDataInDepreciationPayments extends Migration
                 if ($amount != 0) {
                     $subsidiary->depreciation_payments()->create([
                         'sub_id' => $subsidiary->sub_id,
-                        'amount' => $amount,
+                        'amount' => round($amount,2),
                         'date_paid' => $date_paid,
                     ]);
                 }
