@@ -29,7 +29,8 @@ class SubsidiaryCategory extends Model
 
     public function accounts()
     {
-        return $this->belongsToMany(Accounts::class, 'subsidiary_category_accounts', 'sub_cat_id', 'account_id');
+        return $this->belongsToMany(Accounts::class, 'subsidiary_category_accounts', 'sub_cat_id', 'account_id')
+            ->withPivot('transaction_type');
     }
 
     public function subsidiaries()
