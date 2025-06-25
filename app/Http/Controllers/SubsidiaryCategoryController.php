@@ -32,10 +32,11 @@ class SubsidiaryCategoryController extends Controller
         $data = $request->validated();
         try {
             $category = SubsidiaryCategory::create($data);
-            $category->accounts()->attach([
-                $data['account_id_credit'],
-                $data['account_id_debit']
-            ]);
+            $categoryAccounts = [
+                $data['account_id_credit'] => ['transaction_type' => 'credit'],
+                $data['account_id_debit'] => ['transaction_type' => 'debit'],
+            ];
+            $category->accounts()->attach($categoryAccounts);
         } catch (\Throwable $th) {
             return new JsonResponse([
                 'message' => $th->getMessage()

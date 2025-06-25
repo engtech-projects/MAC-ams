@@ -242,7 +242,7 @@ class ReportsController extends MainController
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
             $subs['monthly_due'] = $value->monthly_due;
-            
+
             // Calculate prepaid expense payments first
             $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
 
@@ -258,7 +258,7 @@ class ReportsController extends MainController
             $subs['prepaid_balance'] = $originalPrepaidAmount + $totalAllPayments; // remaining balance
             $subs['posted_payment'] = $totalPostedPayments;
             $subs['unposted_payments'] = $totalUnpostedPayments;
-            
+
             // Calculate unexpensed based on category type
             if (
                 $value->sub_cat_name === "INSURANCE-ADD" &&
@@ -272,7 +272,7 @@ class ReportsController extends MainController
                 $subs['unexpensed'] = $value->unexpensed;
                 $subs['expensed'] = $value->expensed;
             }
-            
+
             $subs['salvage'] = $value->salvage;
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['rem'] = $value->rem;
@@ -469,12 +469,26 @@ class ReportsController extends MainController
 
             ];
 
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                if ($account->pivot->transaction_type == 'credit') {
+                    $details['journal_details_credit'] = $request->total['total_unposted_payments'];
+                } else {
+                    $details['journal_details_debit'] =  0;
+                }
+            } else {
+                if ($account->pivot->transaction_type == 'credit') {
 
-           
-            /* if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
-                $details['journal_details_debit'] = $account->account_number == 5210 
-                    ? $request->total['total_unposted_payments'] 
+                    $details['journal_details_credit'] = $request->total['total_due_amort'];
+                    $details['journal_details_debit'] = 0;
+                } else {
+                    $details['journal_details_credit'] = 0;
+                    $details['journal_details_debit'] = $request->total['total_due_amort'];
+                }
+            }
 
+            /*             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                $details['journal_details_debit'] = $account->account_number == 5210
+                    ? $request->total['total_unposted_payments']
                     : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415
                     ? $request->total['total_unposted_payments']
@@ -490,10 +504,7 @@ class ReportsController extends MainController
             } */
 
 
-
-             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
-
-
+            /*         if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
 
                 $details['journal_details_debit'] = $account->account_number == 5210 ? $request->total['total_due_amort'] : 0;
                 $details['journal_details_credit'] = $account->account_number == 1415 ? $request->total['total_due_amort'] : 0;
@@ -522,10 +533,7 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = 0.0;
                     $details['journal_details_credit'] = $request->total['total_due_amort'];
                 }
-
-            } 
-
- 
+            } */
             if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
                 $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                 $details["subsidiary_id"] = 1;
