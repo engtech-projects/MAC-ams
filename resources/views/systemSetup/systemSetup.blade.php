@@ -225,8 +225,9 @@
                                                 <div class="box">
                                                     <div class="form-group">
                                                         <label class="label-normal" for="book_ref">Account(Credit)</label>
-                                                        <select class="form-control" v-model="category.account_id_credit"
-                                                            id="select-account-credit account-id-credit" required>
+                                                        <select name="account_id" ref="credit"
+                                                            class="select2 form-control form-control-sm"
+                                                            id="select-account-credit" value="" required>
                                                             <option v-for="account in accounts" :key="account.account_id"
                                                                 :value="account.account_id">
                                                                 @{{ account.account_name }}</option>
@@ -239,9 +240,9 @@
                                                 <div class="box">
                                                     <div class="form-group">
                                                         <label class="label-normal" for="book_ref">Account(Debit)</label>
-                                                        <select name="account_id_debit" class="form-control"
-                                                            id="select-account-debit account-id-debit"
-                                                            v-model="category.account_id_debit" required>
+                                                        <select name="account_id_debit" ref="debit"
+                                                            class="select2 form-control"
+                                                            id="select-account-debit account-id-debit" required>
                                                             <option v-for="account in accounts" :key="account.account_id"
                                                                 :value="account.account_id">
                                                                 @{{ account.account_name }}</option>
@@ -517,18 +518,25 @@
                     this.category = {}
                 },
                 saveCategory() {
+                    this.category.account_id_credit = this.$refs.credit.value;
+                    this.category.account_id_debit = this.$refs.debit.value;
+                    if (this.category.sub_cat_type == null || this.category.sub_cat_type == "depre") {
 
-                    axios.post('/MAC-ams/subsidiary-category', this.category, {
-                        headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                .content
-                        },
-                    }).then(response => {
-                        toastr.success(response.data.message);
+                        axios.post('/MAC-ams/subsidiary-category', this.category, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            },
+                        }).then(response => {
+                            toastr.success(response.data.message);
+                            this.resetForm();
+                        }).catch(err => {
+                            console.error(err)
+                        })
+                    } else {
+                        toastr.error("Subisidiary category type is invalid.");
                         this.resetForm();
-                    }).catch(err => {
-                        console.error(err)
-                    })
+                    }
                 },
                 filterOptions() {
                     const term = this.postingPeriodYear.toLowerCase();

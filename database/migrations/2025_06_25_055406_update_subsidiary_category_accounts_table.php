@@ -25,6 +25,8 @@ class UpdateSubsidiaryCategoryAccountsTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('subsidiary_category_accounts', function (Blueprint $table) {
+            $table->dropColumn('transaction_type');
+        });
     }
 }
