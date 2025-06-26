@@ -152,8 +152,7 @@ class SubsidiaryController extends Controller
                 ], 422);
             }
         }
-
-        $data = $request->validate([
+            $rules = [
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
             'sub_address' => 'nullable',
@@ -165,14 +164,17 @@ class SubsidiaryController extends Controller
             'sub_amount' => 'numeric|nullable|gt:0',
             'sub_no_depre' => 'numeric|nullable',
             'sub_per_branch' => 'string|nullable',
-            'prepaid_expense' => 'required_if:sub_cat_id,0',
-            'prepaid_expense_payment' => 'required_if:sub_cat_id,0|gt:0',
             'monthly_due' => 'sometimes|numeric',
             'new_life' => 'nullable|numeric|min:0'
+        ];
 
-        ], [
-            'required_if' => 'Expense is required.'
-        ]);
+        // Only add prepaid validation if category is additional prepaid
+        if ($request->sub_cat_id == 51) {
+            $rules['prepaid_expense'] = 'required|numeric';
+            $rules['prepaid_expense_payment'] = 'required|numeric|gt:0';
+        }
+
+        $data = $request->validate($rules);
 
         $used = (int) $subsidiary->sub_no_amort;
         $newLife = (int) $request->input('new_life', 0);
