@@ -730,8 +730,8 @@
                             <td>@{{ d.transaction_date }}</td>
                             <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
                             <td>@{{ formatCurrency(d.total) }}</td>
-                            <td>@{{ formatCurrency(d.cash_ending_balance - d.total) }}</td>
-                            <td style="text-transform: capitalize;">@{{ d.status }}</td>
+                            <td>@{{ formatDifference(d.cash_ending_balance - d.total) }}</td>
+                            <td>@{{ d.status }}</td>
                             <td>
                                 <button @click="showCashBlotter(d.collection_id, d.branch_id)"
                                     class="mr-1 btn btn-xs btn-success">
@@ -1382,8 +1382,9 @@
                     })
                 },
                 resetForm: function() {
-                    this.collectionBreakdown.collection_id = null;
-                    this.collectionBreakdown.branch_id = '';
+
+                    this.collectionBreakdown.collection_id = null,
+                    this.collectionBreakdown.branch_id = null;
                     this.collectionBreakdown.transaction_date = '';
                     this.collectionBreakdown.p_1000 = 0;
                     this.collectionBreakdown.p_500 = 0;
@@ -1448,6 +1449,31 @@
                     if (index >= 0 && index < this.collectionBreakdown.account_officer_collections.length) {
                         this.collectionBreakdown.account_officer_collections.splice(index, 1);
                     }
+
+                    const isEqual = (obj1, obj2) =>
+                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
+                    const updatedArray = this.collectionBreakdown.account_officer_collections
+                        .filter(element =>
+                            !
+                            isEqual(element, collection));
+                    this.collectionBreakdown.account_officer_collections = updatedArray;
+                },
+                    formatDifference(value) {
+                    // Normalize -0 to 0 before rounding
+                    if (Math.abs(value) < 0.005) {
+                        value = 0;
+                    }
+
+                    // Round to two decimal places
+                    let rounded = Math.round(value * 100) / 100;
+
+                    // Format as currency (e.g., PHP style)
+                    return rounded.toLocaleString('en-PH', {
+                        style: 'currency',
+                        currency: 'PHP',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
                 },
                 calculateCashCount: function(collectionBreakdown) {
                     this.total.p_1000 = collectionBreakdown.p_1000 * 1000;
@@ -1460,10 +1486,6 @@
                     this.total.p_5 = collectionBreakdown.p_5 * 5;
                     this.total.p_1 = collectionBreakdown.p_1 * 1;
                     this.total.c_25 = collectionBreakdown.c_25 * 0.25;
-
-
-
-
                 },
                 openModal: function() {
                     $(this.$refs.modal).modal('show')
@@ -1586,7 +1608,7 @@
                 updateStatus: function(collectionBreakdown, status) {
                     this.isUpdateStatus = true;
                     var diff = collectionBreakdown.cash_ending_balance - collectionBreakdown.total;
-                    if (diff == 0) {
+                    if ((Math.abs(diff) < 0.01)) {
                         this.collectionBreakdown = collectionBreakdown;
                         this.collectionBreakdown.status = status
                         this.updateCollectionBreakdown();
