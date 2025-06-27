@@ -13,12 +13,14 @@ class CreatePaymentTermsTable extends Migration
      */
     public function up()
     {
-        Schema::create('payment_terms', function (Blueprint $table) {
-            $table->increments('term_id');
-			$table->string('term');
-			$table->integer('no_of_days');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('transaction_category')) {
+            Schema::create('payment_terms', function (Blueprint $table) {
+                $table->increments('term_id');
+                $table->string('term');
+                $table->integer('no_of_days');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

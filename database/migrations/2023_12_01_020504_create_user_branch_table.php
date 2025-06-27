@@ -13,14 +13,16 @@ class CreateUserBranchTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_branch', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedInteger('branch_id');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('branch_id')->references('branch_id')->on('branch');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('user_branch')) {
+            Schema::create('user_branch', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedInteger('branch_id');
+                $table->foreign('user_id')->references('id')->on('users');
+                $table->foreign('branch_id')->references('branch_id')->on('branch');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

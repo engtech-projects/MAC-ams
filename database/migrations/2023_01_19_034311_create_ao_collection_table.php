@@ -13,20 +13,22 @@ class CreateAoCollectionTable extends Migration
      */
     public function up()
     {
-        Schema::create('ao_collection', function (Blueprint $table) {
-            $table->id('aocollection_id');
-            $table->string('remarks');
-            $table->double('total_amount', 10, 2)->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('ao_collection')) {
+            Schema::create('ao_collection', function (Blueprint $table) {
+                $table->id('aocollection_id');
+                $table->string('remarks');
+                $table->double('total_amount', 10, 2)->nullable();
+                $table->timestamps();
+            });
 
-        Schema::table('ao_collection',function(Blueprint $table){
-            $table->unsignedBigInteger('accountofficer_id');
-            $table->foreign('accountofficer_id')->references('accountofficer_id')->on('account_officer');
+            Schema::table('ao_collection', function (Blueprint $table) {
+                $table->unsignedBigInteger('accountofficer_id');
+                $table->foreign('accountofficer_id')->references('accountofficer_id')->on('account_officer');
 
-            $table->unsignedBigInteger('cashblotter_id');
-            $table->foreign('cashblotter_id')->references('cashblotter_id')->on('cash_blotter');
-        });
+                $table->unsignedBigInteger('cashblotter_id');
+                $table->foreign('cashblotter_id')->references('cashblotter_id')->on('cash_blotter');
+            });
+        }
     }
 
     /**

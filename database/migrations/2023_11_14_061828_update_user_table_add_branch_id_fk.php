@@ -13,10 +13,12 @@ class UpdateUserTableAddBranchIdFk extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('branch_id')->nullable()->unsigned()->after('role_id');
-            $table->foreign('branch_id')->references('branch_id')->on('branch');
-        });
+        if (!Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->integer('branch_id')->nullable()->unsigned()->after('role_id');
+                $table->foreign('branch_id')->references('branch_id')->on('branch');
+            });
+        }
     }
 
     /**

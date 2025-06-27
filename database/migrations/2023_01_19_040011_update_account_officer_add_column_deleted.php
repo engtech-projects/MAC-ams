@@ -13,10 +13,12 @@ class UpdateAccountOfficerAddColumnDeleted extends Migration
      */
     public function up()
     {
-        Schema::table('account_officer', function (Blueprint $table) {
-            //
-            $table->integer('deleted');
-        });
+        if (!Schema::hasTable('account_officer')) {
+            Schema::table('account_officer', function (Blueprint $table) {
+                //
+                $table->integer('deleted');
+            });
+        }
     }
 
     /**

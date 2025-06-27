@@ -715,6 +715,17 @@
                 this.fetchPostingPeriodYears();
                 this.fetchAccounts();
                 document.addEventListener('click', this.handleClickOutside);
+
+                axios.get('/MAC-ams/activity-logs', {
+                    headers: {
+                        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            .content
+                    }
+                }).then(response => {
+                    console.log(response);
+                }).catch(err => {
+                    console.error(err)
+                })
             },
             beforeDestroy() {
                 document.removeEventListener('click', this.handleClickOutside);

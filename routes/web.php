@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CollectionBreakdown;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginController;
@@ -15,18 +16,18 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\AccountingController;
-use App\Http\Controllers\AccountsApiController;
-use App\Http\Controllers\CollectionBreakdownController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\SubsidiaryController;
+use App\Http\Controllers\AccountsApiController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\JournalBookController;
 use App\Http\Controllers\SystemSetupController;
 use App\Http\Controllers\UserProfileController;
-use App\Http\Controllers\GeneralSettingsController;
 use App\Http\Controllers\PostingPeriodController;
+use App\Http\Controllers\GeneralSettingsController;
 use App\Http\Controllers\ProductsServicesController;
 use App\Http\Controllers\SubsidiaryCategoryController;
-use App\Models\CollectionBreakdown;
+use App\Http\Controllers\CollectionBreakdownController;
 
 /*
 |--------------------------------------------------------------------------
@@ -247,3 +248,5 @@ Route::get('journal/journalEntryList', [JournalController::class, 'journalEntryL
 Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalEntry'])->name('journal.saveJournalEntry');
 
 Route::get('accounting', [AccountingController::class, 'index'])->name('accounting');
+
+Route::resource('activity-logs', ActivityLogController::class);

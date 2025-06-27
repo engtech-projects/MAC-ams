@@ -13,17 +13,19 @@ class CreateTransactionDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('transaction_details', function (Blueprint $table) {
-            $table->increments('transaction_details_id');
-            $table->integer('account_id')->nullable();
-			$table->integer('transaction_id')->unsigned();
-			$table->double('amount')->nullable();
-			$table->text('description')->nullable();
-			$table->integer('person')->nullable();
-			$table->string('person_type')->nullable();
-			$table->string('to_increase')->nullable();
-			$table->timestamps();
-        });
+        if (!Schema::hasTable('transaction_details')) {
+            Schema::create('transaction_details', function (Blueprint $table) {
+                $table->increments('transaction_details_id');
+                $table->integer('account_id')->nullable();
+                $table->integer('transaction_id')->unsigned();
+                $table->double('amount')->nullable();
+                $table->text('description')->nullable();
+                $table->integer('person')->nullable();
+                $table->string('person_type')->nullable();
+                $table->string('to_increase')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -13,11 +13,13 @@ class CreateTransactionCategoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('transaction_category', function (Blueprint $table) {
-            $table->increments('transaction_category_id');
-            $table->string('transaction_category')->nullable();
-			$table->timestamps();
-        });
+        if (!Schema::hasTable('transaction_category')) {
+            Schema::create('transaction_category', function (Blueprint $table) {
+                $table->increments('transaction_category_id');
+                $table->string('transaction_category')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
