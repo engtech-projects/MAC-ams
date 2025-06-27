@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Subsidiary extends Model
 {
@@ -28,6 +29,7 @@ class Subsidiary extends Model
         'sub_no_amort',
         'sub_life_used',
         'sub_salvage',
+        'monthly_due',
         'sub_date_post'
     ];
 
@@ -59,11 +61,9 @@ class Subsidiary extends Model
     public function deleteSubsidiary($id) {}
     public function getDepreciation($categoryId, $branch, $date)
     {
-
-
         $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId) {
             $query->where('sub_cat_id', $categoryId);
-        })->with(['prepaid_expense.prepaid_expense_payments'])
+        })->with(['depreciation_payments', 'prepaid_expense.prepaid_expense_payments'])
             ->when(isset($branch), function ($query) use ($branch) {
                 $query->where('sub_per_branch', $branch->branch_code);
             })->when(isset($date), function ($query) use ($date) {
@@ -77,7 +77,7 @@ class Subsidiary extends Model
     public function getBranchAttribute()
     {
         $branch = Branch::where('branch_code', $this->sub_per_branch)->first();
-        return $branch->branch_code . '-' . $branch->branch_name;
+        return $branch ? $branch->branch_code . '-' . $branch->branch_name : '';
     }
 
     public function getSalvageAttribute()
@@ -106,19 +106,6 @@ class Subsidiary extends Model
     {
         return $this->subsidiary_category->sub_cat_name;
     }
-    /*     public function getSubCatIdAttribute()
-    {
-        return $this->subsidiary_category->sub_cat_id;
-    } */
-    public function getExpensedAttribute()
-    {
-        return floatval($this->monthly_amort) * intVal($this->sub_no_amort);
-    }
-    public function getUnexpensedAttribute()
-    {
-
-        return $this->rem * $this->monthly_amort;
-    }
     public function getDueAmortAttribute()
     {
         return $this->rem > 0 ? ($this->monthly_amort) : 0;
@@ -130,5 +117,30 @@ class Subsidiary extends Model
     public function getNoAttribute()
     {
         return 0;
+    }
+
+    public function depreciation_payments(): HasMany
+    {
+        return $this->hasMany(DepreciationPayment::class, 'sub_id', 'sub_id');
+    }
+
+    public function getTotalDepreciableAmountAttribute()
+    {
+        return round($this->sub_amount - $this->salvage, 2);
+    }
+    /* protected function monthlyDue(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => ucfirst($value),
+            set: fn(string $value) => strtolower($value),
+        );
+    } */
+    public function getExpensedAttribute()
+    {
+        return round($this->depreciation_payments()->sum("amount"), 2);
+    }
+    public function getUnexpensedAttribute()
+    {
+        return round($this->sub_no_depre != 0 ? $this->total_depreciable_amount - $this->expensed : 0.00, 2);
     }
 }

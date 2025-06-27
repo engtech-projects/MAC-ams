@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrUpdateCollectionRequest;
 use App\Models\AccountOfficerCollection;
 use App\Models\BranchCollection;
+use App\Models\PosCollection;
 use App\Models\CollectionBreakdown;
 use App\Models\journalEntry;
 use App\Models\OtherPayment;
@@ -78,64 +79,137 @@ class CollectionBreakdownController extends Controller
     {
         $data = $request->validated();
         try {
-            $collectionBreakdown->update($data);
-            foreach ($data["account_officer_collections"] as $aco) {
+            // Handle deletions first
+            $this->handleCollectionDeletions($collectionBreakdown, $data);
 
-                if (isset($aco['collection_ao_id'])) {
-                    AccountOfficerCollection::find($aco["collection_ao_id"])->update([
+            // Update main collection breakdown
+            $collectionBreakdown->update($data);
+
+            // Process updates and creates
+            $this->processAccountOfficerCollections($collectionBreakdown, $data);
+            $this->processBranchCollections($collectionBreakdown, $data);
+            $this->processPosCollections($collectionBreakdown, $data);
+            $this->processOtherPayments($collectionBreakdown, $data);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+        return response()->json(['message' => 'Successfully updated.']);
+    }
+
+    protected function handleCollectionDeletions($collectionBreakdown, $data)
+    {
+        // Account Officer Collections
+        $incomingAoIds = isset($data['account_officer_collections']) 
+            ? collect($data['account_officer_collections'])->pluck('collection_ao_id')->filter()->toArray()
+            : [];
+        $existingAoIds = $collectionBreakdown->account_officer_collections()->pluck('collection_ao_id')->toArray();
+        $toDeleteAoIds = array_diff($existingAoIds, $incomingAoIds);
+        if (!empty($toDeleteAoIds)) {
+            AccountOfficerCollection::whereIn('collection_ao_id', $toDeleteAoIds)->delete();
+        }
+
+        // Branch Collections
+        $incomingBranchIds = isset($data['branch_collections']) 
+            ? collect($data['branch_collections'])->pluck('id')->filter()->toArray()
+            : [];
+        $existingBranchIds = $collectionBreakdown->branch_collections->pluck('id')->toArray();
+        $toDeleteBranchIds = array_diff($existingBranchIds, $incomingBranchIds);
+        if (!empty($toDeleteBranchIds)) {
+            BranchCollection::destroy($toDeleteBranchIds);
+        }
+
+        // POS Collections
+        $incomingPosIds = isset($data['pos_collections']) 
+            ? collect($data['pos_collections'])->pluck('id')->filter()->toArray()
+            : [];
+        $existingPosIds = $collectionBreakdown->pos_collections->pluck('id')->toArray();
+        $toDeletePosIds = array_diff($existingPosIds, $incomingPosIds);
+        if (!empty($toDeletePosIds)) {
+            PosCollection::destroy($toDeletePosIds);
+        }
+    }
+
+    protected function processAccountOfficerCollections($collectionBreakdown, $data)
+    {
+        if (!isset($data["account_officer_collections"])) return;
+
+        foreach ($data["account_officer_collections"] as $aco) {
+            if (!empty($aco['collection_ao_id'])) {
+                AccountOfficerCollection::where('collection_ao_id', $aco['collection_ao_id'])
+                    ->update([
                         "representative" => $aco["representative"],
                         "note" => $aco["note"],
                         "total" => $aco["total"],
                         "grp" => $aco["grp"],
                         "collection_id" => $aco["collection_id"],
+                    ]);
+            } else {
+                AccountOfficerCollection::create([
+                    "representative" => $aco["representative"],
+                    "collection_id" => $collectionBreakdown->collection_id,
+                    "grp" => CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER,
+                    "note" => $aco["note"],
+                    "total" => $aco["total"],
+                ]);
+            }
+        }
+    }
 
-                    ]);
-                } else {
-                    AccountOfficerCollection::create([
-                        "representative" => $aco["representative"],
-                        "collection_id" => $collectionBreakdown->collection_id,
-                        "grp" => CollectionBreakdown::COLLECTION_GRP_ACCOUNT_OFFICER,
-                        "note" => $aco["note"],
-                        "total" => $aco["total"],
-                    ]);
-                }
-            }
-            foreach ($data["branch_collections"] as $bc) {
-                if ($bc) {
-                    if (isset($bc["id"])) {
-                        BranchCollection::find($bc["id"])->update([
-                            "total_amount" => $bc["total_amount"],
-                            "branch_id" => $bc["branch"]["branch_id"],
+    protected function processBranchCollections($collectionBreakdown, $data)
+    {
+        if (!isset($data["branch_collections"])) return;
 
-                        ]);
-                    } else {
-                        BranchCollection::create([
-                            "collection_id" => $collectionBreakdown->collection_id,
-                            "total_amount" => $bc["total_amount"],
-                            "branch_id" => $bc["branch"]["branch_id"],
-                        ]);
-                    }
-                }
+        foreach ($data["branch_collections"] as $bc) {
+            if (isset($bc["id"])) {
+                BranchCollection::find($bc["id"])->update([
+                    "total_amount" => $bc["total_amount"],
+                    "branch_id" => $bc["branch"]["branch_id"],
+                ]);
+            } else {
+                BranchCollection::create([
+                    "collection_id" => $collectionBreakdown->collection_id,
+                    "total_amount" => $bc["total_amount"],
+                    "branch_id" => $bc["branch"]["branch_id"],
+                ]);
             }
-            if (isset($data["other_payment"])) {
-                $op = $data["other_payment"];
-                if (isset($op['id'])) {
-                    OtherPayment::find($op["id"])->update([
-                        "cash_amount" => $op["cash_amount"],
-                        "check_amount" => $op["check_amount"],
-                        "memo_amount" => $op["memo_amount"],
-                        "pos_amount" => $op["pos_amount"],
-                        "interbranch_amount" => $op["interbranch_amount"],
-                        "collection_id" => $collectionBreakdown->collection_id,
-                    ]);
-                }
+        }
+    }
+
+    protected function processPosCollections($collectionBreakdown, $data)
+    {
+        if (!isset($data["pos_collections"])) return;
+
+        foreach ($data["pos_collections"] as $pc) {
+            if (isset($pc['id'])) {
+                PosCollection::find($pc['id'])->update([
+                    "total_amount" => $pc["total_amount"],
+                    "or_no" => $pc["or_no"],
+                ]);
+            } else {
+                $collectionBreakdown->pos_collections()->create([
+                    "total_amount" => $pc["total_amount"],
+                    "or_no" => $pc["or_no"],
+                ]);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
+        }
+    }
+
+    protected function processOtherPayments($collectionBreakdown, $data)
+    {
+        if (!isset($data["other_payment"])) return;
+
+        $op = $data["other_payment"];
+        if (isset($op['id'])) {
+            OtherPayment::find($op["id"])->update([
+                "cash_amount" => $op["cash_amount"],
+                "check_amount" => $op["check_amount"],
+                "memo_amount" => $op["memo_amount"],
+                "pos_amount" => $op["pos_amount"],
+                "interbranch_amount" => $op["interbranch_amount"],
+                "collection_id" => $collectionBreakdown->collection_id,
             ]);
         }
-        return response()->json(['message' => 'Successfully updated.']);
     }
     public function deleteAccountOffficerCollection(AccountOfficerCollection $accountOfficerCollection)
     {

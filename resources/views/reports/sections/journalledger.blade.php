@@ -25,6 +25,12 @@
 	#external_filter_container {
 		display: inline-block;
 	}
+	.select2 {
+  	width: 100% !important
+  }
+  [v-cloak] {
+    display: none;
+  }
 </style>
 
 <!-- Main content -->
@@ -34,13 +40,12 @@
 		<div class="col-md-12">
 			<form id="bookJournalForm" method="get">
 				@csrf
-				<input type="hidden" class="form-control form-control-sm rounded-0" name="bookId" id="bookId"  placeholder="" >
 				<div style="display:flex;margin-bottom:32px;">
 					<div style="display:flex;flex:1;flex-direction:column;margin-right:32px;">
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="book_id" style="flex:1" >By Book</label>
+							<label class="label-normal" for="book_id" style="flex:1" >Book Reference</label>
 							<div class="input-group" style="flex:3">
-								<select @change="logbook($event)" v-model="filter.book_id" name="book_id" class="select-jl-bybook form-control form-control-sm" id="book_id">
+								<select @change="logbook($event)" v-model="filter.book_id" name="book_id" class="select2 form-control form-control-sm" id="select-jl-bybook">
 									<option value="" disabled selected>-Select Book-</option>
 									@foreach ($journalBooks as $journalBook)
 									<option value="{{$journalBook->book_id}}" _count="{{$journalBook->book_code}}-{{sprintf('%006s',$journalBook->ccount + 1)}}" book-src="{{$journalBook->book_src}}">{{$journalBook->book_code}} - {{$journalBook->book_name}}</option>
@@ -67,58 +72,63 @@
 						<div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="branch_id" style="flex:1" >Branch</label>
 							<div class="input-group" style="flex:3">
-								<select v-model="filter.branch_id" name="branch_id" class="select-jl-branch form-control form-control-sm" id="jlBranch">
+								<select v-model="filter.branch_id" name="branch_id" class="select2 form-control form-control-sm" id="jlBranch">
 									<option value="" disabled selected>-Select Branch-</option>
 									<option value="1">Butuan City Branch</option>
-									<option value="2">Nasipit Branch</option>
+                  <option value="2">Nasipit Branch</option>
+                  <option value="3">Gingoog Branch</option>
+                  <option value="4">Head Office</option>
 								</select>
 							</div>
 						</div>
                         <div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="branch_id" style="flex:1" >Payee</label>
 							<div class="input-group" style="flex:3">
-								<input v-model="filter.journal_no" name="journal_payee" value="{{request('journal_payee')}}" type="text" class="form-control form-control-sm">
+								<input v-model="filter.journal_payee" name="journal_payee" value="" type="text" class="form-control form-control-sm">
 							</div>
 						</div>
 					</div>
 					<div style="display:flex;flex:1;flex-direction:column;margin-right:32px;">
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="status" style="flex:1" >Journal Status:</label>
+							<label class="label-normal" for="status" style="flex:1" >Journal Status</label>
 							<div class="input-group" style="flex:3">
-								<select v-model="filter.status" name="status" class="select-jl-status form-control form-control-sm" id="jlStatus">
-								<option value="posted" selected>Posted</option>
+								<select v-model="filter.status" name="status" class="select2 form-control form-control-sm" id="jlStatus">
+									<option value="" disabled selected>-Select Status-</option>
+									<option value="posted">Posted</option>
 									<option value="unposted">Unposted</option>
+									<option value="cancelled">Cancelled</option>
 								</select>
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="" style="flex:1" >Book Reference:</label>
+							<label class="label-normal" for="" style="flex:1" >Reference No.</label>
 							<div class="input-group" style="flex:3">
-								<input v-model="filter.journal_no" name="journal_no" value="{{request('journal_no')}}" type="text" class="form-control form-control-sm">
+								<input v-model="filter.journal_no" name="journal_no" value="" type="text" class="form-control form-control-sm">
 							</div>
 						</div>
                         <div class="form-group" style="display:flex;align-items:center">
 							<label class="label-normal" for="branch_id" style="flex:1" >Source</label>
 							<div class="input-group" style="flex:3">
-								<input v-model="filter.journal_no" name="journal_source" value="{{request('journal_source')}}" type="text" class="form-control form-control-sm">
+								<input v-model="filter.journal_source" name="journal_source" value="" type="text" class="form-control form-control-sm">
 							</div>
 						</div>
 					</div>
 					<div style="display:flex;flex:1;flex-direction:column;">
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="from" style="flex:1" >From:</label>
+							<label class="label-normal" for="from" style="flex:1" >From</label>
 							<div class="input-group" style="flex:3">
-								<input name="from" type="date" value="{{ $requests['from'] }}" class="form-control form-control-sm">
+								<input v-model="filter.from" name="from" type="date" value="" class="form-control form-control-sm">
 							</div>
 						</div>
 						<div class="form-group" style="display:flex;align-items:center">
-							<label class="label-normal" for="to" style="flex:1" >To:</label>
+							<label class="label-normal" for="to" style="flex:1" >To</label>
 							<div class="input-group" style="flex:3">
-								<input name="to" type="date" value="{{ $requests['to'] }}" class="form-control form-control-sm">
+								<input v-model="filter.to" name="to" type="date" value="" class="form-control form-control-sm">
 							</div>
 						</div>
-						<div class="form-group" style="display:flex;align-items:center;justify-content:right;">
-							<button class="btn btn-success" style="padding-left:32px;padding-right:32px;">Search</button>
+						<div class="form-group" style="display: flex; align-items: center; justify-content: right; gap: 10px;">
+              <span v-if="warningMessage" v-cloak style="color: #d9534f; font-size: 0.725rem;">@{{ warningMessage }}</span>
+              <button class="btn btn-success" style="padding:8px 32px;">Search</button>
 						</div>
 					</div>
 				</div>
@@ -265,33 +275,72 @@
 <!-- /.content -->
 
 <script>
-	// new Vue({
-	// 	el: '#app',
-	// 	data: {
-	// 		data: @json($jLedger),
-	// 		filter:{
-	// 			from:@json(request('from'))?@json(request('from')):'',
-	// 			to:@json(request('to'))?@json(request('to')):'',
-	// 			branch_id:@json(request('branch_id'))?@json(request('branch_id')):'',
-	// 			status:@json(request('status'))?@json(request('status')):'',
-	// 			book_id:@json(request('book_id'))?@json(request('book_id')):'',
-	// 			journal_no:@json(request('journal_no'))?@json(request('journal_no')):''
-	// 		},
-	// 		baseUrl: window.location.protocol + "//" + window.location.host
-	// 	},
-	// 	methods: {
-	// 		search:function(){
-	// 			// console.log(this.filter);
-	// 			window.location.href = this.baseUrl + "/reports/journalledger?from=" + this.filter.from + '&&to=' +  this.filter.to + '&&branch_id=' +  this.filter.branch_id + '&&status=' +  this.filter.status + '&&book_id=' +  this.filter.book_id + '&&journal_no=' +  this.filter.journal_no;
-	// 		},
-	// 		logbook:function(e){
-	// 			console.log(e);
-	// 		}
-	// 	},
-	// 	mounted(){
-	// 		// console.log(this.data);
-	// 	}
-	// });
+	new Vue({
+		el: '#app',
+		data: {
+			data: @json($jLedger),
+			filter:{
+				from: @json(request('from', '')),
+				to: @json(request('to', '')),
+				branch_id: @json(request('branch_id', '')),
+				status: @json(request('status', '')),
+				book_id: @json(request('book_id', '')),
+				journal_no: @json(request('journal_no', '')),
+				journal_source: @json(request('journal_source', '')),
+				journal_payee: @json(request('journal_payee', ''))
+			},
+			warningMessage: ''
+		},
+		watch: {
+      'filter.from': 'checkDateRange',
+      'filter.to': 'checkDateRange'
+    },
+    methods: {
+      checkDateRange() {
+        if (!this.filter.from || !this.filter.to) {
+            this.warningMessage = '⚠️ You’ve selected a large date range. This may take a while to load.';
+            return null;
+        }
+        const from = new Date(this.filter.from);
+		    const to = new Date(this.filter.to);
+		    const years = to.getFullYear() - from.getFullYear();
+		    const months = (years * 12) + (to.getMonth() - from.getMonth());
+
+		    if (months > 6 || (months === 6 && to.getDate() >= from.getDate())) {
+		      this.warningMessage = '⚠️ You’ve selected a large date range. This may take a while to load.';
+		    } else {
+		      this.warningMessage = '';
+		    }
+      }
+    },
+		mounted() {
+		  const urlParams = new URLSearchParams(window.location.search);
+		  const hasFrom = urlParams.has('from');
+		  const hasTo = urlParams.has('to');
+
+		  if (!hasFrom && !hasTo) {
+		    const now = new Date();
+		    const year = now.getFullYear();
+		    const month = now.getMonth();
+
+		    const firstDay = new Date(year, month, 1);
+		    const lastDay = new Date(year, month + 1, 0);
+
+		    const formatDate = (date) =>
+		      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+		    this.filter.from = formatDate(firstDay);
+		    this.filter.to = formatDate(lastDay);
+
+		    this.$nextTick(() => {
+		      document.getElementById('bookJournalForm').submit();
+		    });
+		  }
+		},
+		created() {
+	    window.app = this;
+	  }
+	});
 </script>
 @endsection
 

@@ -23,6 +23,7 @@ use App\Models\JournalBook;
 use App\Models\journalEntry;
 use App\Models\journalEntryDetails;
 use App\Models\Accounting;
+use App\Models\PostingPeriod;
 use Carbon\Carbon;
 
 class JournalController extends MainController
@@ -86,12 +87,27 @@ class JournalController extends MainController
         //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
         // ], $customMessages);
 
-        try {
-            $journalEntry = $journalEntry->createJournalEntry($request->input());
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+        $request->validate([
+            'journal_entry.journal_date' => 'required|date'
+        ]);
+        $period = new PostingPeriod();
+        $open_periods = $period->openStatus()->get();
+        if (count($open_periods) >= 1) {
+            $matchFound = false;
+            foreach ($open_periods as $open) {
+                $journal_date = $request->journal_entry['journal_date'];
+                $isOpen = $period->isInPostingPeriod($journal_date, $open);
+                if ($isOpen) {
+                    $journalEntry = $journalEntry->createJournalEntry($request->input());
+                    $matchFound = true;
+                }
+            }
+            if (!$matchFound) {
+                return response()->json([
+                    'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
+                ], 201);
+            }
         }
-
         return response()->json([
             'message' => 'Journal Entry successfully saved.',
         ], 201);
@@ -114,61 +130,73 @@ class JournalController extends MainController
     }
     public function JournalEntryEdit(Request $request)
     {
-        // // Define custom validation messages
-        // $customMessages = [
-        //     'journal_entry.edit_journal_no.unique' => 'The reference number has already been taken.',
-        //     'journal_entry.edit_journal_no.required' => 'The reference number is required.',
-        // ];
 
-        // // Validate the request data
-        // $request->validate([
-        //     'journal_entry.edit_journal_no' => [
-        //         'required',
-        //         Rule::unique('journal_entry', 'journal_no')->ignore($request->journal_entry['edit_journal_id'], 'journal_id')
-        //     ],
-        // ], $customMessages);
-        // // Validate the request data
-        // $request->validate([
-        //     'journal_entry.edit_journal_no' => [
-        //         'required',
-        //         Rule::unique('journal_entry', 'journal_no')->ignore($request->journal_entry['edit_journal_id'], 'journal_id')
-        //     ],
-        // ], $customMessages);
-
-        // Retrieve the existing journal entry
         $journalEntry = JournalEntry::findOrFail($request->journal_entry['edit_journal_id']);
 
-        try {
-            // Update the journal entry with the provided data
-            DB::transaction(function () use ($request, $journalEntry) {
-                $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
-                $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
+        $period = new PostingPeriod();
+        $open_periods = $period->openStatus()->get();
 
-                $journalEntry->update([
-                    'journal_no' => $request->journal_entry['edit_journal_no'],
-                    'journal_date' => $request->journal_entry['edit_journal_date'],
-                    'branch_id' => $request->journal_entry['edit_branch_id'],
-                    'book_id' => $request->journal_entry['edit_book_id'],
-                    'source' => $request->journal_entry['edit_source'],
-                    'cheque_no' => $request->journal_entry['edit_cheque_no'],
-                    'cheque_date' => $request->journal_entry['edit_cheque_date'],
-                    'amount' => $amount,
-                    'status' => $request->journal_entry['edit_status'],
-                    'payee' => $request->journal_entry['edit_payee'],
-                    'remarks' => $request->journal_entry['edit_remarks'],
-                ]);
 
-                // Update journal entry details
-                $journalEntry->details()->delete();
-                $journalEntry->details()->createMany($request->details);
-            });
-
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        if(count ($open_periods) < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot update journal entry - no posting periods are currently open.',
+            ], 403);
         }
 
+
+        if (count($open_periods) >= 1) {
+            $matchFound = false;
+            foreach ($open_periods as $open) {
+                $journal_date = $request->journal_entry['journal_date'];
+
+                $isOpen = $period->isInPostingPeriod($journal_date, $open);
+                // if ($journalEntry->journal_date == $journal_date) {
+                //     $isOpen = true;
+                // }
+                if ($isOpen) {
+                    try {
+                        DB::transaction(function () use ($request, $journalEntry) {
+                            $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
+                            $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
+
+                            $journalEntry->update([
+                                'journal_no' => $request->journal_entry['edit_journal_no'],
+                                'journal_date' => $request->journal_entry['journal_date'],
+                                'branch_id' => $request->journal_entry['edit_branch_id'],
+                                'book_id' => $request->journal_entry['edit_book_id'],
+                                'source' => $request->journal_entry['edit_source'],
+                                'cheque_no' => $request->journal_entry['edit_cheque_no'],
+                                'cheque_date' => $request->journal_entry['edit_cheque_date'],
+                                'amount' => $amount,
+                                'status' => $request->journal_entry['edit_status'],
+                                'payee' => $request->journal_entry['edit_payee'],
+                                'remarks' => $request->journal_entry['edit_remarks'],
+                            ]);
+
+                            // Update journal entry details
+                            $journalEntry->details()->delete();
+                            $journalEntry->details()->createMany($request->details);
+                        });
+                        $matchFound = true;
+                    } catch (Exception $e) {
+                        return response()->json([
+                            'success' => true,
+                            'message' => $e->getMessage()
+                        ], 500);
+                    }
+                }
+            }
+            if (!$matchFound) {
+                return response()->json([
+                    'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
+                    'success' => false,
+                ], 201);
+            }
+        }
         return response()->json([
             'message' => 'Journal Entry updated successfully.',
+            'success' => true,
         ], 200);
     }
 
@@ -228,10 +256,6 @@ class JournalController extends MainController
         // echo '</pre>';
         return view('journal.sections.journalEntryList', $data);
     }
-    public function show($id)
-    {
-    }
-    public function populate()
-    {
-    }
+    public function show($id) {}
+    public function populate() {}
 }

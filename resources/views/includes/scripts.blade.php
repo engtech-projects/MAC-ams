@@ -12,28 +12,29 @@
 <!-- Toastr -->
 <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 <!-- DataTables  & Plugins -->
-<script src="{{  asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-<script src="{{  asset('plugins/yadfc/jquery.dataTables.yadcf.js') }}"></script>
-<script src="{{  asset('plugins/yadfc/jquery-ui.js') }}"></script>
+<script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<script src="{{ asset('plugins/yadfc/jquery.dataTables.yadcf.js') }}"></script>
+<script src="{{ asset('plugins/yadfc/jquery-ui.js') }}"></script>
 
 
-<script src="{{  asset('plugins/datatables/buttons.print.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables/pdfmake.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables/vfs_fonts.js') }}"></script>
-<script src="{{  asset('plugins/datatables/jszip.min.js') }}"></script>
-<script src="{{  asset('plugins/datatables/buttons.print.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/buttons.print.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/pdfmake.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/vfs_fonts.js') }}"></script>
+<script src="{{ asset('plugins/datatables/jszip.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/buttons.print.min.js') }}"></script>
 
 
 <!-- x editable -->
-<script src="{{ asset('plugins/bootstrap3-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable.min.js') }}"></script>
+<script src="{{ asset('plugins/bootstrap3-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable.min.js') }}">
+</script>
 <!-- AdminLTE App -->
 <script src="{{ asset('js/adminlte/adminlte.min.js') }}"></script>
 <!-- Select2 -->
@@ -46,11 +47,23 @@
 
 
 <script>
-	jQuery(document).ready(function() {
-		@if(Session::has('success'))
-			$.bootstrapGrowl("{{Session::get('success')}}", {type:'success'});
-		@endif
-	});
+    jQuery(document).ready(function() {
+        @if (Session::has('success'))
+            $.bootstrapGrowl("{{ Session::get('success') }}", {
+                type: 'success'
+            });
+        @endif
+    });
+    flatpickr("#datepicker", {
+        enable: [
+            function(date) {
+                // Allow only March (2) and May (4)
+                const month = date.getMonth();
+                return month === 2 || month === 4;
+            }
+        ],
+        dateFormat: "Y-m-d"
+    });
 </script>
 
 @yield('js')

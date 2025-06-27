@@ -325,30 +325,30 @@
 
         $('form').attr('autocomplete', 'off');
         var journalEntryDetails = $('#journalEntryDetails').DataTable({
-            dom: 'Bftrip',
+            dom: 'lftrip',
             pageLength: 10,
-            buttons: ['print', 'csv',
-                {
-                    text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
-                    className: 'btn btn-flat btn-sm btn-default',
-                    titleAttr: 'Export',
-                    action: function(e, dt, node, config) {
-                        var exportBtn = document.getElementsByClassName(
-                            'btn btn-secondary buttons-csv buttons-html5')[0];
-                        exportBtn.click();
-                    }
-                },
-                {
-                    text: '<i class="fas fa-print" aria-hidden="true"></i>',
-                    className: 'btn btn-flat btn-sm btn-default',
-                    titleAttr: 'Print',
-                    action: function(e, dt, node, config) {
-                        var printBtn = document.getElementsByClassName(
-                            'btn btn-secondary buttons-print')[0];
-                        printBtn.click();
-                    }
-                },
-            ],
+            // buttons: ['print', 'csv',
+            //     {
+            //         text: '<i class="fas fa-file-download" aria-hidden="true"></i>',
+            //         className: 'btn btn-flat btn-sm btn-default',
+            //         titleAttr: 'Export',
+            //         action: function(e, dt, node, config) {
+            //             var exportBtn = document.getElementsByClassName(
+            //                 'btn btn-secondary buttons-csv buttons-html5')[0];
+            //             exportBtn.click();
+            //         }
+            //     },
+            //     {
+            //         text: '<i class="fas fa-print" aria-hidden="true"></i>',
+            //         className: 'btn btn-flat btn-sm btn-default',
+            //         titleAttr: 'Print',
+            //         action: function(e, dt, node, config) {
+            //             var printBtn = document.getElementsByClassName(
+            //                 'btn btn-secondary buttons-print')[0];
+            //             printBtn.click();
+            //         }
+            //     },
+            // ],
         });
         var Toast = Swal.mixin({
             toast: true,
@@ -526,19 +526,32 @@
                                 },
                                 error: function(jqXHR) {
                                     // Check if it's a validation error
-                                    if (jqXHR.status === 422) {
-                                        $('#LrefNo').text('')
-                                        $('#book_id').val('');
-                                        $('#book_id').select2({
-                                            placeholder: 'Select',
-                                            allowClear: true,
-                                        });
-                                        const errors = jqXHR.responseJSON.errors;
-                                        // Display the validation error in an alert
-                                        alert(errors['journal_entry.journal_no'][0]);
-                                    } else {
-                                        toastr.error('Error');
+                                    var response = jqXHR.responseJSON
+                                    var errors = response?.errors || {}
+
+                                    toastr.error(response?.message || "An error occured.");
+
+
+                                    for (const field in errors) {
+                                        if (errors.hasOwnProperty(field)) {
+                                            errors[field].forEach(message => {
+                                                toastr.error(message)
+                                            })
+                                        }
                                     }
+                                    /*                                     if (jqXHR.status === 422) {
+                                                                            $('#LrefNo').text('')
+                                                                            $('#book_id').val('');
+                                                                            $('#book_id').select2({
+                                                                                placeholder: 'Select',
+                                                                                allowClear: true,
+                                                                            });
+                                                                            const errors = jqXHR.responseJSON.errors;
+                                                                            // Display the validation error in an alert
+                                                                            alert(errors['journal_entry.journal_no'][0]);
+                                                                        } else {
+                                                                            toastr.error('Error');
+                                                                        } */
                                     jefIsLoading = false
                                 }
                             });
@@ -648,8 +661,8 @@
                             stStatusButton.text('Post');
                         }
                     },
-                    error: function() {
-                        toastr.error('Error');
+                    error: function(response) {
+                        toastr.error(response.responseJSON.message);
                     }
                 });
             }
@@ -697,8 +710,8 @@
                     }
                     // $('#journalEntryDetails').DataTable().ajax.reload(null, false);
                 },
-                error: function(data) {
-                    toastr.error('Error occurred');
+                error: function(response) {
+                    toastr.error(response.responseJSON.message);
                 }
             });
         });
@@ -814,11 +827,16 @@
                                 url: "{{ route('journal.JournalEntryEdit') }}",
                                 data: data,
                                 dataType: "json",
-                                success: function(data) {
-                                    toastr.success(data.message);
-                                    saveJournalEntryDetails(data.id, 'update')
-                                    $('#journalModalEdit').modal('hide');
-                                    $('#SearchJournalForm').submit();
+                                success: function(response) {
+                                    if (response.success) {
+                                            toastr.success(response.message);
+                                            saveJournalEntryDetails(response.id, 'update');
+                                             $('body').focus();
+                                            $('#journalModalEdit').modal('hide');
+                                        } else {
+                                            toastr.error(response.message);
+                                            $('#journalModalEdit').find('button[type="submit"]').focus();
+                                        }
                                 },
                                 error: function(jqXHR) {
                                     if (jqXHR.status === 422) {
@@ -835,7 +853,7 @@
                                             alert('An unknown validation error occurred.');
                                         }
                                     } else {
-                                        toastr.error('Error');
+                                        toastr.error(jqXHR.responseJSON.message);
                                     }
                                 }
                             });
@@ -887,6 +905,29 @@
             $('#tbl-create-edit-container').html('');
             $('#edit_journal_date').prop('readonly', true);
             isInitialSetup = true;
+            $.ajax({
+                url: '/MAC-ams/open-posting-period',
+                method: 'GET',
+                success: function(response) {
+                    const dates = response.data || [];
+
+                    const date_ranges = dates.map(function(period) {
+                        return {
+                            from: period.start_date,
+                            to: period.end_date
+                        };
+                    });
+
+                    // Initialize Flatpickr with enabled date ranges
+                    flatpickr("#edit_journal_date", {
+                        enable: date_ranges,
+                        dateFormat: "Y-m-d"
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching dates:", error);
+                }
+            });
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

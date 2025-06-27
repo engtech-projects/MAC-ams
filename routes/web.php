@@ -15,6 +15,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\AccountsApiController;
 use App\Http\Controllers\CollectionBreakdownController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\SubsidiaryController;
@@ -22,7 +23,9 @@ use App\Http\Controllers\JournalBookController;
 use App\Http\Controllers\SystemSetupController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\GeneralSettingsController;
+use App\Http\Controllers\PostingPeriodController;
 use App\Http\Controllers\ProductsServicesController;
+use App\Http\Controllers\SubsidiaryCategoryController;
 use App\Models\CollectionBreakdown;
 
 /*
@@ -55,7 +58,8 @@ Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard'
 
 
 // AccountsController
-Route::resource('accounts', AccountsController::class);
+Route::resource('chart-of-accounts', AccountsController::class);
+Route::resource('accounts', AccountsApiController::class);
 Route::get('accounts-datatable', [AccountsController::class, 'populate'])->name('accounts.populate');
 Route::get('accounts/getAccountTypeContent', [AccountsController::class, 'getAccountTypeContent'])->name('accounts.getAccountTypeContent');
 Route::post('accounts/saveType', [AccountsController::class, 'saveType'])->name('accounts.saveType');
@@ -146,6 +150,7 @@ Route::get('reports/subsidiary-ledger-listing', [ReportsController::class, 'subs
 
 
 Route::get('reports/subsidiaryViewInfo', [ReportsController::class, 'subsidiaryViewInfo'])->name('reports.subsidiaryViewInfo');
+Route::get('subsidiary/{subsidiary}', [SubsidiaryController::class, 'show']);
 Route::get('reports/subsidiaryDelete', [ReportsController::class, 'subsidiaryDelete'])->name('reports.subsidiaryDelete');
 Route::get('reports/generalLedger', [ReportsController::class, 'generalLedger'])->name('reports.generalLedger');
 Route::get('reports/balance-sheet', [ReportsController::class, 'balanceSheet'])->name('reports.balancesheet');
@@ -167,6 +172,11 @@ Route::post('reports/cashTransactionBlotter', [ReportsController::class, 'search
 Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'showCashBlotter'])->name('reports.showCashBlotter');
 
 Route::resource('collection-breakdown', CollectionBreakdownController::class);
+
+Route::resource('posting-period', PostingPeriodController::class);
+Route::get('posting-period-years', [PostingPeriodController::class, "getYears"]);
+Route::get('posting-period/search', [PostingPeriodController::class, 'search']);
+Route::get('open-posting-period', [PostingPeriodController::class, 'openPostingPeriod']);
 Route::delete('branch-collection/{branchCollection}', [CollectionBreakdownController::class, 'deleteBranchCollection']);
 Route::delete('account-officer-collection/{accountOfficerCollection}', [CollectionBreakdownController::class, 'deleteAccountOffficerCollection']);
 
@@ -196,6 +206,8 @@ Route::post('reports/monthly-depreciation-report-post', [ReportsController::clas
 Route::post('subsidiary', [SubsidiaryController::class, 'store'])->name('subsidiary.store');
 Route::delete('subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('subsidiary.delete');
 Route::post('subsidiary/{subsidiary}', [SubsidiaryController::class, 'update'])->name('subsidiary.update');
+Route::resource('subsidiary-category', SubsidiaryCategoryController::class);
+
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');
 Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'])->name('payment.customer');

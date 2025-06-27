@@ -87,14 +87,14 @@
                         @if (Gate::allows('manager'))
                             <div class="col-md-4">
                                 <label for="branch">Select Branch</label>
-                                <select-branch @setselectedbranch="getSelectedBranch" />
+                                <select-branch @setselectedbranch="getSelectedBranch" ref="branchFilter"/>
                             </div>
                         @endif
 
                         <div class="col-md-4">
                             <label for="branch">Transaction Date</label>
                             <div class="input-group">
-                                <input type="date" v-model="filter.transaction_date" id="transaction_date"
+                                <input type="date" v-model="selectedDate" id="transaction_date"
                                     name="transaction_date" class="form-control form-control-sm">
                             </div>
 
@@ -122,7 +122,7 @@
 
 
             <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" ref="modal"
-                aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                aria-labelledby="myLargeModalLabel" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog modal-xl">
 
                     <div class="modal-content">
@@ -144,7 +144,8 @@
                                     <div class="col-md-3">
                                         <label for="branch">Select Branch</label>
                                         <select name="branch_id" v-model="collectionBreakdown.branch_id"
-                                            class="select2 form-control form-control-sm" style="width:100%" id="branchID">
+                                            class="form-control form-control-sm" style="width:100%" id="branchID">
+                                            <option value="" disabled selected>-Select Branch-</option>
                                             @foreach ($branches as $branch)
                                                 <option value="{{ $branch->branch_id }}">
                                                     {{ $branch->branch_name }}
@@ -307,57 +308,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-if="isEdit">
-                                                        <td>
-                                                            <input type="text" class="form-control form-control-sm"
-                                                                id="accountofficer_id"
-                                                                v-model="officer_collection.representative">
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" id="remarks"
-                                                                class="form-control form-control-sm rounded-0"
-                                                                v-model="officer_collection.note" name="remarks"
-                                                                form="frm-add-account-officer-details"
-                                                                placeholder="Remarks">
-                                                        </td>
-                                                        <td>
-                                                            <input type="number"
-                                                                class="form-control form-control-sm rounded-0 text-right"
-                                                                id="total_amount" v-model="officer_collection.total">
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <button class="btn btn-xs btn-primary"
-                                                                @click="addAccountOfficerCollection()">
-                                                                <i class="fas fa-plus fa-xs"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="isEdit"
-                                                        v-for="officerCollection in collectionBreakdown.account_officer_collections">
-                                                        <td>
-                                                            <h6 v-text="officerCollection.representative"></h6>
-                                                        </td>
-                                                        <td>
-                                                            <h6 v-text="officerCollection.note"></h6>
-
-                                                        </td>
-                                                        <td>
-                                                            <h6>@{{ formatCurrency(officerCollection.total) }}
-                                                            </h6>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            {{-- <button type="button"
-                                                                    id="btn-add-account-officer-collection"
-                                                                    class="btn btn-xs btn-danger add-accounting-officer">
-                                                                    <i class="fas fa-trash fa-xs"></i>
-                                                                </button> --}}
-                                                            <button class="btn btn-xs btn-danger"
-                                                                @click="removeAccountOfficerCollection(officerCollection)">
-                                                                <i class="fas fa-trash fa-xs"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="!isEdit">
+                                                    <tr>
                                                         <td>
                                                             <input type="text" class="form-control form-control-sm"
                                                                 v-model="officer_collection.representative"
@@ -376,21 +327,19 @@
                                                                 id="total_amount">
                                                         </td>
                                                         <td class="text-center">
-                                                            <button class="btn btn-xs btn-primary"
+                                                            <button type="button" class="btn btn-xs btn-primary"
                                                                 @click="addAccountOfficerCollection()">
                                                                 <i class="fas fa-plus fa-xs"></i>
                                                             </button>
-
                                                         </td>
                                                     </tr>
-                                                    <tr v-if="!isEdit"
-                                                        v-for="(officerCollection,i) in collectionBreakdown.account_officer_collections">
+
+                                                    <tr v-for="(officerCollection, i) in collectionBreakdown.account_officer_collections" :key="i">
                                                         <td>
                                                             <div v-if="officerCollection.isEditing">
                                                                 <input type="text" class="form-control form-control-sm"
                                                                     v-model="officerCollection.representative"
                                                                     id="accountofficer_representative">
-
                                                             </div>
                                                             <div v-else>
                                                                 <h6 v-text="officerCollection.representative"></h6>
@@ -401,52 +350,46 @@
                                                                 <input type="text" class="form-control form-control-sm"
                                                                     v-model="officerCollection.note"
                                                                     id="accountofficer_note">
-
                                                             </div>
                                                             <div v-else>
                                                                 <h6 v-text="officerCollection.note"></h6>
                                                             </div>
-
                                                         </td>
                                                         <td>
                                                             <div v-if="officerCollection.isEditing">
                                                                 <input type="text" class="form-control form-control-sm"
                                                                     v-model="officerCollection.total"
                                                                     id="accountofficer_total">
-
                                                             </div>
                                                             <div v-else>
-                                                                <h6>@{{ formatCurrency(officerCollection.total) }}
-                                                                </h6>
+                                                                <h6>@{{ formatCurrency(officerCollection.total) }}</h6>
                                                             </div>
                                                         </td>
-                                                        <td class="text-center">
-                                                            <div class="row">
-                                                                <div class="col-md-6">
-                                                                    <button v-if="!isEditing"
-                                                                        class="btn btn-xs btn-success"
-                                                                        @click="editOfficerCollection(i)">
-                                                                        <i class="fas fa-pen fa-xs"></i>
-                                                                    </button>
-
-                                                                    <button v-else class="btn btn-xs btn-success"
-                                                                        @click="saveOfficerCollection(i)">
-                                                                        <i class="fas fa-save fa-xs"></i>
-                                                                    </button>
-
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <button class="btn btn-xs btn-danger">
-                                                                        <i class="fas fa-trash fa-xs"
-                                                                            @click="removeAccountOfficerCollection(officerCollection)"></i>
-                                                                    </button>
-                                                                </div>
+                                                        <td class="text-center align-middle p-0">
+                                                            <div class="d-flex justify-content-center align-items-center p-0" style="gap: 4px;">
+                                                                <button type="button" class="btn btn-success btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    v-if="!officerCollection.isEditing"
+                                                                    @click="editOfficerCollection(i)">
+                                                                    <i class="fas fa-pen fa-xs"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-success btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    v-else
+                                                                    @click="saveOfficerCollection(i)">
+                                                                    <i class="fas fa-save fa-xs"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-danger btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    @click="removeAccountOfficerCollection(i)">
+                                                                    <i class="fas fa-trash fa-xs"></i>
+                                                                </button>
                                                             </div>
                                                         </td>
                                                     </tr>
 
                                                     <tr id="footer-row">
-                                                        <!-- <td colspan="7"></td> -->
+                                                        <!-- Optional footer row -->
                                                     </tr>
                                                 </tbody>
                                                 <tfoot>
@@ -478,19 +421,17 @@
                                                     <tr>
                                                         <td>
                                                             <select class="form-control form-control-sm rounded-0"
-                                                                id="branch_id_collection"
-                                                                v-model="branch_collection.branch_name">
-                                                                <option value="" disabled selected>-Select
-                                                                    Branch-</option>
+                                                                v-model="branch_collection.branch_id"
+                                                                id="branch_id_collection">
+                                                                <option value="" disabled selected>-Select Branch-</option>
                                                                 @foreach ($branches as $branch)
-                                                                    <option value="{{ $branch->branch_id }}">
-                                                                        {{ $branch->branch_name }}</option>
+                                                                    <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}</option>
                                                                 @endforeach
-
                                                             </select>
                                                         </td>
                                                         <td>
-                                                            <input type="number" v-model="branch_collection.total_amount"
+                                                            <input type="number"
+                                                                v-model="branch_collection.total_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 id="branchcollection_amount">
                                                         </td>
@@ -501,41 +442,18 @@
                                                             </button>
                                                         </td>
                                                     </tr>
-                                                    <tr v-if="isEdit"
-                                                        v-for="(branchCollection,i) in collectionBreakdown.branch_collections">
-                                                        <td>
-                                                            <h6 v-text="branchCollection.branch.branch_name"
-                                                                value="branchCollection.branch.branch_id"></h6>
-                                                        </td>
-                                                        <td class="text-right">
-                                                            <h6 v-text="branchCollection.total_amount"></h6>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <button class="btn btn-xs btn-danger"
-                                                                @click="removeBranchCollection(branchCollection,i)">
-                                                                <i class="fas fa-trash fa-xs"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
 
-                                                    <tr v-if="!isEdit"
-                                                        v-for="(branchCollection,i) in collectionBreakdown.branch_collections">
+                                                    <tr v-for="(branchCollection, i) in collectionBreakdown.branch_collections" :key="i">
                                                         <td>
                                                             <div v-if="branchCollection.isEditing">
-
                                                                 <select class="form-control form-control-sm rounded-0"
-                                                                    id="branch_id_collection_edit"
-                                                                    v-model="branchCollection.branch.branch_id">
-                                                                    <option value="" disabled selected>-Select
-                                                                        Branch-</option>
+                                                                    v-model="branchCollection.branch.branch_id"
+                                                                    id="branch_id_collection_edit">
+                                                                    <option value="" disabled selected>-Select Branch-</option>
                                                                     @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch->branch_id }}">
-                                                                            {{ $branch->branch_name }}</option>
+                                                                        <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}</option>
                                                                     @endforeach
-
                                                                 </select>
-
-
                                                             </div>
                                                             <div v-else>
                                                                 <h6 v-text="branchCollection.branch.branch_name"></h6>
@@ -543,57 +461,53 @@
                                                         </td>
                                                         <td>
                                                             <div v-if="branchCollection.isEditing">
-                                                                <input type="number" class="form-control form-control-sm"
-                                                                    v-model="branchCollection.total_amount">
-
+                                                                <input type="number"
+                                                                    v-model="branchCollection.total_amount"
+                                                                    class="form-control form-control-sm rounded-0 text-right">
                                                             </div>
                                                             <div v-else>
-                                                                <h6>@{{ formatCurrency(branchCollection.total_amount) }}
+                                                                <h6>@{{ formatCurrency(branchCollection.total_amount) }}</h6>
                                                             </div>
-
                                                         </td>
+                                                        <td class="text-center align-middle p-1">
+                                                            <div class="d-flex justify-content-center align-items-center" style="gap: 4px;">
+                                                                <button v-if="!branchCollection.isEditing"
+                                                                    class="btn btn-success btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    @click="editBranchCollection(i, branchCollection)">
+                                                                    <i class="fas fa-pen fa-xs"></i>
+                                                                </button>
+                                                                <button v-else
+                                                                    class="btn btn-success btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    @click="saveBranchCollection(i, branchCollection.branch.branch_id)">
+                                                                    <i class="fas fa-save fa-xs"></i>
+                                                                </button>
+                                                                <button type="button"
+                                                                    class="btn btn-danger btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    @click="removeBranchCollection(i)">
+                                                                    <i class="fas fa-trash fa-xs"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
 
-
-
-                                                        <td class="text-center">
-
-                                                            <button v-if="!isEditing" class="btn btn-xs btn-success"
-                                                                @click="editBranchCollection(i,branchCollection)">
-                                                                <i class="fas fa-pen fa-xs"></i>
-                                                            </button>
-
-                                                            <button v-else class="btn btn-xs btn-success"
-                                                                @click="saveBranchCollection(i,branchCollection.branch.branch_id)">
-                                                                <i class="fas fa-save fa-xs"></i>
-                                                            </button>
-
-
-                                                            <button class="btn btn-xs btn-danger">
-                                                                <i class="fas fa-trash fa-xs"
-                                                                    @click="removeBranchCollection(branchCollection,i)"></i>
-                                                            </button>
+                                                    <tr id="branch-footer-row">
+                                                        <!-- Optional footer row -->
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">total</td>
+                                                        <td class="text-right" colspan="2" id="totalbranchcollection">
+                                                            @{{ formatCurrency(branchCollectionTotal) }}
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
 
                                         </div>
-                                        </td>
-                                        </tr>
-
-                                        <tr style="background-color: #f1f1f1;" id="branch-collection-row">
-                                            <!-- <td colspan="7">&nbsp;</td> -->
-                                        </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr class="bg-primary">
-                                                <td class="text-uppercase">
-                                                    total
-                                                </td>
-                                                <td class="text-right" colspan="3" id="totalbranchcollection">
-                                                    @{{ formatCurrency(branchCollectionTotal) }}
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                        </table>
-
-                                    </div>
 
                                     <!-- POS COLLECTION -->
                                     <div class="col-md-12">
@@ -618,96 +532,68 @@
                                                             id="pos_collection_total_amount">
                                                     </td>
                                                     <td class="text-center">
-                                                        <button class="btn btn-xs btn-primary"
+                                                        <button type="button" class="btn btn-xs btn-primary"
                                                             @click="addPosCollection()">
                                                             <i class="fas fa-plus fa-xs"></i>
                                                         </button>
                                                     </td>
                                                 </tr>
-                                                <tr v-if="isEdit"
-                                                    v-for="(posCollection,i) in collectionBreakdown.pos_collections">
-                                                    <td>
-                                                        <h6 v-text="posCollection.or_no"></h6>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <h6>@{{ formatCurrency(posCollection.total_amount) }}</h6>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <button class="btn btn-xs btn-danger"
-                                                            @click="removePosCollection(posCollection,i)">
-                                                            <i class="fas fa-trash fa-xs"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
 
-                                                <tr v-if="!isEdit"
-                                                    v-for="(posCollection,i) in collectionBreakdown.pos_collections">
+                                                <tr v-for="(posCollection, i) in collectionBreakdown.pos_collections" :key="i">
                                                     <td>
                                                         <div v-if="posCollection.isEditing">
-
                                                             <input type="text" v-model="posCollection.or_no"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                id="pos_collection_or_no" placeholder="OR No.">
-
-
+                                                                placeholder="OR No.">
                                                         </div>
-
                                                         <div v-else>
                                                             <h6 v-text="posCollection.or_no"></h6>
                                                         </div>
-
                                                     </td>
                                                     <td>
                                                         <div v-if="posCollection.isEditing">
-
                                                             <input type="number" class="form-control form-control-sm"
                                                                 v-model="posCollection.total_amount">
-
                                                         </div>
                                                         <div v-else>
-                                                            <h6>@{{ formatCurrency(posCollection.total_amount) }}
+                                                            <h6>@{{ formatCurrency(posCollection.total_amount) }}</h6>
                                                         </div>
-
                                                     </td>
+                                                    <td class="text-center align-middle p-1">
+                                                        <div class="d-flex justify-content-center align-items-center p-0 m-0" style="gap: 4px;">
+                                                            <button type="button" class="btn btn-success btn-sm p-0"
+                                                                style="width: 20px; height: 28px;"
+                                                                v-if="!posCollection.isEditing"
+                                                                @click="editPosCollection(i)">
+                                                                <i class="fas fa-pen fa-xs"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-success btn-sm p-0"
+                                                                style="width: 20px; height: 28px;"
+                                                                v-else
+                                                                @click="savePosCollection(i)">
+                                                                <i class="fas fa-save fa-xs"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm p-0"
+                                                                style="width: 20px; height: 28px;"
+                                                                @click="removePosCollection(i)">
+                                                                <i class="fas fa-trash fa-xs"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
 
-
-
-                                                    <td class="text-center">
-
-                                                        <button v-if="!isEditing" class="btn btn-xs btn-success"
-                                                            @click="editPosCollection(i,posCollection)">
-                                                            <i class="fas fa-pen fa-xs"></i>
-                                                        </button>
-
-                                                        <button v-else class="btn btn-xs btn-success"
-                                                            @click="savePosCollection(i)">
-                                                            <i class="fas fa-save fa-xs"></i>
-                                                        </button>
-
-
-                                                        <button class="btn btn-xs btn-danger">
-                                                            <i class="fas fa-trash fa-xs"
-                                                                @click="removePosCollection(posCollection,i)"></i>
-                                                        </button>
-
-                                    </div>
-                                    </td>
-                                    </tr>
-
-                                    <tr style="background-color: #f1f1f1;" id="branch-collection-row">
-                                        <!-- <td colspan="7">&nbsp;</td> -->
-                                    </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr class="bg-primary">
-                                            <td class="text-uppercase">
-                                                total
-                                            </td>
-                                            <td class="text-right" colspan="3" id="totalPosCollection">
-                                                @{{ formatCurrency(posCollectionTotal) }}
-                                            </td>
-                                        </tr>
-                                    </tfoot>
+                                                <tr id="footer-row">
+                                                    <!-- Optional footer row -->
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="bg-primary">
+                                                    <td class="text-uppercase">total</td>
+                                                    <td class="text-right" colspan="2" id="totalPosCollection">
+                                                        @{{ formatCurrency(posCollectionTotal) }}
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
                                     </table>
 
                                 </div>
@@ -831,8 +717,15 @@
                         <th>Status</th>
                         <th>Action</th>
                     </thead>
-                    <tbody>
-                        <tr v-for="d in collectionsBreakdown">
+                    <tbody v-if="loading">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                <i class="fas fa-spinner fa-spin"></i> Loading collections...
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else-if="collectionsBreakdown && collectionsBreakdown.length > 0">
+                        <tr v-for="d in collectionsBreakdown" :key="d.collection_id">
                             <td>@{{ getBranchName(d.branch_id) }}</td>
                             <td>@{{ d.transaction_date }}</td>
                             <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
@@ -870,6 +763,13 @@
                                     <button class="mr-1 btn btn-xs btn-warning"
                                         @click="updateStatus(d,'unposted')">Unpost</button>
                                 @endif
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                No records found.
                             </td>
                         </tr>
                     </tbody>
@@ -1123,7 +1023,7 @@
                                                 <tbody class="text-uppercase">
                                                     <tr v-for="bc in collections.branch_collections">
                                                         <td class="text-bold" v-text="bc.branch.branch_name"></td>
-                                                        <td v-text="bc.total_amount"></td>
+                                                        <td>@{{ formatCurrency(bc.total_amount) }}</td>
                                                     </tr>
                                                     <tr
                                                         style="border-top:4px dashed black;border-bottom:4px dashed black;">
@@ -1190,10 +1090,6 @@
                 baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
                 branches: null,
                 branch: null,
-                filter: {
-                    transaction_date: "", //'2024-11-30',
-                    branch_id: null,
-                },
                 isEdit: false,
                 isEditing: false,
                 isUpdateStatus: false,
@@ -1218,7 +1114,7 @@
                 },
                 branch_collection: {
                     total_amount: null,
-                    branch_id: null,
+                    branch_id: '',
                     branch: ''
                 },
                 pos_collections: {
@@ -1237,7 +1133,7 @@
                 collectionBreakdown: {
                     total: 0,
                     collection_id: 0,
-                    branch_id: null,
+                    branch_id: '',
                     transaction_date: "",
                     p_1000: null, //34,
                     p_500: null, //1,
@@ -1283,6 +1179,9 @@
                     transaction_date: ''
                 },
                 statusUpdate: false,
+                loading: false,
+                selectedBranch: '',
+                selectedDate: ''
             },
             methods: {
                 nextTextField: function(textField) {
@@ -1318,29 +1217,33 @@
                 },
                 addBranchCollection() {
                     this.isEditing = false;
-                    if ($('#branch_id_collection').val() == "") {
-                        alert("Please add branch");
+                    let missingField = !this.branch_collection.branch_id ? "Branch" :
+                                        !this.branch_collection.total_amount ? "Total Amount" : null;
+                    if (missingField) {
+                            toastr.error(`Please add ${missingField}`);
                     } else {
-                        var branch = $('#branch_id_collection option:selected').text().trim();
+                        const branch = this.branches.find(b => b.branch_id == this.branch_collection.branch_id);
                         this.collectionBreakdown.branch_collections.push({
                             branch: {
-                                branch_id: $('#branch_id_collection').val(),
-                                branch_name: branch
+                                branch_id: this.branch_collection.branch_id,
+                                branch_name: branch.branch_name
                             },
                             total_amount: this.branch_collection.total_amount,
                             isEditing: false,
                         });
 
-                        $('#branch_id_collection option:selected').val("");
-
+                        this.branch_collection.branch_id = "";
                         this.branch_collection.total_amount = null;
 
                     }
                 },
 
                 addAccountOfficerCollection: function() {
-                    if ($('#remarks').val() == "") {
-                        alert("Please add account officer collection");
+                    let missingField = !this.officer_collection.representative ? "Account Officer" :
+                                       !this.officer_collection.note ? "Remarks" :
+                                       !this.officer_collection.total ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
                     } else {
 
                         this.collectionBreakdown.account_officer_collections.push({
@@ -1360,8 +1263,10 @@
                 },
                 addPosCollection() {
                     this.isEditing = false;
-                    if (this.pos_collections.or_no == null) {
-                        alert("Please enter or no.");
+                    let missingField = !this.pos_collections.or_no ? "OR no." :
+                                       !this.pos_collections.total_amount ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
                     } else {
                         this.collectionBreakdown.pos_collections.push({
                             or_no: this.pos_collections.or_no,
@@ -1370,36 +1275,60 @@
                         });
 
 
-                        this.pos_collections.total_amount = 0;
+                        this.pos_collections.or_no = null;
+                        this.pos_collections.total_amount = null;
 
                     }
-                    this.pos_collections.or_no = null;
-                    this.pos_collections.total_amount = null;
                 },
                 editPosCollection: function(index) {
-                    var or_no = this.collectionBreakdown.pos_collections[index].or_no;
-                    this.collectionBreakdown.pos_collections[index].isEditing = true;
-                    /* this.pos_collections.or_no = or_no; */
+                    this.$set(this.collectionBreakdown.pos_collections[index], 'isEditing', true);
                     this.isEditing = true;
-
                 },
                 editOfficerCollection: function(index) {
-                    this.collectionBreakdown.account_officer_collections[index].isEditing = true;
+                    this.$set(this.collectionBreakdown.account_officer_collections[index], 'isEditing', true);
                     this.isEditing = true;
-
+                },
+                editBranchCollection: function(index, branchCollection) {
+                    this.$set(this.collectionBreakdown.branch_collections[index], 'isEditing', true);
+                    this.isEditing = true;
+                },
+                saveBranchCollection: function(index, branch_id) {
+                    const branchCollection = this.collectionBreakdown.branch_collections[index];
+                    if (!branchCollection.total_amount) {
+                        toastr.error('Please add Total Amount');
+                        return;
+                    }
+                    const branch = $('#branch_id_collection_edit option:selected').text().trim();
+                    branchCollection.branch.branch_name = branch;
+                    branchCollection.isEditing = false;
+                    this.isEditing = false;
                 },
                 savePosCollection: function(index) {
-                    this.collectionBreakdown.pos_collections[index].isEditing = false;
+                    let pos = this.collectionBreakdown.pos_collections[index];
+                    let missingField = !pos.or_no ? "OR no." :
+                                       !pos.total_amount ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
+                        return;
+                    }
+                    pos.isEditing = false;
                     this.isEditing = false;
                 },
                 saveOfficerCollection: function(index) {
-                    this.collectionBreakdown.account_officer_collections[index].isEditing = false;
+                    let officer = this.collectionBreakdown.account_officer_collections[index];
+                    let missingField = !officer.representative ? "Account Officer" :
+                                       !officer.note ? "Remarks" :
+                                       !officer.total ? "Total Amount" : null;
+                    if (missingField) {
+                        toastr.error(`Please add ${missingField}`);
+                        return;
+                    }
+                    officer.isEditing = false;
                     this.isEditing = false;
                 },
                 processCreateOrUpdate: function() {
                     if (this.isEdit) {
                         this.updateCollectionBreakdown();
-                        this.resetForm();
 
                     } else {
                         this.createValidation()
@@ -1408,7 +1337,6 @@
 
 
                         }
-                        this.resetForm();
                     }
                 },
                 createValidation: function() {
@@ -1436,69 +1364,25 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        window.location.reload();
-                        //  this.resetForm();
+                        this.closeModal();
+
+                        this.selectedBranch = this.collectionBreakdown.branch_id;
+                        this.selectedDate = this.collectionBreakdown.transaction_date;
+
+                        if (this.$refs.branchFilter) {
+                          this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
+                        }
+
+                        this.$nextTick(() => {
+                            this.filterCollections();
+                        });
                     }).catch(err => {
                         toastr.error(err.response.data.message);
 
                     })
                 },
-                editBranchCollection: function(index, branchCollection) {
-                    this.collectionBreakdown.branch_collections[index].isEditing = true;
-                    this.isEditing = true;
-
-                },
-                saveBranchCollection: function(index, branch_id) {
-                    this.collectionBreakdown.branch_collections[index].isEditing = false;
-                    var branch = $('#branch_id_collection_edit option:selected').text().trim();
-                    this.collectionBreakdown.branch_collections[index].branch.branch_name = branch;
-                    this.isEditing = false;
-                },
-                removePosCollection: function(collection, index) {
-                    this.collectionBreakdown.pos_collections[index].isEditing = false;
-                    if (index !== -1) {
-                        console.log(collection);
-                        this.collectionBreakdown.pos_collections.splice(index, 1);
-                    }
-
-
-                    /* const isEqual = (obj1, obj2) =>
-                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.branch_collections.filter(
-                        element => !
-                        isEqual(element, collection)); */
-
-                },
-                removeBranchCollection: function(collection, index) {
-                    this.collectionBreakdown.branch_collections[index].isEditing = false;
-                    if (this.isEdit) {
-                        axios.delete('/MAC-ams/branch-collection/' + collection.id, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        }).then(response => {
-                            toastr.success(response.data.message);
-
-                            this.collectionBreakdown.branch_collections = updatedArray;
-                        }).catch(err => {
-                            toastr.error(err.data.message);
-                        })
-                    } else {
-                        if (index !== -1) {
-                            this.collectionBreakdown.branch_collections.splice(index, 1);
-                        }
-                    }
-
-
-                    /* const isEqual = (obj1, obj2) =>
-                        Object.keys(obj1).every(key => obj1[key] === obj2[key]);
-                    const updatedArray = this.collectionBreakdown.branch_collections.filter(
-                        element => !
-                        isEqual(element, collection)); */
-
-                },
                 resetForm: function() {
+
                     this.collectionBreakdown.collection_id = null,
                     this.collectionBreakdown.branch_id = null;
                     this.collectionBreakdown.transaction_date = '';
@@ -1514,6 +1398,7 @@
                     this.collectionBreakdown.c_25 = 0;
                     this.collectionBreakdown.branch_collections = [];
                     this.collectionBreakdown.account_officer_collections = [];
+                    this.collectionBreakdown.pos_collections = [];
                     this.collectionBreakdown.other_payment = {
                         cash_amount: 0,
                         check_amount: 0,
@@ -1521,7 +1406,21 @@
                         memo_amount: 0,
                         interbranch_amount: 0
                     }
+                    this.branch_collection = {
+                        branch_id: "",
+                        total_amount: null
+                    };
 
+                    this.officer_collection = {
+                        representative: "",
+                        note: "",
+                        total: null
+                    };
+
+                    this.pos_collections = {
+                        or_no: "",
+                        total_amount: null
+                    };
                     this.total = {
                         grandTotal: null,
                         p_1000: null,
@@ -1536,20 +1435,21 @@
                         c_25: null,
                     }
                 },
-                removeAccountOfficerCollection: function(collection) {
-                    if (this.isEdit) {
-                        axios.delete('/MAC-ams/account-officer-collection/' + collection.collection_ao_id, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                    .content
-                            }
-                        }).then(response => {
-                            toastr.success(response.data.message);
-
-                        }).catch(err => {
-                            toastr.error(err.data.message);
-                        })
+                removePosCollection: function(index) {
+                    if (index >= 0 && index < this.collectionBreakdown.pos_collections.length) {
+                        this.collectionBreakdown.pos_collections.splice(index, 1);
                     }
+                },
+                removeBranchCollection: function(index) {
+                    if (index >= 0 && index < this.collectionBreakdown.branch_collections.length) {
+                        this.collectionBreakdown.branch_collections.splice(index, 1);
+                    }
+                },
+                removeAccountOfficerCollection: function(index) {
+                    if (index >= 0 && index < this.collectionBreakdown.account_officer_collections.length) {
+                        this.collectionBreakdown.account_officer_collections.splice(index, 1);
+                    }
+
                     const isEqual = (obj1, obj2) =>
                         Object.keys(obj1).every(key => obj1[key] === obj2[key]);
                     const updatedArray = this.collectionBreakdown.account_officer_collections
@@ -1575,7 +1475,6 @@
                         maximumFractionDigits: 2
                     });
                 },
-
                 calculateCashCount: function(collectionBreakdown) {
                     this.total.p_1000 = collectionBreakdown.p_1000 * 1000;
                     this.total.p_500 = collectionBreakdown.p_500 * 500
@@ -1596,42 +1495,83 @@
                 },
                 editCollectionBreakdown: function(collectionBreakdown) {
                     this.isEdit = true;
-                    this.calculateCashCount(collectionBreakdown)
+                    this.calculateCashCount(collectionBreakdown);
+
+                    // Ensure other_payment exists before assigning
+                    if (!collectionBreakdown.other_payment) {
+                        collectionBreakdown.other_payment = {
+                            cash_amount: 0,
+                            check_amount: 0,
+                            pos_amount: 0,
+                            memo_amount: 0,
+                            interbranch_amount: 0
+                        };
+                    }
+
                     this.collectionBreakdown = collectionBreakdown;
-                    this.branch = $('#branchID').find(':selected').val()
-                    if (collectionBreakdown.status === 'posted') {
+                    this.branch = $('#branchID').find(':selected').val();
+
+                    if (collectionBreakdown.status.toLowerCase() === 'posted') {
                         toastr.error("Unable to edit posted transaction.");
                         this.closeModal();
                     } else {
-                        this.openModal();
                         axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
-                                headers: {
-                                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                        .content
-                                }
-                            }).then(response => {
-                                var cb = response.data.data.collections;
-                                if (!cb.other_payment) {
-                                    cb.other_payment = {
-                                        cash_amount: 0,
-                                        check_amount: 0,
-                                        pos_amount: 0,
-                                        memo_amount: 0,
-                                        interbranch_amount: 0
-                                    }
-                                }
-                                this.collectionBreakdown = cb;
-                                this.closeModal();
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
-                        this.calculateCashCount(collectionBreakdown);
-                    }
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+                            }
+                        }).then(response => {
+                            var cb = response.data.data.collections;
 
+                            if (!cb.other_payment) {
+                                cb.other_payment = {
+                                    cash_amount: 0,
+                                    check_amount: 0,
+                                    pos_amount: 0,
+                                    memo_amount: 0,
+                                    interbranch_amount: 0
+                                };
+                            }
+
+                            this.initializeEditingState(cb);
+
+                            this.collectionBreakdown = cb;
+                            this.calculateCashCount(cb);
+                            this.openModal();
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            this.closeModal();
+                        });
+                    }
+                },
+                initializeEditingState: function(collectionBreakdown) {
+                    // Initialize isEditing for account officer collections
+                    if (collectionBreakdown.account_officer_collections) {
+                        collectionBreakdown.account_officer_collections.forEach((item, index) => {
+                            if (item.isEditing === undefined) {
+                                this.$set(collectionBreakdown.account_officer_collections[index], 'isEditing', false);
+                            }
+                        });
+                    }
+                    // Initialize isEditing for POS collections
+                    if (collectionBreakdown.pos_collections) {
+                        collectionBreakdown.pos_collections.forEach((item, index) => {
+                            if (item.isEditing === undefined) {
+                                this.$set(collectionBreakdown.pos_collections[index], 'isEditing', false);
+                            }
+                        });
+                    }
+                    // Initialize isEditing for branch collections
+                    if (collectionBreakdown.branch_collections) {
+                        collectionBreakdown.branch_collections.forEach((item, index) => {
+                            if (item.isEditing === undefined) {
+                                this.$set(collectionBreakdown.branch_collections[index], 'isEditing', false);
+                            }
+                        });
+                    }
                 },
                 deleteCollectionBreakdown: function(collection, collection_id) {
-                    if (collection.status === 'posted') {
+                    if (collection.status.toLowerCase() === 'posted') {
                         toastr.error("Unable to delete posted transaction.");
                         return false;
                     } else {
@@ -1642,9 +1582,19 @@
                             }
                         }).then(response => {
                             toastr.success(response.data.message);
-                            window.location.reload();
+
+                            this.selectedBranch = collection.branch_id;
+                            this.selectedDate = collection.transaction_date;
+
+                            if (this.$refs.branchFilter) {
+                                this.$refs.branchFilter.branch_id = collection.branch_id;
+                            }
+
+                            this.$nextTick(() => {
+                                this.filterCollections();
+                            });
                         }).catch(err => {
-                            toastr.success(err);
+                            toastr.error(err.response?.data?.message || 'Failed to delete collection breakdown.');
                         })
                     }
                 },
@@ -1673,8 +1623,9 @@
                         var totalCash = parseFloat(this.totalCash);
                         this.collectionBreakdown.other_payment.interbranch_amount = parseFloat(this
                             .branchCollectionTotal);
-                        this.collectionBreakdown.total = totalCash
                         this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
+                        this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
+                        this.collectionBreakdown.total = totalCash;
                     }
                     axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
@@ -1686,7 +1637,17 @@
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
                         this.closeModal();
-                        this.filterCollections();
+
+                        this.selectedBranch = this.collectionBreakdown.branch_id;
+                        this.selectedDate = this.collectionBreakdown.transaction_date;
+
+                        if (this.$refs.branchFilter) {
+                          this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
+                        }
+
+                        this.$nextTick(() => {
+                            this.filterCollections();
+                        });
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
@@ -1699,7 +1660,7 @@
                     return branch ? branch.branch_name : 'N/A'; // Return 'N/A' if no branch found
                 },
                 getSelectedBranch(branchId) {
-                    this.filter.branch_id = branchId
+                    this.selectedBranch = branchId;
                 },
                 print: function() {
                     var content = document.getElementById('printContent').innerHTML;
@@ -1711,9 +1672,10 @@
                     }, 500);
                 },
                 filterCollections: function() {
+                    this.loading = true;
                     var data = {
-                        transaction_date: this.filter.transaction_date,
-                        branch_id: this.filter.branch_id
+                        transaction_date: this.selectedDate,
+                        branch_id: this.selectedBranch
                     }
                     var url = "{{ route('reports.cashTransactionBlotter') }}"
                     axios.post(url, data)
@@ -1723,7 +1685,9 @@
                         }).catch(error => {
                             console.error(error);
                         })
-
+                        .finally(() => {
+                            this.loading = false;
+                        });
 
                 },
                 showCashBlotter: function(id, branch_id) {
@@ -2032,12 +1996,6 @@
                 this.data = @json($cash_blotter);
                 this.branches = @json($branches);
             }
-        });
-    </script>
-    <script>
-        // Disable keyboard input for the date field
-        document.getElementById('transactionDate').addEventListener('keydown', function(e) {
-            e.preventDefault();
         });
     </script>
 @endsection

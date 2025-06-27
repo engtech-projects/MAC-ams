@@ -18,16 +18,19 @@ class SubsidiaryCategory extends Model
     const DEPRE = 'DEPRE';
     const INSUR_ADD = 'INSUR-ADD';
     const ADDTIONAL_PREPAID_EXP = 'Additional Prepaid Expense';
+    const LEASE = "LEASE";
 
     protected $fillable = [
         'sub_cat_name',
         'sub_cat_type',
-        'description'
+        'description',
+        'sub_cat_code'
     ];
 
     public function accounts()
     {
-        return $this->belongsToMany(Accounts::class, 'subsidiary_category_accounts', 'sub_cat_id', 'account_id');
+        return $this->belongsToMany(Accounts::class, 'subsidiary_category_accounts', 'sub_cat_id', 'account_id')
+            ->withPivot('transaction_type');
     }
 
     public function subsidiaries()

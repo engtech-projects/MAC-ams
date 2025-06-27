@@ -110,6 +110,11 @@ class journalEntry extends Model
 
         return $query->get();
     }
+    public function scopePostedStatus($query)
+    {
+        $query->where('status', 'posted');
+    }
+    public function isPostingPeriod() {}
 
     public function details()
     {
@@ -434,12 +439,16 @@ class journalEntry extends Model
 
     public function getBankReconciliationReport(array $filter)
     {
+        $glAccounts = new Accounts();
+        $transactions = array_values($glAccounts->ledger([$filter['date_from'], $filter['date_to']], $filter['account_id']));
+        $balance = str_replace(',', '', $transactions[0]['current_balance']);
         $collections = collect($this->getJournalEntry($filter));
-        $journalEntries = $collections->map(function ($item, $key) {
+        $journalEntries = $collections->map(function ($item, $key) use ($balance) {
             $data = [
                 "account_id" => $item["account_id"],
                 "account_name" => $item["account_name"],
                 "account_number" => $item["account_number"],
+                "balance" => $balance,
                 "entries" => collect($item["entries"])->map(function ($item) {
                     return [
 

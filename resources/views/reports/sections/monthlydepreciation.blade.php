@@ -53,9 +53,9 @@
                                                     <div class="box">
                                                         <div class="form-group">
                                                             <div class="input-group">
-                                                                <select v-model="filter.category"
+                                                                <select v-model="filter.category" required
                                                                     class="form-control form-control-sm" id="branch">
-                                                                    <option :value="null" disabled selected
+                                                                    <option :value="null" disabled selected 
                                                                         class="text-uppercase">
                                                                         SELECT CATEGORY
                                                                     </option>
@@ -181,7 +181,7 @@
                                             <th>Salvage</th>
                                             <th>Rem.</th>
                                             <th>Inv.</th>
-                                            <th>Action</th>
+                                            <th v-show="filter.branch && searching">Action</th>
                                         </thead>
                                         <tbody>
 
@@ -225,8 +225,8 @@
 
 
 
-                                                <td v-if="ps[2]">
-                                                    <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'>
+                                                <td v-if="ps[2]" v-show="filter.branch && searching">
+                                                    <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'> 
                                                         <i class="fa fa-trash fa-xs"></i>
                                                     </button>
 
@@ -236,19 +236,19 @@
                                                     </button>
                                                 </td>
 
-                                                <td v-if="ps[0] == 'BRANCH TOTAL'">
+                                                <td v-if="ps[0] == 'BRANCH TOTAL'" v-show="filter.branch && searching">
                                                     <button
-                                                        v-show="processSubsidiary.length >3 && filter.branch && searching"
+                                                        v-show="ps.length > 13"
                                                         class="btn btn-primary" @click="post(ps[14])">
                                                         Post
                                                     </button>
 
 
-                                                    <button v-show="ps.length >=13 && filter.branch && searching"
+                                                    <button v-show="ps.length >= 13"
                                                         class="btn
                                                         btn-success"
-                                                        data-toggle="modal" @click="onAdd()"
-                                                        data-target="#createSubsidiaryModal" @click="add(ps[13])">
+                                                        data-toggle="modal" @click="onAdd(); add(ps[13])"
+                                                        data-target="#createSubsidiaryModal">
                                                         Add
                                                     </button>
                                                     {{-- <button v-show="processSubsidiary.length === 0" class="btn btn-success"
@@ -328,8 +328,8 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" v-show="showModal" id="createSubsidiaryModal" tabindex="-1" role="dialog"
-            aria-labelledby="createSubsidiaryModalLabel" aria-hidden="true">
+        <div class="modal fade" id="createSubsidiaryModal" tabindex="-1" role="dialog"
+            aria-labelledby="createSubsidiaryModalLabel">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -340,11 +340,10 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <form>
+                    <form @submit.prevent="processAction()">
+                        <div class="modal-body">
                             <div class="form-group">
                                 <div class="row">
-
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Inventory Number: </label>
                                         <input type="text" v-model="subsidiary.sub_code" class="form-control"
@@ -356,100 +355,122 @@
                                             id="sub_name" required>
                                         <input v-if="isEdit" type="hidden" name="_method" value="PUT">
                                     </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Date Obtained: </label>
                                         <input type="date" v-model="subsidiary.sub_date" class="form-control"
                                             id="sub_code" required>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Number of Terms: </label>
-                                        <input type="text" v-model="subsidiary.sub_no_depre" class="form-control"
-                                            id="sub_address" required>
+                                    <div class="col-md-3"
+                                        v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label"> Original Life: </label>
+                                        <input type="text" :value="subsidiary.sub_no_depre" class="form-control"
+                                            id="original_life" readonly>
                                     </div>
-                                </div>
 
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
+                                    <div class="col-md-3"
+                                        v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label">New Life: </label>
+                                        <input type="number" v-model="subsidiary.new_life" class="form-control"
+                                            id="new_life">
+                                        <small v-if="validationErrors.newLifeTooSmall" class="text-danger">
+                                            ❌ New life must be greater than or equal to used value.
+                                        </small>
+                                    </div>
+
+                                    <div class="col-md-6" v-if="!isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label">Life: </label>
+                                        <input type="number" v-model="subsidiary.sub_no_depre" class="form-control"
+                                            id="sub_address" required min="1" step="1">
+                                    </div>
+
                                     <div class="col-md-6">
                                         <label for="message-text" class="col-form-label">Amount:</label>
                                         <input type="text" v-model="subsidiary.sub_amount" class="form-control"
-                                            @change="formatTextField()" id="sub_tel" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Monthly Amortization</label>
-                                        <input type="text" disabled v-model="monthlyAmort" class="form-control"
-                                            id="sub_acct_no" required>
+                                            @change="formatTextField()" id="sub_tel" :readonly="isEdit" required>
                                     </div>
 
-                                </div>
-
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
+                                    <div class="col-md-6"
+                                        v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label">Monthly Amortization 
+                                            <span v-if="isEdit" class="text-success ms-2"
+                                                style="font-size: 0.875rem;">*Note: unexpensed / remaining
+                                                life)*</span>
+                                        </label>
+                                        <input type="text" disabled :value="amortToDisplay" class="form-control"
+                                            id="sub_acct_no">
+                                    </div>
+                                    <div class="col-md-6" v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
-                                            id="sub_salvage" required>
+                                            id="sub_salvage">
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Salvage:</label>
-
-
+                                    <!-- <div class="col-md-6" v-if="isEdit">
+                                        <label for="message-text" class="col-form-label">Salvage:
+                                            <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
+                                                expand (rate/ 100) * unexpensed</span>
+                                        </label>
                                         <input type="text" v-model="ratePercentage" class="form-control">
+                                    </div> -->
+                                    <div class="col-md-6" v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label">Salvage:
+                                        </label>
+                                        <input type="text" v-model="ratePercentageAmount" class="form-control">
                                     </div>
-                                </div>
 
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
+
+                                    <div class="col-md-6" v-if="isEdit"
+                                        v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Used:</label>
                                         <input type="number" v-model="subsidiary.sub_no_amort" class="form-control"
-                                            id="sub_no_amort">
+                                            id="sub_no_amort" readonly>
                                     </div>
-                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense'"
-                                        class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Expense</label>
-                                        <input :readonly="isEdit" type="text" @change="formatPrepaidAmountField()"
-                                            v-model="prepaid_amount" class="form-control">
+                                    <div class="col-md-6"
+                                        v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
+                                        <label for="message-text" class="col-form-label"> Remaining Life </label>
+                                        <input type="text" :value="remaining_life" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-md-6"
+                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit">
+                                        <label for="message-text" class="col-form-label">Expensed</label>
+                                        <input type="text" :value="displayPrepaidAmount" class="form-control" :readonly="isEdit">
                                     </div>
 
-                                    <div v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit"
-                                        class="col-md-12">
-
-                                        <label for="message-text" class="col-form-label">Expense(Should be less than
-                                            @{{ subsidiary.unexpensed }})</label>
+                                    <div class="col-md-6"
+                                        v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit">
+                                        <label for="message-text" class="col-form-label">Expense <span class="text-success ms-2"
+                                                style="font-size: 0.875rem;">*(Note: Should be less than
+                                            @{{ subsidiary.unexpensed }})*</span></label>
                                         <input type="text" @change="formatToPrepaidAmountField()"
                                             v-model="to_add_prepaid_amount" class="form-control">
                                     </div>
+                                    <div class="col-md-6"
+                                        v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
+                                        <label for="expensed" class="col-form-label"> Total Expensed: </label>
+                                        <input type="text" :value="formattedExpensed" class="form-control"
+                                            id="expensed" readonly>
+                                    </div>
+                                    <div class="col-md-6"
+                                        v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
+                                        <label for="unexpensed-text" class="col-form-label"> Total Unexpensed: </label>
+                                        <input type="text" :value="formattedUnexpensed" class="form-control"
+                                            id="unexpensed" readonly>
+                                    </div>
 
-
-
-                                    <!-- <div class="col-md-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="message-text" class="col-form-label">Rate Percentage(%)::</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
                                 </div>
-
                             </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button @click="processAction()" type="submit" class="btn btn-primary">Save</button>
-                    </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
         </div>
 
     </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- /.content -->
     <script>
         new Vue({
@@ -457,7 +478,6 @@
             data: {
                 branches: @json($branches),
                 sub_categories: @json($subsidiary_categories),
-                showModal: true,
                 reportType: '',
                 sub_month: '',
                 monthlyAmortization: 0,
@@ -465,6 +485,7 @@
                 rate_percentage: 0,
                 type: '',
                 isEdit: false,
+                isInitializing: false,
                 subId: null,
                 newSub: null,
                 searching: false,
@@ -477,25 +498,6 @@
                     account_id: '',
                     type: ''
                 },
-                /* filter: {
-
-                    "branch": {
-                        "branch_id": 3,
-                        "branch_code": "00003",
-                        "branch_name": "BRANCH 3 - GINGOOG BRANCH",
-                        "branch_alias": "00003-BRANCH 3 - GINGOOG BRANCH"
-                    },
-                    "subsidiary_id": "",
-                    "category": {
-                        "sub_cat_id": 51,
-                        "sub_cat_name": "Additional Prepaid Expense"
-                    },
-                    "from": "",
-                    "to": "2025-04-08",
-                    "account_id": "",
-                    "type": ""
-
-                }, */
                 subAmount: 0,
                 prepaid_amount: 0,
                 to_add_prepaid_amount: 0,
@@ -504,7 +506,7 @@
                     sub_code: null,
                     sub_no_amort: 0,
                     sub_amount: 0,
-                    sub_no_depre: 0,
+                    sub_no_depre: '',
                     sub_cat_id: null,
                     sub_per_branch: null,
                     sub_salvage: 0,
@@ -512,17 +514,43 @@
                     branch_id: '',
                     prepaid_expense: null,
                     prepaid_expense_payment: null,
+                    expensed: 0,
+                    unexpensed: 0,
+                    new_life: '',
+                    used: '',
+                    remaining_life: 0,
+                    original_salvage_rate: 0,
+                    original_life: 0,
+                },
+                validationErrors: {
+                    newLifeTooSmall: false
                 },
                 incomeExpense: {
                     income: [],
                     expense: []
                 },
-                subsidiaryAll: [],
+                subsidiaryAll: {},
                 balance: 0,
                 url: "{{ route('reports.post-monthly-depreciation') }}",
                 search: "{{ route('reports.monthly-depreciation-report-search') }}",
             },
             computed: {
+                formattedExpensed() {
+                    return this.subsidiary.expensed || '₱0.00';
+                },
+
+                formattedUnexpensed() {
+                    return this.subsidiary.unexpensed || '₱0.00';
+                },
+                amortToDisplay() {
+                    const isEditing = this.isEdit;
+                    const newLife = Number(this.subsidiary.new_life);
+
+                    if (isEditing && newLife > 0) {
+                        return this.newAmort;
+                    }
+                    return this.monthlyAmort;
+                },
                 monthlyDepreciationReportType: function() {
                     var branch = this.filter.branch_id;
                     if (this.type == '') {
@@ -545,19 +573,87 @@
 
                     return this.type
                 },
-                monthlyAmort: function() {
-                    var amount = this.subsidiary.sub_amount;
-                    if (typeof this.subsidiary.sub_amount === 'string') {
-                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                monthlyAmort() {
+                    const used = Number(this.subsidiary.sub_no_amort) || 0;
+                    
+                    if (used === 0) {
+                        // New item - use simple calculation
+                        let amount = this.subsidiary.sub_amount;
+                        if (typeof amount === 'string') {
+                            amount = Number(amount.replace(/[^0-9.-]+/g, ""));
+                        }
+                        const rate = Number(this.subsidiary.sub_salvage) || 0;
+                        const salvage = (rate / 100) * amount;
+                        const life = Number(this.subsidiary.sub_no_depre) || 1;
+                        const amort = (amount - salvage) / life;
+                        return isNaN(amort) ? 0 : this.formatCurrency(amort);
+                    } else {
+                        // Used item - calculate directly without using remaining_life computed property
+                        const totalLife = Number(this.subsidiary.sub_no_depre) || 1;
+                        const remaining = Math.max(totalLife - used, 1);
+                        
+                        // Convert unexpensed to number (handle both string and number cases)
+                        let unexpensed = this.subsidiary.unexpensed;
+                        if (typeof unexpensed === 'string') {
+                            unexpensed = Number(unexpensed.replace(/[^0-9.-]+/g, ""));
+                        } else {
+                            unexpensed = Number(unexpensed) || 0;
+                        }
+                        
+                        const amort = unexpensed / remaining;
+                        return isNaN(amort) ? 0 : this.formatCurrency(amort);
                     }
-                    this.monthlyAmortization = amount / this.subsidiary.sub_no_depre;
-                    if (this.subsidiary.sub_salvage > 0) {
-                        this.ratePercentage / this.subsidiary.sub_no_depre;
-                    }
-
-                    return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
                 },
+                newAmort() {
+                    const newLife = Number(this.subsidiary.new_life) || 0;
+                    const used = Number(this.subsidiary.sub_no_amort) || 0;
+                    
+                    if (used === 0) {
+                        // New item with new life
+                        let amount = this.subsidiary.sub_amount;
+                        if (typeof amount === 'string') {
+                            amount = Number(amount.replace(/[^0-9.-]+/g, ""));
+                        }
+                        const rate = Number(this.subsidiary.sub_salvage) || 0;
+                        const salvage = (rate / 100) * amount;
+                        const amort = (amount - salvage) / newLife;
+                        return isNaN(amort) ? 0 : this.formatCurrency(amort);
+                    } else {
+                        // Used item - calculate directly without using remaining_life computed property
+                        const remaining = Math.max(newLife - used, 1);
+                        
+                        // Convert unexpensed to number (handle both string and number cases)
+                        let unexpensed = this.subsidiary.unexpensed;
+                        if (typeof unexpensed === 'string') {
+                            unexpensed = Number(unexpensed.replace(/[^0-9.-]+/g, ""));
+                        } else {
+                            unexpensed = Number(unexpensed) || 0;
+                        }
+                        
+                        const amort = unexpensed / remaining;
+                        return isNaN(amort) ? 0 : this.formatCurrency(amort);
+                    }
+                },
+                remaining_life() {
+                    if (this.subsidiary.new_life) {
+                        const new_life = Number(this.subsidiary.new_life) || 0;
+                        const used = Number(this.subsidiary.sub_no_amort) || 0;
+                        const remaining = new_life - used;
+                        return remaining > 0 ? remaining : 0;
+                    }
+                    return this.subsidiary.sub_no_depre - this.subsidiary.sub_no_amort;
+                },
+                displayPrepaidAmount() {
+                    if (this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' && this.isEdit && this.to_add_prepaid_amount) {
+                        var currentExpensed = Number((this.prepaid_amount || '0').toString().replace(/[^0-9\.-]+/g, ""));
+                        var additionalAmount = Number((this.to_add_prepaid_amount || '0').toString().replace(/[^0-9\.-]+/g, ""));
+                        return this.formatCurrency(currentExpensed + additionalAmount);
+                    }
+                    return this.prepaid_amount;
+                },
+
                 amort: function() {
+
                     var amount = this.subsidiary.sub_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
@@ -571,11 +667,21 @@
 
 
                 ratePercentage: function() {
+                    var unexpensed = this.subsidiary.unexpensed;
+                    if (typeof this.subsidiary.unexpensed === 'string') {
+                        var unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""))
+                    }
+                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * unexpensed
+                    return this.formatCurrency(this.subsidiary.rate_percentage);
+                },
+                ratePercentageAmount: function() {
                     var amount = this.subsidiary.sub_amount;
                     if (typeof this.subsidiary.sub_amount === 'string') {
-                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
-                    this.subsidiary.rate_percentage = (this.subsidiary.sub_salvage / 100) * amount
+                    let salvage = Number(this.subsidiary.sub_salvage);
+                    salvage = isNaN(salvage) ? 0 : salvage;
+                    this.subsidiary.rate_percentage = (salvage / 100) * amount;
                     return this.formatCurrency(this.subsidiary.rate_percentage);
                 },
                 processSubsidiary: function() {
@@ -650,80 +756,68 @@
                                 var subsidiary = branch[k];
                                 no += 1;
 
-
-                                if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                    total_expensed += parseFloat(subsidiary
-                                        .prepaid_expense);
-                                    totalUnpostedPayments += parseFloat(subsidiary.unposted_payments);
-                                    console.log(totalUnpostedPayments);
-                                } else {
-                                    total_expensed += parseFloat(subsidiary.expensed)
-                                }
-                                if (j == subsidiary.branch) {
-                                    sub_ids.push(subsidiary.sub_id)
-                                    let val = [no + ' - ' + subsidiary.sub_code,
-                                        subsidiary.sub_name,
-                                        subsidiary.sub_date,
-                                        this.formatCurrency(subsidiary.sub_amount),
-                                        this.formatCurrency(subsidiary.monthly_amort),
-                                        subsidiary.sub_no_depre,
-                                        subsidiary.sub_no_amort,
-                                    ]
-
+                                if (subsidiary.total_amort != 0) {
                                     if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                        val.push(this.formatCurrency(subsidiary.prepaid_expense))
+                                        total_expensed += parseFloat(subsidiary
+                                            .prepaid_expense);
+                                        totalUnpostedPayments += parseFloat(subsidiary.unposted_payments);
                                     } else {
-                                        val.push(this.formatCurrency(subsidiary.expensed))
+                                        total_expensed += parseFloat(subsidiary.expensed)
                                     }
-                                    console.log(subsidiary);
-                                    val.push(this.formatCurrency(subsidiary.unexpensed),
-                                        this.formatCurrency(subsidiary.due_amort),
-                                        this.formatCurrency(subsidiary.salvage),
-                                        subsidiary.rem,
-                                        subsidiary.inv,
-                                        subsidiary.sub_id,
-                                        subsidiary.sub_salvage,
-                                        subsidiary.sub_code,
-                                        subsidiary.sub_cat_id,
-                                        subsidiary.sub_per_branch)
-                                    rows.push(val);
-                                    /* rows.push([no + ' - ' + subsidiary.sub_code,
-                                        subsidiary.sub_name,
-                                        subsidiary.sub_date,
-                                        this.formatCurrency(subsidiary.sub_amount),
-                                        this.formatCurrency(subsidiary.monthly_amort),
-                                        subsidiary.sub_no_depre,
-                                        subsidiary.sub_no_amort,
-                                        subsidiary.prepaid_expense && this.filter.category
-                                        ?.sub_cat_name === this.prepaid_expense ? subsidiary
-                                        .prepaid_expense : 0,
-                                        this.formatCurrency(subsidiary.unexpensed),
-                                        this.formatCurrency(subsidiary.due_amort),
-                                        this.formatCurrency(subsidiary.salvage),
-                                        this.formatCurrency(subsidiary.rem),
-                                        subsidiary.inv,
-                                        subsidiary.sub_id,
-                                        subsidiary.sub_salvage,
-                                        subsidiary.sub_code,
-                                        subsidiary.sub_cat_id,
-                                        subsidiary.sub_per_branch
+                                    if (j == subsidiary.branch) {
+                                        sub_ids.push(subsidiary.sub_id)
+                                        let val = [no + ' - ' + subsidiary.sub_code,
+                                            subsidiary.sub_name,
+                                            subsidiary.sub_date,
+                                            this.formatCurrency(subsidiary.sub_amount),
+                                            this.formatCurrency(subsidiary.monthly_amort),
+                                            subsidiary.sub_no_depre,
+                                            subsidiary.sub_no_amort,
+                                        ]
 
-                                    ]); */
-
-                                    totalAmount += parseFloat(subsidiary.sub_amount),
-                                        total_monthly_amort += parseFloat(subsidiary.monthly_amort)
-                                    total_no_depre += parseInt(subsidiary.sub_no_depre)
-                                    total_no_amort += parseFloat(subsidiary.sub_no_amort)
-                                    total_amort += parseFloat(subsidiary.total_amort)
-                                    total_used += parseInt(subsidiary.sub_no_amort)
-                                    total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                    total_due_amort += parseFloat(subsidiary.due_amort)
-                                    total_sub_salvage += parseFloat(subsidiary.salvage)
-                                    total_rem += parseFloat(subsidiary.rem)
-                                    total_inv += parseFloat(subsidiary.inv)
-                                    prepaid_expensed += parseFloat(subsidiary.prepaid_expense)
+                                        if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
+                                            val.push(this.formatCurrency(subsidiary.prepaid_expense))
+                                        } else {
+                                            val.push(this.formatCurrency(subsidiary.expensed))
+                                        }
+                                        val.push(
+                                            this.formatCurrency(subsidiary.unexpensed),
+                                            this.formatCurrency(
+                                                parseFloat(subsidiary.sub_no_amort) === parseFloat(
+                                                    subsidiary.sub_no_depre) ?
+                                                0.00 :
+                                                parseFloat(subsidiary.monthly_due)),
+                                            this.formatCurrency(subsidiary.salvage),
+                                            subsidiary.rem,
+                                            subsidiary.inv,
+                                            subsidiary.sub_id,
+                                            subsidiary.sub_salvage,
+                                            subsidiary.sub_code,
+                                            subsidiary.sub_cat_id,
+                                            subsidiary.sub_per_branch)
+                                        rows.push(val);
 
 
+                                        totalAmount += parseFloat(subsidiary.sub_amount),
+                                            total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                        total_no_depre += parseInt(subsidiary.sub_no_depre)
+                                        total_no_amort += parseFloat(subsidiary.sub_no_amort)
+                                        total_amort += parseFloat(subsidiary.total_amort)
+                                        total_used += parseInt(subsidiary.sub_no_amort)
+                                        total_unexpensed += parseFloat(subsidiary.unexpensed)
+                                        if (parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary
+                                                .sub_no_depre)) {
+                                            total_due_amort += 0.00;
+                                        } else {
+                                            total_due_amort += parseFloat(subsidiary.monthly_due);
+                                        }
+                                        total_sub_salvage += parseFloat(subsidiary.salvage)
+                                        total_rem += parseFloat(subsidiary.rem)
+                                        total_inv += parseFloat(subsidiary.inv)
+                                        prepaid_expensed += parseFloat(subsidiary.prepaid_expense)
+
+
+                                    }
                                 }
 
 
@@ -804,7 +898,7 @@
                             gTotalInv, branch, data
                         ]);
                     }
-                    if (this.subsidiaryAll.length === 0) {
+                    if (Object.keys(this.subsidiaryAll).length === 0) {
                         rows.push(['No Data Found.']);
                         rows.push(['',
                             '',
@@ -918,7 +1012,169 @@
 
 
             },
+            watch: {
+                'subsidiary.new_life'(newVal) {
+                    const newLife = Number(newVal);
+                    const used = Number(this.subsidiary.sub_no_amort);
+                    this.validationErrors.newLifeTooSmall = newLife < used;
+                    !this.isInitializing ? this.recomputeExpUnexp() : null;
+                },
+                'subsidiary.used'(newVal) {
+                    const newLife = Number(this.subsidiary.new_life);
+                    const used = Number(newVal);
+                    this.validationErrors.newLifeTooSmall = newLife < used;
+                },
+                'subsidiary.sub_amount': function() {
+                    !this.isInitializing ? this.recomputeExpUnexp() : null;
+                },
+                'subsidiary.sub_salvage': function() {
+                    !this.isInitializing ? this.recomputeExpUnexp() : null;
+                },
+                'subsidiary.sub_no_amort': function() {
+                    !this.isInitializing ? this.recomputeExpUnexp() : null;
+                }
+            },
+
             methods: {
+                recomputeExpUnexp() {
+                    let amount = this.subsidiary.sub_amount;
+                    if (typeof amount === 'string') {
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ''));
+                    }
+                    
+                    const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
+                    const newLife = parseInt(this.subsidiary.new_life ?? this.subsidiary.sub_no_depre ?? 1);
+                    
+                    // FIX: Better handling of empty/erased rates
+                    const oldRate = parseFloat(this.subsidiary.original_salvage_rate || 0) || 0;
+                    
+                    // FIX: Explicitly handle empty, null, undefined, or whitespace-only strings as 0
+                    let newRateInput = this.subsidiary.sub_salvage;
+                    let newRate = 0;
+                    
+                    if (newRateInput !== null && newRateInput !== undefined && newRateInput !== '') {
+                        // Only parse if there's actually a value
+                        if (typeof newRateInput === 'string') {
+                            newRateInput = newRateInput.trim(); // Remove whitespace
+                            if (newRateInput !== '') {
+                                newRate = parseFloat(newRateInput) || 0;
+                            }
+                        } else {
+                            newRate = parseFloat(newRateInput) || 0;
+                        }
+                    }
+                    
+                    const lifeToUse = newLife > 0 ? newLife : 1;
+                    
+                    // Calculate original monthly depreciation (without salvage initially)
+                    const originalMonthlyBase = amount / lifeToUse;
+                    
+                    // Parse stored expensed value (handle formatted strings)
+                    let storedExpensed = this.subsidiary.expensed;
+                    if (typeof storedExpensed === 'string') {
+                        storedExpensed = Number(storedExpensed.replace(/[^0-9\.-]+/g, ""));
+                    }
+                    storedExpensed = isNaN(storedExpensed) ? 0 : storedExpensed;
+                    
+                    // Parse stored unexpensed value (handle formatted strings)
+                    let storedUnexpensed = this.subsidiary.unexpensed;
+                    if (typeof storedUnexpensed === 'string') {
+                        storedUnexpensed = Number(storedUnexpensed.replace(/[^0-9\.-]+/g, ""));
+                    }
+                    storedUnexpensed = isNaN(storedUnexpensed) ? 0 : storedUnexpensed;
+                    
+                    let expensed, unexpensed;
+                    
+                    if (used === 0) {
+                        // NEW ITEM: Apply salvage to full amount
+                        const salvageValue = (newRate / 100) * amount;
+                        const depreciableAmount = amount - salvageValue;
+                        const monthlyDue = depreciableAmount / lifeToUse;
+                        
+                        expensed = 0;
+                        unexpensed = depreciableAmount;
+                        
+                    } else {
+                        // USED ITEM: More complex logic
+                        
+                        if (oldRate === 0 && newRate > 0) {
+                            // Case: No prior rate → New rate
+                            // Only subtract new salvage from unexpensed (don't touch expensed)
+                            expensed = storedExpensed; // Keep expensed unchanged
+                            const newSalvage = (newRate / 100) * amount;
+                            unexpensed = storedUnexpensed - newSalvage; // Subtract salvage from unexpensed
+                            
+                        } else if (oldRate === 0 && newRate === 0) {
+                            // Case: No prior rate and still no rate - keep original stored values
+                            expensed = storedExpensed;
+                            unexpensed = storedUnexpensed;
+                            
+                        } else if (oldRate > 0 && newRate !== oldRate) {
+                            // Case: Existing rate → Different rate
+                            if (newRate === 0) {
+                                // Rate cleared completely - revert to original stored values
+                                expensed = storedExpensed;
+                                unexpensed = storedUnexpensed;
+                            } else {
+                                // Rate changed: Adjust unexpensed based on salvage difference
+                                // Keep expensed unchanged: amount = expensed + salvage + unexpensed
+                                expensed = storedExpensed; // Don't touch expensed
+                                
+                                const oldSalvage = (oldRate / 100) * amount;
+                                const newSalvage = (newRate / 100) * amount;
+                                const salvageDifference = newSalvage - oldSalvage;
+                                
+                                if (newRate > oldRate) {
+                                    // New rate is higher: more salvage, less unexpensed
+                                    unexpensed = storedUnexpensed - salvageDifference;
+                                } else {
+                                    // New rate is lower: less salvage, more unexpensed  
+                                    unexpensed = storedUnexpensed - salvageDifference; // This adds because salvageDifference is negative
+                                }
+                            }
+                            
+                        } else {
+                            // Case: Same rate or life change only OR oldRate=0 and newRate=0 (no change)
+                            const hasValidNewLife = newLife > 0 && !isNaN(newLife);
+                            const originalLife = this.subsidiary.sub_no_depre || this.subsidiary.original_life;
+                            
+                            if (hasValidNewLife && newLife != originalLife) {
+                                // Check if new life is less than or equal to used months
+                                if (newLife <= used) {
+                                    // Do nothing - invalid life change
+                                    expensed = storedExpensed;
+                                    unexpensed = storedUnexpensed;
+                                } else {
+                                    // Life changed and is valid: KEEP existing expensed (already depreciated)
+                                    expensed = storedExpensed; // Don't touch what's already been expensed
+                                    
+                                    const salvageValue = (newRate / 100) * amount;
+                                    const totalDepreciableAmount = amount - salvageValue;
+                                    
+                                    // Calculate new monthly due for remaining months
+                                    const remainingAmount = totalDepreciableAmount - expensed;
+                                    const remainingLife = newLife - used;
+                                    
+                                    // Unexpensed is what's left to be depreciated over remaining life
+                                    unexpensed = remainingAmount;
+                                }
+                                
+                            } else {
+                                // FIX: No changes (including oldRate=0, newRate=0) - keep stored values
+                                expensed = storedExpensed;
+                                unexpensed = storedUnexpensed;
+                            }
+                        }
+                    }
+                    
+                    // Ensure no negative values
+                    expensed = Math.max(0, expensed);
+                    unexpensed = Math.max(0, unexpensed);
+                    
+                    // Round to 2 decimal places and format back to currency
+                    this.subsidiary.expensed = this.formatCurrency(Math.round(expensed * 100) / 100);
+                    this.subsidiary.unexpensed = this.formatCurrency(Math.round(unexpensed * 100) / 100);
+                },
                 onSearch: function() {
                     this.searching = false;
                 },
@@ -927,14 +1183,8 @@
                     this.resetForm();
                 },
                 toAddPrepaidAmount() {
-                    var unexpensed = Number(this.subsidiary.unexpensed.replace(/[^0-9\.-]+/g, ""))
                     var prepaidAmount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g, ""))
-                    if (prepaidAmount > unexpensed) {
-                        alert('Value should be less than or equal to unexpensed');
-                    } else {
-                        prepaidAmount = parseFloat(this.prepaid_amount) + prepaidAmount
-                    }
-
+                    prepaidAmount = parseFloat(this.prepaid_amount) + prepaidAmount
                     this.prepaid_amount = this.formatCurrency(prepaidAmount);
                 },
                 formatCurrency: function(number) {
@@ -962,7 +1212,7 @@
                 },
                 rowStyleSubsidiaryListing: function(p, i, r) {
                     var style = '';
-                    if (i >= 6) {
+                    if (i >= 3) {
                         style += 'text-right';
                     }
                     if (i == 0) {
@@ -989,20 +1239,61 @@
                     return current_month;
                 },
                 post: function(data) {
-                    this.resetForm();
-                    data.branch_id = this.filter.branch.branch_id;
-                    axios.post(this.url, data, {
-                        headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                .content
-                        }
-                    }).then(response => {
-                        toastr.success(response.data.message);
-                        this.newSub = response.data.data;
-                        // window.reload();
-                    }).catch(err => {
-                        console.error(err)
-                    })
+                    this.resetForm()
+                    if (data) {
+                        data.branch_id = this.filter.branch.branch_id;
+                        axios.post(this.url, data, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+                            this.newSub = response.data.data;
+                            // window.reload();
+                        }).catch(err => {
+                            console.error(err)
+                        })
+                    } else {
+                        toastr.warning("No data available");
+                    }
+                },
+
+                getRawNewAmort() {
+
+                    let amount = this.subsidiary.sub_amount;
+                    if (typeof amount === 'string') {
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
+                    }
+
+                    let unexpensed = this.subsidiary.unexpensed;
+                    if (typeof unexpensed === 'string') {
+                        unexpensed = Number(unexpensed.replace(/[^0-9\.-]+/g, ""));
+                    }
+                    const salvageRate = Number(this.subsidiary.sub_salvage) || 0;
+                    const salvage = (salvageRate / 100) * unexpensed;
+
+                    const remaining = this.remaining_life || 1; // computed property or fallback to 1!
+
+                    const amort = (unexpensed - salvage) / remaining;
+                    console.log("due:", amort);
+                    return isNaN(amort) ? 0 : amort;
+                },
+                calculateMonthlyAmort() {
+                    let amount = this.subsidiary.sub_amount;
+
+                    // Convert string to number if needed
+                    if (typeof amount === 'string') {
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ''));
+                    }
+
+                    const salvage = Number(this.subsidiary.sub_salvage) || 0;
+                    const months = Number(this.subsidiary.sub_no_depre) || 1;
+
+                    const amort = (amount - salvage) / months;
+
+                    // ✅ Assign value to data property
+                    this.monthlyAmortization = isNaN(amort) ? 0 : amort;
                 },
                 add: function(subsidiary) {
                     this.isEdit = false;
@@ -1035,12 +1326,12 @@
                                         this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, "")) */
 
                 },
+
                 formatPrepaidAmountField() {
                     this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
                 },
                 formatToPrepaidAmountField() {
                     this.to_add_prepaid_amount = this.formatCurrency(this.to_add_prepaid_amount);
-                    this.toAddPrepaidAmount();
 
                 },
                 formatTextToNumberFormat() {
@@ -1056,26 +1347,34 @@
                     return typeof val === 'string' || val instanceof String;
                 },
                 processEdit: function(sub) {
-
+                    this.isInitializing = true;
                     this.isEdit = true;
+                    this.to_add_prepaid_amount = '';
                     this.subId = sub[13];
-                    this.monthlyAmortization = sub[4];
-                    this.subsidiary.sub_date = sub[2];
-                    this.subsidiary.sub_cat_id = sub[16];
-                    this.subsidiary.sub_per_branch = sub[17];
-                    this.subsidiary.sub_name = sub[1];
-                    this.subsidiary.sub_code = sub[15];
-                    this.subsidiary.sub_no_amort = sub[6];
-                    this.subsidiary.sub_amount = sub[3];
-                    this.subsidiary.sub_salvage = parseInt(sub[14]);
-                    this.subsidiary.sub_rate_percentage = sub[6];
-                    this.subsidiary.sub_date_of_depreciation = sub[2];
-                    this.subsidiary.sub_no_depre = sub[5];
-                    this.subsidiary.prepaid_expense = sub[7];
-                    this.subsidiary.unexpensed = sub[8];
-                    this.prepaid_amount = Number(sub[7].replace(/[^0-9\.-]+/g, ""))
-                    // this.subsidiary.sub_no_amort = sub[]
+                    this.subsidiary = {
+                        sub_code: sub[15],
+                        sub_name: sub[1],
+                        sub_date: sub[2],
+                        sub_cat_id: sub[16],
+                        sub_per_branch: sub[17],
+                        sub_no_amort: parseInt(sub[6]),
+                        sub_amount: sub[3],
+                        sub_salvage: sub[14] !== null ? parseFloat(sub[14]) : 0,
+                        sub_no_depre: parseInt(sub[5]),
+                        prepaid_expense: sub[7],
+                        expensed: sub[7],
+                        unexpensed: sub[8],
+                        sub_rate_percentage: parseInt(sub[6]),
+                        sub_date_of_depreciation: sub[2],
+                        original_salvage_rate: sub[14] !== null ? parseFloat(sub[14]) : 0,
+                        original_life: parseInt(sub[5] ?? 1),
+                    };
 
+                    this.monthlyAmortization = sub[4];
+                    this.prepaid_amount = sub[7];
+                    this.$nextTick(() => {
+                        this.isInitializing = false;
+                    });
                 },
                 resetForm: function() {
                     this.subsidiary = {
@@ -1083,7 +1382,7 @@
                         sub_code: null,
                         sub_no_amort: 0,
                         sub_amount: 0,
-                        sub_no_depre: 0,
+                        sub_no_depre: '',
                         sub_per_branch: null,
                         sub_salvage: 0,
                         rate_percentage: 0,
@@ -1095,14 +1394,24 @@
                             sub_id: null
                         }
                     }
-                    this.to_add_prepaid_amount = 0;
+                    this.to_add_prepaid_amount = '';
                     this.prepaid_amount = 0;
                 },
                 createSubsidiary: function() {
                     this.isEdit = false;
                     this.subsidiary.sub_no_amort = 0;
                     var amount = this.subsidiary.sub_amount;
-                    this.subsidiary.prepaid_expense = this.prepaid_amount;
+
+
+                    let prepaid = this.prepaid_amount ?? '';
+                    this.subsidiary.prepaid_expense = parseFloat(
+                        String(prepaid).replace(/[₱,]/g, '') || '0'
+                    );
+                    //this.subsidiary.prepaid_expense = parseFloat(String(this.prepaid_amount).replace(/[₱,]/g, ''))
+                    // this.subsidiary.prepaid_expense = parseFloat(
+                    //             this.prepaid_amount.replace(/[₱,]/g, '')
+                    //             );
+
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
@@ -1119,8 +1428,10 @@
                     }).then(response => {
                         toastr.success(response.data.message);
                         this.addSubsidiary(response.data.data);
+                        document.activeElement.blur();
                         $('#createSubsidiaryModal').modal('hide');
                         this.resetForm();
+                        this.fetchSubAll();
                     }).catch(err => {
                         var errors = err.response.data.errors;
                         var messages = [];
@@ -1135,24 +1446,20 @@
                     })
                 },
                 addSubsidiary: function(data) {
-                    var filters = this.filter;
+                    const filters = this.filter;
+                    const category = filters.category.sub_cat_name;
+                    const branch = filters.branch.branch_alias;
 
-
-                    if (this.subsidiaryAll.length === 0) {
-                        this.subsidiaryAll = {};
-                        if (!this.subsidiaryAll[filters.category.sub_cat_name]) {
-                            this.subsidiaryAll[filters.category.sub_cat_name] = {};
-                        }
-                        if (!this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias]) {
-                            this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] = [];
-                        }
-
+                    // Initialize if undefined
+                    if (!this.subsidiaryAll[category]) {
+                        this.$set(this.subsidiaryAll, category, {});
                     }
 
-                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
-                        .branch_alias
-                    ].push(data);
+                    if (!this.subsidiaryAll[category][branch]) {
+                        this.$set(this.subsidiaryAll[category], branch, []);
+                    }
 
+                    this.subsidiaryAll[category][branch].push(data);
                 },
                 updateSubsidiary: function(data) {
                     var filters = this.filter;
@@ -1170,32 +1477,62 @@
 
                 },
                 deleteSubsidiary: function(subId) {
-                    var filters = this.filter;
-                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
-                        .branch_alias
-                    ]
-                    subsidiaries.forEach((sub, index) => {
-                        if (sub.sub_id === subId) {
-                            subsidiaries.splice(index, 1);
+                    const filters = this.filter;
+                    const category = filters.category.sub_cat_name;
+                    const branch = filters.branch.branch_alias;
+
+                    const subsidiaries = this.subsidiaryAll[category][branch];
+                    const index = subsidiaries.findIndex(sub => sub.sub_id === subId);
+
+                    if (index !== -1) {
+                        subsidiaries.splice(index, 1);
+                    }
+
+                    // Optional: cleanup if array becomes empty
+                    if (subsidiaries.length === 0) {
+                        this.$delete(this.subsidiaryAll[category], branch);
+                        if (Object.keys(this.subsidiaryAll[category]).length === 0) {
+                            this.$delete(this.subsidiaryAll, category);
                         }
-                    });
-                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
-                        subsidiaries;
-
-
+                    }
                 },
                 editSubsidiary: function(subId) {
                     this.isEdit = true;
-                    this.formatTextToNumberFormat();
-                    var amount = this.subsidiary.sub_amount;
-                    this.subsidiary.prepaid_expense = this.prepaid_amount;
-                    this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount
-                    this.subsidiary.category = this.filter.category;
-                    if (typeof this.subsidiary.sub_amount === 'string') {
-                        var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
+                    let amount = this.subsidiary.sub_amount;
+
+                    if (typeof amount === 'string') {
+                        amount = Number(amount.replace(/[^0-9\.-]+/g, ""));
                     }
+
+                    const newLife = parseInt(this.subsidiary.new_life ?? 0);
+                    const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
+
+                    if (newLife > 0 && newLife < used) {
+                        toastr.error("New life must be greater than or equal to months already used.");
+                        return; // stop the update
+                    }
+
+                    if (this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' && this.to_add_prepaid_amount) {
+                        var unexpensed = Number(this.subsidiary.unexpensed.replace(/[^0-9\.-]+/g, ""));
+                        var toAddAmountStr = this.to_add_prepaid_amount ? String(this.to_add_prepaid_amount) : '0';
+                        var toAddAmount = Number(toAddAmountStr.replace(/[^0-9\.-]+/g, ""));
+                        
+                        if (toAddAmount > unexpensed) {
+                            toastr.error('Value should be less than or equal to unexpensed');
+                            return; // stop the update
+                        }
+                    }
+
+                    this.formatTextToNumberFormat();
                     this.subsidiary.sub_amount = amount;
-                    // this.subsidiary.sub_no_amort = 0;
+                    this.subsidiary.prepaid_expense = this.prepaid_amount;
+                    this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount;
+                    this.subsidiary.category = this.filter.category;
+                    this.subsidiary.original_salvage_rate = parseFloat(this.subsidiary.sub_salvage ?? 0);
+                    this.subsidiary.original_life = parseInt(this.subsidiary.sub_no_depre ?? 1);
+
+                    this.recomputeExpUnexp();
+
                     axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
@@ -1204,12 +1541,16 @@
                         }
                     }).then(response => {
                         toastr.success(response.data.message);
-                        this.updateSubsidiary(response.data.data)
-                        $('#createSubsidiaryModal').modal('hide');
 
+                        this.updateSubsidiary(response.data.data)
+                        document.activeElement.blur();
+                        $('#createSubsidiaryModal').modal('hide');
+                        this.fetchSubAll();
                         setTimeout(() => {
                             this.resetForm();
                             this.isEdit = false;
+
+                            // this.getSubsidiaries();
                         }, 100);
                     }).catch(err => {
                         var errors = err.response.data.errors;
@@ -1223,6 +1564,10 @@
                             }
                         }
                         toastr.error(messages);
+                        this.$nextTick(() => {
+                            this.formatTextField();
+                            this.formatToPrepaidAmountField();
+                        });
                     })
                 },
                 deleteSub: function(data) {
@@ -1259,6 +1604,21 @@
                 },
 
             },
+            getSubsidiaries() {
+                axios.get('/MAC-ams/subsidiaries')
+                    .then(res => {
+                        this.subsidiaries = res.data.data;
+                    })
+                    .catch(err => {
+                        toastr.error("Failed to load subsidiaries.");
+                    });
+            },
+            mounted() {
+                this.calculateMonthlyAmort();
+                $('#createSubsidiaryModal').on('hidden.bs.modal', () => {
+                    this.resetForm();
+                });
+            }
 
         });
     </script>
