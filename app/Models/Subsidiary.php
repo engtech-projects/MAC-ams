@@ -92,7 +92,8 @@ class Subsidiary extends Model
         $subNoDepre = intval($this->sub_no_depre);
 
         // Prevent division by zero
-        return ($subNoDepre > 0) ? (($amount - $salvage) / $subNoDepre) : 0.0;
+        //return ($subNoDepre > 0) ? (($amount - $salvage) / $subNoDepre) : 0.0;
+        return floatval($this->monthly_due ?? 0);
     }
     public function getRemAttribute()
     {

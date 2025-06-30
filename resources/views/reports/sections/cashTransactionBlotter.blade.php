@@ -1645,9 +1645,9 @@
                           this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
                         }
 
-                        this.$nextTick(() => {
-                            this.filterCollections();
-                        });
+                        // this.$nextTick(() => {
+                        //     this.filterCollections();
+                        // });
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
