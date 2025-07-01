@@ -242,7 +242,7 @@
                                                         <label class="label-normal" for="book_ref">Account(Debit)</label>
                                                         <select name="account_id_debit" ref="debit"
                                                             class="select2 form-control"
-                                                            id="select-account-debit account-id-debit" required>
+                                                            id="select-account-debit" required>
                                                             <option v-for="account in accounts" :key="account.account_id"
                                                                 :value="account.account_id">
                                                                 @{{ account.account_name }}</option>
