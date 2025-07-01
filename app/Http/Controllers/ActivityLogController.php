@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 use Spatie\Activitylog\Models\Activity;
 
 class ActivityLogController extends Controller
@@ -17,8 +18,29 @@ class ActivityLogController extends Controller
     public function index()
     {
         $activityLogs = Activity::all();
+
+        $data = $activityLogs->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'log_name' => $item->log_name,
+                'description' => $item->description,
+                'subject_type' => Str::headline(class_basename($item->subject_type)),
+                'subject' => $item->subject->id,
+                'subject' => [
+                    'id' => $item->subject_id,
+                    'data' => $item->subject
+                ],
+                'event' => $item->event,
+                'causer_type' => Str::headline(class_basename($item->causer_type)),
+                'causer' => $item->causer->username,
+                'causer' => $item->causer->username,
+                'user_role' => $item->causer->userRole,
+                'properties' => $item->changes(),
+                'created_at' => $item->created_at->format('H:i d, M Y')
+            ];
+        });
         return new JsonResponse([
-            'data' => $activityLogs,
+            'data' => $data,
             'message' => "Successfully fetched."
         ], JsonResponse::HTTP_OK);
     }

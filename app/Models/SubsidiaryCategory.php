@@ -41,9 +41,11 @@ class SubsidiaryCategory extends Model
     {
         return LogOptions::defaults()
             ->setDescriptionForEvent(fn(string $eventName) => $this->getModelName() . " has been {$eventName}")
+            ->useLogName('Subsidiary Category LogPac')
             ->logOnly([
                 'sub_cat_name',
-                'sub_cat_type'
+                'sub_cat_type',
+                'sub_cat_code',
             ]);
     }
 

@@ -86,6 +86,7 @@ function checkUserHasAccessModule($type, $moduleName)
         if (count($accessLists) > 0) {
             $accessbilities = $user->accessibilities->toArray();
             foreach ($accessbilities as $accessibility) {
+                /*          dd($accessibility['sub_module_list']['al_id'], $accessibility['sub_module_list']['al_id'], $accessLists[0]); */
                 if (isset($accessibility['sub_module_list']['al_id']) && $accessibility['sub_module_list']['al_id'] == $accessLists[0]) {
                     return true;
                 }

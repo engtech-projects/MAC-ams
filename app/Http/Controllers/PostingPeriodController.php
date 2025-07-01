@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class PostingPeriodController extends Controller
@@ -16,6 +17,7 @@ class PostingPeriodController extends Controller
 
     public function index(Request $request)
     {
+
         $year = $request['year'];
         $postingPeriods = PostingPeriod::where('posting_period', 'like', "$year-%")->get();
 

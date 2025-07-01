@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class journalEntry extends Model
@@ -37,6 +39,23 @@ class journalEntry extends Model
         'payee',
         'remarks',
     ];
+
+    public function getModelName()
+    {
+        return Str::headline(class_basename($this));
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) => $this->getModelName() . " has been {$eventName}")
+            ->useLogName('Journal Entry Category')
+            ->logOnly([
+                'sub_cat_name',
+                'sub_cat_type',
+                'sub_cat_code',
+            ]);
+    }
 
     public function branch()
     {
