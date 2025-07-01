@@ -520,7 +520,7 @@
                 saveCategory() {
                     this.category.account_id_credit = this.$refs.credit.value;
                     this.category.account_id_debit = this.$refs.debit.value;
-                    if (this.category.sub_cat_type == null || this.category.sub_cat_type == "depre") {
+                    if (this.category.sub_cat_type == "" || this.category.sub_cat_type == "depre") {
 
                         axios.post('/MAC-ams/subsidiary-category', this.category, {
                             headers: {
