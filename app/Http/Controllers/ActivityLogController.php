@@ -15,9 +15,15 @@ class ActivityLogController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $activityLogs = Activity::all();
+
+        $activityLogs = Activity::when($request['event'], function ($query) use ($request) {
+            $query->where('event', $request['event']);
+        })->when($request['subject_type'], function ($query) use ($request) {
+            $type = preg_replace('/\s+/', '', $request['subject_type']);
+            $query->where('subject_type', $request['subject_type']);
+        })->get();
 
         $data = $activityLogs->map(function ($item) {
             return [
@@ -25,7 +31,7 @@ class ActivityLogController extends Controller
                 'log_name' => $item->log_name,
                 'description' => $item->description,
                 'subject_type' => Str::headline(class_basename($item->subject_type)),
-                'subject' => $item->subject->id,
+                'subject' => $item->subject?->id,
                 'subject' => [
                     'id' => $item->subject_id,
                     'data' => $item->subject
@@ -64,7 +70,30 @@ class ActivityLogController extends Controller
      */
     public function show($id)
     {
-        //
+        $activity = Activity::find($id);
+
+        $activity = [
+            'id' => $activity->id,
+            'log_name' => $activity->log_name,
+            'description' => $activity->description,
+            'subject_type' => Str::headline(class_basename($activity->subject_type)),
+            'subject' => $activity->subject?->id,
+            'subject' => [
+                'id' => $activity->subject_id,
+                'data' => $activity->subject
+            ],
+            'event' => $activity->event,
+            'causer_type' => Str::headline(class_basename($activity->causer_type)),
+            'causer' => $activity->causer->username,
+            'causer' => $activity->causer->username,
+            'user_role' => $activity->causer->userRole,
+            'properties' => $activity->changes(),
+            'created_at' => $activity->created_at->format('H:i d, M Y')
+        ];
+        return new JsonResponse([
+            'data' => $activity,
+            'message' => "Activity fetched."
+        ], JsonResponse::HTTP_OK);
     }
 
     /**

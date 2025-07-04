@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class journalEntry extends Model
 {
     use HasFactory;
+    use LogsActivity;
     protected $table = 'journal_entry';
     protected $primaryKey = 'journal_id';
     public $timestamps = true;
@@ -39,6 +41,7 @@ class journalEntry extends Model
         'payee',
         'remarks',
     ];
+    protected static $recordEvents = ['deleted', 'created'];
 
     public function getModelName()
     {
@@ -48,13 +51,17 @@ class journalEntry extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $this->getModelName() . " has been {$eventName}")
-            ->useLogName('Journal Entry Category')
+            ->setDescriptionForEvent(fn(string $eventName) =>  $eventName)
             ->logOnly([
-                'sub_cat_name',
-                'sub_cat_type',
-                'sub_cat_code',
-            ]);
+                'journal_no',
+                'journal_date',
+                'branch_id',
+                'book_id',
+                'amount',
+                'status',
+                'remarks',
+            ])
+            ->useLogName('Journal Entry');
     }
 
     public function branch()

@@ -353,9 +353,8 @@
                                                             <div class="form-group">
                                                                 <div class="row">
                                                                     <div class="col-md-6">
-                                                                        <select name="account_id" ref="subject_type"
-                                                                            class="select2 form-control form-control-sm"
-                                                                            id="filter-type" value="" required>
+                                                                        <select class="form-control"
+                                                                            v-model="filter.subject_type">
                                                                             <option disabled value="">Subject Type
                                                                             </option>
                                                                             <option value="Subsidiary">Subsidiary</option>
@@ -365,20 +364,19 @@
                                                                         </select>
                                                                     </div>
                                                                     <div class="col-md-4">
-                                                                        <select name="event" ref="event"
-                                                                            class="select2 form-control form-control-sm"
-                                                                            id="filter-event" value="" required>
-                                                                            <option disabled value="">Select Event
+                                                                        <select class="form-control"
+                                                                            v-model="filter.event">
+                                                                            <option value="">Select Event
                                                                             </option>
                                                                             <option value="created">created</option>
-                                                                            <option value="created">updated</option>
-                                                                            <option value="created">deleted</option>
+                                                                            <option value="updated">updated</option>
+                                                                            <option value="deleted">deleted</option>
 
                                                                         </select>
                                                                     </div>
                                                                     <div class="col-md-2">
-                                                                        <input type="button" class="btn btn-success"
-                                                                            value="search">
+                                                                        <input type="button" @click="searchActivityLog()"
+                                                                            class="btn btn-success" value="search">
                                                                     </div>
                                                                 </div>
 
@@ -400,11 +398,9 @@
                                                                 <th width="15%">Log Name</th>
                                                                 <th>Description</th>
                                                                 <th>Subject Type</th>
-                                                                <th>Subject ID</th>
                                                                 <th>Log Type</th>
                                                                 <th>Log By</th>
                                                                 <th>Role</th>
-                                                                <th>Properties</th>
                                                                 <th>Event</th>
                                                                 <th>Date</th>
                                                                 <th width="13%">Action</th>
@@ -413,16 +409,27 @@
                                                                 <tr v-for="activityLog in activityLogs"
                                                                     :key="activityLog.id">
                                                                     <td>@{{ activityLog.log_name }}</td>
-                                                                    <td>@{{ activityLog.description }}</td>
+                                                                    <td class="text-uppercase">@{{ activityLog.event }}</td>
                                                                     <td>@{{ activityLog.subject_type }}</td>
-                                                                    <td>@{{ activityLog.subject.id }}</td>
+
                                                                     <td>@{{ activityLog.causer_type }}</td>
                                                                     <td>@{{ activityLog.causer }}</td>
                                                                     <td>@{{ activityLog.user_role.role_name }}</td>
-                                                                    <td>@{{ activityLog.properties }}</td>
-                                                                    <td>@{{ activityLog.event }}</td>
+                                                                    <td>@{{ activityLog.description }}</td>
                                                                     <td>@{{ activityLog.created_at }}</td>
-                                                                    <td></td>
+                                                                    <td>
+
+                                                                        <button type="button"
+                                                                            class="btn btn-xs btn-success"
+                                                                            @click="viewActivityLog(activityLog.id)"
+                                                                            data-toggle="modal"
+                                                                            data-target="#view-activity">
+                                                                            <i class="fa fa-eye"></i>
+                                                                        </button>
+                                                                        <button class="btn btn-xs btn-danger">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </button>
+                                                                    </td>
                                                                 </tr>
 
                                                             </tbody>
@@ -483,21 +490,7 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                        {{-- <input type="number" @change="validateYear()" :min="minYear"
-                                                :max="maxYear" v-model="year" class="form-control">
-                                            <p v-if="error" class="text-red">@{{ error }}</p> --}}
-
-
-                                        {{-- <div class="col-md-2">
-                                            <select @change="handleChange()" class="form-control"
-                                                v-model="postingPeriodYear">
-                                                <option value="">Select Year</option>
-                                                <option v-for="(postingYear,i) in postingPeriodYears"
-                                                    :key="i" :value="postingYear">
-                                                    @{{ postingYear }}
-                                                </option>
-                                            </select>
-                                        </> --}} <div class="col-md-2">
+                                        <div class="col-md-2">
                                             <button @click="searchPostingPeriod()" class="btn btn-primary">
                                                 Search</button>
                                         </div>
@@ -569,12 +562,132 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="view-activity" tabindex="-1" role="dialog" aria-labelledby="viewActivityLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="viewActivityLabel">Activity Log - @{{ activityLog.log_name }}</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-bold">
+                                        Log Info
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    Subject:
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <ul>
+                                                        <li v-for="(item, index) in activityLog.subject?.data"
+                                                            :key="index">
+                                                            @{{ index }} : <br> @{{ item }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    Description:
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @{{ activityLog.event }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    Log by:
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @{{ activityLog.causer }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    Event:
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @{{ activityLog.description }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-bold">
+                                        Properties
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header text-bold">
+                                                    Attributes
+                                                </div>
+                                                <ul class="list-group list-group-flush">
+                                                    <ul>
+                                                        <li v-for="(item, index) in activityLog.properties?.attributes"
+                                                            :key="index">
+                                                            @{{ index }} : <br> @{{ item }}
+                                                        </li>
+                                                    </ul>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header text-bold">
+                                                    Old
+                                                </div>
+                                                <ul class="list-group list-group-flush">
+                                                    <ul>
+                                                        <li v-for="(item, index) in activityLog.properties?.old"
+                                                            :key="index">
+                                                            @{{ index }} : <br> @{{ item }}
+                                                        </li>
+                                                    </ul>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
     <script>
         new Vue({
             el: '#app',
             data: {
+                filter: {
+                    'subject_type': null,
+                    'event': null
+                },
                 activityLogs: [],
+                activityLog: {},
                 postingPeriods: [],
                 year: null,
                 postingPeriodYears: null,
@@ -627,14 +740,36 @@
                 }
             },
             methods: {
+                isObject(val) {
+                    return val?.attributes !== null && typeof val?.attributes === 'object' && !Array.isArray(val);
+                },
+                searchActivityLog() {
+                    this.fetchActivityLogs();
+                },
                 fetchActivityLogs() {
                     axios.get('/MAC-ams/activity-logs', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
+                        },
+                        params: {
+                            'event': this.filter.event,
+                            'subject_type': this.filter.subject_type
                         }
                     }).then(response => {
                         this.activityLogs = response.data.data;
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                },
+                viewActivityLog(id) {
+                    axios.get('/MAC-ams/activity-logs/' + id, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        this.activityLog = response.data.data;
                     }).catch(err => {
                         console.error(err)
                     })

@@ -34,19 +34,15 @@ class SubsidiaryCategory extends Model
     protected static $recordEvents = ['deleted', 'created', 'updated'];
     public function getModelName()
     {
-        return Str::headline(class_basename($this));
+
+        return class_basename($this);
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $this->getModelName() . " has been {$eventName}")
-            ->useLogName('Subsidiary Category LogPac')
-            ->logOnly([
-                'sub_cat_name',
-                'sub_cat_type',
-                'sub_cat_code',
-            ]);
+            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
+            ->useLogName('Subsidiary Category');
     }
 
     public function accounts()

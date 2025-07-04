@@ -25,9 +25,11 @@ use App\Models\journalEntryDetails;
 use App\Models\Accounting;
 use App\Models\PostingPeriod;
 use Carbon\Carbon;
+use Spatie\Activitylog\LogOptions;
 
 class JournalController extends MainController
 {
+
     public function index()
     {
         $this->journalEntry();
@@ -123,7 +125,12 @@ class JournalController extends MainController
     {
         $journal = JournalEntry::find($request->id);
         $journal->status = 'cancelled';
+        $replicate = $journal->replicate();
+
         if ($journal->save()) {
+            activity("Journal Entry")->event($journal->proc_get_status)->performedOn($journal)
+                ->withProperties(['attributes' => $journal, 'old' => $replicate])
+                ->log("updated");
             return response()->json(['message' => $journal->status]);
         }
         return response()->json(['message' => 'error']);
@@ -132,12 +139,13 @@ class JournalController extends MainController
     {
 
         $journalEntry = JournalEntry::findOrFail($request->journal_entry['edit_journal_id']);
+        $replicate = $journalEntry->replicate();
 
         $period = new PostingPeriod();
         $open_periods = $period->openStatus()->get();
 
 
-        if(count ($open_periods) < 1) {
+        if (count($open_periods) < 1) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cannot update journal entry - no posting periods are currently open.',
@@ -156,7 +164,7 @@ class JournalController extends MainController
                 // }
                 if ($isOpen) {
                     try {
-                        DB::transaction(function () use ($request, $journalEntry) {
+                        DB::transaction(function () use ($request, $journalEntry, $replicate) {
                             $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
                             $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
 
@@ -177,6 +185,9 @@ class JournalController extends MainController
                             // Update journal entry details
                             $journalEntry->details()->delete();
                             $journalEntry->details()->createMany($request->details);
+                            activity("Journal Entry")->event("edit")->performedOn($journalEntry)
+                                ->withProperties(['attributes' => $journalEntry, 'old' => $replicate])
+                                ->log("updated");
                         });
                         $matchFound = true;
                     } catch (Exception $e) {
@@ -194,6 +205,8 @@ class JournalController extends MainController
                 ], 201);
             }
         }
+        activity()
+            ->log('Edit');
         return response()->json([
             'message' => 'Journal Entry updated successfully.',
             'success' => true,
@@ -203,14 +216,18 @@ class JournalController extends MainController
     public function JournalEntryPostUnpost(Request $request)
     {
         $journal = JournalEntry::find($request->journal_id);
+        $replicate = $journal->replicate();
 
         // Toggle the status between 'posted' and 'unposted'
         $journal->status = ($journal->status === 'posted') ? 'unposted' : 'posted';
+        $logDescription = $journal->status === 'posted' ? 'post' : 'unpost';
 
         if ($journal->save()) {
+            activity("Journal Entry")->event($logDescription)->performedOn($journal)
+                ->withProperties(['attributes' => $journal, 'old' => $replicate])
+                ->log("updated");
             return response()->json(['message' => $journal->status]);
         }
-
         return response()->json(['message' => 'error']);
     }
     public function searchJournalEntry(Request $request)

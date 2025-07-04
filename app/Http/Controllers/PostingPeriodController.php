@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\PostingPeriod;
-use Carbon\Carbon;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\PostingPeriod;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
@@ -101,12 +102,28 @@ class PostingPeriodController extends Controller
     public function update(Request $request, PostingPeriod $postingPeriod)
     {
         $data = $request->all();
-        $postingPeriod->update([
-            'posting_period' => $data['posting_period'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'status' => $data['status']
-        ]);
+
+        $replicate = $postingPeriod->replicate();
+
+        try {
+            DB::transaction(function () use ($postingPeriod, $data, $replicate) {
+                $postingPeriod->update([
+                    'posting_period' => $data['posting_period'],
+                    'start_date' => $data['start_date'],
+                    'end_date' => $data['end_date'],
+                    'status' => $data['status']
+                ]);
+
+                activity("Journal Entry")->event("edit")->performedOn($postingPeriod)
+                    ->withProperties(['attributes' => $postingPeriod, 'old' => $replicate])
+                    ->log("updated");
+            });
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
         return new JsonResponse([
             'message' => 'Successfully updated.'
         ], JsonResponse::HTTP_OK);
