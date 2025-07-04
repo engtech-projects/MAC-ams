@@ -249,4 +249,6 @@ Route::post('journal/saveJournalEntry', [JournalController::class, 'saveJournalE
 
 Route::get('accounting', [AccountingController::class, 'index'])->name('accounting');
 
-Route::resource('activity-logs', ActivityLogController::class);
+Route::prefix('system-setup')->group(function () {
+    Route::resource('activity-logs', ActivityLogController::class);
+});

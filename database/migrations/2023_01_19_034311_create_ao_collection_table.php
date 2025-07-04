@@ -21,13 +21,13 @@ class CreateAoCollectionTable extends Migration
                 $table->timestamps();
             });
 
-            Schema::table('ao_collection', function (Blueprint $table) {
+            /* Schema::table('ao_collection', function (Blueprint $table) {
                 $table->unsignedBigInteger('accountofficer_id');
                 $table->foreign('accountofficer_id')->references('accountofficer_id')->on('account_officer');
 
                 $table->unsignedBigInteger('cashblotter_id');
                 $table->foreign('cashblotter_id')->references('cashblotter_id')->on('cash_blotter');
-            });
+            }); */
         }
     }
 

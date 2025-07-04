@@ -128,10 +128,9 @@ class JournalController extends MainController
         $replicate = $journal->replicate();
 
         if ($journal->save()) {
-            activity("Journal Entry")->event($journal->proc_get_status)->performedOn($journal)
+            activity("Journal Entry")->event("cancelled")->performedOn($journal)
                 ->withProperties(['attributes' => $journal, 'old' => $replicate])
-                ->log("updated");
-            return response()->json(['message' => $journal->status]);
+                ->log("cancelled");
         }
         return response()->json(['message' => 'error']);
     }

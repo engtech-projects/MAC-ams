@@ -42,7 +42,7 @@ class SubsidiaryCategory extends Model
     {
         return LogOptions::defaults()
             ->setDescriptionForEvent(fn(string $eventName) => $eventName)
-            ->useLogName('Subsidiary Category');
+            ->useLogName('Category File');
     }
 
     public function accounts()

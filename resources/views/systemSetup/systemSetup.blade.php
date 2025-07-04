@@ -112,7 +112,7 @@
                                             aria-selected="false"><i class="nav-icon fas fa-tachometer-alt"></i> Category
                                             File</a>
                                     @endif
-                                    @if (checkUserHasAccessModule('sub-module', 'activity-logs'))
+                                    @if (checkUserHasAccessModule('sub-module', 'system-setup/activity-logs'))
                                         <a class="nav-link sysnav" id="v-pills-activity-logs-tab" data-toggle="pill"
                                             href="#v-pills-activity-logs" role="tab"
                                             aria-controls="v-pills-activity-logs" aria-selected="false"><i
@@ -747,7 +747,7 @@
                     this.fetchActivityLogs();
                 },
                 fetchActivityLogs() {
-                    axios.get('/MAC-ams/activity-logs', {
+                    axios.get('/MAC-ams/system-setup/activity-logs', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -763,7 +763,7 @@
                     })
                 },
                 viewActivityLog(id) {
-                    axios.get('/MAC-ams/activity-logs/' + id, {
+                    axios.get('/MAC-ams/system-setup/activity-logs/' + id, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content

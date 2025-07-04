@@ -30,10 +30,10 @@ class CreateCashBreakdownTable extends Migration
                 $table->timestamps();
             });
 
-            Schema::table('cash_breakdown', function (Blueprint $table) {
+            /*  Schema::table('cash_breakdown', function (Blueprint $table) {
                 $table->unsignedBigInteger('cashblotter_id');
                 $table->foreign('cashblotter_id')->references('cashblotter_id')->on('cash_blotter');
-            });
+            }); */
         }
     }
 

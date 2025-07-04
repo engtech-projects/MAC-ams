@@ -17,7 +17,7 @@ class CreateUserBranchTable extends Migration
             Schema::create('user_branch', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
-                $table->unsignedInteger('branch_id');
+                $table->unsignedBigInteger('branch_id');
                 $table->foreign('user_id')->references('id')->on('users');
                 $table->foreign('branch_id')->references('branch_id')->on('branch');
                 $table->timestamps();
