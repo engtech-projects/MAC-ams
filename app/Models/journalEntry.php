@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class journalEntry extends Model
 {
     use HasFactory;
+    use LogsActivity;
     protected $table = 'journal_entry';
     protected $primaryKey = 'journal_id';
     public $timestamps = true;
@@ -37,6 +41,28 @@ class journalEntry extends Model
         'payee',
         'remarks',
     ];
+    protected static $recordEvents = ['deleted', 'created'];
+
+    public function getModelName()
+    {
+        return Str::headline(class_basename($this));
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) =>  $eventName)
+            ->logOnly([
+                'journal_no',
+                'journal_date',
+                'branch_id',
+                'book_id',
+                'amount',
+                'status',
+                'remarks',
+            ])
+            ->useLogName('Journal Entry');
+    }
 
     public function branch()
     {

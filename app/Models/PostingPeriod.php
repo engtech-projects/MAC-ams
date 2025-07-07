@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PostingPeriod extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'start_date',
@@ -17,8 +20,24 @@ class PostingPeriod extends Model
         'status',
         'posting_period'
     ];
+    protected static $recordEvents = ['deleted', 'created'];
 
     const OPEN_STATUS = 'open';
+
+    public function getModelName()
+    {
+
+        return class_basename($this);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
+            ->useLogName('Posting Period');
+    }
+
+
 
     public function scopeOpenStatus(Builder $query): void
     {

@@ -13,10 +13,12 @@ class AddColumnsAccountCategory extends Migration
      */
     public function up()
     {
-        Schema::table('account_category', function (Blueprint $table) {
-            //
-            $table->string('to_increase');
-        });
+        if (!Schema::hasTable('account_category')) {
+            Schema::table('account_category', function (Blueprint $table) {
+                //
+                $table->string('to_increase');
+            });
+        }
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Models\Subsidiary;
 use App\Models\SubsidiaryCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Spatie\Activitylog\Models\Activity;
 
 class SubsidiaryCategoryController extends Controller
 {
@@ -37,6 +38,13 @@ class SubsidiaryCategoryController extends Controller
                 $data['account_id_debit'] => ['transaction_type' => 'debit'],
             ];
             $category->accounts()->attach($categoryAccounts);
+            /*   activity()
+                ->performedOn($category)
+                ->log('created');
+            $lastActivity = Activity::all()->last(); //returns the last logged activity
+
+            $lastActivity->subject; //returns the model that was passed to `performedOn`;
+            dd($lastActivity); */
         } catch (\Throwable $th) {
             return new JsonResponse([
                 'message' => $th->getMessage()

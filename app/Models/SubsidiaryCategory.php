@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Support\Str;
+use Spatie\Activitylog\Contracts\Activity;
 
 class SubsidiaryCategory extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $table = 'subsidiary_category';
     protected $primaryKey = 'sub_cat_id';
@@ -26,6 +31,19 @@ class SubsidiaryCategory extends Model
         'description',
         'sub_cat_code'
     ];
+    protected static $recordEvents = ['deleted', 'created', 'updated'];
+    public function getModelName()
+    {
+
+        return class_basename($this);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
+            ->useLogName('Category File');
+    }
 
     public function accounts()
     {

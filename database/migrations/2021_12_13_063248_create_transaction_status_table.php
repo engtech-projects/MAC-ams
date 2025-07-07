@@ -13,13 +13,15 @@ class CreateTransactionStatusTable extends Migration
      */
     public function up()
     {
-        Schema::create('transaction_status', function (Blueprint $table) {
-            $table->increments('transaction_status_id');
-            $table->string('status')->nullable();
-			$table->integer('default')->nullable();
-			$table->integer('transaction_type_id')->nullable();
-			$table->timestamps();
-        });
+        if (!Schema::hasTable('transaction_status')) {
+            Schema::create('transaction_status', function (Blueprint $table) {
+                $table->increments('transaction_status_id');
+                $table->string('status')->nullable();
+                $table->integer('default')->nullable();
+                $table->integer('transaction_type_id')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
