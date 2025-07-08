@@ -624,7 +624,7 @@
                 }
 
                 flatpickr(this.$refs.datepicker, {
-                    defaultDate: validToday,
+                    // defaultDate: validToday,
                     enable: date_range,
                     dateFormat: 'Y-m-d'
                 })
