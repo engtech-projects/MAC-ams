@@ -612,10 +612,19 @@
                 })
                 const firstDefault = dates.length > 0 ? dates[0].end_date : null;
 
+                // Check if today's date is within any range
+                const today = new Date().toISOString().split('T')[0]; // format: 'YYYY-MM-DD'
+                let validToday = null;
 
+                for (let period of date_range) {
+                    if (today >= period.from && today <= period.to) {
+                        validToday = today;
+                        break;
+                    }
+                }
 
                 flatpickr(this.$refs.datepicker, {
-                    defaultDate: firstDefault,
+                    // defaultDate: validToday,
                     enable: date_range,
                     dateFormat: 'Y-m-d'
                 })
