@@ -20,10 +20,10 @@ class DashboardController extends MainController
 
 
 
-        return new JsonResource([
-            'data' => $data,
+        /* return new JsonResource([
+            'data' => $title,
             'message' => 'Successfully Fetched.'
-        ], JsonResponse::HTTP_OK);
+        ], JsonResponse::HTTP_OK); */
         return view('dashboard.dashboard')->with(compact('title'));
     }
 }
