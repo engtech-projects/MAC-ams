@@ -15,18 +15,23 @@ class UpdateDepreciationPaymentsTable extends Migration
     public function up()
     {
         //
-        $subsidiaries = Subsidiary::where('monthly_due', '>', 0)->whereHas('depreciation_payments')->get();
-        Subsidiary::where('monthly_due', '>', 0)->whereHas('depreciation_payments')->withoutEvents(function () use ($subsidiaries) {
-            $subsidiaries->forEach(function ($subsidiary) {
+        $subsidiaries = Subsidiary::where('monthly_due', '>', 0)->whereHas('depreciation_payments', function ($query) {
+            $query->whereDate('date_paid', '>', '2024-04-30');
+        })->get();
+
+        Subsidiary::withoutEvents(function () use ($subsidiaries) {
+            $subsidiaries->map(function ($subsidiary) {
                 $used = $subsidiary->sub_no_amort;
+                $number_of_paid = $subsidiary->depreciation_payments->count();
+                $used = $used - $number_of_paid;
                 $payments = $subsidiary->depreciation_payments;
                 $depreciation_payments = [];
                 foreach ($payments as $payment) {
-                    $amount = $payment->amount / $used;
+                    $amount = $used != 0 ? $payment->amount / $used : 0;
                     foreach (range(1, $used) as $i) {
                         $depreciation_payments[] = [
                             'sub_id' => $subsidiary->sub_id,
-                            'amount' => $amount,
+                            'amount' => round($amount, 2),
                             'date_paid' => now(),
                         ];
                     }
