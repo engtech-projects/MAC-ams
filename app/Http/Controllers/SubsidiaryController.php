@@ -157,6 +157,8 @@ class SubsidiaryController extends Controller
                 ], 422);
             }
         }
+        $subCategory = SubsidiaryCategory::find($request->sub_cat_id);
+        $hasDepreInType = $subCategory && stripos($subCategory->sub_cat_type, 'depre') !== false;
 
             $rules = [
             'sub_code' => 'string|required',
@@ -167,7 +169,7 @@ class SubsidiaryController extends Controller
             'sub_date' => 'date|nullable',
             'sub_cat_id' => 'integer|required',
             'sub_salvage' => 'numeric|nullable',
-            'sub_amount' => 'numeric|nullable|gt:0',
+            'sub_amount' => $hasDepreInType ? 'nullable|numeric|sometimes|gt:0' : 'nullable|numeric|sometimes',
             'sub_no_depre' => 'numeric|nullable',
             'sub_per_branch' => 'string|nullable',
             'monthly_due' => 'sometimes|numeric',
@@ -332,12 +334,7 @@ class SubsidiaryController extends Controller
             $subsidiary['unexpensed'] = $subsidiary->unexpensed;
         }
 
-        \Log::info('Original Attributes', $subsidiary->getAttributes());
-        \Log::info('Merged Attributes with due_amort', array_merge(
-            $subsidiary->getAttributes(),
-            ['due_amort' => $monthlyDue]
-        ));
-
+       
         return response()->json([
             'message' => 'Successfully updated.',
             'data' => array_merge(
