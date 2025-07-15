@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Subsidiary;
 use Illuminate\Http\Request;
-use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class DashboardController extends MainController
 {
@@ -20,11 +21,13 @@ class DashboardController extends MainController
 
 
 
-        /* $subsidiaries = Subsidiary::where('monthly_due', '>', 0)->whereHas('depreciation_payments', function ($query) {
-            $query->whereDate('date_paid', '>', '2024-04-30');
+        $subsidiaries = Subsidiary::where('monthly_due', '>', 0)->whereHas('depreciation_payments', function ($query) {
+            $query->whereDate('date_paid', '>', Subsidiary::DEPRECIATION_LATEST_DATE);
         })->get();
 
-        $subsidiaries->map(function ($subsidiary) {
+        $date = Carbon::parse(Subsidiary::DEPRECIATION_LATEST_DATE);
+
+        $subsidiaries->map(function ($subsidiary) use ($date) {
             $used = $subsidiary->sub_no_amort;
             $number_of_paid = $subsidiary->depreciation_payments->count();
             $used = $used - $number_of_paid;
@@ -36,13 +39,13 @@ class DashboardController extends MainController
                     $depreciation_payments[] = [
                         'sub_id' => $subsidiary->sub_id,
                         'amount' => round($amount, 2),
-                        'date_paid' => now(),
+                        'date_paid' => $date->addMonth()->format('Y-m-d'),
                     ];
                 }
                 $subsidiary->depreciation_payments()->createMany($depreciation_payments);
                 $payment->delete();
             }
-        }); */
+        });
         return view('dashboard.dashboard')->with(compact('title'));
     }
 }

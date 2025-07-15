@@ -14,6 +14,7 @@ class Subsidiary extends Model
     protected $primaryKey = 'sub_id';
 
     const SUBSIDIARY_OFFICE = 5;
+    const DEPRECIATION_LATEST_DATE = '2024-04-30';
 
     protected $fillable = [
         'sub_code',
