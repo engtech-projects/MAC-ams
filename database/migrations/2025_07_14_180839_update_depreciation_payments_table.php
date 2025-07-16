@@ -21,22 +21,22 @@ class UpdateDepreciationPaymentsTable extends Migration
         })->get();
         $orginalDate = Carbon::parse(Subsidiary::DEPRECIATION_LATEST_DATE);
         Subsidiary::withoutEvents(function () use ($subsidiaries, $orginalDate) {
-            $newDate = $orginalDate->copy();
-            $subsidiaries->map(function ($subsidiary) use ($newDate) {
+
+            $subsidiaries->map(function ($subsidiary) use ($orginalDate) {
+                $newDate = $orginalDate->copy();
                 $used = $subsidiary->sub_no_amort;
-                $number_of_paid = $subsidiary->depreciation_payments->count();
-                $used = $used - $number_of_paid;
                 $payments = $subsidiary->depreciation_payments;
                 $depreciation_payments = [];
 
                 foreach ($payments as $payment) {
-                    $amount = $used != 0 ? $payment->amount / $used : 0;
+                    $amount = $used != 0 ? $subsidiary->sub_amount / $used : 0;
                     foreach (range(1, $used) as $i) {
                         $depreciation_payments[] = [
                             'sub_id' => $subsidiary->sub_id,
                             'amount' => round($amount, 2),
-                            'date_paid' => $newDate->addMonth()->day(30)->format('Y-m-d'),
+                            'date_paid' => $newDate->format('Y-m-d'),
                         ];
+                        $newDate = $newDate->startOfMonth()->subMonth()->endOfMonth();
                     }
                     $subsidiary->depreciation_payments()->createMany($depreciation_payments);
                     $payment->delete();

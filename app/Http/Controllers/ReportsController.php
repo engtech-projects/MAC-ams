@@ -213,10 +213,16 @@ class ReportsController extends MainController
 
         $result = $subsidiary->getDepreciation($request->category['sub_cat_id'], $branch, $date);
 
-        $data = $result->map(function ($value) use ($isPosted, $lastEntryDate, $filteredDate) {
+        $data = $result->map(function ($value) use ($isPosted, $date, $filteredDate) {
             if ($isPosted) {
                 $value->sub_no_amort = max(0, $value->sub_no_amort - 1);
             }
+            /*             dd([
+                "date filter" => $date,
+                "data" => $value->depreciation_payments->toArray(),
+                "total" => $value->depreciation_payments->sum('amount')
+            ]); */
+            $expensed = $value->depreciation_payments->sum('amount');
 
             $subs  = [];
 
@@ -270,7 +276,7 @@ class ReportsController extends MainController
             } else {
                 // For other categories, use the model's unexpensed attribute
                 $subs['unexpensed'] = $value->unexpensed;
-                $subs['expensed'] = $value->expensed;
+                $subs['expensed'] = $expensed;
             }
 
             $subs['salvage'] = $value->salvage;

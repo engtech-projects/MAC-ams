@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Subsidiary extends Model
 {
@@ -62,9 +63,17 @@ class Subsidiary extends Model
     public function deleteSubsidiary($id) {}
     public function getDepreciation($categoryId, $branch, $date)
     {
+        $date = Carbon::parse($date);
         $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId) {
             $query->where('sub_cat_id', $categoryId);
-        })->with(['depreciation_payments', 'prepaid_expense.prepaid_expense_payments'])
+        })->with(['depreciation_payments' => function ($query) use ($date) {
+            $query->when($date, function ($query) use ($date) {
+                $month = $date->month;
+                $year = $date->year;
+                $query->whereDate('date_paid', '<=', $date);
+                /* $query->whereMonth('date_paid', '>=', $month)->whereYear('date_paid', $year); */
+            });
+        }, 'prepaid_expense.prepaid_expense_payments'])
             ->when(isset($branch), function ($query) use ($branch) {
                 $query->where('sub_per_branch', $branch->branch_code);
             })->when(isset($date), function ($query) use ($date) {
