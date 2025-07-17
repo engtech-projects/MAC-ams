@@ -15,10 +15,13 @@ class UpdateDepreciationPaymentsTable extends Migration
      */
     public function up()
     {
-        $subsidiaries = Subsidiary::where('monthly_due', '>', 0)->whereHas('depreciation_payments', function ($query) {
+        $subsidiaries = Subsidiary::where('monthly_due', '>', 0)
+        ->whereHas('depreciation_payments', function ($query) {
             $query->whereDate('date_paid', '>', Subsidiary::DEPRECIATION_LATEST_DATE);
-        })->get();
+        })->with('depreciation_payments')->get();
+
         $orginalDate = Carbon::parse(Subsidiary::DEPRECIATION_LATEST_DATE);
+
         Subsidiary::withoutEvents(function () use ($subsidiaries, $orginalDate) {
 
             $subsidiaries->map(function ($subsidiary) use ($orginalDate) {
@@ -28,7 +31,10 @@ class UpdateDepreciationPaymentsTable extends Migration
                 $depreciation_payments = [];
 
                 foreach ($payments as $payment) {
-                    $amount = $used != 0 ? $subsidiary->sub_amount / $used : 0;
+
+                    $originalAmount = $payment->amount;
+                    $amount = $used != 0 ? $originalAmount / $used : 0;
+                    
                     foreach (range(1, $used) as $i) {
                         $depreciation_payments[] = [
                             'sub_id' => $subsidiary->sub_id,
