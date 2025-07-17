@@ -217,6 +217,7 @@ class ReportsController extends MainController
             if ($isPosted) {
                 $value->sub_no_amort = max(0, $value->sub_no_amort - 1);
             }
+            $expensed = $value->depreciation_payments->sum('amount');
 
             $subs  = [];
 
@@ -269,8 +270,8 @@ class ReportsController extends MainController
                 $subs['expensed'] = $totalAllPayments;
             } else {
                 // For other categories, use the model's unexpensed attribute
-                $subs['unexpensed'] = $value->unexpensed;
-                $subs['expensed'] = $value->expensed;
+                $subs['unexpensed'] = round($value->unexpensed, 2);
+                $subs['expensed'] = round($expensed, 2);
             }
 
             $subs['salvage'] = $value->salvage;
