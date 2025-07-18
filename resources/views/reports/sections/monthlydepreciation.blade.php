@@ -234,6 +234,10 @@
                                                         data-target="#createSubsidiaryModal" @click='processEdit(ps)'>
                                                         <i class="fa fa-pen fa-xs text-white"></i>
                                                     </button>
+                                                    <button class="btn btn-success btn-xs" data-toggle="modal"
+                                                        data-target="#payDepreciationModal" @click='processPayment(ps)'>
+                                                        <i class="fa fa-solid fa-file-invoice text-white"></i>
+                                                    </button>
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'" v-show="filter.branch && searching">
@@ -406,12 +410,12 @@
                                             id="sub_salvage">
                                     </div>
                                     <!-- <div class="col-md-6" v-if="isEdit">
-                                            <label for="message-text" class="col-form-label">Salvage:
-                                                <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
-                                                    expand (rate/ 100) * unexpensed</span>
-                                            </label>
-                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                        </div> -->
+                                                                                                                                                                                                            <label for="message-text" class="col-form-label">Salvage:
+                                                                                                                                                                                                                <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
+                                                                                                                                                                                                                    expand (rate/ 100) * unexpensed</span>
+                                                                                                                                                                                                            </label>
+                                                                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                        </div> -->
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Salvage:
@@ -471,6 +475,52 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="payDepreciationModal" tabindex="-1" role="dialog"
+            aria-labelledby="payDepreciationLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Depreciation Payment</h5>
+                        </h5>
+                        <button type="button" class="close" @click="closeAction()" data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form @submit.prevent="processAction()">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="message-text" class="col-form-label">Number of remaining bal to
+                                            pay:</label>
+                                        <input type="number" class="form-control" ref="rem">
+                                        <small v-if="validationErrors.newLifeTooSmall" class="text-danger">
+                                            ❌ Must be less than or equal to remaining value.
+                                        </small>
+                                    </div>
+
+
+                                    <div class="col-md-12">
+                                        <label for="message-text" class="col-form-label">Total of remaining balance:
+                                        </label>
+                                        <input type="text" disabled :value="amortToDisplay" class="form-control"
+                                            id="sub_acct_no">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         </div>
 
     </section>
@@ -1137,7 +1187,7 @@
                                 } else {
                                     // New rate is lower: less salvage, more unexpensed
                                     unexpensed = storedUnexpensed -
-                                    salvageDifference; // This adds because salvageDifference is negative
+                                        salvageDifference; // This adds because salvageDifference is negative
                                 }
                             }
 
@@ -1383,6 +1433,11 @@
                     this.$nextTick(() => {
                         this.isInitializing = false;
                     });
+                },
+                processPayment: function(sub) {
+                    var payment = sub[4] * this.subsidiary.rem;
+                    console.log(sub[4], this.$refs.rem.value)
+                    console.log(payment);
                 },
                 resetForm: function() {
                     this.subsidiary = {
