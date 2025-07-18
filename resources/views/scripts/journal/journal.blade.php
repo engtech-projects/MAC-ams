@@ -1277,6 +1277,7 @@
             }
         });
 
+      
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
             var s_data = $(this).serialize();
@@ -1291,6 +1292,14 @@
                 success: function(data) {
                     $('#journalEntryDetails').DataTable().destroy();
                     $('#journalEntryDetailsContent').html('');
+
+                    function formatDateToMMDDYYYY(dateStr) {
+                        const date = new Date(dateStr);
+                        const mm = String(date.getMonth() + 1).padStart(2, '0');
+                        const dd = String(date.getDate()).padStart(2, '0');
+                        const yyyy = date.getFullYear();
+                        return `${mm}-${dd}-${yyyy}`;
+                    }
                     $.each(data, function(k, v) {
                         var status = (v.status == 'posted') ? 'text-success' :
                             'text-danger';
@@ -1317,7 +1326,7 @@
 
                         var journalListTable =
                             `<tr>
-							<td class="font-weight-bold">${v.journal_date}</td>
+							<td class="font-weight-bold">${formatDateToMMDDYYYY(v.journal_date)}</td>
                             <td>${v.book_details.book_code}</td>
                             <td>${journal_no}</td>
 							<td>${source}</td>
