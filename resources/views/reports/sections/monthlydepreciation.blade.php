@@ -854,7 +854,7 @@
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
                                             this.formatCurrency(
-                                                parseFloat(subsidiary.sub_no_amort) === parseFloat(
+                                                parseFloat(subsidiary.used) === parseFloat(
                                                     subsidiary.sub_no_depre) ?
                                                 0.00 :
                                                 parseFloat(subsidiary.monthly_due)),
