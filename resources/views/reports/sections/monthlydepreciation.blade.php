@@ -1043,7 +1043,12 @@
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
-                                branchTotalDueAmort += parseFloat(subsidiary[k].due_amort);
+                               
+                                if (parseFloat(subsidiary[k].used) === parseFloat(subsidiary[k].sub_no_depre)) {
+                                    branchTotalDueAmort += 0.00;
+                                } else {
+                                    branchTotalDueAmort += parseFloat(subsidiary[k].monthly_due);
+                                }
                                 branchTotalRem += parseFloat(subsidiary[k].rem);
 
                             }
