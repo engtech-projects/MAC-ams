@@ -415,12 +415,12 @@
                                     </div>
                                     <!-- <div class="col-md-6" v-if="isEdit">
 
-                                            <label for="message-text" class="col-form-label">Salvage:
-                                                <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
-                                                    expand (rate/ 100) * unexpensed</span>
-                                            </label>
-                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                        </div> -->
+                                                                                                                                                            <label for="message-text" class="col-form-label">Salvage:
+                                                                                                                                                                <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
+                                                                                                                                                                    expand (rate/ 100) * unexpensed</span>
+                                                                                                                                                            </label>
+                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                        </div> -->
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Salvage:
@@ -501,7 +501,7 @@
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
                                         <input type="number" class="form-control" v-model="rem" ref="rem">
-                                        <small v-if="validationErrors.newLifeTooSmall" class="text-danger">
+                                        <small class="text-danger">
                                             ❌ Must be less than or equal to remaining value.
                                         </small>
                                     </div>
@@ -598,12 +598,12 @@
             },
             computed: {
                 rem_bal() {
-                    var bal = 0;
+                    var monthly_due = 0
                     if (this.sub) {
-                        bal = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
+                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
                     }
 
-                    return this.rem * bal
+                    return this.rem * monthly_due
                 },
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
@@ -1202,7 +1202,7 @@
                                     // New rate is lower: less salvage, more unexpensed
                                     unexpensed = storedUnexpensed -
 
-                                    salvageDifference; // This adds because salvageDifference is negative
+                                        salvageDifference; // This adds because salvageDifference is negative
                                 }
                             }
 
@@ -1453,6 +1453,7 @@
                         $('#payDepreciationModal').modal('show');
                         this.index = index;
                         this.sub = sub;
+                        console.log(sub);
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
                         return false;
@@ -1463,6 +1464,11 @@
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
                     const subId = selectedItem[13];
+                    var current_rem = selectedItem[11];
+                    if (this.rem > current_rem) {
+                        toastr.warning("The number of remaining balance should not be greater than " + current_rem);
+                        return false;
+                    }
                     for (const [branchName, rows] of Object.entries(branchList)) {
                         if (!Array.isArray(rows)) continue;
                         const index = rows.findIndex(item => item.sub_id === subId);
