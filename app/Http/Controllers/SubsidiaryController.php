@@ -37,6 +37,11 @@ class SubsidiaryController extends Controller
         $request->merge([
             'monthly_due' => $monthlyDue
         ]);
+
+        $subCategory = SubsidiaryCategory::find($request->sub_cat_id);
+        $hasDepreInType = $subCategory && stripos($subCategory->sub_cat_type, 'depre') !== false;
+
+
         $data = $request->validate([
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -46,7 +51,7 @@ class SubsidiaryController extends Controller
             'sub_date' => 'date|sometimes',
             'sub_cat_id' => 'integer|required',
             'sub_salvage' => 'numeric|sometimes',
-            'sub_amount' => 'nullable|numeric|sometimes|gt:0',
+            'sub_amount' => $hasDepreInType ? 'nullable|numeric|sometimes|gt:0' : 'nullable|numeric|sometimes',
             'sub_no_depre' => 'numeric|sometimes',
             'sub_per_branch' => 'nullable',
             'branch_id' => 'nullable',
@@ -152,6 +157,9 @@ class SubsidiaryController extends Controller
                 ], 422);
             }
         }
+        $subCategory = SubsidiaryCategory::find($request->sub_cat_id);
+        $hasDepreInType = $subCategory && stripos($subCategory->sub_cat_type, 'depre') !== false;
+
             $rules = [
             'sub_code' => 'string|required',
             'sub_name' => 'string|required',
@@ -161,7 +169,7 @@ class SubsidiaryController extends Controller
             'sub_date' => 'date|nullable',
             'sub_cat_id' => 'integer|required',
             'sub_salvage' => 'numeric|nullable',
-            'sub_amount' => 'numeric|nullable|gt:0',
+            'sub_amount' => $hasDepreInType ? 'nullable|numeric|sometimes|gt:0' : 'nullable|numeric|sometimes',
             'sub_no_depre' => 'numeric|nullable',
             'sub_per_branch' => 'string|nullable',
             'monthly_due' => 'sometimes|numeric',
@@ -188,59 +196,60 @@ class SubsidiaryController extends Controller
         $monthlyDue = 0;
         $unexpensed = 0;
         
-        if ($used === 0) {
-            // NEW ITEM: Standard calculation
-            $salvageValue = ($newRate / 100) * $amount;
-            $depreciableAmount = $amount - $salvageValue;
-            $monthlyDue = $depreciableAmount / $lifeToUse;
-            $unexpensed = $depreciableAmount;
-            
-        } else {
-            // USED ITEM: Complex calculation based on your requirements
-            
-            if ($oldRate == 0 && $newRate > 0) {
-                // Case: No prior rate → New rate (only subtract from unexpensed)
-                $originalMonthlyBase = $amount / $lifeToUse;
-                $expensed = $used * $originalMonthlyBase;
-                $remainingAmount = $amount - $expensed;
-                $newSalvageOnRemaining = ($newRate / 100) * $remainingAmount;
-                $unexpensed = $remainingAmount - $newSalvageOnRemaining;
-                
-            } else if ($oldRate > 0 && $newRate != $oldRate) {
-                // Case: Existing rate → Different rate (including going to 0)
-                $originalSalvage = ($oldRate / 100) * $amount;
-                $newSalvage = ($newRate / 100) * $amount;
-                $originalDepreciableAmount = $amount - $originalSalvage;
-                
-                // Expensed based on original calculation
-                $expensed = $used * ($originalDepreciableAmount / $lifeToUse);
-                $remainingAmount = $amount - $expensed;
-                
-                if ($newRate == 0) {
-                    // Rate cleared: no salvage on remaining amount
-                    $unexpensed = $remainingAmount;
-                } else {
-                    // Rate changed: apply new rate to remaining amount
-                    $unexpensed = $remainingAmount - ($newRate / 100) * $remainingAmount;
-                }
+        if($hasDepreInType){
+            if ($used === 0) {
+                // NEW ITEM: Standard calculation
+                $salvageValue = ($newRate / 100) * $amount;
+                $depreciableAmount = $amount - $salvageValue;
+                $monthlyDue = $depreciableAmount / $lifeToUse;
+                $unexpensed = $depreciableAmount;
                 
             } else {
-                // Case: Same rate or life change only
-                if ($newLife > 0 && $newLife != $subsidiary->sub_no_depre) {
-                    // Life changed: use current expensed and unexpensed values
-                    $expensed = $subsidiary->expensed;
-                    $unexpensed = $subsidiary->unexpensed;
-                } else {
-                    // No changes: recalculate normally
-                    $salvageValue = ($newRate / 100) * $amount;
-                    $depreciableAmount = $amount - $salvageValue;
-                    $originalMonthlyDue = $depreciableAmount / $lifeToUse;
+                // USED ITEM: Complex calculation based on your requirements
+                
+                if ($oldRate == 0 && $newRate > 0) {
+                    // Case: No prior rate → New rate (only subtract from unexpensed)
+                    $originalMonthlyBase = $amount / $lifeToUse;
+                    $expensed = $used * $originalMonthlyBase;
+                    $remainingAmount = $amount - $expensed;
+                    $newSalvageOnRemaining = ($newRate / 100) * $remainingAmount;
+                    $unexpensed = $remainingAmount - $newSalvageOnRemaining;
                     
-                    $expensed = $used * $originalMonthlyDue;
-                    $unexpensed = $depreciableAmount - $expensed;
+                } else if ($oldRate > 0 && $newRate != $oldRate) {
+                    // Case: Existing rate → Different rate (including going to 0)
+                    $originalSalvage = ($oldRate / 100) * $amount;
+                    $newSalvage = ($newRate / 100) * $amount;
+                    $originalDepreciableAmount = $amount - $originalSalvage;
+                    
+                    // Expensed based on original calculation
+                    $expensed = $used * ($originalDepreciableAmount / $lifeToUse);
+                    $remainingAmount = $amount - $expensed;
+                    
+                    if ($newRate == 0) {
+                        // Rate cleared: no salvage on remaining amount
+                        $unexpensed = $remainingAmount;
+                    } else {
+                        // Rate changed: apply new rate to remaining amount
+                        $unexpensed = $remainingAmount - ($newRate / 100) * $remainingAmount;
+                    }
+                    
+                } else {
+                    // Case: Same rate or life change only
+                    if ($newLife > 0 && $newLife != $subsidiary->sub_no_depre) {
+                        // Life changed: use current expensed and unexpensed values
+                        $expensed = $subsidiary->expensed;
+                        $unexpensed = $subsidiary->unexpensed;
+                    } else {
+                        // No changes: recalculate normally
+                        $salvageValue = ($newRate / 100) * $amount;
+                        $depreciableAmount = $amount - $salvageValue;
+                        $originalMonthlyDue = $depreciableAmount / $lifeToUse;
+                        
+                        $expensed = $used * $originalMonthlyDue;
+                        $unexpensed = $depreciableAmount - $expensed;
+                    }
                 }
             }
-            
             // Calculate monthly due for remaining months
             $monthsRemaining = max($lifeToUse - $used, 1);
             $monthlyDue = $unexpensed / $monthsRemaining;
@@ -325,12 +334,7 @@ class SubsidiaryController extends Controller
             $subsidiary['unexpensed'] = $subsidiary->unexpensed;
         }
 
-        \Log::info('Original Attributes', $subsidiary->getAttributes());
-        \Log::info('Merged Attributes with due_amort', array_merge(
-            $subsidiary->getAttributes(),
-            ['due_amort' => $monthlyDue]
-        ));
-
+       
         return response()->json([
             'message' => 'Successfully updated.',
             'data' => array_merge(

@@ -234,6 +234,7 @@
                                                         data-target="#createSubsidiaryModal" @click='processEdit(ps)'>
                                                         <i class="fa fa-pen fa-xs text-white"></i>
                                                     </button>
+
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'" v-show="filter.branch && searching">
@@ -256,6 +257,13 @@
                                                         Add
                                                     </button> --}}
 
+                                                </td>
+                                                <td
+                                                    v-show="!filter.branch && ps[0] != 'BRANCH TOTAL' && ps[0] != 'GRAND TOTAL' && ps[0] != '' && searching && i>=2">
+                                                    <button class="btn btn-success btn-xs"
+                                                        data-target="#payDepreciationModal" @click='pay(ps,i)'>
+                                                        <i class="fa fa-solid fa-file-invoice text-white"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
                                             {{-- <tr v-show="processSubsidiary === false">
@@ -406,6 +414,7 @@
                                             id="sub_salvage">
                                     </div>
                                     <!-- <div class="col-md-6" v-if="isEdit">
+
                                             <label for="message-text" class="col-form-label">Salvage:
                                                 <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
                                                     expand (rate/ 100) * unexpensed</span>
@@ -471,6 +480,52 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="payDepreciationModal" tabindex="-1" role="dialog"
+            aria-labelledby="payDepreciationLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Depreciation Payment</h5>
+                        </h5>
+                        <button type="button" class="close" @click="closeAction()" data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form @submit.prevent="processPayment()">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="message-text" class="col-form-label">Number of remaining bal to
+                                            pay:</label>
+                                        <input type="number" class="form-control" v-model="rem" ref="rem">
+                                        <small v-if="validationErrors.newLifeTooSmall" class="text-danger">
+                                            ❌ Must be less than or equal to remaining value.
+                                        </small>
+                                    </div>
+
+
+                                    <div class="col-md-12">
+                                        <label for="message-text" class="col-form-label">Total of remaining balance:
+                                        </label>
+                                        <input type="text" disabled :value="rem_bal" class="form-control"
+                                            id="sub_acct_no">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Pay</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         </div>
 
     </section>
@@ -480,6 +535,7 @@
         new Vue({
             el: '#app',
             data: {
+                sub: null,
                 branches: @json($branches),
                 sub_categories: @json($subsidiary_categories),
                 reportType: '',
@@ -537,12 +593,21 @@
                 balance: 0,
                 url: "{{ route('reports.post-monthly-depreciation') }}",
                 search: "{{ route('reports.monthly-depreciation-report-search') }}",
+                rem: 1,
+                index: null,
             },
             computed: {
+                rem_bal() {
+                    var bal = 0;
+                    if (this.sub) {
+                        bal = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
+                    }
+
+                    return this.rem * bal
+                },
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
                 },
-
                 formattedUnexpensed() {
                     return this.subsidiary.unexpensed || '₱0.00';
                 },
@@ -762,7 +827,6 @@
                             for (var k in branch) {
                                 var subsidiary = branch[k];
                                 no += 1;
-
                                 if (subsidiary.total_amort != 0) {
                                     if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
                                         total_expensed += parseFloat(subsidiary
@@ -1137,6 +1201,7 @@
                                 } else {
                                     // New rate is lower: less salvage, more unexpensed
                                     unexpensed = storedUnexpensed -
+
                                     salvageDifference; // This adds because salvageDifference is negative
                                 }
                             }
@@ -1284,7 +1349,6 @@
                     const remaining = this.remaining_life || 1; // computed property or fallback to 1!
 
                     const amort = (unexpensed - salvage) / remaining;
-                    console.log("due:", amort);
                     return isNaN(amort) ? 0 : amort;
                 },
                 calculateMonthlyAmort() {
@@ -1383,6 +1447,40 @@
                     this.$nextTick(() => {
                         this.isInitializing = false;
                     });
+                },
+                pay: function(sub, index) {
+                    if (sub[11] > 0) {
+                        $('#payDepreciationModal').modal('show');
+                        this.index = index;
+                        this.sub = sub;
+                    } else {
+                        toastr.warning("Depreaciation Payment already paid.");
+                        return false;
+                    }
+
+                },
+                processPayment() {
+                    const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
+                    const selectedItem = this.processSubsidiary[this.index];
+                    const subId = selectedItem[13];
+                    for (const [branchName, rows] of Object.entries(branchList)) {
+                        if (!Array.isArray(rows)) continue;
+                        const index = rows.findIndex(item => item.sub_id === subId);
+                        if (index !== -1) {
+                            const updated = {
+                                ...rows[index]
+                            };
+                            updated.monthly_due = this.rem_bal;
+                            const newArray = [...branchList[branchName]];
+
+                            newArray[index] = updated;
+                            branchList[branchName] = newArray;
+                        }
+
+                    }
+                    this.subsidiaryAll[this.filter.category.sub_cat_name] = branchList;
+                    $('#payDepreciationModal').modal('hide');
+
                 },
                 resetForm: function() {
                     this.subsidiary = {
