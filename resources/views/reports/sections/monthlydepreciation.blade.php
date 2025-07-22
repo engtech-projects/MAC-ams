@@ -876,7 +876,7 @@
                                         total_amort += parseFloat(subsidiary.total_amort)
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                        if (parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary
+                                        if (parseFloat(subsidiary.used) === parseFloat(subsidiary
                                                 .sub_no_depre)) {
                                             total_due_amort += 0.00;
                                         } else {
