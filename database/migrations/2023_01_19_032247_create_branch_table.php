@@ -13,16 +13,18 @@ class CreateBranchTable extends Migration
      */
     public function up()
     {
-        Schema::create('branch', function (Blueprint $table) {
-            $table->id("branch_id");
-            $table->string("branch_name");
-            $table->string("branch_code");
-            $table->string("branch_manager");
-            $table->string("branch_address");
-            $table->string("status");
-            $table->integer("deleted");
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('branch')) {
+            Schema::create('branch', function (Blueprint $table) {
+                $table->id("branch_id");
+                $table->string("branch_name");
+                $table->string("branch_code");
+                $table->string("branch_manager");
+                $table->string("branch_address");
+                $table->string("status");
+                $table->integer("deleted");
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -112,6 +112,13 @@
                                             aria-selected="false"><i class="nav-icon fas fa-tachometer-alt"></i> Category
                                             File</a>
                                     @endif
+                                    @if (checkUserHasAccessModule('sub-module', 'system-setup/activity-logs'))
+                                        <a class="nav-link sysnav" id="v-pills-activity-logs-tab" data-toggle="pill"
+                                            href="#v-pills-activity-logs" role="tab"
+                                            aria-controls="v-pills-activity-logs" aria-selected="false"><i
+                                                class="nav-icon fas fa-tachometer-alt"></i> Activity
+                                            Logs</a>
+                                    @endif
                                     @if (checkUserHasAccessModule('sub-module', 'UserMasterFile'))
                                         <a class="nav-link sysnav" id="v-pills-UserMasterFile-tab" data-toggle="pill"
                                             href="#v-pills-UserMasterFile" role="tab"
@@ -147,121 +154,238 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="tab-content" id="v-pills-tabContent">
+                                <!----------------------------------------- J O U R N A L B O O K M O D U L E ------------------------------------------->
                                 <div class="tab-pane fade" id="v-pills-JournalBook" role="tabpanel"
                                     aria-labelledby="v-pills-JournalBook-tab">
                                     @include('systemSetup.sections.journalBook')
                                 </div>
+                                <!-----------------------------------------/ END J O U R N A L B O O K M O D U L E ------------------------------------------->
+
+
+                                <!----------------------------------------- C A T E G O R Y F I L E M O D U L E ------------------------------------------->
                                 <div class="tab-pane fade" id="v-pills-CategoryFile" role="tabpanel"
                                     aria-labelledby="v-pills-CategoryFile-tab">
-                                    <form>
-                                        <input type="hidden" class="form-control form-control-sm rounded-0" name="catId"
-                                            id="catId" placeholder="">
-                                        <div class="row">
-                                            <div class="col-md-12 frm-header">
-                                                <h3 class="card-title"><b> Category File Settings</b></h3>
-                                            </div>
-                                            <div class="col-md-4 col-xs-12">
-                                                <div class="box">
-                                                    <div class="form-group">
-                                                        <label class="label-normal" for="sub_cat_code"> Category
-                                                            Code</label>
-                                                        <div class="input-group">
-                                                            <input type="text" v-model="category.sub_cat_code"
-                                                                class="form-control form-control-sm rounded-0"
-                                                                name="sub_cat_code" id="sub_cat_code"
-                                                                placeholder="Category Code" required>
-                                                        </div>
+                                    <input type="hidden" class="form-control form-control-sm rounded-0" name="catId"
+                                        id="catId" placeholder="">
+                                    <div class="row">
+                                        <div class="col-md-12 frm-header">
+                                            <h3 class="card-title"><b> Category File Settings</b></h3>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="sub_cat_code"> Category
+                                                        Code</label>
+                                                    <div class="input-group">
+                                                        <input type="text" v-model="category.sub_cat_code"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="sub_cat_code" id="sub_cat_code"
+                                                            placeholder="Category Code" required>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4 col-xs-12">
-                                                <div class="box">
-                                                    <div class="form-group">
-                                                        <label class="label-normal" for="sub_cat_name"> Category
-                                                            Name</label>
-                                                        <div class="input-group">
-                                                            <input type="text" v-model="category.sub_cat_name"
-                                                                class="form-control form-control-sm rounded-0"
-                                                                name="sub_cat_name" id="sub_cat_name"
-                                                                placeholder="Category Name" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4 col-xs-12">
-                                                <div class="box">
-                                                    <div class="form-group">
-                                                        <label class="label-normal" for="sub_cat_type"> Category
-                                                            Type <span class="text-red text-bold">(NOTE: Enter "depre" in
-                                                                the field
-                                                                if
-                                                                for depreciation
-                                                                else leave it blank.)</span></label>
-                                                        <div class="input-group">
-                                                            <input type="text" v-model="category.sub_cat_type"
-                                                                class="form-control form-control-sm rounded-0"
-                                                                name="sub_cat_type" id="sub_cat_type"
-                                                                placeholder="Category Type" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4 col-xs-12">
-                                                <div class="box">
-                                                    <div class="form-group">
-                                                        <label class="label-normal" for="sub_cat_type">Description</label>
-                                                        <div class="input-group">
-                                                            <input type="text" v-model="category.description"
-                                                                class="form-control form-control-sm rounded-0"
-                                                                name="cat_description" id="cat_description"
-                                                                placeholder="Category Type"></input>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 col-xs-12">
-                                                <div class="box">
-                                                    <div class="form-group">
-                                                        <label class="label-normal" for="book_ref">Account(Credit)</label>
-                                                        <select name="account_id" ref="credit"
-                                                            class="select2 form-control form-control-sm"
-                                                            id="select-account-credit" value="" required>
-                                                            <option v-for="account in accounts" :key="account.account_id"
-                                                                :value="account.account_id">
-                                                                @{{ account.account_name }}</option>
-
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 col-xs-12">
-                                                <div class="box">
-                                                    <div class="form-group">
-                                                        <label class="label-normal" for="book_ref">Account(Debit)</label>
-                                                        <select name="account_id_debit" ref="debit"
-                                                            class="select2 form-control"
-                                                            id="select-account-debit account-id-debit" required>
-                                                            <option v-for="account in accounts" :key="account.account_id"
-                                                                :value="account.account_id">
-                                                                @{{ account.account_name }}</option>
-                                                        </select>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="sub_cat_name"> Category
+                                                        Name</label>
+                                                    <div class="input-group">
+                                                        <input type="text" v-model="category.sub_cat_name"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="sub_cat_name" id="sub_cat_name"
+                                                            placeholder="Category Name" required>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="col-md-12 col-xs-12" style="padding-bottom:20px;">
-                                            <div class="col-md-4">
-                                                <div class="box">
-                                                    <label class="label-normal" for="">&nbsp;</label>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="sub_cat_type"> Category
+                                                        Type <span class="text-red text-bold">(NOTE: Enter "depre" in
+                                                            the field
+                                                            if
+                                                            for depreciation
+                                                            else leave it blank.)</span></label>
                                                     <div class="input-group">
-                                                        <input type="button" @click="saveCategory()"
-                                                            class="btn btn-success" value="UPDATE / SAVE">
+                                                        <input type="text" v-model="category.sub_cat_type"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="sub_cat_type" id="sub_cat_type"
+                                                            placeholder="Category Type" required>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="sub_cat_type">Description</label>
+                                                    <div class="input-group">
+                                                        <input type="text" v-model="category.description"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="cat_description" id="cat_description"
+                                                            placeholder="Category Type"></input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="book_ref">Account(Credit)</label>
+                                                    <select name="account_id" ref="credit"
+                                                        class="select2 form-control form-control-sm"
+                                                        id="select-account-credit" value="" required>
+                                                        <option v-for="account in accounts" :key="account.account_id"
+                                                            :value="account.account_id">
+                                                            @{{ account.account_name }}</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="book_ref">Account(Debit)</label>
+                                                    <select name="account_id_debit" ref="debit"
+                                                        class="select2 form-control" id="select-account-debit" required>
+                                                        <option v-for="account in accounts" :key="account.account_id"
+                                                            :value="account.account_id">
+                                                            @{{ account.account_name }}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 col-xs-12" style="padding-bottom:20px;">
+                                        <div class="col-md-4">
+                                            <div class="box">
+                                                <label class="label-normal" for="">&nbsp;</label>
+                                                <div class="input-group">
+                                                    <input type="button" @click="saveCategory()" class="btn btn-success"
+                                                        value="UPDATE / SAVE">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <!-- Table -->
+                                        <section class="content">
+                                            <div class="container-fluid">
+                                                <div class="col-md-12">
+                                                    <table id="categoryFileTbl" class="table table-bordered">
+                                                        <thead>
+                                                            <th width="15%">Category Code</th>
+                                                            <th>Category Name</th>
+                                                            <th>Category Type</th>
+                                                            <th>Description</th>
+                                                            <th width="13%">Action</th>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($subsidiaryCategories as $subsidiaryCategory)
+                                                                <tr>
+                                                                    <td class="font-weight-bold">
+                                                                        {{ $subsidiaryCategory->sub_cat_code }}</td>
+                                                                    <td>{{ $subsidiaryCategory->sub_cat_name }}</td>
+                                                                    <td>{{ $subsidiaryCategory->sub_cat_type }}</td>
+                                                                    <td>{{ $subsidiaryCategory->description }}</td>
+                                                                    <td>
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <button
+                                                                                    value="{{ $subsidiaryCategory->sub_cat_id }}"
+                                                                                    vType="edit"
+                                                                                    class="btn btn-categoryA btn-info btn-sm"><i
+                                                                                        class="fa  fa-pen"></i></button>
+                                                                            </div>
+                                                                            @if (isDeletable('subsidiary', 'sub_cat_id', $subsidiaryCategory->sub_cat_id))
+                                                                                <div class="col-md-4">
+                                                                                    <button
+                                                                                        value="{{ $subsidiaryCategory->sub_cat_id }}"
+                                                                                        vType="delete"
+                                                                                        class="btn btn-categoryA btn-danger btn-sm"><i
+                                                                                            class="fa fa-trash"></i></button>
+                                                                                </div>
+                                                                            @else
+                                                                                <div class="col-md-4">
+                                                                                    <button
+                                                                                        class="btn  btn-danger btn-sm disabled"
+                                                                                        onclick="alert('this category is already used in other field')"><i
+                                                                                            class="fa fa-trash"></i></button>
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <!-- /.Table -->
+                                    </div>
+                                </div>
+                                <!-----------------------------------------/ END C A T E G O R Y F I L E M O D U L E ----------------------------------------->
+
+
+                                <!----------------------------------------- A C T I V I T Y L O G S M O D U LE ---------------------------------------------------------------->
+                                <div class="tab-pane fade" id="v-pills-activity-logs" role="tabpanel"
+                                    aria-labelledby="v-pills-activity-logs-tab">
+
+
+                                    <div class="row">
+                                        <div class="col-md-12 frm-header">
+                                            <h3 class="card-title"><b>Activity Logs</b></h3>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <form>
+                                                <div class="row">
+                                                    <div class="col-md-4 col-xs-12">
+                                                        <div class="box">
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <select class="form-control"
+                                                                            v-model="filter.subject_type">
+                                                                            <option disabled value="">Subject Type
+                                                                            </option>
+                                                                            <option value="Subsidiary">Subsidiary</option>
+                                                                            <option value="Subsidiary">Journal Entry
+                                                                            </option>
+
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <select class="form-control"
+                                                                            v-model="filter.event">
+                                                                            <option value="">Select Event
+                                                                            </option>
+                                                                            <option value="created">created</option>
+                                                                            <option value="updated">updated</option>
+                                                                            <option value="deleted">deleted</option>
+
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <input type="button" @click="searchActivityLog()"
+                                                                            class="btn btn-success" value="search">
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
 
                                         <div class="col-md-12">
@@ -269,51 +393,44 @@
                                             <section class="content">
                                                 <div class="container-fluid">
                                                     <div class="col-md-12">
-                                                        <table id="categoryFileTbl" class="table table-bordered">
+                                                        <table id="categoryFileTbl" class="table table-sm table-striped ">
                                                             <thead>
-                                                                <th width="15%">Category Code</th>
-                                                                <th>Category Name</th>
-                                                                <th>Category Type</th>
+                                                                <th width="15%">Log Name</th>
                                                                 <th>Description</th>
+                                                                <th>Subject Type</th>
+                                                                <th>Log Type</th>
+                                                                <th>Log By</th>
+                                                                <th>Role</th>
+                                                                <th>Event</th>
+                                                                <th>Date</th>
                                                                 <th width="13%">Action</th>
                                                             </thead>
                                                             <tbody>
-                                                                @foreach ($subsidiaryCategories as $subsidiaryCategory)
-                                                                    <tr>
-                                                                        <td class="font-weight-bold">
-                                                                            {{ $subsidiaryCategory->sub_cat_code }}</td>
-                                                                        <td>{{ $subsidiaryCategory->sub_cat_name }}</td>
-                                                                        <td>{{ $subsidiaryCategory->sub_cat_type }}</td>
-                                                                        <td>{{ $subsidiaryCategory->description }}</td>
-                                                                        <td>
-                                                                            <div class="row">
-                                                                                <div class="col-md-4">
-                                                                                    <button
-                                                                                        value="{{ $subsidiaryCategory->sub_cat_id }}"
-                                                                                        vType="edit"
-                                                                                        class="btn btn-categoryA btn-info btn-sm"><i
-                                                                                            class="fa  fa-pen"></i></button>
-                                                                                </div>
-                                                                                @if (isDeletable('subsidiary', 'sub_cat_id', $subsidiaryCategory->sub_cat_id))
-                                                                                    <div class="col-md-4">
-                                                                                        <button
-                                                                                            value="{{ $subsidiaryCategory->sub_cat_id }}"
-                                                                                            vType="delete"
-                                                                                            class="btn btn-categoryA btn-danger btn-sm"><i
-                                                                                                class="fa fa-trash"></i></button>
-                                                                                    </div>
-                                                                                @else
-                                                                                    <div class="col-md-4">
-                                                                                        <button
-                                                                                            class="btn  btn-danger btn-sm disabled"
-                                                                                            onclick="alert('this category is already used in other field')"><i
-                                                                                                class="fa fa-trash"></i></button>
-                                                                                    </div>
-                                                                                @endif
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
+                                                                <tr v-for="activityLog in activityLogs"
+                                                                    :key="activityLog.id">
+                                                                    <td>@{{ activityLog.log_name }}</td>
+                                                                    <td class="text-uppercase">@{{ activityLog.event }}</td>
+                                                                    <td>@{{ activityLog.subject_type }}</td>
+
+                                                                    <td>@{{ activityLog.causer_type }}</td>
+                                                                    <td>@{{ activityLog.causer }}</td>
+                                                                    <td>@{{ activityLog.user_role.role_name }}</td>
+                                                                    <td>@{{ activityLog.description }}</td>
+                                                                    <td>@{{ activityLog.created_at }}</td>
+                                                                    <td>
+
+                                                                        <button type="button"
+                                                                            class="btn btn-xs btn-success"
+                                                                            @click="viewActivityLog(activityLog.id)"
+                                                                            data-toggle="modal"
+                                                                            data-target="#view-activity">
+                                                                            <i class="fa fa-eye"></i>
+                                                                        </button>
+                                                                        <button class="btn btn-xs btn-danger">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
 
                                                             </tbody>
                                                         </table>
@@ -322,23 +439,31 @@
                                             </section>
                                             <!-- /.Table -->
                                         </div>
-
-                                    </form>
+                                    </div>
                                 </div>
+                                <!-----------------------------------------/ END A C T I V I T Y L O G S M O D U L E ------------------------------------------->
+
+
+                                <!----------------------------------------- U S E R M A S T E R F I L E M O D U L E ------------------------------------------->
                                 <div class="tab-pane fade" id="v-pills-UserMasterFile" role="tabpanel"
                                     aria-labelledby="v-pills-UserMasterFile-tab">
-
+                                    @include('systemSetup.sections.userMasterFile')
 
                                 </div>
+                                <!-----------------------------------------/END U S E R M A S T E R F I L E M O D U L E ------------------------------------------->
+
+                                <!-----------------------------------------C O M P A N Y S E T T I N G S M O D U L E ------------------------------------------->
                                 <div class="tab-pane fade" id="v-pills-CompanySettings" role="tabpanel"
                                     aria-labelledby="v-pills-CompanySettings-tab">
                                     @include('systemSetup.sections.companySettings')
                                 </div>
+                                <!-----------------------------------------/END C O M P A N Y S E T T I N G S M O D U L E ------------------------------------------->
                                 <div class="tab-pane fade" id="v-pills-Accounting" role="tabpanel"
                                     aria-labelledby="v-pills-Accounting-tab">
                                     @include('systemSetup.sections.accounting')
                                 </div>
 
+                                <!-----------------------------------------P O S T I N G P E R I O D M O D U L E ------------------------------------------->
                                 <div class="tab-pane fade" id="v-pills-posting-period" role="tabpanel"
                                     aria-labelledby="v-pills-Accounting-tab">
                                     <div class="row mb-5">
@@ -365,21 +490,7 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                        {{-- <input type="number" @change="validateYear()" :min="minYear"
-                                                :max="maxYear" v-model="year" class="form-control">
-                                            <p v-if="error" class="text-red">@{{ error }}</p> --}}
-
-
-                                        {{-- <div class="col-md-2">
-                                            <select @change="handleChange()" class="form-control"
-                                                v-model="postingPeriodYear">
-                                                <option value="">Select Year</option>
-                                                <option v-for="(postingYear,i) in postingPeriodYears"
-                                                    :key="i" :value="postingYear">
-                                                    @{{ postingYear }}
-                                                </option>
-                                            </select>
-                                        </> --}} <div class="col-md-2">
+                                        <div class="col-md-2">
                                             <button @click="searchPostingPeriod()" class="btn btn-primary">
                                                 Search</button>
                                         </div>
@@ -435,10 +546,14 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <!-----------------------------------------/END P O S T I N G P E R I O D M O D U L E ------------------------------------------->
+
+                                <!-----------------------------------------C U R R E N C Y M O D U L E ------------------------------------------->
                                 <div class="tab-pane fade" id="v-pills-Currency" role="tabpanel"
                                     aria-labelledby="v-pills-Currency-tab">
                                     @include('systemSetup.sections.currency')
                                 </div>
+                                <!-----------------------------------------/ END C U R R E N C Y M O D U L E ------------------------------------------->
 
                             </div>
                         </div>
@@ -447,11 +562,132 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="view-activity" tabindex="-1" role="dialog" aria-labelledby="viewActivityLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="viewActivityLabel">Activity Log - @{{ activityLog.log_name }}</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-bold">
+                                        Log Info
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    Subject:
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <ul>
+                                                        <li v-for="(item, index) in activityLog.subject?.data"
+                                                            :key="index">
+                                                            @{{ index }} : <br> @{{ item }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    Description:
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @{{ activityLog.event }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    Log by:
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @{{ activityLog.causer }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    Event:
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @{{ activityLog.description }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-bold">
+                                        Properties
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header text-bold">
+                                                    Attributes
+                                                </div>
+                                                <ul class="list-group list-group-flush">
+                                                    <ul>
+                                                        <li v-for="(item, index) in activityLog.properties?.attributes"
+                                                            :key="index">
+                                                            @{{ index }} : <br> @{{ item }}
+                                                        </li>
+                                                    </ul>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header text-bold">
+                                                    Old
+                                                </div>
+                                                <ul class="list-group list-group-flush">
+                                                    <ul>
+                                                        <li v-for="(item, index) in activityLog.properties?.old"
+                                                            :key="index">
+                                                            @{{ index }} : <br> @{{ item }}
+                                                        </li>
+                                                    </ul>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
     <script>
         new Vue({
             el: '#app',
             data: {
+                filter: {
+                    'subject_type': null,
+                    'event': null
+                },
+                activityLogs: [],
+                activityLog: {},
                 postingPeriods: [],
                 year: null,
                 postingPeriodYears: null,
@@ -504,6 +740,40 @@
                 }
             },
             methods: {
+                isObject(val) {
+                    return val?.attributes !== null && typeof val?.attributes === 'object' && !Array.isArray(val);
+                },
+                searchActivityLog() {
+                    this.fetchActivityLogs();
+                },
+                fetchActivityLogs() {
+                    axios.get('/MAC-ams/system-setup/activity-logs', {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        },
+                        params: {
+                            'event': this.filter.event,
+                            'subject_type': this.filter.subject_type
+                        }
+                    }).then(response => {
+                        this.activityLogs = response.data.data;
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                },
+                viewActivityLog(id) {
+                    axios.get('/MAC-ams/system-setup/activity-logs/' + id, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        this.activityLog = response.data.data;
+                    }).catch(err => {
+                        console.error(err)
+                    })
+                },
                 fetchAccounts() {
                     axios.get('/MAC-ams/accounts').then(res => {
                             console.log(res)
@@ -520,7 +790,7 @@
                 saveCategory() {
                     this.category.account_id_credit = this.$refs.credit.value;
                     this.category.account_id_debit = this.$refs.debit.value;
-                    if (this.category.sub_cat_type == null || this.category.sub_cat_type == "depre") {
+                    if (this.category.sub_cat_type == "" || this.category.sub_cat_type == "depre") {
 
                         axios.post('/MAC-ams/subsidiary-category', this.category, {
                             headers: {
@@ -715,6 +985,9 @@
                 this.fetchPostingPeriodYears();
                 this.fetchAccounts();
                 document.addEventListener('click', this.handleClickOutside);
+                this.fetchActivityLogs();
+
+
             },
             beforeDestroy() {
                 document.removeEventListener('click', this.handleClickOutside);

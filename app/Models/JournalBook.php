@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use DB;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class JournalBook extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
 
     const GENERAL_LEDGER_BOOK = 5;
@@ -36,6 +39,14 @@ class JournalBook extends Model
         'book_head',
         'book_flag',
     ];
+    protected static $recordEvents = ['deleted', 'created', 'updated'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
+            ->useLogName('Journal Book');
+    }
 
     public static function getBookWithJournalCount()
     {
