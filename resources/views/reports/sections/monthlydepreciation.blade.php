@@ -251,38 +251,18 @@
                                                         data-target="#createSubsidiaryModal">
                                                         Add
                                                     </button>
-                                                    {{-- <button v-show="processSubsidiary.length === 0" class="btn btn-success"
-                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
-                                                        @click="add(null)">
-                                                        Add
-                                                    </button> --}}
 
                                                 </td>
+
                                                 <td
-                                                    v-show="!filter.branch && ps[0] != 'BRANCH TOTAL' && ps[0] != 'GRAND TOTAL' && ps[0] != '' && searching && i>=2">
+                                                    v-show="!filter.branch && ps.length !=1 && ps[0] != 'BRANCH TOTAL' && ps[0] != 'GRAND TOTAL' && ps[0] != '' && searching && i>=2">
                                                     <button class="btn btn-success btn-xs"
                                                         data-target="#payDepreciationModal" @click='pay(ps,i)'>
+
                                                         <i class="fa fa-solid fa-file-invoice text-white"></i>
                                                     </button>
                                                 </td>
                                             </tr>
-                                            {{-- <tr v-show="processSubsidiary === false">
-                                                <td colspan="15">
-                                                    <b>
-                                                        <center>No data available in table.</center>
-                                                    </b>
-                                                </td>
-                                                <td v-if="filter.category && filter.branch && filter.to && searching">
-                                                    <button class="btn btn-success" data-toggle="modal"
-                                                        data-target="#createSubsidiaryModal"
-                                                        @click="add(filter.sub_cat_id)">
-                                                        Add
-                                                    </button>
-                                                </td>
-                                            <tr> --}}
-
-
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -415,12 +395,12 @@
                                     </div>
                                     <!-- <div class="col-md-6" v-if="isEdit">
 
-                                                                                                                                                            <label for="message-text" class="col-form-label">Salvage:
-                                                                                                                                                                <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
-                                                                                                                                                                    expand (rate/ 100) * unexpensed</span>
-                                                                                                                                                            </label>
-                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                        </div> -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label for="message-text" class="col-form-label">Salvage:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            expand (rate/ 100) * unexpensed</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <input type="text" v-model="ratePercentage" class="form-control">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div> -->
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Salvage:
@@ -500,7 +480,8 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
-                                        <input type="number" class="form-control" v-model="rem" ref="rem">
+                                        <input type="number" class="form-control" v-model="rem"
+                                            @change="newRemBalance()">
                                         <small class="text-danger">
                                             ❌ Must be less than or equal to remaining value.
                                         </small>
@@ -510,7 +491,7 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Total of remaining balance:
                                         </label>
-                                        <input type="text" disabled :value="rem_bal" class="form-control"
+                                        <input type="text" disabled v-model="bal" class="form-control"
                                             id="sub_acct_no">
                                     </div>
 
@@ -593,18 +574,12 @@
                 balance: 0,
                 url: "{{ route('reports.post-monthly-depreciation') }}",
                 search: "{{ route('reports.monthly-depreciation-report-search') }}",
-                rem: 1,
+                rem: 0,
+                remDefault: 0,
+                bal: 0,
                 index: null,
             },
             computed: {
-                rem_bal() {
-                    var monthly_due = 0
-                    if (this.sub) {
-                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
-                    }
-
-                    return this.rem * monthly_due
-                },
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
                 },
@@ -1074,7 +1049,6 @@
                             grandTotalRem
                         ];
 
-                        rows.push(result);
                     }
                     return rows;
 
@@ -1107,6 +1081,17 @@
             },
 
             methods: {
+                newRemBalance(event) {
+                    var monthly_due = 0;
+                    var rem = this.rem;
+                    if (this.sub) {
+                        rem = this.sub[11]
+                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
+
+                    }
+                    var newBal = this.rem * monthly_due
+                    this.bal = newBal
+                },
                 recomputeExpUnexp() {
                     let amount = this.subsidiary.sub_amount;
                     if (typeof amount === 'string') {
@@ -1453,7 +1438,9 @@
                         $('#payDepreciationModal').modal('show');
                         this.index = index;
                         this.sub = sub;
-                        console.log(sub);
+                        this.rem = sub[11]
+                        this.bal = Number(this.sub[8].replace(/[^0-9.-]+/g, ""));
+                        console.log(this.processSubsidiary);
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
                         return false;
@@ -1463,6 +1450,7 @@
                 processPayment() {
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
+
                     const subId = selectedItem[13];
                     var current_rem = selectedItem[11];
                     if (this.rem > current_rem) {
