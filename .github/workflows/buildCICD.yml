@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
       - name: Set output
         id: vars
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
@@ -43,6 +43,8 @@ jobs:
       - name: Build Laravel
         run: |
               composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+              npm ci
+              npm run production
               rm -rf .git
               rm -rf .gitignore
               git config --global user.email "engtechsolutions2020@gmail.com"
@@ -59,7 +61,7 @@ jobs:
     steps:
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
       - name: Set output
         id: vars
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
@@ -69,6 +71,8 @@ jobs:
       - name: Build Laravel
         run: |
               composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+              npm ci
+              npm run production
               rm -rf .git
               rm -rf .gitignore
               git config --global user.email "engtechsolutions2020@gmail.com"
