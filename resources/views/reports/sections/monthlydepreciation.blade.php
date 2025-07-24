@@ -32,7 +32,6 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
-        <!-- <h1 v-text='monthlyDepreciationReportType'></h1> -->
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -64,17 +63,6 @@
                                                                         @{{ sub_cat.description }}
                                                                     </option>
                                                                 </select>
-                                                                {{-- <select name="sub_cat_id"
-                                                                    class="form-control form-control-sm"
-                                                                    v-model="filter.sub_cat_id" id="sub_cat_id">
-                                                                    <option value="" disabled selected>-Select
-                                                                        Category-</option>
-                                                                    @foreach ($subsidiary_categories as $sub_category)
-                                                                        <option value="{{ $sub_category->sub_cat_id }}">
-                                                                            {{ $sub_category->description }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -93,17 +81,6 @@
                                                                         @{{ branch.branch_code + '-' + branch.branch_name }}
                                                                     </option>
                                                                 </select>
-                                                                {{-- <select name="branch_id" v-model="filter.branch_id"
-                                                                    class="form-control form-control-sm" id="branch">
-                                                                    <option value="" disabled selected>-Select Branch-
-                                                                    </option>
-                                                                    @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch->branch_id }}">
-                                                                            {{ $branch->branch_code }} -
-                                                                            {{ $branch->branch_name }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -162,7 +139,6 @@
 
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
-                                    {{--  @{{ subsidiaries[filter.category?.sub_cat_name] }} --}}
                                     <table class="table">
                                         <thead>
                                             <th>No.</th>
@@ -192,39 +168,6 @@
                                                     :colspan="ps.length == 2 && j == 1 ? 8 : ''">
                                                     @{{ p }}
                                                 </td>
-                                                {{-- <template v-if="filter.category?.sub_cat_name === prepaid_expense">
-                                                    <td v-for="(p, j) in ps" v-if="j <= 12" :key="j"
-                                                        :class="rowStyleSubsidiaryListing(p, j, ps)"
-                                                        :colspan="ps.length == 2 && j == 1 ? 8 : ''">
-
-
-                                                        <template v-if="j === 7 && filter.category?.sub_cat_name">
-                                                            @{{ typeof p === 'object' && p !== null ? (p.amount ?? 0) : p }}
-                                                        </template>
-                                                        <template v-else-if="ps[0] === 'BRANCH TOTAL'">
-                                                            @{{ p }}
-                                                        </template>
-                                                        <template v-else-if="Array.isArray(p)">
-                                                            @{{ p.join(', ') }}
-                                                        </template>
-                                                        <template v-else-if="typeof p === 'object' && p !== null">
-                                                            @{{ p.id === null ? 0 : (p.amount ?? p.total?.total_prepaid_exepnse ?? 0) }}
-                                                        </template>
-                                                        <template v-else>
-                                                            @{{ p }}
-                                                        </template>
-
-                                                    </td>
-                                                </template>
-                                                <template v-else>
-                                                    <td v-for="p,i in ps" v-if="i<=12"
-                                                        :class="rowStyleSubsidiaryListing(p, i, ps)"
-                                                        :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
-                                                    </td>
-                                                </template> --}}
-
-
-
                                                 <td v-if="ps[2]" v-show="filter.branch && searching">
                                                     <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'>
                                                         <i class="fa fa-trash fa-xs"></i>
@@ -251,38 +194,18 @@
                                                         data-target="#createSubsidiaryModal">
                                                         Add
                                                     </button>
-                                                    {{-- <button v-show="processSubsidiary.length === 0" class="btn btn-success"
-                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
-                                                        @click="add(null)">
-                                                        Add
-                                                    </button> --}}
 
                                                 </td>
+
                                                 <td
-                                                    v-show="!filter.branch && ps[0] != 'BRANCH TOTAL' && ps[0] != 'GRAND TOTAL' && ps[0] != '' && searching && i>=2">
+                                                    v-show="!filter.branch && ps.length !=1 && ps[0] != 'BRANCH TOTAL' && ps[0] != 'GRAND TOTAL' && ps[0] != '' && searching && i>=2">
                                                     <button class="btn btn-success btn-xs"
                                                         data-target="#payDepreciationModal" @click='pay(ps,i)'>
+
                                                         <i class="fa fa-solid fa-file-invoice text-white"></i>
                                                     </button>
                                                 </td>
                                             </tr>
-                                            {{-- <tr v-show="processSubsidiary === false">
-                                                <td colspan="15">
-                                                    <b>
-                                                        <center>No data available in table.</center>
-                                                    </b>
-                                                </td>
-                                                <td v-if="filter.category && filter.branch && filter.to && searching">
-                                                    <button class="btn btn-success" data-toggle="modal"
-                                                        data-target="#createSubsidiaryModal"
-                                                        @click="add(filter.sub_cat_id)">
-                                                        Add
-                                                    </button>
-                                                </td>
-                                            <tr> --}}
-
-
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -413,14 +336,6 @@
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage">
                                     </div>
-                                    <!-- <div class="col-md-6" v-if="isEdit">
-
-                                                                                                                                                            <label for="message-text" class="col-form-label">Salvage:
-                                                                                                                                                                <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
-                                                                                                                                                                    expand (rate/ 100) * unexpensed</span>
-                                                                                                                                                            </label>
-                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                        </div> -->
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Salvage:
@@ -500,7 +415,8 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
-                                        <input type="number" class="form-control" v-model="rem" ref="rem">
+                                        <input type="number" class="form-control" v-model="rem"
+                                            @change="newRemBalance()">
                                         <small class="text-danger">
                                             ❌ Must be less than or equal to remaining value.
                                         </small>
@@ -510,7 +426,7 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Total of remaining balance:
                                         </label>
-                                        <input type="text" disabled :value="rem_bal" class="form-control"
+                                        <input type="text" disabled v-model="bal" class="form-control"
                                             id="sub_acct_no">
                                     </div>
 
@@ -593,18 +509,12 @@
                 balance: 0,
                 url: "{{ route('reports.post-monthly-depreciation') }}",
                 search: "{{ route('reports.monthly-depreciation-report-search') }}",
-                rem: 1,
+                rem: 0,
+                remDefault: 0,
+                bal: 0,
                 index: null,
             },
             computed: {
-                rem_bal() {
-                    var monthly_due = 0
-                    if (this.sub) {
-                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
-                    }
-
-                    return this.rem * monthly_due
-                },
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
                 },
@@ -734,7 +644,6 @@
                         .sub_no_depre;
 
                     return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
-                    //return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
 
 
@@ -1079,7 +988,6 @@
                             grandTotalRem
                         ];
 
-                        rows.push(result);
                     }
                     return rows;
 
@@ -1112,6 +1020,17 @@
             },
 
             methods: {
+                newRemBalance(event) {
+                    var monthly_due = 0;
+                    var rem = this.rem;
+                    if (this.sub) {
+                        rem = this.sub[11]
+                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
+
+                    }
+                    var newBal = this.rem * monthly_due
+                    this.bal = newBal
+                },
                 recomputeExpUnexp() {
                     let amount = this.subsidiary.sub_amount;
                     if (typeof amount === 'string') {
@@ -1273,13 +1192,6 @@
                     });
 
                     return formatter.format(number)
-                    /* const formatter = new Intl.NumberFormat('en-US', {
-                        style: 'decimal',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                    });
-
-                    return formatter.format(number); */
                 },
                 rowStyles: function(element) {
                     var style = '';
@@ -1399,8 +1311,6 @@
                 formatTextField() {
                     this.subsidiary.sub_amount = this.formatCurrency(this.subsidiary.sub_amount);
                     this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
-                    /*                     this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
-                                        this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, "")) */
 
                 },
 
@@ -1458,7 +1368,8 @@
                         $('#payDepreciationModal').modal('show');
                         this.index = index;
                         this.sub = sub;
-                        console.log(sub);
+                        this.rem = sub[11]
+                        this.bal = Number(this.sub[8].replace(/[^0-9.-]+/g, ""));
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
                         return false;
@@ -1468,6 +1379,7 @@
                 processPayment() {
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
+
                     const subId = selectedItem[13];
                     var current_rem = selectedItem[11];
                     if (this.rem > current_rem) {
@@ -1524,11 +1436,6 @@
                     this.subsidiary.prepaid_expense = parseFloat(
                         String(prepaid).replace(/[₱,]/g, '') || '0'
                     );
-                    //this.subsidiary.prepaid_expense = parseFloat(String(this.prepaid_amount).replace(/[₱,]/g, ''))
-                    // this.subsidiary.prepaid_expense = parseFloat(
-                    //             this.prepaid_amount.replace(/[₱,]/g, '')
-                    //             );
-
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
@@ -1536,7 +1443,6 @@
                     this.subsidiary.branch = this.filter.branch
                     this.subsidiary.sub_cat_id = this.filter.category.sub_cat_id
 
-                    /* this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, "")) */
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
