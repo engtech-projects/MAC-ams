@@ -416,8 +416,8 @@
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
                                         <input type="number" class="form-control" v-model="rem">
-                                        <small class="text-danger">
-                                            ❌ Must be less than or equal to remaining value.
+                                        <small class="text-success">
+                                            Must be less than or equal to remaining value.
                                         </small>
                                     </div>
 
@@ -521,11 +521,13 @@
                     var monthly_due = 0;
                     var rem = this.rem;
                     if (this.sub) {
-                        rem = this.sub[11]
-                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, "")) * this.rem;
+                        monthly_due = Number(this.sub[8].replace(/[^0-9.-]+/g, "")) / this.rem
+
+                        var amortization = Number(this.sub[4].replace(/[^0-9.-]+/g, "")) * this.rem
+
 
                     }
-                    return monthly_due
+                    return this.formatCurrency(amortization * this.rem);
                 },
                 formattedUnexpensed() {
                     return this.subsidiary.unexpensed || '₱0.00';
@@ -1384,7 +1386,7 @@
                             const updated = {
                                 ...rows[index]
                             };
-                            updated.monthly_due = this.rem_bal;
+                            updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
                             const newArray = [...branchList[branchName]];
 
                             newArray[index] = updated;
