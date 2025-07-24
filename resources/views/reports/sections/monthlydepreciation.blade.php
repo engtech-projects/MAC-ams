@@ -1365,7 +1365,6 @@
                         this.sub = sub;
                         this.rem = sub[11]
                         this.bal = Number(this.sub[8].replace(/[^0-9.-]+/g, ""));
-                        console.log(this.processSubsidiary);
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
                         return false;
