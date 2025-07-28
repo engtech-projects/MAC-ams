@@ -271,8 +271,11 @@ class ReportsController extends MainController
                 $subs['expensed'] = $totalAllPayments;
             } else {
                 // For other categories, use the model's unexpensed attribute
-                $subs['unexpensed'] = round($value->unexpensed, 2);
+                //$subs['unexpensed'] = round($value->unexpensed, 2);
+                
+              
                 $subs['expensed'] = round($expensed, 2);
+                $subs['unexpensed'] = round($value->sub_amount - $subs['expensed'] -  $value->salvage, 2);
             }
 
             $subs['salvage'] = $value->salvage;
