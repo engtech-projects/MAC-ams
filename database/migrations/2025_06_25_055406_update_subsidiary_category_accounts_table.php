@@ -13,10 +13,13 @@ class UpdateSubsidiaryCategoryAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::table('subsidiary_category_accounts', function (Blueprint $table) {
-            $table->string('transaction_type'); // Example: Add string column
-        });
+        if (!Schema::hasTable('subsidiary_category_accounts')) {
+            Schema::table('subsidiary_category_accounts', function (Blueprint $table) {
+                $table->string('transaction_type'); // Example: Add string column
+            });
+        }
     }
+
 
     /**
      * Reverse the migrations.

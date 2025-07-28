@@ -13,15 +13,17 @@ class CreateTransactionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('transactions', function (Blueprint $table) {
-            $table->increments('transaction_id');
-			$table->integer('transaction_type_id')->unsigned();
-            $table->text('note')->nullable();
-			$table->text('attachments')->nullable();
-			$table->string('status')->nullable();
-			$table->date('transaction_date')->nullable();
-			$table->timestamps();
-        });
+        if (!Schema::hasTable('transactions')) {
+            Schema::create('transactions', function (Blueprint $table) {
+                $table->increments('transaction_id');
+                $table->integer('transaction_type_id')->unsigned();
+                $table->text('note')->nullable();
+                $table->text('attachments')->nullable();
+                $table->string('status')->nullable();
+                $table->date('transaction_date')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

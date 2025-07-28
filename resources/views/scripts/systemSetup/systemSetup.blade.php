@@ -10,6 +10,10 @@
             placeholder: 'Account',
             allowClear: true,
         });
+        $('#filter-logs').select2({
+            placeholder: 'Account',
+            allowClear: true,
+        });
 
         $('#systemSetupAccessibility').DataTable({
             pageLength: 1000

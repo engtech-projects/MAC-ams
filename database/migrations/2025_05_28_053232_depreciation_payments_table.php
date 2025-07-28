@@ -13,18 +13,20 @@ class DepreciationPaymentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('depreciation_payments', function (Blueprint $table) {
-            $table->id('id');
-            $table->double('amount');
-            $table->integer('sub_id');
-            $table->date('date_paid');
-            $table->foreign('sub_id')
-                ->references('sub_id')
-                ->on('subsidiary')
-                ->onDelete('cascade');
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        if (!Schema::hasTable('depreciation_payments')) {
+            Schema::create('depreciation_payments', function (Blueprint $table) {
+                $table->id('id');
+                $table->double('amount');
+                $table->integer('sub_id');
+                $table->date('date_paid');
+                $table->foreign('sub_id')
+                    ->references('sub_id')
+                    ->on('subsidiary')
+                    ->onDelete('cascade');
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**

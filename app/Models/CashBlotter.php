@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CashBlotter extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $primaryKey = 'cashblotter_id';
     protected $table = 'cash_blotter';
@@ -19,7 +22,19 @@ class CashBlotter extends Model
         'total_collection',
         'branch_id'
     ];
+    protected static $recordEvents = ['deleted', 'created', 'updated'];
+    public function getModelName()
+    {
 
+        return class_basename($this);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
+            ->useLogName('Cash Blotter');
+    }
 
     public static function fetchCashBlotter()
     {

@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\PersonalInfo;
+use App\Models\Accessibilities;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\HasApiTokens;
-use App\Models\PersonalInfo;
-use App\Models\Accessibilities;
-
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
-    public $with = ['personal_info', 'accessibilities.sub_module_list', 'userBranch','userRole'];
+    use HasApiTokens, HasFactory, Notifiable, LogsActivity;
+    public $with = ['personal_info', 'accessibilities.sub_module_list', 'userBranch', 'userRole'];
 
     protected $fillable = [
         'username',
@@ -36,6 +37,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    protected static $recordEvents = ['deleted', 'created', 'updated'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
+            ->useLogName('User Master File');
+    }
 
     public function personal_info()
     {
@@ -44,7 +53,7 @@ class User extends Authenticatable
 
     public function userRole()
     {
-        return $this->belongsTo(UserRole::class,'role_id','role_id');
+        return $this->belongsTo(UserRole::class, 'role_id', 'role_id');
     }
 
     public function userBranch()
@@ -70,5 +79,4 @@ class User extends Authenticatable
 
         return $user;
     }
-
 }

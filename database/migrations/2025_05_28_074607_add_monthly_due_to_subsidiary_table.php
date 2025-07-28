@@ -13,9 +13,11 @@ class AddMonthlyDueToSubsidiaryTable extends Migration
      */
     public function up()
     {
-        Schema::table('subsidiary', function (Blueprint $table) {
-            $table->double('monthly_due', 8, 2)->default(0.00)->after('sub_amount');
-        });
+        if (!Schema::hasTable('subsidiary')) {
+            Schema::table('subsidiary', function (Blueprint $table) {
+                $table->double('monthly_due', 8, 2)->default(0.00)->after('sub_amount');
+            });
+        }
     }
 
     /**

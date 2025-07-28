@@ -13,15 +13,17 @@ class CreateTransactionTypeTable extends Migration
      */
     public function up()
     {
-        Schema::create('transaction_type', function (Blueprint $table) {
-            $table->increments('transaction_type_id');
-			$table->string('transaction_type')->nullable();
-			$table->integer('transaction_category_id')->nullable();
-			$table->integer('visible')->nullable();
-			$table->integer('account_id')->nullable();
-			$table->integer('counter_account_id')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('transaction_type')) {
+            Schema::create('transaction_type', function (Blueprint $table) {
+                $table->increments('transaction_type_id');
+                $table->string('transaction_type')->nullable();
+                $table->integer('transaction_category_id')->nullable();
+                $table->integer('visible')->nullable();
+                $table->integer('account_id')->nullable();
+                $table->integer('counter_account_id')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
