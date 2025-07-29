@@ -275,7 +275,8 @@ class ReportsController extends MainController
                 
               
                 $subs['expensed'] = round($expensed, 2);
-                $subs['unexpensed'] = round($value->sub_amount - $subs['expensed'] -  $value->salvage, 2);
+                $unexpensed = round($value->sub_amount - $subs['expensed'] - $value->salvage, 2);
+                $subs['unexpensed'] = ($unexpensed >= -0.01 && $unexpensed <= 0.01) ? 0.00 : $unexpensed;
             }
 
             $subs['salvage'] = $value->salvage;
