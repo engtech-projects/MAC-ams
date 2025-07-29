@@ -143,7 +143,7 @@
                         request()->is('reports/cheque') ||
                         request()->is('reports/postDatedCheque') ||
                         request()->is('reports/chartOfAccounts') ||
-                        request()->is('reports/monthly-depreciation-report')
+                        request()->is('reports/monthly-depreciation/report')
                             ? 'menu-open'
                             : '' }}">
                         <a class="nav-link {{ request()->is('reports/subsidiary-ledger') ? 'active' : '' }}">
@@ -266,7 +266,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (checkUserHasAccessModule('sub-module', 'reports/monthly-depreciation-report'))
+                            @if (checkUserHasAccessModule('sub-module', 'reports/monthly-depreciation/report'))
                                 <form id="monthly-depreciation-report"
                                     action="{{ route('reports.monthly-depreciation') }}" method="POST"
                                     style="display: none;">
@@ -276,7 +276,7 @@
                                 <li class="nav-item">
                                     <a onclick="event.preventDefault(); document.getElementById('monthly-depreciation-report').submit();"
                                         href="{{ route('reports.monthly-depreciation') }}"
-                                        class="nav-link {{ request()->is('reports/monthly-depreciation-report') ? 'active' : '' }}">
+                                        class="nav-link {{ request()->is('reports/monthly-depreciation/report') ? 'active' : '' }}">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Monthly Depreciation</p>
                                     </a>

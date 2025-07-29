@@ -1237,34 +1237,6 @@
                             "sub_month").defaultValue;
                     return current_month;
                 },
-                /*                 postBranch: function(data) {
-                                    this.resetForm()
-
-                                    if (data && Array.isArray(data)) {
-                                        var newData = [];
-                                        for (var i = 0; i < data.length; i++) {
-                                            if (data[i][0] == "BRANCH TOTAL") {
-                                                newData.push(data[i][14])
-                                            }
-                                        }
-
-
-                                        axios.post(this.url, newData, {
-                                            headers: {
-                                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                                    .content
-                                            }
-                                        }).then(response => {
-                                            toastr.success(response.data.message);
-                                            this.newSub = response.data.data;
-                                            // window.reload();
-                                        }).catch(err => {
-                                            console.error(err)
-                                        })
-                                    } else {
-                                        toastr.warning("No data available");
-                                    }
-                                }, */
                 postMonthlyDepreciation: function(data) {
                     this.resetForm()
                     if (data) {
@@ -1274,7 +1246,7 @@
                                 newData.push(data[i][14])
                             }
                         }
-                        axios.post('post-depreciation', newData, {
+                        axios.post('monthly-depreciation/post', newData, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
