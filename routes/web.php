@@ -200,8 +200,6 @@ Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsContro
 Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter');
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
 /* Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses'); */
-Route::match(['get', 'post'], 'reports/monthly-depreciation-report', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthly-depreciation');
-
 
 Route::prefix('reports')->group(function () {
     Route::prefix('monthly-depreciation')->group(function () {
