@@ -220,6 +220,7 @@ class ReportsController extends MainController
             $expensed = $value->depreciation_payments->sum('amount');
 
             $subs  = [];
+            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
 
             $subs['sub_id'] = $value->sub_id;
             $subs['branch'] = $value->branch;
@@ -235,7 +236,7 @@ class ReportsController extends MainController
             $subs['sub_per_branch'] = $value->sub_per_branch;
             $subs['sub_address'] = $value->sub_address;
             $subs['sub_date_post'] = $value->sub_date_post;
-            $subs['branch_id'] = $value->branch_id;
+            $subs['branch_id'] = $branch->branch_id;
             $subs['description'] = $value->description;
             $subs['sub_cat_name'] = $value->sub_cat_name;
             $subs['sub_amount'] = $value->sub_amount;
@@ -403,17 +404,182 @@ class ReportsController extends MainController
             'type' => $type,
         ]);
     }
+    public function postDepreciation(Request $request)
+    {
+        $depreciationData = [];
+        $subIds = [];
+        $data = [];
+        $attributes = $request->all();
+        $category_id = null;
+        foreach ($attributes as $item) {
+
+            $temp = [
+                'sub_ids' => $item['sub_ids'],
+                'category_id' => $item['category_id'],
+                'total' => $item['total'],
+                'payment_ids' => $item['payment_ids'],
+                'category_id' => $item['category_id'],
+                'branch_id' => $item['branch_id'],
+                'branch_code' => $item['branch_code'],
+                'as_of' => $item['as_of']
+            ];
+            $category_id = $item['category_id'];
+            $data[] = $temp;
+        }
+
+        $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $category_id)->first();
+        $as_of = Carbon::parse($request->as_of)->endOfMonth();
+        $journalEntry = new JournalEntry();
+
+        $accountName = null;
+        $subIds = $request->sub_ids;
+        $branch = Branch::where('branch_code', $request->branch_code)->first();
+
+        $lastEntry = JournalEntry::where('book_id', 5)->orderBy('journal_id', 'DESC')->pluck('journal_no')->first();
+        $series = explode('-', $lastEntry);
+        $lastSeries = (int) $series[1] + 1;
+        $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
+
+        $journalDetails = [];
+        $totalMonthlyAmort = 0;
+        $totalPrepaidExpense = 0;
+
+
+        foreach ($data as $sub) {
+            foreach ($sub['sub_ids'] as $id) {
+                $subsidiary = Subsidiary::find($id);
+                if ($subsidiary) {
+                    if ($subsidiary->due_amort > 0) {
+                        $subsidiary->depreciation_payments()->create([
+                            'amount' => $subsidiary->monthly_due,
+                            'date_paid' => now(),
+                        ]);
+                    }
+                    if ($category_id === 51) {
+                        foreach ($request->sub_ids as $subId) {
+                            if ($subsidiary->prepaid_expense) {
+                                $payment = $subsidiary->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->first();
+                                if ($payment) {
+                                    $payment->update(['status' => 'posted']);
+                                }
+                                $subsidiary->prepaid_expense->save();
+                            }
+                        }
+                    }
+                }
+                $this->updateMonthlyDepreciation($sub['sub_ids']);
+            }
+            $subId = Subsidiary::where('sub_per_branch', $sub['branch_code'])->pluck('sub_id')->first();
+            $accountName = $subsidiaryCategory->accounts->first()->account_name;
+            if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
+                $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
+            } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
+                $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
+            } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::LEASE) {
+                $accountName = Accounts::where('account_number', 1555)->pluck('account_name')->first();
+            } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
+                $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
+            } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
+                $accountName = Accounts::where('account_number', 1415)->pluck('account_name')->first();
+            } else {
+                $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
+            }
+            foreach ($subsidiaryCategory->accounts as $account) {
+
+                $details = [
+                    'account_id' => $account->account_id,
+                    'journal_details_title' => $account->account_name,
+                    'subsidiary_id' => $subId, //$subsidiary["branch_code"] === Branch::BRANCH_CODE_HEAD_OFFICE ? Subsidiary::SUBSIDIARY_OFFICE : $request->branch_id,
+                    'status' => JournalEntry::STATUS_POSTED,
+                    'journal_details_account_no' => $account->account_number,
+                    'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
+
+                ];
+
+
+                if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                    if ($account->pivot->transaction_type == 'credit') {
+                        $details['journal_details_credit'] = $sub['total']['total_unposted_payments'];
+                    } else {
+                        $details['journal_details_debit'] =  0;
+                    }
+                    $totalPrepaidExpense += $sub['total']['total_unposted_payments'];
+                } else {
+                    if ($account->pivot->transaction_type == 'credit') {
+
+                        $details['journal_details_credit'] = $sub['total']['total_due_amort'];
+                        $details['journal_details_debit'] = 0;
+                    } else {
+                        $details['journal_details_credit'] = 0;
+                        $details['journal_details_debit'] = $sub['total']['total_due_amort'];
+                    }
+                }
+
+                if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
+                    $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
+                    $details["subsidiary_id"] = 1;
+                    $journalDetails[] = $details;
+                    $details["subsidiary_id"] = 2;
+                    $journalDetails[] = $details;
+                } else {
+                    $journalDetails[] = $details;
+                }
+                continue;
+            }
+            $totalMonthlyAmort += $sub['total']['total_due_amort'];
+        }
+        try {
+            DB::transaction(function () use ($journalEntry, $journalNumber, $as_of, $accountName, $subsidiaryCategory, $totalPrepaidExpense, $totalMonthlyAmort, $journalDetails) {
+                $journalEntry = JournalEntry::create([
+                    'journal_no' => $journalNumber,
+                    'journal_date' => $as_of->format('Y-m-d'),
+                    'branch_id' => 4,
+                    'book_id' => $journalEntry::DEPRECIATION_BOOK,
+                    'source' => $journalEntry::DEPRECIATION_SOURCE,
+                    'status' => $journalEntry::STATUS_POSTED,
+                    'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
+                    'amount' => $subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD
+                        ? $totalPrepaidExpense
+                        : $totalMonthlyAmort,
+                ]);
+                $journalEntry->details()->createMany($journalDetails);
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+
+        return response()->json(['message' => "Successfully Posted"], 200);
+    }
 
     public function postMonthlyDepreciation(Request $request)
     {
 
+
+        $depreciationData = [];
+        $subIds = [];
+        if (count($request->all()) === 1) {
+            /*             $subIds[] = $request->sub_ids; */
+        } else {
+
+            foreach ($request->all() as $item) {
+                $subIds[] = $item['sub_ids'];
+            }
+        }
+
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
+        $branchCode = null;
         $branchCode = $request->branch_code;
-        $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
-
-        $subAccounts = Subsidiary::where('sub_code', $branchCode)->with(['subsidiary_category'])->get();
-
-        $subCategory = SubsidiaryCategory::find($request->category_id);
+        $branchId = null;
+        if ($request->branch_code) {
+            $branchCode = $request->branch_code;
+        }
+        if ($request->branch_id) {
+            $branchId = $request->branch_id;
+        }
+        $subId = Subsidiary::when($branchCode, function ($query) use ($branchCode) {
+            $query->where('sub_per_branch', $branchCode);
+        })->pluck('sub_id')->first();
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
         $journalEntry = new JournalEntry();

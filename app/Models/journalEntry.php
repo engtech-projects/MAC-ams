@@ -16,7 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class journalEntry extends Model
 {
     use HasFactory;
-    use LogsActivity;
+    //use LogsActivity;
     protected $table = 'journal_entry';
     protected $primaryKey = 'journal_id';
     public $timestamps = true;
@@ -41,7 +41,7 @@ class journalEntry extends Model
         'payee',
         'remarks',
     ];
-    protected static $recordEvents = ['deleted', 'created'];
+    //protected static $recordEvents = ['deleted', 'created'];
 
     public function getModelName()
     {
