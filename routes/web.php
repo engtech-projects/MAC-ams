@@ -203,6 +203,11 @@ Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsCo
 Route::match(['get', 'post'], 'reports/monthly-depreciation-report', [ReportsController::class, 'monthlyDepreciation'])->name('reports.monthly-depreciation');
 Route::post('reports/monthly-depreciation-report-search', [ReportsController::class, 'search'])->name('reports.monthly-depreciation-report-search');
 Route::post('reports/monthly-depreciation-report-post', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
+
+Route::prefix('reports')->group(function () {
+    Route::post('post-depreciation', [ReportsController::class, 'postDepreciation'])->name('post.depreciation');
+});
+
 /* Route::delete('reports/subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('reports.delete-subsidiary'); */
 Route::post('subsidiary', [SubsidiaryController::class, 'store'])->name('subsidiary.store');
 Route::delete('subsidiary/{subsidiary}', [SubsidiaryController::class, 'destroy'])->name('subsidiary.delete');

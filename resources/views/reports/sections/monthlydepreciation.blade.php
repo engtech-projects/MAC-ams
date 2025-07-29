@@ -206,6 +206,15 @@
                                                     </button>
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <td>
+                                                    <button class="btn btn-primary"
+                                                        @click="postMonthlyDepreciation(processSubsidiary)">
+                                                        Post
+                                                    </button>
+                                                </td>
+
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -415,9 +424,10 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
-                                        <input type="number" class="form-control" v-model="rem">
-                                        <small class="text-success">
-                                            Must be less than or equal to remaining value.
+                                        <input type="number" class="form-control" v-model="rem"
+                                            @change="newRemBalance()">
+                                        <small class="text-danger">
+                                            ❌ Must be less than or equal to remaining value.
                                         </small>
                                     </div>
 
@@ -425,7 +435,7 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Total of remaining balance:
                                         </label>
-                                        <input type="text" disabled v-model="newRemBalance" class="form-control"
+                                        <input type="text" disabled v-model="bal" class="form-control"
                                             id="sub_acct_no">
                                     </div>
 
@@ -469,7 +479,7 @@
                     subsidiary_id: '',
                     category: null,
                     from: '',
-                    to: '',
+                    to: '2025-07-26',
                     account_id: '',
                     type: ''
                 },
@@ -516,18 +526,6 @@
             computed: {
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
-                },
-                newRemBalance() {
-                    var monthly_due = 0;
-                    var rem = this.rem;
-                    if (this.sub) {
-                        monthly_due = Number(this.sub[8].replace(/[^0-9.-]+/g, "")) / this.rem
-
-                        var amortization = Number(this.sub[4].replace(/[^0-9.-]+/g, "")) * this.rem
-
-
-                    }
-                    return this.formatCurrency(amortization * this.rem);
                 },
                 formattedUnexpensed() {
                     return this.subsidiary.unexpensed || '₱0.00';
@@ -963,7 +961,7 @@
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
-                               
+
                                 if (parseFloat(subsidiary[k].used) === parseFloat(subsidiary[k].sub_no_depre)) {
                                     branchTotalDueAmort += 0.00;
                                 } else {
@@ -1031,6 +1029,17 @@
             },
 
             methods: {
+                newRemBalance(event) {
+                    var monthly_due = 0;
+                    var rem = this.rem;
+                    if (this.sub) {
+                        rem = this.sub[11]
+                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
+
+                    }
+                    var newBal = this.rem * monthly_due
+                    this.bal = newBal
+                },
                 recomputeExpUnexp() {
                     let amount = this.subsidiary.sub_amount;
                     if (typeof amount === 'string') {
@@ -1228,10 +1237,64 @@
                             "sub_month").defaultValue;
                     return current_month;
                 },
+                /*                 postBranch: function(data) {
+                                    this.resetForm()
+
+                                    if (data && Array.isArray(data)) {
+                                        var newData = [];
+                                        for (var i = 0; i < data.length; i++) {
+                                            if (data[i][0] == "BRANCH TOTAL") {
+                                                newData.push(data[i][14])
+                                            }
+                                        }
+
+
+                                        axios.post(this.url, newData, {
+                                            headers: {
+                                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                                    .content
+                                            }
+                                        }).then(response => {
+                                            toastr.success(response.data.message);
+                                            this.newSub = response.data.data;
+                                            // window.reload();
+                                        }).catch(err => {
+                                            console.error(err)
+                                        })
+                                    } else {
+                                        toastr.warning("No data available");
+                                    }
+                                }, */
+                postMonthlyDepreciation: function(data) {
+                    this.resetForm()
+                    if (data) {
+                        var newData = [];
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i][0] == "BRANCH TOTAL") {
+                                newData.push(data[i][14])
+                            }
+                        }
+                        axios.post('post-depreciation', newData, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+                            this.newSub = response.data.data;
+                            // window.reload();
+                        }).catch(err => {
+                            console.error(err)
+                        })
+                    } else {
+                        toastr.warning("No data available");
+                    }
+                },
                 post: function(data) {
                     this.resetForm()
                     if (data) {
                         data.branch_id = this.filter.branch.branch_id;
+                        console.log(data);
                         axios.post(this.url, data, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1240,6 +1303,7 @@
                         }).then(response => {
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
+                            // window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
@@ -1368,6 +1432,7 @@
                         this.index = index;
                         this.sub = sub;
                         this.rem = sub[11]
+                        this.bal = Number(this.sub[8].replace(/[^0-9.-]+/g, ""));
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
                         return false;
@@ -1391,7 +1456,7 @@
                             const updated = {
                                 ...rows[index]
                             };
-                            updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                            updated.monthly_due = this.rem_bal;
                             const newArray = [...branchList[branchName]];
 
                             newArray[index] = updated;
