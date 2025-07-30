@@ -424,10 +424,11 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
-                                        <input type="number" class="form-control" v-model="rem"
-                                            @change="newRemBalance()">
-                                        <small class="text-danger">
-                                            ❌ Must be less than or equal to remaining value.
+
+                                        <input type="number" class="form-control" v-model="sub.rem">
+                                        <small class="text-success">
+                                            Must be less than or equal to remaining value.
+
                                         </small>
                                     </div>
 
@@ -460,7 +461,16 @@
         new Vue({
             el: '#app',
             data: {
-                sub: null,
+                sub: {
+                    'sub_id': null,
+                    'amount': 0,
+                    'unexpensed': 0,
+                    'expensed': 0,
+                    'rem': 0,
+                    'monthly_due': 0,
+                    'amort': 0,
+                    'used': 0
+                },
                 branches: @json($branches),
                 sub_categories: @json($subsidiary_categories),
                 reportType: '',
@@ -522,11 +532,32 @@
                 remDefault: 0,
                 bal: 0,
                 index: null,
+                subsidiaryList: {
+                    dynamic: [],
+                    non_dynamic: []
+                },
             },
             computed: {
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
                 },
+                newRemBalance() {
+                    var monthly_due = 0;
+                    var rem = this.sub.rem;
+                    var total = 0;
+                    var monthly_due = 0;
+                    if (this.sub.sub_id) {
+                        var diff = this.sub.rem - this.sub.used;
+                        monthly_due = this.sub.monthly_due * this.sub.rem
+                        if (diff <= 1) {
+                            monthly_due = this.sub.unexpensed
+                        }
+
+                    }
+                    return this.formatCurrency(monthly_due);
+                },
+
+
                 formattedUnexpensed() {
                     return this.subsidiary.unexpensed || '₱0.00';
                 },
@@ -769,6 +800,17 @@
                                         } else {
                                             val.push(this.formatCurrency(subsidiary.expensed))
                                         }
+                                        this.subsidiaryList.non_dynamic.push({
+                                            'sub_id': subsidiary.sub_id,
+                                            'amount': subsidiary.sub_amount,
+                                            'unexpensed': subsidiary.unexpensed,
+                                            'expensed': subsidiary.expensed,
+                                            'rem': subsidiary.rem,
+                                            'monthly_due': subsidiary.monthly_due,
+                                            'amort': subsidiary.sub_no_amort,
+                                            'used': subsidiary.used,
+                                            'amount_to_depreciate': subsidiary.monthly_due
+                                        });
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
                                             this.formatCurrency(
@@ -783,7 +825,8 @@
                                             subsidiary.sub_salvage,
                                             subsidiary.sub_code,
                                             subsidiary.sub_cat_id,
-                                            subsidiary.sub_per_branch)
+                                            subsidiary.sub_per_branch,
+                                            subsidiary.used)
                                         rows.push(val);
 
 
@@ -1401,10 +1444,18 @@
                 pay: function(sub, index) {
                     if (sub[11] > 0) {
                         $('#payDepreciationModal').modal('show');
-                        this.index = index;
-                        this.sub = sub;
-                        this.rem = sub[11]
-                        this.bal = Number(this.sub[8].replace(/[^0-9.-]+/g, ""));
+                        this.index = index
+                        this.sub = {
+                            'sub_id': sub[13],
+                            'amount': Number(sub[3].replace(/[^0-9\.-]+/g, "")),
+                            'unexpensed': Number(sub[8].replace(/[^0-9\.-]+/g, "")),
+                            'expensed': Number(sub[7].replace(/[^0-9\.-]+/g, "")),
+                            'rem': sub[11],
+                            'monthly_due': Number(sub[4].replace(/[^0-9\.-]+/g, "")),
+                            'amort': Number(sub[5].replace(/[^0-9\.-]+/g, "")),
+                            'used': sub[18]
+                        }
+
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
                         return false;
@@ -1412,12 +1463,18 @@
 
                 },
                 processPayment() {
+                    this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""))
+                    this.subsidiaryList.dynamic.push(this.sub);
+                    const dynamicIds = this.subsidiaryList.dynamic.map(item => item.sub_id);
+                    this.subsidiaryList.non_dynamic = this.subsidiaryList.non_dynamic.filter(item => !dynamicIds
+                        .includes(item
+                            .sub_id));
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
                     const subId = selectedItem[13];
                     var current_rem = selectedItem[11];
-                    if (this.rem > current_rem) {
+                    if (this.sub.rem > current_rem) {
                         toastr.warning("The number of remaining balance should not be greater than " + current_rem);
                         return false;
                     }
