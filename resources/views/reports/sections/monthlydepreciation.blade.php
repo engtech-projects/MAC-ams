@@ -206,6 +206,15 @@
                                                     </button>
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <td>
+                                                    <button class="btn btn-primary"
+                                                        @click="postMonthlyDepreciation(processSubsidiary)">
+                                                        Post
+                                                    </button>
+                                                </td>
+
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -415,9 +424,11 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
+
                                         <input type="number" class="form-control" v-model="sub.rem">
                                         <small class="text-success">
                                             Must be less than or equal to remaining value.
+
                                         </small>
                                     </div>
 
@@ -425,7 +436,7 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Total of remaining balance:
                                         </label>
-                                        <input type="text" disabled v-model="newRemBalance" class="form-control"
+                                        <input type="text" disabled v-model="bal" class="form-control"
                                             id="sub_acct_no">
                                     </div>
 
@@ -478,7 +489,7 @@
                     subsidiary_id: '',
                     category: null,
                     from: '',
-                    to: '',
+                    to: '2025-07-26',
                     account_id: '',
                     type: ''
                 },
@@ -545,6 +556,8 @@
                     }
                     return this.formatCurrency(monthly_due);
                 },
+
+
                 formattedUnexpensed() {
                     return this.subsidiary.unexpensed || '₱0.00';
                 },
@@ -801,7 +814,7 @@
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
                                             this.formatCurrency(
-                                                parseFloat(subsidiary.sub_no_amort) === parseFloat(
+                                                parseFloat(subsidiary.used) === parseFloat(
                                                     subsidiary.sub_no_depre) ?
                                                 0.00 :
                                                 parseFloat(subsidiary.monthly_due)),
@@ -824,7 +837,7 @@
                                         total_amort += parseFloat(subsidiary.total_amort)
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                        if (parseFloat(subsidiary.sub_no_amort) === parseFloat(subsidiary
+                                        if (parseFloat(subsidiary.used) === parseFloat(subsidiary
                                                 .sub_no_depre)) {
                                             total_due_amort += 0.00;
                                         } else {
@@ -991,7 +1004,12 @@
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
-                                branchTotalDueAmort += parseFloat(subsidiary[k].due_amort);
+
+                                if (parseFloat(subsidiary[k].used) === parseFloat(subsidiary[k].sub_no_depre)) {
+                                    branchTotalDueAmort += 0.00;
+                                } else {
+                                    branchTotalDueAmort += parseFloat(subsidiary[k].monthly_due);
+                                }
                                 branchTotalRem += parseFloat(subsidiary[k].rem);
 
                             }
@@ -1054,6 +1072,17 @@
             },
 
             methods: {
+                newRemBalance(event) {
+                    var monthly_due = 0;
+                    var rem = this.rem;
+                    if (this.sub) {
+                        rem = this.sub[11]
+                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
+
+                    }
+                    var newBal = this.rem * monthly_due
+                    this.bal = newBal
+                },
                 recomputeExpUnexp() {
                     let amount = this.subsidiary.sub_amount;
                     if (typeof amount === 'string') {
@@ -1251,10 +1280,36 @@
                             "sub_month").defaultValue;
                     return current_month;
                 },
+                postMonthlyDepreciation: function(data) {
+                    this.resetForm()
+                    if (data) {
+                        var newData = [];
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i][0] == "BRANCH TOTAL") {
+                                newData.push(data[i][14])
+                            }
+                        }
+                        axios.post('monthly-depreciation/post', newData, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+                            this.newSub = response.data.data;
+                            // window.reload();
+                        }).catch(err => {
+                            console.error(err)
+                        })
+                    } else {
+                        toastr.warning("No data available");
+                    }
+                },
                 post: function(data) {
                     this.resetForm()
                     if (data) {
                         data.branch_id = this.filter.branch.branch_id;
+                        console.log(data);
                         axios.post(this.url, data, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
@@ -1263,6 +1318,7 @@
                         }).then(response => {
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
+                            // window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
@@ -1429,7 +1485,7 @@
                             const updated = {
                                 ...rows[index]
                             };
-                            updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                            updated.monthly_due = this.rem_bal;
                             const newArray = [...branchList[branchName]];
 
                             newArray[index] = updated;
