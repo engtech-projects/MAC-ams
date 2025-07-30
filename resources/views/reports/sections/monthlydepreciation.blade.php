@@ -436,7 +436,7 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Total of remaining balance:
                                         </label>
-                                        <input type="text" disabled v-model="bal" class="form-control"
+                                        <input type="text" disabled v-model="newRemBalance" class="form-control"
                                             id="sub_acct_no">
                                     </div>
 
@@ -1074,17 +1074,6 @@
             },
 
             methods: {
-                newRemBalance(event) {
-                    var monthly_due = 0;
-                    var rem = this.rem;
-                    if (this.sub) {
-                        rem = this.sub[11]
-                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
-
-                    }
-                    var newBal = this.rem * monthly_due
-                    this.bal = newBal
-                },
                 recomputeExpUnexp() {
                     let amount = this.subsidiary.sub_amount;
                     if (typeof amount === 'string') {
