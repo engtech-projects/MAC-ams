@@ -543,9 +543,6 @@
                 },
                 newRemBalance() {
                     var monthly_due = 0;
-                    var rem = this.sub.rem;
-                    var total = 0;
-                    var monthly_due = 0;
                     if (this.sub.sub_id) {
                         var diff = this.sub.rem - this.sub.used;
                         monthly_due = this.sub.monthly_due * this.sub.rem
@@ -799,6 +796,11 @@
                                             val.push(this.formatCurrency(subsidiary.prepaid_expense))
                                         } else {
                                             val.push(this.formatCurrency(subsidiary.expensed))
+                                        }
+
+                                        var diff = subsidiary.rem - subsidiary.used;
+                                        if (diff <= 1) {
+                                            subsidiary.monthly_due = subsidiary.unexpensed
                                         }
                                         this.subsidiaryList.non_dynamic.push({
                                             'sub_id': subsidiary.sub_id,
