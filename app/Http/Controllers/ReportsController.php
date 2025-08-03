@@ -207,7 +207,7 @@ class ReportsController extends MainController
 
         // Check if the filtered month is the same as the last entry month
         $isSameMonth = $lastEntryDate && $filteredDate->format('Y-m') === $lastEntryDate->format('Y-m');
-        $isPosted = $lastEntryDate && $lastEntryDate->greaterThan($filteredDate) && !$isSameMonth;
+        $isPosted = $lastEntryDate && $lastEntryDate->greaterThan($filteredDate);
 
 
 
