@@ -408,6 +408,20 @@ class ReportsController extends MainController
         ]);
     }
 
+    
+            function splitAmountInTwo($amount) {
+                // work in cents to avoid floating imprecision
+                $totalCents = (int) round($amount * 100);
+                $halfCents = intdiv($totalCents, 2); // floor division
+                $first = $halfCents / 100; // e.g., 1714.28
+                $second = ($totalCents - $halfCents) / 100; // remainder, e.g., 1714.29
+                return [$first, $second];
+            }
+
+
+  
+
+
     public function postMonthlyDepreciation(Request $request)
     {
 
@@ -489,16 +503,21 @@ class ReportsController extends MainController
                 }
             }
 
-            if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
-                $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
-                $details["subsidiary_id"] = 1;
-                $journalDetails[] = $details;
-                $details["subsidiary_id"] = 2;
-                $journalDetails[] = $details;
-            } else {
-                $journalDetails[] = $details;
-            }
-            continue;
+       if ($request->branch_id === 4 && !empty($details['journal_details_debit']) && $details['journal_details_debit'] > 0) {
+            list($half1, $half2) = $this->splitAmountInTwo($details['journal_details_debit']);
+
+            $d1 = $details;
+            $d1['journal_details_debit'] = $half1;
+            $d1['subsidiary_id'] = 1;
+            $journalDetails[] = $d1;
+
+            $d2 = $details;
+            $d2['journal_details_debit'] = $half2;
+            $d2['subsidiary_id'] = 2;
+            $journalDetails[] = $d2;
+        } else {
+            $journalDetails[] = $details;
+        }
         }
         $journalEntry = JournalEntry::create([
             'journal_no' => $journalNumber,
