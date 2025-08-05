@@ -450,7 +450,7 @@ class ReportsController extends MainController
                 if ($subsidiary->due_amort > 0) {
                     $subsidiary->depreciation_payments()->create([
                         'amount' => $subsidiary->monthly_due,
-                        'date_paid' => now(),
+                        'date_paid' => $as_of,
                     ]);
                 }
             }
