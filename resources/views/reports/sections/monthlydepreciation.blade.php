@@ -209,6 +209,7 @@
                                             <tr>
                                                 <td>
                                                     <button class="btn btn-primary"
+                                                        v-show="subsidiaryAll && Object.keys(subsidiaryAll).length > 0"
                                                         @click="postMonthlyDepreciation(processSubsidiary)">
                                                         Post
                                                     </button>
@@ -532,9 +533,17 @@
                 remDefault: 0,
                 bal: 0,
                 index: null,
-                subsidiaryList: {
+                subsidiaries: {
+                    non_dynamic: [],
                     dynamic: [],
-                    non_dynamic: []
+                    category: null,
+                    date: null,
+                    branches: []
+                },
+                subsidiaryList: {
+                    sub_to_depreciate: [],
+                    category: null,
+                    date: null,
                 },
             },
             computed: {
@@ -544,9 +553,9 @@
                 newRemBalance() {
                     var monthly_due = 0;
                     if (this.sub.sub_id) {
-                        var diff = this.sub.rem - this.sub.used;
+                        var diff = this.sub.amort - this.sub.used;
                         monthly_due = this.sub.monthly_due * this.sub.rem
-                        if (diff <= 1) {
+                        if (this.sub.rem == this.remDefault) {
                             monthly_due = this.sub.unexpensed
                         }
 
@@ -802,17 +811,6 @@
                                         if (diff <= 1) {
                                             subsidiary.monthly_due = subsidiary.unexpensed
                                         }
-                                        this.subsidiaryList.non_dynamic.push({
-                                            'sub_id': subsidiary.sub_id,
-                                            'amount': subsidiary.sub_amount,
-                                            'unexpensed': subsidiary.unexpensed,
-                                            'expensed': subsidiary.expensed,
-                                            'rem': subsidiary.rem,
-                                            'monthly_due': subsidiary.monthly_due,
-                                            'amort': subsidiary.sub_no_amort,
-                                            'used': subsidiary.used,
-                                            'amount_to_depreciate': subsidiary.monthly_due
-                                        });
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
                                             this.formatCurrency(
@@ -828,7 +826,11 @@
                                             subsidiary.sub_code,
                                             subsidiary.sub_cat_id,
                                             subsidiary.sub_per_branch,
-                                            subsidiary.used)
+                                            subsidiary.used,
+                                            payment_ids,
+                                            branch[0].branch_id,
+                                            branch[0].branch_code,
+                                            subsidiary.branch)
                                         rows.push(val);
 
 
@@ -897,7 +899,8 @@
                                 'TOTAL MONTHLY',
                                 'TOTAL AMORT',
                                 'TOTAL USED',
-                                this.filter.category && this.filter.category.sub_cat_name === this
+                                this.filter.category && this.filter.category.sub_cat_name ===
+                                this
                                 .prepaid_expense ? 'TOTAL PREPAID EXP.' : 'TOTAL EXPENSED',
                                 'TOTAL UNEXPENSED',
                                 'TOTAL DUE AMORT',
@@ -917,7 +920,6 @@
                                 total_rem,
                                 total_inv, branch, data
                             ]);
-
                         }
                         rows.push(['GRAND TOTAL', '', '',
                             this.formatCurrency(gTotalAmount),
@@ -999,7 +1001,8 @@
                             let branchSubSalvage = 0;
                             for (var k in subsidiary) {
                                 if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                    branchTotalExpensed += parseFloat(subsidiary[k].prepaid_expense);
+                                    branchTotalExpensed += parseFloat(subsidiary[k]
+                                        .prepaid_expense);
                                 } else {
                                     branchTotalExpensed += parseFloat(subsidiary[k].expensed);
                                 }
@@ -1007,7 +1010,8 @@
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
 
-                                if (parseFloat(subsidiary[k].used) === parseFloat(subsidiary[k].sub_no_depre)) {
+                                if (parseFloat(subsidiary[k].used) === parseFloat(subsidiary[k]
+                                        .sub_no_depre)) {
                                     branchTotalDueAmort += 0.00;
                                 } else {
                                     branchTotalDueAmort += parseFloat(subsidiary[k].monthly_due);
@@ -1081,7 +1085,8 @@
                     }
 
                     const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
-                    const newLife = parseInt(this.subsidiary.new_life ?? this.subsidiary.sub_no_depre ?? 1);
+                    const newLife = parseInt(this.subsidiary.new_life ?? this.subsidiary
+                        .sub_no_depre ?? 1);
 
                     // FIX: Better handling of empty/erased rates
                     const oldRate = parseFloat(this.subsidiary.original_salvage_rate || 0) || 0;
@@ -1090,7 +1095,8 @@
                     let newRateInput = this.subsidiary.sub_salvage;
                     let newRate = 0;
 
-                    if (newRateInput !== null && newRateInput !== undefined && newRateInput !== '') {
+                    if (newRateInput !== null && newRateInput !== undefined && newRateInput !==
+                        '') {
                         // Only parse if there's actually a value
                         if (typeof newRateInput === 'string') {
                             newRateInput = newRateInput.trim(); // Remove whitespace
@@ -1140,7 +1146,8 @@
                             // Only subtract new salvage from unexpensed (don't touch expensed)
                             expensed = storedExpensed; // Keep expensed unchanged
                             const newSalvage = (newRate / 100) * amount;
-                            unexpensed = storedUnexpensed - newSalvage; // Subtract salvage from unexpensed
+                            unexpensed = storedUnexpensed -
+                                newSalvage; // Subtract salvage from unexpensed
 
                         } else if (oldRate === 0 && newRate === 0) {
                             // Case: No prior rate and still no rate - keep original stored values
@@ -1176,7 +1183,8 @@
                         } else {
                             // Case: Same rate or life change only OR oldRate=0 and newRate=0 (no change)
                             const hasValidNewLife = newLife > 0 && !isNaN(newLife);
-                            const originalLife = this.subsidiary.sub_no_depre || this.subsidiary.original_life;
+                            const originalLife = this.subsidiary.sub_no_depre || this.subsidiary
+                                .original_life;
 
                             if (hasValidNewLife && newLife != originalLife) {
                                 // Check if new life is less than or equal to used months
@@ -1186,7 +1194,8 @@
                                     unexpensed = storedUnexpensed;
                                 } else {
                                     // Life changed and is valid: KEEP existing expensed (already depreciated)
-                                    expensed = storedExpensed; // Don't touch what's already been expensed
+                                    expensed =
+                                        storedExpensed; // Don't touch what's already been expensed
 
                                     const salvageValue = (newRate / 100) * amount;
                                     const totalDepreciableAmount = amount - salvageValue;
@@ -1212,8 +1221,10 @@
                     unexpensed = Math.max(0, unexpensed);
 
                     // Round to 2 decimal places and format back to currency
-                    this.subsidiary.expensed = this.formatCurrency(Math.round(expensed * 100) / 100);
-                    this.subsidiary.unexpensed = this.formatCurrency(Math.round(unexpensed * 100) / 100);
+                    this.subsidiary.expensed = this.formatCurrency(Math.round(expensed * 100) /
+                        100);
+                    this.subsidiary.unexpensed = this.formatCurrency(Math.round(unexpensed * 100) /
+                        100);
                 },
                 onSearch: function() {
                     this.searching = false;
@@ -1223,7 +1234,8 @@
                     this.resetForm();
                 },
                 toAddPrepaidAmount() {
-                    var prepaidAmount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g, ""))
+                    var prepaidAmount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g,
+                        ""))
                     prepaidAmount = parseFloat(this.prepaid_amount) + prepaidAmount
                     this.prepaid_amount = this.formatCurrency(prepaidAmount);
                 },
@@ -1280,9 +1292,15 @@
                                 newData.push(data[i][14])
                             }
                         }
-                        axios.post('monthly-depreciation/post', newData, {
+                        this.subsidiaryList.category = this.filter.category
+                        this.subsidiaryList.date = this.filter.to
+                        this.subsidiaries.category = this.filter.category;
+                        this.subsidiaries.date = this.filter.to
+                        this.subsidiaries.non_dynamic = this.getNonDynamicPayments()
+                        axios.post('post', this.subsidiaries, {
                             headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                'X-CSRF-TOKEN': document.head.querySelector(
+                                        'meta[name="csrf-token"]')
                                     .content
                             }
                         }).then(response => {
@@ -1300,10 +1318,10 @@
                     this.resetForm()
                     if (data) {
                         data.branch_id = this.filter.branch.branch_id;
-                        console.log(data);
-                        axios.post(this.url, data, {
+                        axios.post('post', data, {
                             headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                'X-CSRF-TOKEN': document.head.querySelector(
+                                        'meta[name="csrf-token"]')
                                     .content
                             }
                         }).then(response => {
@@ -1332,7 +1350,8 @@
                     const salvageRate = Number(this.subsidiary.sub_salvage) || 0;
                     const salvage = (salvageRate / 100) * unexpensed;
 
-                    const remaining = this.remaining_life || 1; // computed property or fallback to 1!
+                    const remaining = this.remaining_life ||
+                        1; // computed property or fallback to 1!
 
                     const amort = (unexpensed - salvage) / remaining;
                     return isNaN(amort) ? 0 : amort;
@@ -1392,9 +1411,12 @@
                 },
                 formatTextToNumberFormat() {
                     if (this.isString(this.to_add_prepaid_amount)) {
-                        this.to_add_prepaid_amount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g, ""))
-                        this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, ""));
-                        this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
+                        this.to_add_prepaid_amount = Number(this.to_add_prepaid_amount.replace(
+                            /[^0-9\.-]+/g, ""))
+                        this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g,
+                            ""));
+                        this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(
+                            /[^0-9\.-]+/g, ""))
                     }
 
 
@@ -1436,6 +1458,7 @@
                     if (sub[11] > 0) {
                         $('#payDepreciationModal').modal('show');
                         this.index = index
+                        this.remDefault = sub[11]
                         this.sub = {
                             'sub_id': sub[13],
                             'amount': Number(sub[3].replace(/[^0-9\.-]+/g, "")),
@@ -1444,8 +1467,13 @@
                             'rem': sub[11],
                             'monthly_due': Number(sub[4].replace(/[^0-9\.-]+/g, "")),
                             'amort': Number(sub[5].replace(/[^0-9\.-]+/g, "")),
-                            'used': sub[18]
+                            'used': sub[18],
+                            'payment_ids': sub[19],
+                            'branch_id': sub[20],
+                            'branch_code': sub[21],
+                            'branch': sub[22]
                         }
+                        this.subsidiaries.dynamic.push(this.sub)
 
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
@@ -1453,20 +1481,70 @@
                     }
 
                 },
+                removeSubFromNonDynamic(sub_id, branchKey) {
+                    this.subsidiaryList.sub_to_depreciate.forEach(branchItem => {
+                        const branchKey = Object.keys(branchItem)[0];
+                        const dynamicList = branchItem[branchKey].dynamic;
+                        const nonDynamicList = branchItem[branchKey].non_dynamic;
+
+                        const dynamicIds = new Set(dynamicList.map(item => Number(item.sub_id)));
+                        branchItem[branchKey].non_dynamic = nonDynamicList.filter(
+                            item => !dynamicIds.has(Number(item.sub_id))
+                        );
+                    });
+
+
+                },
+                getNonDynamicPayments() {
+                    const data = this.processSubsidiary
+                    const subsidiaries = []
+                    const branches = []
+                    data.forEach((row, index) => {
+                        if (index === 1) {
+                            this.subsidiaries.branches.push(row[0])
+                        }
+                        if (Array.isArray(row) && row[0] === "BRANCH TOTAL") {
+                            const possibleSubs = row.find(col => Array.isArray(col) && col[0]?.sub_id !==
+                                undefined);
+                            if (Array.isArray(possibleSubs)) {
+                                possibleSubs
+                                    .filter(sub => sub.sub_id !== this.sub
+                                        .sub_id)
+                                    .forEach(sub => {
+                                        console.log(sub)
+                                        subsidiaries.push({
+                                            sub_id: sub.sub_id,
+                                            amount: parseFloat(sub.sub_amount),
+                                            unexpensed: sub.unexpensed,
+                                            expensed: sub.expensed,
+                                            rem: sub.rem,
+                                            monthly_due: sub.monthly_due,
+                                            amort: sub.sub_no_amort,
+                                            amount_to_depreciate: sub.monthly_amort,
+                                            used: sub.sub_no_depre,
+                                            payment_ids: sub.payment_ids || [],
+                                            branch_id: sub.branch_id,
+                                            branch_code: sub.branch_code,
+                                            branch: sub.branch
+                                        });
+                                    });
+                            }
+                        }
+                    });
+                    return subsidiaries
+                },
                 processPayment() {
                     this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""))
-                    this.subsidiaryList.dynamic.push(this.sub);
-                    const dynamicIds = this.subsidiaryList.dynamic.map(item => item.sub_id);
-                    this.subsidiaryList.non_dynamic = this.subsidiaryList.non_dynamic.filter(item => !dynamicIds
-                        .includes(item
-                            .sub_id));
+                    this.subsidiaries.non_dynamic = this.getNonDynamicPayments()
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
                     const subId = selectedItem[13];
                     var current_rem = selectedItem[11];
                     if (this.sub.rem > current_rem) {
-                        toastr.warning("The number of remaining balance should not be greater than " + current_rem);
+                        toastr.warning(
+                            "The number of remaining balance should not be greater than " +
+                            current_rem);
                         return false;
                     }
                     for (const [branchName, rows] of Object.entries(branchList)) {
@@ -1476,9 +1554,9 @@
                             const updated = {
                                 ...rows[index]
                             };
-                            updated.monthly_due = this.rem_bal;
+                            updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g,
+                                ""));
                             const newArray = [...branchList[branchName]];
-
                             newArray[index] = updated;
                             branchList[branchName] = newArray;
                         }
@@ -1528,7 +1606,8 @@
 
                     axios.post('/MAC-ams/subsidiary', this.subsidiary, {
                         headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            'X-CSRF-TOKEN': document.head.querySelector(
+                                    'meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
@@ -1569,7 +1648,8 @@
                 },
                 updateSubsidiary: function(data) {
                     var filters = this.filter;
-                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters
+                        .branch
                         .branch_alias
                     ]
                     subsidiaries = subsidiaries.map(sub =>
@@ -1578,7 +1658,9 @@
                             ...data,
                         } : sub
                     );
-                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                            .branch_alias
+                        ] =
                         subsidiaries;
 
                 },
@@ -1614,14 +1696,19 @@
                     const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
 
                     if (newLife > 0 && newLife < used) {
-                        toastr.error("New life must be greater than or equal to months already used.");
+                        toastr.error(
+                            "New life must be greater than or equal to months already used."
+                        );
                         return; // stop the update
                     }
 
-                    if (this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' && this
+                    if (this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' &&
+                        this
                         .to_add_prepaid_amount) {
-                        var unexpensed = Number(this.subsidiary.unexpensed.replace(/[^0-9\.-]+/g, ""));
-                        var toAddAmountStr = this.to_add_prepaid_amount ? String(this.to_add_prepaid_amount) :
+                        var unexpensed = Number(this.subsidiary.unexpensed.replace(
+                            /[^0-9\.-]+/g, ""));
+                        var toAddAmountStr = this.to_add_prepaid_amount ? String(this
+                                .to_add_prepaid_amount) :
                             '0';
                         var toAddAmount = Number(toAddAmountStr.replace(/[^0-9\.-]+/g, ""));
 
@@ -1636,7 +1723,8 @@
                     this.subsidiary.prepaid_expense = this.prepaid_amount;
                     this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount;
                     this.subsidiary.category = this.filter.category;
-                    this.subsidiary.original_salvage_rate = parseFloat(this.subsidiary.sub_salvage ?? 0);
+                    this.subsidiary.original_salvage_rate = parseFloat(this.subsidiary
+                        .sub_salvage ?? 0);
                     this.subsidiary.original_life = parseInt(this.subsidiary.sub_no_depre ?? 1);
 
                     this.recomputeExpUnexp();
@@ -1705,6 +1793,27 @@
                         })
                         .then(response => {
                             this.subsidiaryAll = response.data.data;
+                            const raw = response.data.data
+
+                            const allItems = Object.values(raw)
+                                .flatMap(branches => Object.values(branches).flat());
+                            this.subsidiaries.non_dynamic = allItems.map(item => {
+                                return {
+                                    'sub_id': item.sub_id,
+                                    'amount': item.sub_amount,
+                                    'unexpensed': item.unexpensed,
+                                    'expensed': item.expensed,
+                                    'rem': item.rem,
+                                    'monthly_due': item.monthly_due,
+                                    'amort': item.sub_no_amort,
+                                    'amount_to_depreciate': item.monthly_due,
+                                    'used': item.sub_no_depre,
+                                    'payment_ids': item.payment_ids,
+                                    'branch_id': item.branch_id,
+                                    'branch_code': item.sub_per_branch,
+                                    'branch': item.branch
+                                }
+                            })
                         })
                         .catch(error => {
                             console.error('Error:', error);
