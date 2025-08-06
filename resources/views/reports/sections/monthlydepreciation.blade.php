@@ -209,6 +209,7 @@
                                             <tr>
                                                 <td>
                                                     <button class="btn btn-primary"
+                                                        v-show="subsidiaryAll && Object.keys(subsidiaryAll).length > 0"
                                                         @click="postMonthlyDepreciation(processSubsidiary)">
                                                         Post
                                                     </button>
@@ -1510,6 +1511,7 @@
                                     .filter(sub => sub.sub_id !== this.sub
                                         .sub_id)
                                     .forEach(sub => {
+                                        console.log(sub)
                                         subsidiaries.push({
                                             sub_id: sub.sub_id,
                                             amount: parseFloat(sub.sub_amount),
@@ -1518,7 +1520,7 @@
                                             rem: sub.rem,
                                             monthly_due: sub.monthly_due,
                                             amort: sub.sub_no_amort,
-                                            amount_to_depreciate: sub.sub_amount,
+                                            amount_to_depreciate: sub.monthly_amort,
                                             used: sub.sub_no_depre,
                                             payment_ids: sub.payment_ids || [],
                                             branch_id: sub.branch_id,
@@ -1812,7 +1814,6 @@
                                     'branch': item.branch
                                 }
                             })
-                            console.log(this.subsidiaries);
                         })
                         .catch(error => {
                             console.error('Error:', error);

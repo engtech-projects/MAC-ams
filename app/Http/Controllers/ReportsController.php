@@ -49,13 +49,7 @@ class ReportsController extends MainController
     {
 
         /* ----- start journal ledger ----- */
-
-
         $accounting = Accounting::getFiscalYear();
-        // $from = $request->from ? $request->from : $accounting->default_start;
-        // $to = $request->to ? $request->to : $accounting->default_end;
-        // $from = $request->from ? $request->from : $accounting->start_date;
-        // $to = $request->to ? $request->to : $accounting->end_date;
         $from = $request->from ?? '';
         $to = $request->to ?? '';
         $branch_id = $request->branch_id ?? '';
@@ -64,8 +58,6 @@ class ReportsController extends MainController
         $journal_no = $request->journal_no ?? '';
         $journal_source = $request->journal_source ?? '';
         $journal_payee = $request->journal_payee ?? '';
-
-        // $branch = Branch::find($branch_id);
         $journal_entry = [];
         if ($from || $to || $book_id || $branch_id || $journal_no || $journal_source || $journal_payee || $status) {
             $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no, $journal_source, $journal_payee);
@@ -124,15 +116,6 @@ class ReportsController extends MainController
                 'details' => $entries
             ];
         }
-
-        // $currentPage = $request->page ? $request->page : 1;
-
-        /* ----- end journal ledger ----- */
-        // $paginated = $this->paginate($journal_ledger, $currentPage);
-
-        // echo '<pre>';
-        // var_export($journal_ledger);
-        // echo '</pre>';
 
         $data = [
             'title' => 'MAC-AMS | Journal Ledger',
@@ -389,10 +372,13 @@ class ReportsController extends MainController
         $totalPrepaidExpense = 0;
 
         $branch_sub = collect($attributes['subsidiaries'])->groupBy('branch_code');
-
+        $total = 0;
+        $total_to_depreciate = 0;
         foreach ($branch_sub as $branch) {
-            $total_to_depreciate = 0;
+
+            $totalBranchDue = 0;
             foreach ($branch as $sub) {
+
                 $subsidiary = Subsidiary::find($sub['sub_id']);
                 if ($subsidiary) {
                     if ($subsidiary->due_amort > 0) {
@@ -414,7 +400,6 @@ class ReportsController extends MainController
                     }
                 }
                 $this->updateMonthlyDepreciation($subIds);
-
                 $subId = Subsidiary::where('sub_per_branch', $sub['branch_code'])->pluck('sub_id')->first();
                 $subCategory = $subsidiaryCategory->sub_cat_code;
                 $accountNumber = Accounts::DEPRECIATION_ACCOUNTS[$subCategory] ?? Accounts::DEPRECIATION_DEFAULT_ACCOUNT;
@@ -422,36 +407,36 @@ class ReportsController extends MainController
                     $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
                 }
                 $accountName = Accounts::where('account_number', $accountNumber)->pluck('account_name')->first();
-
-                $total_to_depreciate += $sub['amount_to_depreciate'];
+                $totalBranchDue += $sub['monthly_due'];
             }
+
 
             foreach ($subsidiaryCategory->accounts as $account) {
                 $details = [
                     'account_id' => $account->account_id,
                     'journal_details_title' => $account->account_name,
-                    'subsidiary_id' => $subId, //$subsidiary["branch_code"] === Branch::BRANCH_CODE_HEAD_OFFICE ? Subsidiary::SUBSIDIARY_OFFICE : $request->branch_id,
+                    'subsidiary_id' => $subId,
                     'status' => JournalEntry::STATUS_POSTED,
                     'journal_details_account_no' => $account->account_number,
-                    'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
+                    'journal_details_ref_no' => $lastSeries,
 
                 ];
 
                 if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
                     if ($account->pivot->transaction_type == 'credit') {
-                        $details['journal_details_credit'] = 0; //$sub['total']['total_unposted_payments'];
+                        $details['journal_details_credit'] = 0;
                     } else {
                         $details['journal_details_debit'] =  0;
                     }
-                    $totalPrepaidExpense += 0; //$sub['total']['total_unposted_payments'];
+                    $totalPrepaidExpense += 0;
                 } else {
                     if ($account->pivot->transaction_type == 'credit') {
 
-                        $details['journal_details_credit'] = $total_to_depreciate;
+                        $details['journal_details_credit'] = $totalBranchDue;
                         $details['journal_details_debit'] = 0;
                     } else {
                         $details['journal_details_credit'] = 0;
-                        $details['journal_details_debit'] = $total_to_depreciate;
+                        $details['journal_details_debit'] = $totalBranchDue;
                     }
                 }
 
@@ -466,7 +451,7 @@ class ReportsController extends MainController
                 }
                 continue;
             }
-            $totalMonthlyAmort += $total_to_depreciate;
+            $totalMonthlyAmort += $totalBranchDue;
         }
         try {
             DB::transaction(function () use ($journalEntry, $journalNumber, $as_of, $accountName, $subsidiaryCategory, $totalPrepaidExpense, $totalMonthlyAmort, $journalDetails) {
@@ -686,10 +671,6 @@ class ReportsController extends MainController
                         'entries' => []
                     ];
                 }
-
-                //$transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
-
-
                 return response()->json(['data' => [$transactions, $balance]]);
 
 
@@ -1213,27 +1194,16 @@ class ReportsController extends MainController
 
         $coa = new Accounts();
         $accounting = Accounting::getFiscalYear();
-
         $from = $accounting->start_date;
-        // $from = '2024-02-01';
-        // $to = '2024-02-01';
-
         $now = Carbon::now();
         $to =  $request->input("date") ? new Carbon($request->input("date")) : $now;
         $balanceSheet = $coa->balanceSheet([$from, $to]);
-        // $currentEarnings = $coa->currentEarnings([$from, $to]);
-
-        // echo '<pre>';
-        // var_export($balanceSheet);
-        // echo '</pre>';
-
         $data = [
             'title' => 'MAC-AMS | Balance Sheet',
             'requests' => ['from' => $from, 'to' => $to],
             'fiscalYear' => $accounting,
             'balanceSheet' => $balanceSheet,
             'current_date' => $to->toDateString(),
-            // 'currentEarnings' => $currentEarnings
         ];
 
         return view('reports.sections.balanceSheet', $data);
