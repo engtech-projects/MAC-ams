@@ -281,7 +281,7 @@ class ReportsController extends MainController
 
             $subs['salvage'] = $value->salvage;
             $subs['sub_no_amort'] = $value->sub_no_amort;
-            $subs['rem'] = $value->rem;
+            $subs['rem'] = max(0, $value->sub_no_depre - $subs['used']);
             $subs['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
             $subs['inv'] = $value->inv;
             $subs['no'] = $value->no;
