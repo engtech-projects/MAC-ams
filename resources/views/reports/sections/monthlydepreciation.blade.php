@@ -1482,64 +1482,12 @@
                     }
 
                 },
-                removeSubFromNonDynamic(sub_id, branchKey) {
-                    this.subsidiaryList.sub_to_depreciate.forEach(branchItem => {
-                        const branchKey = Object.keys(branchItem)[0];
-                        const dynamicList = branchItem[branchKey].dynamic;
-                        const nonDynamicList = branchItem[branchKey].non_dynamic;
-
-                        const dynamicIds = new Set(dynamicList.map(item => Number(item.sub_id)));
-                        branchItem[branchKey].non_dynamic = nonDynamicList.filter(
-                            item => !dynamicIds.has(Number(item.sub_id))
-                        );
-                    });
-
-
-                },
-                getNonDynamicPayments() {
-                    const data = this.processSubsidiary
-                    const subsidiaries = []
-                    const branches = []
-                    data.forEach((row, index) => {
-                        if (index === 1) {
-                            this.subsidiaries.branches.push(row[0])
-                        }
-                        if (Array.isArray(row) && row[0] === "BRANCH TOTAL") {
-                            const possibleSubs = row.find(col => Array.isArray(col) && col[0]?.sub_id !==
-                                undefined);
-                            if (Array.isArray(possibleSubs)) {
-                                possibleSubs
-                                    .filter(sub => sub.sub_id !== this.sub
-                                        .sub_id)
-                                    .forEach(sub => {
-                                        subsidiaries.push({
-                                            sub_id: sub.sub_id,
-                                            amount: parseFloat(sub.sub_amount),
-                                            unexpensed: sub.unexpensed,
-                                            expensed: sub.expensed,
-                                            rem: sub.rem,
-                                            monthly_due: sub.monthly_due,
-                                            amort: sub.sub_no_amort,
-                                            amount_to_depreciate: sub.monthly_due,
-                                            used: sub.sub_no_depre,
-                                            payment_ids: sub.payment_ids || [],
-                                            branch_id: sub.branch_id,
-                                            branch_code: sub.branch_code,
-                                            branch: sub.branch
-                                        });
-                                    });
-                            }
-                        }
-                    });
-                    return subsidiaries
-                },
                 processPayment() {
                     this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""))
                     const dynamicIds = this.subsidiaries.non_dynamic.map(item => this.sub.sub_id);
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(item => !dynamicIds
                         .includes(item.sub_id)
                     );
-                    //this.subsidiaries.non_dynamic = this.getNonDynamicPayments()
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
