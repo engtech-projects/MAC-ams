@@ -490,7 +490,7 @@
                     subsidiary_id: '',
                     category: null,
                     from: '',
-                    to: '2025-07-26',
+                    to: '',
                     account_id: '',
                     type: ''
                 },
