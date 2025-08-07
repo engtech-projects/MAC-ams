@@ -1486,12 +1486,11 @@
                         this.closeModal();
                     } else {
                         axios.get('/collection-breakdown/' + collectionBreakdown.collection_id, {
-                                headers: {
-                                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                        .content
-                                }
-                            }).then(response => {
-                                var cb = response.data.data.collections;
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+                            }
+                        }).then(response => {
+                            var cb = response.data.data.collections;
 
                                 if (!cb.other_payment) {
                                     cb.other_payment = {
