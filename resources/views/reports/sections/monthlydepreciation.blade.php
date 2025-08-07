@@ -754,9 +754,7 @@
 
                     for (var i in this.subsidiaryAll) {
                         var branches = data[i];
-
                         rows.push([i]);
-
                         for (var j in branches) {
                             var branch = branches[j];
                             rows.push([j]);
@@ -808,8 +806,10 @@
                                         }
 
                                         var diff = subsidiary.rem - subsidiary.used;
+
+                                        var monthlyDue = subsidiary.monthly_due;
                                         if (diff <= 1) {
-                                            subsidiary.monthly_due = subsidiary.unexpensed
+                                            monthlyDue = subsidiary.unexpensed
                                         }
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
@@ -817,7 +817,7 @@
                                                 parseFloat(subsidiary.used) === parseFloat(
                                                     subsidiary.sub_no_depre) ?
                                                 0.00 :
-                                                parseFloat(subsidiary.monthly_due)),
+                                                parseFloat(monthlyDue)),
                                             this.formatCurrency(subsidiary.salvage),
                                             subsidiary.rem,
                                             subsidiary.inv,
@@ -830,12 +830,14 @@
                                             payment_ids,
                                             branch[0].branch_id,
                                             branch[0].branch_code,
-                                            subsidiary.branch)
+                                            subsidiary.branch,
+                                            subsidiary.monthly_due)
                                         rows.push(val);
 
 
+
                                         totalAmount += parseFloat(subsidiary.sub_amount),
-                                            total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                            total_monthly_amort += parseFloat(monthlyDue)
                                         total_no_depre += parseInt(subsidiary.sub_no_depre)
                                         total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                         total_amort += parseFloat(subsidiary.total_amort)
@@ -845,7 +847,7 @@
                                                 .sub_no_depre)) {
                                             total_due_amort += 0.00;
                                         } else {
-                                            total_due_amort += parseFloat(subsidiary.monthly_due);
+                                            total_due_amort += parseFloat(monthlyDue);
                                         }
                                         total_sub_salvage += parseFloat(subsidiary.salvage)
                                         total_rem += parseFloat(subsidiary.rem)
@@ -1296,7 +1298,6 @@
                         this.subsidiaryList.date = this.filter.to
                         this.subsidiaries.category = this.filter.category;
                         this.subsidiaries.date = this.filter.to
-                        this.subsidiaries.non_dynamic = this.getNonDynamicPayments()
                         axios.post('post', this.subsidiaries, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
@@ -1511,7 +1512,6 @@
                                     .filter(sub => sub.sub_id !== this.sub
                                         .sub_id)
                                     .forEach(sub => {
-                                        console.log(sub)
                                         subsidiaries.push({
                                             sub_id: sub.sub_id,
                                             amount: parseFloat(sub.sub_amount),
@@ -1520,7 +1520,7 @@
                                             rem: sub.rem,
                                             monthly_due: sub.monthly_due,
                                             amort: sub.sub_no_amort,
-                                            amount_to_depreciate: sub.monthly_amort,
+                                            amount_to_depreciate: sub.monthly_due,
                                             used: sub.sub_no_depre,
                                             payment_ids: sub.payment_ids || [],
                                             branch_id: sub.branch_id,
@@ -1535,7 +1535,12 @@
                 },
                 processPayment() {
                     this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""))
-                    this.subsidiaries.non_dynamic = this.getNonDynamicPayments()
+                    const dynamicIds = this.subsidiaries.non_dynamic.map(item => this.sub.sub_id);
+                    this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(item => !dynamicIds
+                        .includes(item.sub_id)
+                    );
+                    console.log(this.subsidiaries);
+                    //this.subsidiaries.non_dynamic = this.getNonDynamicPayments()
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
@@ -1554,8 +1559,8 @@
                             const updated = {
                                 ...rows[index]
                             };
-                            updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g,
-                                ""));
+                            updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                            updated.rem = updated.rem - this.sub.rem;
                             const newArray = [...branchList[branchName]];
                             newArray[index] = updated;
                             branchList[branchName] = newArray;
@@ -1794,10 +1799,16 @@
                         .then(response => {
                             this.subsidiaryAll = response.data.data;
                             const raw = response.data.data
-
+                            console.log()
                             const allItems = Object.values(raw)
                                 .flatMap(branches => Object.values(branches).flat());
                             this.subsidiaries.non_dynamic = allItems.map(item => {
+                                var diff = item.rem - item.used;
+
+                                var monthlyDue = item.monthly_due;
+                                if (diff <= 1) {
+                                    monthlyDue = item.unexpensed
+                                }
                                 return {
                                     'sub_id': item.sub_id,
                                     'amount': item.sub_amount,
@@ -1806,7 +1817,7 @@
                                     'rem': item.rem,
                                     'monthly_due': item.monthly_due,
                                     'amort': item.sub_no_amort,
-                                    'amount_to_depreciate': item.monthly_due,
+                                    'amount_to_depreciate': monthlyDue,
                                     'used': item.sub_no_depre,
                                     'payment_ids': item.payment_ids,
                                     'branch_id': item.branch_id,
@@ -1814,6 +1825,7 @@
                                     'branch': item.branch
                                 }
                             })
+                            console.log(this.subsidiaries);
                         })
                         .catch(error => {
                             console.error('Error:', error);
