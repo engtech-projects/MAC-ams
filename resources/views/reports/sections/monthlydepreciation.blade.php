@@ -1539,7 +1539,6 @@
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(item => !dynamicIds
                         .includes(item.sub_id)
                     );
-                    console.log(this.subsidiaries);
                     //this.subsidiaries.non_dynamic = this.getNonDynamicPayments()
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
@@ -1799,7 +1798,6 @@
                         .then(response => {
                             this.subsidiaryAll = response.data.data;
                             const raw = response.data.data
-                            console.log()
                             const allItems = Object.values(raw)
                                 .flatMap(branches => Object.values(branches).flat());
                             this.subsidiaries.non_dynamic = allItems.map(item => {
@@ -1825,7 +1823,6 @@
                                     'branch': item.branch
                                 }
                             })
-                            console.log(this.subsidiaries);
                         })
                         .catch(error => {
                             console.error('Error:', error);
