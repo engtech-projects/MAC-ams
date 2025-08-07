@@ -512,7 +512,6 @@ class ReportsController extends MainController
         if ($subCategory === SubsidiaryCategory::INSUR_ADD) {
             $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
         }
-        dd($subId);
         $accountName = Accounts::where('account_number', $accountNumber)->pluck('account_name')->first();
         foreach ($subsidiaryCategory->accounts as $account) {
             $details = [
