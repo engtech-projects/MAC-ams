@@ -400,7 +400,7 @@ class ReportsController extends MainController
                     }
                 }
                 $this->updateMonthlyDepreciation($subIds);
-                $subId = Subsidiary::where('sub_per_branch', $sub['branch_code'])->pluck('sub_id')->first();
+                $subId = Subsidiary::where('sub_code', $sub['branch_code'])->pluck('sub_id')->first();
                 $subCategory = $subsidiaryCategory->sub_cat_code;
                 $accountNumber = Accounts::DEPRECIATION_ACCOUNTS[$subCategory] ?? Accounts::DEPRECIATION_DEFAULT_ACCOUNT;
                 if ($subCategory === SubsidiaryCategory::INSUR_ADD) {
