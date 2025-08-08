@@ -906,7 +906,7 @@
             $('#edit_journal_date').prop('readonly', true);
             isInitialSetup = true;
             $.ajax({
-                url: '/open-posting-period',
+                url: '/MAC-ams/open-posting-period',
                 method: 'GET',
                 success: function(response) {
                     const dates = response.data || [];
