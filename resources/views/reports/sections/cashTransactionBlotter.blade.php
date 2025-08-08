@@ -1087,7 +1087,7 @@
                 data: @json($cash_blotter),
                 showModal: false,
                 accountOfficers: @json($account_officers),
-                baseUrl: window.location.protocol + "//" + window.location.host + "/MAC-ams",
+                baseUrl: window.location.protocol + "//" + window.location.host + "",
                 branches: null,
                 branch: null,
                 isEdit: false,
@@ -1357,7 +1357,7 @@
                     this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
                     this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
                     this.collectionBreakdown.total = totalCash;
-                    axios.post('/MAC-ams/collections', this.collectionBreakdown, {
+                    axios.post('/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -1515,7 +1515,7 @@
                         toastr.error("Unable to edit posted transaction.");
                         this.closeModal();
                     } else {
-                        axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown.collection_id, {
+                        axios.get('/collection-breakdown/' + collectionBreakdown.collection_id, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
                             }
@@ -1575,7 +1575,7 @@
                         toastr.error("Unable to delete posted transaction.");
                         return false;
                     } else {
-                        axios.delete('/MAC-ams/collection-breakdown/' + collection_id, {
+                        axios.delete('/collection-breakdown/' + collection_id, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
@@ -1627,7 +1627,7 @@
                         this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
                         this.collectionBreakdown.total = totalCash;
                     }
-                    axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
+                    axios.put('/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')

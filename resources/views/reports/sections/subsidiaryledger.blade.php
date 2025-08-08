@@ -1149,7 +1149,7 @@
                 show(event) {
                     this.isEdit = true;
                     const value = event.target.dataset.value;
-                    axios.get('/MAC-ams/subsidiary/' + value, {
+                    axios.get('/subsidiary/' + value, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content

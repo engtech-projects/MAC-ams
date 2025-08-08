@@ -747,7 +747,7 @@
                     this.fetchActivityLogs();
                 },
                 fetchActivityLogs() {
-                    axios.get('/MAC-ams/system-setup/activity-logs', {
+                    axios.get('/system-setup/activity-logs', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -763,7 +763,7 @@
                     })
                 },
                 viewActivityLog(id) {
-                    axios.get('/MAC-ams/system-setup/activity-logs/' + id, {
+                    axios.get('/system-setup/activity-logs/' + id, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -775,7 +775,7 @@
                     })
                 },
                 fetchAccounts() {
-                    axios.get('/MAC-ams/accounts').then(res => {
+                    axios.get('/accounts').then(res => {
                             console.log(res)
                             this.accounts = res.data.data;
                         })
@@ -792,7 +792,7 @@
                     this.category.account_id_debit = this.$refs.debit.value;
                     if (this.category.sub_cat_type == "" || this.category.sub_cat_type == "depre") {
 
-                        axios.post('/MAC-ams/subsidiary-category', this.category, {
+                        axios.post('/subsidiary-category', this.category, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                     .content
@@ -904,7 +904,7 @@
                     });
                 },
                 createPostingPeriod() {
-                    axios.post('/MAC-ams/posting-period', {
+                    axios.post('/posting-period', {
                         year: this.postingPeriodYear
                     }, {
                         headers: {
@@ -919,7 +919,7 @@
                     })
                 },
                 saveEdit: function(id, index) {
-                    axios.put('/MAC-ams/posting-period/' + id, this.editRow, {
+                    axios.put('/posting-period/' + id, this.editRow, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -951,7 +951,7 @@
                                 }, */
 
                 fetchPostingPeriodYears: function() {
-                    axios.get('/MAC-ams/posting-period-years', {
+                    axios.get('/posting-period-years', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -965,7 +965,7 @@
                 },
 
                 fetchPostingPeriods: function() {
-                    axios.get('/MAC-ams/posting-period', {
+                    axios.get('/posting-period', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
