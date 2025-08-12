@@ -805,19 +805,13 @@
                                             val.push(this.formatCurrency(subsidiary.expensed))
                                         }
 
-                                        var diff = subsidiary.rem - subsidiary.used;
-
-                                        var monthlyDue = subsidiary.monthly_due;
-                                        if (diff <= 1) {
-                                            monthlyDue = subsidiary.unexpensed
+                                        var due_amort = subsidiary.due_amort;
+                                        if (subsidiary.rem == 1) {
+                                            due_amort = subsidiary.unexpensed
                                         }
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
-                                            this.formatCurrency(
-                                                parseFloat(subsidiary.used) === parseFloat(
-                                                    subsidiary.sub_no_depre) ?
-                                                0.00 :
-                                                parseFloat(monthlyDue)),
+                                            this.formatCurrency(parseFloat(due_amort)),
                                             this.formatCurrency(subsidiary.salvage),
                                             subsidiary.rem,
                                             subsidiary.inv,
@@ -837,18 +831,19 @@
 
 
                                         totalAmount += parseFloat(subsidiary.sub_amount),
-                                            total_monthly_amort += parseFloat(monthlyDue)
+                                            total_monthly_amort += parseFloat(subsidiary.monthly_due)
                                         total_no_depre += parseInt(subsidiary.sub_no_depre)
                                         total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                         total_amort += parseFloat(subsidiary.total_amort)
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                        if (parseFloat(subsidiary.used) === parseFloat(subsidiary
-                                                .sub_no_depre)) {
-                                            total_due_amort += 0.00;
-                                        } else {
-                                            total_due_amort += parseFloat(monthlyDue);
-                                        }
+                                        total_due_amort += due_amort
+                                        /*                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary
+                                                                                        .sub_no_depre)) {
+                                                                                    total_due_amort += 0.00;
+                                                                                } else {
+                                                                                    total_due_amort += parseFloat(due_amort);
+                                                                                } */
                                         total_sub_salvage += parseFloat(subsidiary.salvage)
                                         total_rem += parseFloat(subsidiary.rem)
                                         total_inv += parseFloat(subsidiary.inv)
@@ -1507,7 +1502,7 @@
                             const updated = {
                                 ...rows[index]
                             };
-                            updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                            updated.due_amort = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
 
                             const newArray = [...rows];
                             newArray[index] = updated;
