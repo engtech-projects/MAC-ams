@@ -449,8 +449,6 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                     $details["subsidiary_id"] = 1;
                     $journalDetails[] = $details;
-                    $details["subsidiary_id"] = 2;
-                    $journalDetails[] = $details;
                 } else {
                     $journalDetails[] = $details;
                 }
@@ -622,9 +620,7 @@ class ReportsController extends MainController
         ];
         switch ($filter["type"]) {
             case 'subsidiary-ledger-listing-report':
-
                 $journalEntry = new journalEntry();
-                /* $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter); */
                 $subsidiaryListing = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id);
                 return response()->json(['data' => $subsidiaryListing]);
 
@@ -768,27 +764,6 @@ class ReportsController extends MainController
         return false;
     }
 
-    /* public function searchIndex() {
-        $transactions = Accounts::generalLedger_fetchAccounts();
-            $balance = 0;
-            foreach ($transactions as $transaction) {
-                $balance += $transaction->journal_details_debit;
-                $balance -= $transaction->journal_details_credit;
-                journalEntryDetails::where('journal_details_id',$transaction->journal_details_id)
-                ->update(['balance' => $balance]);
-            }
-            $data = [
-                'title' => 'General Ledger',
-                'chartOfAccount' => Accounts::get(),
-                'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
-                'transactions' => $transactions,
-            ];
-            return view('reports.sections.generalledger', $data);
-    } */
-    /* public function searchLedger(Request $request) {
-        return $request;
-    }
- */
     public function generalLedger(Request $request)
     {
 

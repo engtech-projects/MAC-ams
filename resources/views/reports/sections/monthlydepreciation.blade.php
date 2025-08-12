@@ -1307,7 +1307,7 @@
                         }).then(response => {
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
-                            // window.reload();
+                            window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
@@ -1483,41 +1483,43 @@
 
                 },
                 processPayment() {
-                    this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""))
-                    const dynamicIds = this.subsidiaries.non_dynamic.map(item => this.sub.sub_id);
-                    this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(item => !dynamicIds
-                        .includes(item.sub_id)
+
+                    this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+
+                    this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
+                        item => item.sub_id !== this.sub.sub_id
                     );
+
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
                     const subId = selectedItem[13];
-                    var current_rem = selectedItem[11];
+                    const current_rem = selectedItem[11];
                     if (this.sub.rem > current_rem) {
-                        toastr.warning(
-                            "The number of remaining balance should not be greater than " +
-                            current_rem);
+                        toastr.warning(`The number of remaining balance should not be greater than ${current_rem}`);
                         return false;
                     }
                     for (const [branchName, rows] of Object.entries(branchList)) {
                         if (!Array.isArray(rows)) continue;
+
                         const index = rows.findIndex(item => item.sub_id === subId);
                         if (index !== -1) {
                             const updated = {
                                 ...rows[index]
                             };
                             updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
-                            updated.rem = updated.rem - this.sub.rem;
-                            const newArray = [...branchList[branchName]];
+
+                            const newArray = [...rows];
                             newArray[index] = updated;
-                            branchList[branchName] = newArray;
+
+                            this.$set(branchList, branchName, newArray);
                         }
-
                     }
-                    this.subsidiaryAll[this.filter.category.sub_cat_name] = branchList;
+                    this.$set(this.subsidiaryAll, this.filter.category.sub_cat_name, branchList);
                     $('#payDepreciationModal').modal('hide');
-
                 },
+
+
                 resetForm: function() {
                     this.subsidiary = {
                         sub_name: '',
