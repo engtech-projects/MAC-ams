@@ -1507,7 +1507,6 @@
                             const updated = {
                                 ...rows[index]
                             };
-                            console.log(this.newRemBalance);
                             updated.monthly_due = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
 
                             const newArray = [...rows];
@@ -1602,7 +1601,6 @@
                     this.subsidiaryAll[category][branch].push(data);
                 },
                 updateSubsidiary: function(data) {
-                    console.log(data);
                     var filters = this.filter;
                     var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters
                         .branch
