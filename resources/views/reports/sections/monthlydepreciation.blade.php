@@ -1307,7 +1307,7 @@
                         }).then(response => {
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
-                            // window.reload();
+                            window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
@@ -1483,10 +1483,9 @@
 
                 },
                 processPayment() {
-                    // Update the amount
+
                     this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
 
-                    // FIX: Get real sub_ids from non_dynamic
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
                         item => item.sub_id !== this.sub.sub_id
                     );
@@ -1496,14 +1495,10 @@
 
                     const subId = selectedItem[13];
                     const current_rem = selectedItem[11];
-
-                    // Validation
                     if (this.sub.rem > current_rem) {
                         toastr.warning(`The number of remaining balance should not be greater than ${current_rem}`);
                         return false;
                     }
-
-                    // Update matching branch row
                     for (const [branchName, rows] of Object.entries(branchList)) {
                         if (!Array.isArray(rows)) continue;
 
@@ -1518,17 +1513,13 @@
                             const newArray = [...rows];
                             newArray[index] = updated;
 
-                            // Vue 2 reactivity for nested property
                             this.$set(branchList, branchName, newArray);
                         }
                     }
-
-                    // Ensure top-level reactivity
                     this.$set(this.subsidiaryAll, this.filter.category.sub_cat_name, branchList);
-
-                    // Close modal
                     $('#payDepreciationModal').modal('hide');
                 },
+
 
                 resetForm: function() {
                     this.subsidiary = {
@@ -1611,6 +1602,7 @@
                     this.subsidiaryAll[category][branch].push(data);
                 },
                 updateSubsidiary: function(data) {
+                    console.log(data);
                     var filters = this.filter;
                     var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters
                         .branch
