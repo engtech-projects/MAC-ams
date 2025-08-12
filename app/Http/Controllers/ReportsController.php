@@ -448,9 +448,9 @@ class ReportsController extends MainController
                 if ($branchId === 4 && $details['journal_details_debit'] > 0) {
                     $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                     $details["subsidiary_id"] = 1;
-                    $journalDetails[] = $details;
+                    /*                     $journalDetails[] = $details;
                     $details["subsidiary_id"] = 2;
-                    $journalDetails[] = $details;
+                    $journalDetails[] = $details; */
                 } else {
                     $journalDetails[] = $details;
                 }
