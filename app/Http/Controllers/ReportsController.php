@@ -449,6 +449,8 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                     $details["subsidiary_id"] = 1;
                     $journalDetails[] = $details;
+                    $details["subsidiary_id"] = 2;
+                    $journalDetails[] = $details;
                 } else {
                     $journalDetails[] = $details;
                 }
