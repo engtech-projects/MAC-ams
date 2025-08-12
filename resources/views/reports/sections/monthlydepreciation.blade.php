@@ -1284,6 +1284,10 @@
                         this.subsidiaryList.date = this.filter.to
                         this.subsidiaries.category = this.filter.category;
                         this.subsidiaries.date = this.filter.to
+                        this.subsidiaries.non_dynamic.map(item => {
+                            item.rem = 1
+                            return item;
+                        })
                         axios.post('post', this.subsidiaries, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
@@ -1460,7 +1464,11 @@
                             'branch_code': sub[21],
                             'branch': sub[22]
                         }
-                        this.subsidiaries.dynamic.push(this.sub)
+                        this.subsidiaries.dynamic = this.subsidiaries.dynamic.filter(
+                            item => item.sub_id !== sub[13]
+                        );
+                        this.subsidiaries.dynamic.push(this.sub);
+
 
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
@@ -1471,11 +1479,13 @@
                 processPayment() {
 
                     this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
-
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
                         item => item.sub_id !== this.sub.sub_id
                     );
 
+                    this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
+                        item => item.sub_id !== this.sub.sub_id
+                    );
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
