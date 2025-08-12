@@ -345,8 +345,6 @@ class ReportsController extends MainController
         $subIds = [];
         $attributes = $request->all();
         $category_id = null;
-        $totalDepreciate = 0;
-        $dynamic_ids = collect($attributes['dynamic'])->pluck('sub_id');
         $attributes['subsidiaries'] = array_merge($attributes['dynamic'], $attributes['non_dynamic']);
         $branchCodes = [];
 
@@ -371,11 +369,7 @@ class ReportsController extends MainController
         $journalDetails = [];
         $totalMonthlyAmort = 0;
         $totalPrepaidExpense = 0;
-
         $branch_sub = collect($attributes['subsidiaries'])->groupBy('branch_code');
-        $total = 0;
-        $total_to_depreciate = 0;
-
         foreach ($branch_sub as $branchKey => $branch) {
 
             $totalBranchDue = 0;
