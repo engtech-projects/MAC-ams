@@ -1288,8 +1288,6 @@
                             item.rem = 1
                             return item;
                         })
-                        console.log(this.subsidiaries)
-                        return false;
                         axios.post('post', this.subsidiaries, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
@@ -1469,8 +1467,6 @@
                         this.subsidiaries.dynamic = this.subsidiaries.dynamic.filter(
                             item => item.sub_id !== sub[13]
                         );
-
-                        // Push the updated sub into dynamic
                         this.subsidiaries.dynamic.push(this.sub);
 
 
@@ -1490,10 +1486,6 @@
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
                         item => item.sub_id !== this.sub.sub_id
                     );
-
-                    console.log(this.subsidiaries)
-
-
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
