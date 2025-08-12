@@ -827,9 +827,6 @@
                                             subsidiary.branch,
                                             subsidiary.monthly_due)
                                         rows.push(val);
-
-
-
                                         totalAmount += parseFloat(subsidiary.sub_amount),
                                             total_monthly_amort += parseFloat(subsidiary.monthly_due)
                                         total_no_depre += parseInt(subsidiary.sub_no_depre)
@@ -838,12 +835,6 @@
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
                                         total_due_amort += due_amort
-                                        /*                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary
-                                                                                        .sub_no_depre)) {
-                                                                                    total_due_amort += 0.00;
-                                                                                } else {
-                                                                                    total_due_amort += parseFloat(due_amort);
-                                                                                } */
                                         total_sub_salvage += parseFloat(subsidiary.salvage)
                                         total_rem += parseFloat(subsidiary.rem)
                                         total_inv += parseFloat(subsidiary.inv)
