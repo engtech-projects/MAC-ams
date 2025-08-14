@@ -181,12 +181,6 @@
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'" v-show="filter.branch && searching">
-                                                    {{-- <button v-show="ps.length > 13" class="btn btn-primary"
-                                                        @click="post(ps[14])">
-                                                        Post
-                                                    </button> --}}
-
-
                                                     <button v-show="ps.length >= 13"
                                                         class="btn
                                                         btn-success"
