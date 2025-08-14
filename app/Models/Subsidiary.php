@@ -144,6 +144,10 @@ class Subsidiary extends Model
     {
         return round($this->sub_amount - $this->salvage, 2);
     }
+    public function getUsedAttribute()
+    {
+        return $this->depreciation_payments()->count();
+    }
     /* protected function monthlyDue(): Attribute
     {
         return Attribute::make(
