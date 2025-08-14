@@ -181,10 +181,10 @@
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'" v-show="filter.branch && searching">
-                                                    <button v-show="ps.length > 13" class="btn btn-primary"
+                                                    {{-- <button v-show="ps.length > 13" class="btn btn-primary"
                                                         @click="post(ps[14])">
                                                         Post
-                                                    </button>
+                                                    </button> --}}
 
 
                                                     <button v-show="ps.length >= 13"
@@ -209,7 +209,7 @@
                                             <tr>
                                                 <td>
                                                     <button class="btn btn-primary"
-                                                        v-show="subsidiaryAll && Object.keys(subsidiaryAll).length > 0"
+                                                        v-show="subsidiaryAll && Object.keys(subsidiaryAll).length > 0 && !filter.branch"
                                                         @click="postMonthlyDepreciation(processSubsidiary)">
                                                         Post
                                                     </button>
@@ -1297,6 +1297,7 @@
                         }).then(response => {
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
+                            this.subsidiaries.dynamic = []
                             window.reload();
                         }).catch(err => {
                             console.error(err)
@@ -1455,7 +1456,7 @@
                             'amount': Number(sub[3].replace(/[^0-9\.-]+/g, "")),
                             'unexpensed': Number(sub[8].replace(/[^0-9\.-]+/g, "")),
                             'expensed': Number(sub[7].replace(/[^0-9\.-]+/g, "")),
-                            'rem': sub[11],
+                            'rem': Number(sub[11]),
                             'monthly_due': Number(sub[4].replace(/[^0-9\.-]+/g, "")),
                             'amort': Number(sub[5].replace(/[^0-9\.-]+/g, "")),
                             'used': sub[18],
@@ -1479,10 +1480,6 @@
                 processPayment() {
 
                     this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
-                    this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
-                        item => item.sub_id !== this.sub.sub_id
-                    );
-
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
                         item => item.sub_id !== this.sub.sub_id
                     );
@@ -1749,9 +1746,9 @@
                             this.subsidiaries.non_dynamic = allItems.map(item => {
                                 var diff = item.rem - item.used;
 
-                                var monthlyDue = item.monthly_due;
-                                if (diff <= 1) {
-                                    monthlyDue = item.unexpensed
+                                var dueAmort = item.due_amort;
+                                if (item.rem == 1) {
+                                    dueAmort = item.unexpensed
                                 }
                                 return {
                                     'sub_id': item.sub_id,
@@ -1761,7 +1758,7 @@
                                     'rem': item.rem,
                                     'monthly_due': item.monthly_due,
                                     'amort': item.sub_no_amort,
-                                    'amount_to_depreciate': monthlyDue,
+                                    'amount_to_depreciate': dueAmort,
                                     'used': item.sub_no_depre,
                                     'payment_ids': item.payment_ids,
                                     'branch_id': item.branch_id,

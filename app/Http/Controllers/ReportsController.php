@@ -227,7 +227,7 @@ class ReportsController extends MainController
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
             $subs['monthly_due'] = $value->monthly_due;
-            $subs['used'] = $value->depreciation_payments->count();
+            $subs['used'] = $value->used;
 
             // Calculate prepaid expense payments first
             $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
@@ -338,6 +338,26 @@ class ReportsController extends MainController
             'type' => $type,
         ]);
     }
+
+    private function createDynamicPayments($sub)
+    {
+        $rem = intVal($sub['rem']);
+        $payments = [];
+        $balance = $sub['amount_to_depreciate'];
+        $newBal = 0;
+        for ($i = 0; $i < $rem; $i++) {
+            $monthly_due = $sub['monthly_due'];
+            if ($i === $rem - 1) {
+                $monthly_due = $balance;
+            }
+            $balance -= $monthly_due;
+            $payments[] = [
+                'amount' => $monthly_due,
+                'date_paid' => now()
+            ];
+        }
+        return $payments;
+    }
     public function postDepreciation(Request $request)
     {
 
@@ -374,14 +394,19 @@ class ReportsController extends MainController
 
             $totalBranchDue = 0;
             $branchId = null;
-            foreach ($branch as $sub) {
+            foreach ($branch as $subKey => $sub) {
                 $subsidiary = Subsidiary::find($sub['sub_id']);
                 if ($subsidiary) {
                     if ($subsidiary->due_amort > 0) {
-                        $subsidiary->depreciation_payments()->create([
-                            'amount' => $subsidiary->monthly_due,
-                            'date_paid' => now(),
-                        ]);
+                        if (intVal($sub['rem']) > 1) {
+                            $dynamic_payments = $this->createDynamicPayments($sub);
+                            $subsidiary->depreciation_payments()->createMany($dynamic_payments);
+                        } else {
+                            $subsidiary->depreciation_payments()->create([
+                                'amount' => $subsidiary->monthly_due,
+                                'date_paid' => now(),
+                            ]);
+                        }
                     }
                     if ($category_id === 51) {
                         foreach ($request->sub_ids as $subId) {
