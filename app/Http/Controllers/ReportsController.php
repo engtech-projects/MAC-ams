@@ -49,13 +49,7 @@ class ReportsController extends MainController
     {
 
         /* ----- start journal ledger ----- */
-
-
         $accounting = Accounting::getFiscalYear();
-        // $from = $request->from ? $request->from : $accounting->default_start;
-        // $to = $request->to ? $request->to : $accounting->default_end;
-        // $from = $request->from ? $request->from : $accounting->start_date;
-        // $to = $request->to ? $request->to : $accounting->end_date;
         $from = $request->from ?? '';
         $to = $request->to ?? '';
         $branch_id = $request->branch_id ?? '';
@@ -64,8 +58,6 @@ class ReportsController extends MainController
         $journal_no = $request->journal_no ?? '';
         $journal_source = $request->journal_source ?? '';
         $journal_payee = $request->journal_payee ?? '';
-
-        // $branch = Branch::find($branch_id);
         $journal_entry = [];
         if ($from || $to || $book_id || $branch_id || $journal_no || $journal_source || $journal_payee || $status) {
             $journal_entry = journalEntry::fetch($status, $from, $to, $book_id, $branch_id, 'ASC', $journal_no, $journal_source, $journal_payee);
@@ -124,15 +116,6 @@ class ReportsController extends MainController
                 'details' => $entries
             ];
         }
-
-        // $currentPage = $request->page ? $request->page : 1;
-
-        /* ----- end journal ledger ----- */
-        // $paginated = $this->paginate($journal_ledger, $currentPage);
-
-        // echo '<pre>';
-        // var_export($journal_ledger);
-        // echo '</pre>';
 
         $data = [
             'title' => 'MAC-AMS | Journal Ledger',
@@ -220,6 +203,7 @@ class ReportsController extends MainController
             $expensed = $value->depreciation_payments->sum('amount');
 
             $subs  = [];
+            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
 
             $subs['sub_id'] = $value->sub_id;
             $subs['branch'] = $value->branch;
@@ -235,7 +219,7 @@ class ReportsController extends MainController
             $subs['sub_per_branch'] = $value->sub_per_branch;
             $subs['sub_address'] = $value->sub_address;
             $subs['sub_date_post'] = $value->sub_date_post;
-            $subs['branch_id'] = $value->branch_id;
+            $subs['branch_id'] = $branch->branch_id;
             $subs['description'] = $value->description;
             $subs['sub_cat_name'] = $value->sub_cat_name;
             $subs['sub_amount'] = $value->sub_amount;
@@ -243,7 +227,7 @@ class ReportsController extends MainController
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
             $subs['monthly_due'] = $value->monthly_due;
-            $subs['used'] = $value->depreciation_payments->count();
+            $subs['used'] = $value->used;
 
             // Calculate prepaid expense payments first
             $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
@@ -305,51 +289,6 @@ class ReportsController extends MainController
 
     public function monthlyDepreciation(Request $request)
     {
-
-        /* $branches = Branch::all();
-        $date = $request->sub_date;
-
-
-        $subsidiary = new Subsidiary();
-        $branch = Branch::find($request->branch_id);
-        $type = 'listing';
-        if ($request->type == 'summary') {
-            $type = $request->type;
-        }
-        $result = $subsidiary->getDepreciation($request->sub_cat_id, $branch, $date);
-        $data = $result->map(function ($value) use ($branch) {
-            if ($value->sub_no_depre == 0) {
-                $value->sub_no_depre = 1;
-            }
-            $branch = Branch::where('branch_code', $value->sub_per_branch)->first();
-            $monthlyAmort = $value->sub_amount / $value->sub_no_depre;
-            $value['branch'] = $branch->branch_code . '-' . $branch->branch_name;
-            $value['branch_code'] = $branch->branch_code;
-            $value['branch_id'] = $branch->branch_id;
-            $value['description'] = $value->subsidiary_category->description;
-            $value['sub_cat_name'] = $value->subsidiary_category->sub_cat_name;
-            $value['sub_cat_id'] = $value->subsidiary_category->sub_cat_id;
-            $value['monthly_amort'] = $monthlyAmort;
-            $value['expensed'] = round($value->sub_no_amort * $monthlyAmort, 2);
-            $value['unexpensed'] = round($value->sub_amount - $value->expensed);
-            $value['due_amort'] = round($value->sub_no_amort, 2);
-
-            $value['rem'] = round($value->sub_no_depre - $value->sub_no_amort, 2);
-            $value['inv'] = 0;
-            $value['no'] = 0;
-            return $value;
-        })->groupBy('description')->map(function ($value) {
-            return $value->groupBy('branch');
-        });
-
-        $data = [
-            'data' => $data,
-            'subsidiary_categories' => SubsidiaryCategory::where('sub_cat_type', 'depre')->get(),
-            'as_of' => $date,
-            'branches' => $branches,
-            'title' => 'MAC-AMS | Monthly Depreciation',
-            'type' => $type
-        ]; */
         $branches = Branch::all();
         $date = $request->to;
 
@@ -363,10 +302,6 @@ class ReportsController extends MainController
         $result = $subsidiary->getDepreciation($request->sub_cat_id, null, $date);
 
         $data = $result->map(function ($value) {
-            // if ($value->sub_no_depre == 0) {
-            //     $value->sub_no_depre = 1;
-            // }
-
             $value['branch'] = $value->branch;
             $value['branch_code'] = $value->sub_per_branch;
             $value['branch_id'] = $value->branch_id;
@@ -422,20 +357,178 @@ class ReportsController extends MainController
   
 
 
+    private function createDynamicPayments($sub)
+    {
+        $rem = intVal($sub['rem']);
+        $payments = [];
+        $balance = $sub['amount_to_depreciate'];
+        $newBal = 0;
+        for ($i = 0; $i < $rem; $i++) {
+            $monthly_due = $sub['monthly_due'];
+            if ($i === $rem - 1) {
+                $monthly_due = $balance;
+            }
+            $balance -= $monthly_due;
+            $payments[] = [
+                'amount' => $monthly_due,
+                'date_paid' => now()
+            ];
+        }
+        return $payments;
+    }
+    public function postDepreciation(Request $request)
+    {
+
+        $data = [];
+        $subIds = [];
+        $attributes = $request->all();
+        $category_id = null;
+        $attributes['subsidiaries'] = array_merge($attributes['dynamic'], $attributes['non_dynamic']);
+        $branchCodes = [];
+
+
+        foreach ($attributes['branches'] as $branch) {
+            $code = explode("-", $branch);
+            $branchCodes[] = $code[0];
+        }
+
+        $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $attributes['category']['sub_cat_id'])->first();
+        $as_of = Carbon::parse($request->as_of)->endOfMonth();
+        $journalEntry = new JournalEntry();
+
+        $accountName = null;
+        $branch = Branch::where('branch_code', $request->branch_code)->first();
+
+        $lastEntry = JournalEntry::where('book_id', 5)->orderBy('journal_id', 'DESC')->pluck('journal_no')->first();
+        $series = explode('-', $lastEntry);
+        $lastSeries = (int) $series[1] + 1;
+        $journalNumber = $series[0] . '-' . str_pad($lastSeries, 6, '0', STR_PAD_LEFT);
+
+        $journalDetails = [];
+        $totalMonthlyAmort = 0;
+        $totalPrepaidExpense = 0;
+        $branch_sub = collect($attributes['subsidiaries'])->groupBy('branch_code');
+        foreach ($branch_sub as $branchKey => $branch) {
+
+            $totalBranchDue = 0;
+            $branchId = null;
+            foreach ($branch as $subKey => $sub) {
+                $subsidiary = Subsidiary::find($sub['sub_id']);
+                if ($subsidiary) {
+                    if ($subsidiary->due_amort > 0) {
+                        if (intVal($sub['rem']) > 1) {
+                            $dynamic_payments = $this->createDynamicPayments($sub);
+                            $subsidiary->depreciation_payments()->createMany($dynamic_payments);
+                        } else {
+                            $subsidiary->depreciation_payments()->create([
+                                'amount' => $subsidiary->monthly_due,
+                                'date_paid' => now(),
+                            ]);
+                        }
+                    }
+                    if ($category_id === 51) {
+                        foreach ($request->sub_ids as $subId) {
+                            if ($subsidiary->prepaid_expense) {
+                                $payment = $subsidiary->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->first();
+                                if ($payment) {
+                                    $payment->update(['status' => 'posted']);
+                                }
+                                $subsidiary->prepaid_expense->save();
+                            }
+                        }
+                    }
+                    if ($subsidiary->sub_no_depre > $subsidiary->sub_no_amort) {
+                        $subsidiary->sub_no_amort = $subsidiary->sub_no_amort + $sub['rem'];
+                    }
+                    $subsidiary->update();
+                }
+                $subId = Subsidiary::where('sub_code', $sub['branch_code'])->pluck('sub_id')->first();
+                $subCategory = $subsidiaryCategory->sub_cat_code;
+                $accountNumber = Accounts::DEPRECIATION_ACCOUNTS[$subCategory] ?? Accounts::DEPRECIATION_DEFAULT_ACCOUNT;
+                if ($subCategory === SubsidiaryCategory::INSUR_ADD) {
+                    $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
+                }
+                $accountName = Accounts::where('account_number', $accountNumber)->pluck('account_name')->first();
+                $totalBranchDue += $sub['amount_to_depreciate'];
+                $branchId = $sub['branch_id'];
+            }
+
+            foreach ($subsidiaryCategory->accounts as $account) {
+                $details = [
+                    'account_id' => $account->account_id,
+                    'journal_details_title' => $account->account_name,
+                    'subsidiary_id' => $subId,
+                    'status' => JournalEntry::STATUS_POSTED,
+                    'journal_details_account_no' => $account->account_number,
+                    'journal_details_ref_no' => $lastSeries,
+
+                ];
+
+                if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+                    if ($account->pivot->transaction_type == 'credit') {
+                        $details['journal_details_credit'] = 0;
+                    } else {
+                        $details['journal_details_debit'] =  0;
+                    }
+                    $totalPrepaidExpense += 0;
+                } else {
+                    if ($account->pivot->transaction_type == 'credit') {
+
+                        $details['journal_details_credit'] = $totalBranchDue;
+                        $details['journal_details_debit'] = 0;
+                    } else {
+                        $details['journal_details_credit'] = 0;
+                        $details['journal_details_debit'] = $totalBranchDue;
+                    }
+                }
+
+                if ($branchId === 4 && $details['journal_details_debit'] > 0) {
+                    $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
+                    $details["subsidiary_id"] = 1;
+                    $journalDetails[] = $details;
+                    $details["subsidiary_id"] = 2;
+                    $journalDetails[] = $details;
+                } else {
+                    $journalDetails[] = $details;
+                }
+                continue;
+            }
+
+            $totalMonthlyAmort += $totalBranchDue;
+        }
+
+        try {
+            DB::transaction(function () use ($journalEntry, $journalNumber, $as_of, $accountName, $subsidiaryCategory, $totalPrepaidExpense, $totalMonthlyAmort, $journalDetails) {
+                $journalEntry = JournalEntry::create([
+                    'journal_no' => $journalNumber,
+                    'journal_date' => $as_of->format('Y-m-d'),
+                    'branch_id' => 4,
+                    'book_id' => $journalEntry::DEPRECIATION_BOOK,
+                    'source' => $journalEntry::DEPRECIATION_SOURCE,
+                    'status' => $journalEntry::STATUS_POSTED,
+                    'remarks' => 'Representing Month End Schedule As of ' . $as_of . '-' . $accountName,
+                    'amount' => $subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD
+                        ? $totalPrepaidExpense
+                        : $totalMonthlyAmort,
+                ]);
+                $journalEntry->details()->createMany($journalDetails);
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+
+        return response()->json(['message' => "Successfully Posted"], 200);
+    }
+
     public function postMonthlyDepreciation(Request $request)
     {
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
         $branchCode = $request->branch_code;
         $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
-
-        $subAccounts = Subsidiary::where('sub_code', $branchCode)->with(['subsidiary_category'])->get();
-
         $subCategory = SubsidiaryCategory::find($request->category_id);
-
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $request->category_id)->first();
         $journalEntry = new JournalEntry();
-
         $accountName = null;
         $subIds = $request->sub_ids;
         $branch = Branch::where('branch_code', $request->branch_code)->first();
@@ -457,25 +550,14 @@ class ReportsController extends MainController
         }
 
         $journalDetails = [];
-        $accountName = $subsidiaryCategory->accounts->first()->account_name;
-
-
-        if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR) {
-            $accountName = Accounts::where('account_number', 5210)->pluck('account_name')->first();
-        } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::SUPPLY) {
-            $accountName = Accounts::where('account_number', 5185)->pluck('account_name')->first();
-        } elseif ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::LEASE) {
-            $accountName = Accounts::where('account_number', 1555)->pluck('account_name')->first();
-        } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::AMORT) {
-            $accountName = Accounts::where('account_number', 5280)->pluck('account_name')->first();
-        } else if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
+        $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
+        $subCategory = $subsidiaryCategory->sub_cat_code;
+        $accountNumber = Accounts::DEPRECIATION_ACCOUNTS[$subCategory] ?? Accounts::DEPRECIATION_DEFAULT_ACCOUNT;
+        if ($subCategory === SubsidiaryCategory::INSUR_ADD) {
             $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
-            $accountName = Accounts::where('account_number', 1415)->pluck('account_name')->first();
-        } else {
-            $accountName = Accounts::where('account_number', 5285)->pluck('account_name')->first();
         }
+        $accountName = Accounts::where('account_number', $accountNumber)->pluck('account_name')->first();
         foreach ($subsidiaryCategory->accounts as $account) {
-
             $details = [
                 'account_id' => $account->account_id,
                 'journal_details_title' => $account->account_name,
@@ -483,7 +565,6 @@ class ReportsController extends MainController
                 'status' => JournalEntry::STATUS_POSTED,
                 'journal_details_account_no' => $account->account_number,
                 'journal_details_ref_no' => $lastSeries, //JournalEntry::DEPRECIATION_BOOK,
-
             ];
 
             if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
@@ -502,22 +583,16 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = $request->total['total_due_amort'];
                 }
             }
-
-       if ($request->branch_id === 4 && !empty($details['journal_details_debit']) && $details['journal_details_debit'] > 0) {
-            list($half1, $half2) = $this->splitAmountInTwo($details['journal_details_debit']);
-
-            $d1 = $details;
-            $d1['journal_details_debit'] = $half1;
-            $d1['subsidiary_id'] = 1;
-            $journalDetails[] = $d1;
-
-            $d2 = $details;
-            $d2['journal_details_debit'] = $half2;
-            $d2['subsidiary_id'] = 2;
-            $journalDetails[] = $d2;
-        } else {
-            $journalDetails[] = $details;
-        }
+            if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
+                $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
+                $details["subsidiary_id"] = 1;
+                $journalDetails[] = $details;
+                $details["subsidiary_id"] = 2;
+                $journalDetails[] = $details;
+            } else {
+                $journalDetails[] = $details;
+            }
+            continue;
         }
         $journalEntry = JournalEntry::create([
             'journal_no' => $journalNumber,
@@ -584,9 +659,7 @@ class ReportsController extends MainController
         ];
         switch ($filter["type"]) {
             case 'subsidiary-ledger-listing-report':
-
                 $journalEntry = new journalEntry();
-                /* $subsidiaryListing = $journalEntry->getSubsidiaryListing($filter); */
                 $subsidiaryListing = Accounts::subsidiaryLedger($request->from, $request->to, $request->account_id);
                 return response()->json(['data' => $subsidiaryListing]);
 
@@ -640,10 +713,6 @@ class ReportsController extends MainController
                         'entries' => []
                     ];
                 }
-
-                //$transactions = Accounts::subsidiaryLedger($filter['from'], $filter['to'], $filter['account_id'], $filter['subsidiary_id']);
-
-
                 return response()->json(['data' => [$transactions, $balance]]);
 
 
@@ -734,27 +803,6 @@ class ReportsController extends MainController
         return false;
     }
 
-    /* public function searchIndex() {
-        $transactions = Accounts::generalLedger_fetchAccounts();
-            $balance = 0;
-            foreach ($transactions as $transaction) {
-                $balance += $transaction->journal_details_debit;
-                $balance -= $transaction->journal_details_credit;
-                journalEntryDetails::where('journal_details_id',$transaction->journal_details_id)
-                ->update(['balance' => $balance]);
-            }
-            $data = [
-                'title' => 'General Ledger',
-                'chartOfAccount' => Accounts::get(),
-                'generalLedgerAccounts' => Accounts::generalLedger_fetchAccounts(),
-                'transactions' => $transactions,
-            ];
-            return view('reports.sections.generalledger', $data);
-    } */
-    /* public function searchLedger(Request $request) {
-        return $request;
-    }
- */
     public function generalLedger(Request $request)
     {
 
@@ -1167,27 +1215,16 @@ class ReportsController extends MainController
 
         $coa = new Accounts();
         $accounting = Accounting::getFiscalYear();
-
         $from = $accounting->start_date;
-        // $from = '2024-02-01';
-        // $to = '2024-02-01';
-
         $now = Carbon::now();
         $to =  $request->input("date") ? new Carbon($request->input("date")) : $now;
         $balanceSheet = $coa->balanceSheet([$from, $to]);
-        // $currentEarnings = $coa->currentEarnings([$from, $to]);
-
-        // echo '<pre>';
-        // var_export($balanceSheet);
-        // echo '</pre>';
-
         $data = [
             'title' => 'MAC-AMS | Balance Sheet',
             'requests' => ['from' => $from, 'to' => $to],
             'fiscalYear' => $accounting,
             'balanceSheet' => $balanceSheet,
             'current_date' => $to->toDateString(),
-            // 'currentEarnings' => $currentEarnings
         ];
 
         return view('reports.sections.balanceSheet', $data);

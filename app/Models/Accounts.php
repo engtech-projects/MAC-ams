@@ -32,6 +32,15 @@ class Accounts extends Model
     const DUE_TO_HO_BXU_BRANCH_NASIPIT_ACC = 67;
     const RETAINED_EARNING_ACC = 83;
 
+    const DEPRECIATION_ACCOUNTS = [
+        SubsidiaryCategory::INSUR     => 5210,
+        SubsidiaryCategory::SUPPLY    => 5185,
+        SubsidiaryCategory::LEASE     => 1555,
+        SubsidiaryCategory::AMORT     => 5280,
+        SubsidiaryCategory::INSUR_ADD => 1415,
+    ];
+    const DEPRECIATION_DEFAULT_ACCOUNT = 5285;
+
     protected $fillable = [
         'account_number',
         'account_name',
