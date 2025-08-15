@@ -420,7 +420,7 @@
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
 
-                                        <input type="number" class="form-control" v-model="sub.rem">
+                                        <input type="number" class="form-control" v-model="sub.rem" min="1">
                                         <small class="text-success">
                                             Must be less than or equal to remaining value.
 
