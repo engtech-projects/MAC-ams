@@ -500,6 +500,7 @@ class ReportsController extends MainController
             
 
             $totalMonthlyAmort += $totalBranchDue;
+            }
         }
 
         try {
