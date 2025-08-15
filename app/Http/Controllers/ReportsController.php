@@ -482,17 +482,22 @@ class ReportsController extends MainController
                     }
                 }
 
-                if ($branchId === 4 && $details['journal_details_debit'] > 0) {
-                    $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
-                    $details["subsidiary_id"] = 1;
-                    $journalDetails[] = $details;
-                    $details["subsidiary_id"] = 2;
-                    $journalDetails[] = $details;
+                if ($request->branch_id === 4 && !empty($details['journal_details_debit']) && $details['journal_details_debit'] > 0) {
+                    list($half1, $half2) = $this->splitAmountInTwo($details['journal_details_debit']);
+        
+                    $d1 = $details;
+                    $d1['journal_details_debit'] = $half1;
+                    $d1['subsidiary_id'] = 1;
+                    $journalDetails[] = $d1;
+        
+                    $d2 = $details;
+                    $d2['journal_details_debit'] = $half2;
+                    $d2['subsidiary_id'] = 2;
+                    $journalDetails[] = $d2;
                 } else {
                     $journalDetails[] = $details;
                 }
-                continue;
-            }
+            
 
             $totalMonthlyAmort += $totalBranchDue;
         }
