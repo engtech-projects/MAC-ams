@@ -190,7 +190,7 @@ class ReportsController extends MainController
 
         // Check if the filtered month is the same as the last entry month
         $isSameMonth = $lastEntryDate && $filteredDate->format('Y-m') === $lastEntryDate->format('Y-m');
-        $isPosted = $lastEntryDate && $lastEntryDate->greaterThan($filteredDate) && !$isSameMonth;
+        $isPosted = $lastEntryDate && $lastEntryDate->greaterThan($filteredDate);
 
 
 
@@ -255,13 +255,17 @@ class ReportsController extends MainController
                 $subs['expensed'] = $totalAllPayments;
             } else {
                 // For other categories, use the model's unexpensed attribute
-                $subs['unexpensed'] = round($value->unexpensed, 2);
+                //$subs['unexpensed'] = round($value->unexpensed, 2);
+
+
                 $subs['expensed'] = round($expensed, 2);
+                $unexpensed = round($value->sub_amount - $subs['expensed'] - $value->salvage, 2);
+                $subs['unexpensed'] = ($unexpensed >= -0.01 && $unexpensed <= 0.01) ? 0.00 : $unexpensed;
             }
 
             $subs['salvage'] = $value->salvage;
             $subs['sub_no_amort'] = $value->sub_no_amort;
-            $subs['rem'] = $value->rem;
+            $subs['rem'] = max(0, $value->sub_no_depre - $subs['used']);
             $subs['due_amort'] = $value->rem > 0 ? ($value->monthly_amort) : 0;
             $subs['inv'] = $value->inv;
             $subs['no'] = $value->no;
@@ -338,6 +342,20 @@ class ReportsController extends MainController
             'type' => $type,
         ]);
     }
+
+
+            function splitAmountInTwo($amount) {
+                // work in cents to avoid floating imprecision
+                $totalCents = (int) round($amount * 100);
+                $halfCents = intdiv($totalCents, 2); // floor division
+                $first = $halfCents / 100; // e.g., 1714.28
+                $second = ($totalCents - $halfCents) / 100; // remainder, e.g., 1714.29
+                return [$first, $second];
+            }
+
+
+
+
 
     private function createDynamicPayments($sub)
     {
@@ -525,7 +543,7 @@ class ReportsController extends MainController
                 if ($subsidiary->due_amort > 0) {
                     $subsidiary->depreciation_payments()->create([
                         'amount' => $subsidiary->monthly_due,
-                        'date_paid' => now(),
+                        'date_paid' => $as_of,
                     ]);
                 }
             }
@@ -565,6 +583,7 @@ class ReportsController extends MainController
                     $details['journal_details_debit'] = $request->total['total_due_amort'];
                 }
             }
+
             if ($request->branch_id === 4 && $details['journal_details_debit'] > 0) {
                 $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
                 $details["subsidiary_id"] = 1;

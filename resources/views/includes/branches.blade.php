@@ -16,7 +16,7 @@
                 this.$emit('setselectedbranch',event.target.value)
             },
             async getBranchList() {
-                axios.get('/MAC-ams/branch').then((response) => {
+                axios.get('/branch').then((response) => {
                     this.branches = response.data.data
                 }).catch((err) => {
                     console.error(err);

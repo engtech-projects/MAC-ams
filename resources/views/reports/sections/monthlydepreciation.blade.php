@@ -1545,7 +1545,7 @@
                     this.subsidiary.branch = this.filter.branch
                     this.subsidiary.sub_cat_id = this.filter.category.sub_cat_id
 
-                    axios.post('/MAC-ams/subsidiary', this.subsidiary, {
+                    axios.post('/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
                                     'meta[name="csrf-token"]')
@@ -1670,7 +1670,7 @@
 
                     this.recomputeExpUnexp();
 
-                    axios.post('/MAC-ams/subsidiary/' + subId, this.subsidiary, {
+                    axios.post('/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
                                     'meta[name="csrf-token"]')
@@ -1709,7 +1709,7 @@
                 },
                 deleteSub: function(data) {
                     var url = @json(env('APP_URL'));
-                    axios.delete('/MAC-ams/subsidiary/' + data, {
+                    axios.delete('/subsidiary/' + data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
                                     'meta[name="csrf-token"]')
@@ -1768,7 +1768,7 @@
 
             },
             getSubsidiaries() {
-                axios.get('/MAC-ams/subsidiaries')
+                axios.get('/subsidiaries')
                     .then(res => {
                         this.subsidiaries = res.data.data;
                     })

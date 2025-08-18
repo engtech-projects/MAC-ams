@@ -17,7 +17,7 @@ class JournalBook extends Model
     const GENERAL_LEDGER_BOOK = 5;
     const CASH_BLOTTER_BOOKS = [1, 9, 6, 8, 7, 4];
     const LOAN_PAYMENTS_BOOK = 9;
-    const CASH_PAID_BOOK = [1, 6, 8, 7, 5];
+    const CASH_PAID_BOOK = [1, 6,4, 8, 7, 5];
     const POS_PAYMENT_BOOK = [9];
     const COLLECTION_DEPOSITS_BOOK = 7;
     const INTER_BRANCH_BOOKS = [9, 4];
