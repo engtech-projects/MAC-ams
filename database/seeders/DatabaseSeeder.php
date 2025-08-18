@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Accessibilities;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AccessListSeeder::class);
         $this->call(SubModuleListSeeder::class);
         $this->call(MonthlyDueSeeder::class);
-        $this->call(Accessibilities::class);
+        $this->call(AccessibilitiesSeeder::class);
 
         $currency =    [
             'PHP' => 'Philippine Peso',
