@@ -43,7 +43,7 @@
 <script src="{{ asset('js/custom.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
 <!-- <script src="{{ asset('js/adminlte/demo.js') }}"></script> -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-growl/1.0.0/jquery.bootstrap-growl.min.js"></script>
+<script src="{{ asset('js/jquery.bootstrap-growl.min.js') }}"></script>
 
 
 <script>

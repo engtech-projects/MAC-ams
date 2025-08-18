@@ -600,7 +600,7 @@
                     this.posting_period = response.data.data;
                 } catch (error) {
                     
-                    console.err('Error:', error);
+                    console.error('Error:', error);
                 }
                 var dates = this.posting_period;
 
