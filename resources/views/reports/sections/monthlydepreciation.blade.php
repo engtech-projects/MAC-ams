@@ -450,7 +450,7 @@
         </div>
 
     </section>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <!-- /.content -->
     <script>
         new Vue({
@@ -1789,6 +1789,6 @@
 
 
 @section('footer-scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
+    <script src="{{ asset('js/xlsx.full.min.js') }}"></script>
     @include('scripts.reports.reports')
 @endsection
