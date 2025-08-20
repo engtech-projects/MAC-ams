@@ -218,6 +218,6 @@
 @endsection
 
 @section('footer-scripts')
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
+  <script src="{{ asset('js/xlsx.full.min.js') }}"></script>
   @include('scripts.reports.reports')
 @endsection
