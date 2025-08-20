@@ -28,8 +28,8 @@ class DatabaseSeeder extends Seeder
                     'role_id'  => 1,
                 ]
             ],
-            ['username'],
-            ['password', 'salt', 'status', 'role_id']
+            ['id', 'username'],
+            ['salt', 'status', 'role_id']
         );
 
 
