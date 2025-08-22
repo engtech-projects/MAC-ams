@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         User::upsert(
             [
                 [
+                    'id' => 1,
                     'username' => 'admin',
                     'password' => Hash::make('admin'),
                     'salt'     => Str::random(10),
@@ -28,8 +29,8 @@ class DatabaseSeeder extends Seeder
                     'role_id'  => 1,
                 ]
             ],
-            ['id', 'username'],
-            ['salt', 'status', 'role_id']
+            ['id'],
+            ['role_id']
         );
 
 
