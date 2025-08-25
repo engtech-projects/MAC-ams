@@ -131,7 +131,7 @@
                                             aria-selected="false"><i class="nav-icon fas fa-cash-register"></i>
                                             Accounting</a>
                                     @endif
-                                    @if (checkUserHasAccessModule('sub-module', 'accounting'))
+                                    @if (checkUserHasAccessModule('sub-module', 'system-setup/posting-periods'))
                                         <a class="nav-link sysnav" id="v-pills-posting-period-tab" data-toggle="pill"
                                             href="#v-pills-posting-period" role="tab"
                                             aria-controls="v-pills-posting-period" aria-selected="false"><i
@@ -469,12 +469,25 @@
                                     <div class="row mb-5">
 
                                         <div class="col-md-4 select2-container">
-                                            <input type="text" class="form-control" v-model="postingPeriodYear"
-                                                @focus="open = true" @input="filterOptions"
-                                                placeholder="Select a year..." class="select2-input" />
+                                            <div>
+                                                <select ref="year"
+                                                    class="select2 select-year form-control form-control-sm"
+                                                    v-model="postingPeriodYear">
+                                                    <option v-for="year in postingPeriodYears" :key="year">
+                                                        @{{ year }}</option>
+                                                    {{-- <option value="" selected>-All-</option>
+                                                    <option value="unposted">Unposted</option>
+                                                    <option value="posted">Posted</option>
+                                                    <option value="cancelled">Cancelled</option> --}}
+                                                </select>
+                                            </div>
+                                            {{--  <input type="text" class="form-control" v-model="postingPeriodYear"
+                                                @click="open = true" @input="filterOptions"
+                                                placeholder="Select a year..." /> --}}
 
-                                            <ul v-if="open" class="select2-dropdown">
-                                                <li v-for="year in postingPeriodYears" :key="year"
+
+                                            {{-- <ul v-if="open" class="select2-dropdown">
+                                                <li v-for="year in filteredYears" :key="year"
                                                     @click="selectYear(year)" class="select2-option">
                                                     @{{ year }}
                                                 </li>
@@ -488,7 +501,7 @@
                                                             @click="reload()">Cancel</button>
                                                     </div>
                                                 </li>
-                                            </ul>
+                                            </ul> --}}
                                         </div>
                                         <div class="col-md-2">
                                             <button @click="searchPostingPeriod()" class="btn btn-primary">
@@ -740,6 +753,9 @@
                 }
             },
             methods: {
+                focusFilter() {
+                    this.open = true;
+                },
                 isObject(val) {
                     return val?.attributes !== null && typeof val?.attributes === 'object' && !Array.isArray(val);
                 },
@@ -747,7 +763,7 @@
                     this.fetchActivityLogs();
                 },
                 fetchActivityLogs() {
-                    axios.get('/system-setup/activity-logs', {
+                    /* axios.get('/system-setup/activity-logs', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -760,10 +776,11 @@
                         this.activityLogs = response.data.data;
                     }).catch(err => {
                         console.error(err)
-                    })
+                    }) */
+
                 },
                 viewActivityLog(id) {
-                    axios.get('/system-setup/activity-logs/' + id, {
+                    axios.get('system-setup/activity-logs/' + id, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -775,8 +792,7 @@
                     })
                 },
                 fetchAccounts() {
-                    axios.get('/accounts').then(res => {
-                            console.log(res)
+                    axios.get('accounts').then(res => {
                             this.accounts = res.data.data;
                         })
                         .catch(err => {
@@ -809,6 +825,7 @@
                     }
                 },
                 filterOptions() {
+                    return this.postingPeriodYear.years;
                     const term = this.postingPeriodYear.toLowerCase();
                     this.filteredYears = this.postingPeriodYears.filter(year =>
                         year.toString().includes(term)
@@ -857,6 +874,7 @@
                     return `${period}-31`;
                 },
                 searchPostingPeriod() {
+                    this.postingPeriodYear = this.$refs.year.options[this.$refs.year.selectedIndex].text
                     if (this.postingPeriodYear) {
                         this.fetchPostingPeriods();
 
@@ -865,7 +883,6 @@
                 },
                 getStartMonth(date) {
                     var date = date.split("-");
-                    /*     console.log(date[0] + "-" + date[1] + "-01"); */
                     return date[0] + "-" + date[1] + "-01";
                 },
                 getEndMonth(date) {
@@ -885,7 +902,6 @@
                     this.editRow = {}
                 },
                 saveEdit(index) {
-                    console.log(this.editRow);
                     this.rows[index] = {
                         ...this.editRow
                     }
@@ -904,7 +920,7 @@
                     });
                 },
                 createPostingPeriod() {
-                    axios.post('/posting-period', {
+                    axios.post('system-setup/posting-periods/posting-period', {
                         year: this.postingPeriodYear
                     }, {
                         headers: {
@@ -919,13 +935,12 @@
                     })
                 },
                 saveEdit: function(id, index) {
-                    axios.put('/posting-period/' + id, this.editRow, {
+                    axios.put('system-setup/posting-periods/posting-period/' + id, this.editRow, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
-                        console.log(this.postingPeriods[index]);
                         this.postingPeriods[index] = {
                             ...this.editRow
                         }
@@ -941,17 +956,9 @@
                         ...this.postingPeriods[index]
                     }
                 },
-                /*                 minYear(postingPeriod) {
-                                    const period = postingPeriod.split(" ");
-                                    return '01-01-' + period[1]
-                                },
-                                maxYear(postingPeriod) {
-                                    const period = postingPeriod.split(" ");
-                                    return '12-31-' + period[1]
-                                }, */
 
                 fetchPostingPeriodYears: function() {
-                    axios.get('/posting-period-years', {
+                    axios.get('system-setup/posting-periods/years', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -965,7 +972,7 @@
                 },
 
                 fetchPostingPeriods: function() {
-                    axios.get('/posting-period', {
+                    axios.get('system-setup/posting-periods/posting-period', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content

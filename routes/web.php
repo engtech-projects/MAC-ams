@@ -174,10 +174,10 @@ Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'sh
 
 Route::resource('collection-breakdown', CollectionBreakdownController::class);
 
-Route::resource('posting-period', PostingPeriodController::class);
-Route::get('posting-period-years', [PostingPeriodController::class, "getYears"]);
+//Route::resource('posting-period', PostingPeriodController::class);
+/* Route::get('posting-period-years', [PostingPeriodController::class, "getYears"]);
 Route::get('posting-period/search', [PostingPeriodController::class, 'search']);
-Route::get('open-posting-period', [PostingPeriodController::class, 'openPostingPeriod']);
+Route::get('open-posting-period', [PostingPeriodController::class, 'openPostingPeriod']); */
 Route::delete('branch-collection/{branchCollection}', [CollectionBreakdownController::class, 'deleteBranchCollection']);
 Route::delete('account-officer-collection/{accountOfficerCollection}', [CollectionBreakdownController::class, 'deleteAccountOffficerCollection']);
 
@@ -207,6 +207,15 @@ Route::prefix('reports')->group(function () {
         Route::post('post', [ReportsController::class, 'postDepreciation'])->name('post.depreciation');
         Route::post('search', [ReportsController::class, 'search'])->name('reports.monthly-depreciation-report-search');
         Route::post('post-by-branch', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
+    });
+});
+
+Route::prefix('system-setup')->group(function () {
+    Route::prefix('posting-periods')->group(function () {
+        Route::resource('posting-period', PostingPeriodController::class);
+        Route::get('years', [PostingPeriodController::class, "getYears"]);
+        Route::get('search', [PostingPeriodController::class, 'search']);
+        Route::get('open', [PostingPeriodController::class, 'openPostingPeriod']);
     });
 });
 
@@ -244,8 +253,6 @@ Route::post('journal/JournalEntryCancel', [JournalController::class, 'JournalEnt
 Route::post('journal/JournalEntryEdit', [JournalController::class, 'JournalEntryEdit'])->name('journal.JournalEntryEdit');
 Route::post('journal/JournalEntryPostUnpost', [JournalController::class, 'JournalEntryPostUnpost'])->name('journal.JournalEntryPostUnpost');
 Route::get('journal/searchJournalEntry', [JournalController::class, 'searchJournalEntry'])->name('journal.searchJournalEntry');
-Route::get('journal', [JournalController::class, 'create'])->name('journal.create');
-Route::post('journal', [JournalController::class, 'store'])->name('journal.store');
 Route::get('journal/journalEntry', [JournalController::class, 'journalEntry'])->name('journal.journalEntry');
 Route::get('journal/generate-journal-number/{journalBook}', [JournalController::class, 'generateJournalNumber'])->name('journal.generateJournalNumber');
 
