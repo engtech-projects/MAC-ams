@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Accessibilities;
+use App\Models\AccessList;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -695,17 +696,27 @@ class AccessibilitiesSeeder extends Seeder
                 "access_id": 376,
                 "sml_id": 285,
                 "user_id": 1
+                },
+                {
+                "access_id": 377,
+                "sml_id": 285,
+                "user_id": 1
                 }
             ]';
         $data = json_decode($acccessibilites_json, true);
+
         try {
             DB::transaction(function () use ($data) {
-                collect($data)->map(function (array $row) {
-                    return Arr::only($row, ['sml_id', 'access_id', 'user_id']);
-                })->chunk(1000)
-                    ->each(function (Collection $chunk) {
-                        Accessibilities::upsert($chunk->toArray(), ['sml_id', 'access_id', 'user_id']);
-                    });
+                $result = collect($data)->map(function ($item) {
+                    return [
+                        'access_id' => $item['access_id'],
+                        'sml_id' => $item['sml_id'],
+                        'user_id' => $item['user_id'],
+                        'created_at' => now(),
+                        'date_created' => now(),
+                    ];
+                });
+                Accessibilities::upsert($result->toArray(), ['access_id'], ['sml_id', 'user_id', 'created_at', 'date_created']);
             });
         } catch (\Exception $e) {
             var_dump(['message' => 'Transcation Failed', 'error' => $e->getMessage()]);
