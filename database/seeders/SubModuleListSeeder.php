@@ -723,12 +723,6 @@ class SubModuleListSeeder extends Seeder
                 "al_id": 4,
                 "route": "reports\/monthly-depreciation\/asdas",
                 "description": "Monthly Depreciation - Reporttt"
-                },
-                {
-                "sml_id":371,
-                "al_id": 4,
-                "route": "reports\/monthly-depreciation\/asdas",
-                "description": "Monthly Depreciation - Reporttt"
                 }
             ]';
 
@@ -743,7 +737,6 @@ class SubModuleListSeeder extends Seeder
                     ];
                 });
                 SubModuleList::upsert($result->toArray(), ['sml_id'], ['al_id', 'route', 'description']);
-                /* SubModuleList::updateOrCreate($data, ['sml_id'], ['al_id' => , 'route', 'description']); */
             });
         } catch (\Exception $e) {
             var_dump(['message' => 'Transcation Failed', 'error' => $e->getMessage()]);

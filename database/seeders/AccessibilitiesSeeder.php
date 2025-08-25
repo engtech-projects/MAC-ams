@@ -696,11 +696,6 @@ class AccessibilitiesSeeder extends Seeder
                 "access_id": 376,
                 "sml_id": 285,
                 "user_id": 1
-                },
-                {
-                "access_id": 377,
-                "sml_id": 285,
-                "user_id": 1
                 }
             ]';
         $data = json_decode($acccessibilites_json, true);
