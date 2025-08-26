@@ -358,7 +358,7 @@
                                                                             <option disabled value="">Subject Type
                                                                             </option>
                                                                             <option value="Subsidiary">Subsidiary</option>
-                                                                            <option value="Subsidiary">Journal Entry
+                                                                            <option value="journalEntry">Journal Entry
                                                                             </option>
 
                                                                         </select>
@@ -475,33 +475,8 @@
                                                     v-model="postingPeriodYear">
                                                     <option v-for="year in postingPeriodYears" :key="year">
                                                         @{{ year }}</option>
-                                                    {{-- <option value="" selected>-All-</option>
-                                                    <option value="unposted">Unposted</option>
-                                                    <option value="posted">Posted</option>
-                                                    <option value="cancelled">Cancelled</option> --}}
                                                 </select>
                                             </div>
-                                            {{--  <input type="text" class="form-control" v-model="postingPeriodYear"
-                                                @click="open = true" @input="filterOptions"
-                                                placeholder="Select a year..." /> --}}
-
-
-                                            {{-- <ul v-if="open" class="select2-dropdown">
-                                                <li v-for="year in filteredYears" :key="year"
-                                                    @click="selectYear(year)" class="select2-option">
-                                                    @{{ year }}
-                                                </li>
-                                                <li v-if="filteredYears.length === 0" class="text-red no-results">No
-                                                    results
-                                                    found, click search to proceed for creating posting period.
-                                                    <div class="container">
-                                                        <button class="btn btn-sm btn-primary"
-                                                            @click="createPostingPeriod()">Create</button>
-                                                        <button class="btn btn btn-warning"
-                                                            @click="reload()">Cancel</button>
-                                                    </div>
-                                                </li>
-                                            </ul> --}}
                                         </div>
                                         <div class="col-md-2">
                                             <button @click="searchPostingPeriod()" class="btn btn-primary">
@@ -763,7 +738,7 @@
                     this.fetchActivityLogs();
                 },
                 fetchActivityLogs() {
-                    /* axios.get('/system-setup/activity-logs', {
+                    axios.get('system-setup/activity-logs', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -776,7 +751,7 @@
                         this.activityLogs = response.data.data;
                     }).catch(err => {
                         console.error(err)
-                    }) */
+                    })
 
                 },
                 viewActivityLog(id) {
