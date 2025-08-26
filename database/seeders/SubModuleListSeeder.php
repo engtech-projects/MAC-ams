@@ -725,12 +725,14 @@ class SubModuleListSeeder extends Seeder
             DB::transaction(function () use ($data) {
                 $result = collect($data)->map(function ($item) {
                     return [
+                        'sml_id' => $item['sml_id'],
                         'al_id' => $item['al_id'],
                         'route' => $item['route'],
-                        'description' => $item['description']
+                        'description' => $item['description'],
+                        'created_at' => now(),
                     ];
                 });
-                SubModuleList::upsert($result->toArray(), ['sml_id'], ['al_id', 'route', 'description']);
+                SubModuleList::upsert($result->toArray(), ['sml_id'], ['al_id', 'route', 'description', 'created_at']);
             });
         } catch (\Exception $e) {
             var_dump(['message' => 'Transcation Failed', 'error' => $e->getMessage()]);
