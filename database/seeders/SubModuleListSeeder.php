@@ -717,12 +717,6 @@ class SubModuleListSeeder extends Seeder
                 "al_id": 4,
                 "route": "reports\/monthly-depreciation-post-by-branch",
                 "description": "Motnhy Depreciation - Post by Branch"
-                },
-                {
-                "sml_id": 285,
-                "al_id": 4,
-                "route": "reports\/monthly-depreciation\/asdas",
-                "description": "Monthly Depreciation - Reporttt"
                 }
             ]';
 
