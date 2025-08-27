@@ -52,8 +52,6 @@ Route::get('logout', [LoginController::class, 'userLogout'])->name('logout');
 Route::get('/me', [AuthController::class, 'getAuthUser'])->name('auth.user');
 Route::get('branch', [BranchController::class, 'index'])->name('branch.list');
 
-/* Route::post('authenticate', [LoginController::class, 'authenticate'])->name('login.user'); */
-// DashboardController
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
@@ -174,14 +172,8 @@ Route::get('reports/cashTransactionBlotter/{id}', [ReportsController::class, 'sh
 
 Route::resource('collection-breakdown', CollectionBreakdownController::class);
 
-//Route::resource('posting-period', PostingPeriodController::class);
-/* Route::get('posting-period-years', [PostingPeriodController::class, "getYears"]);
-Route::get('posting-period/search', [PostingPeriodController::class, 'search']);
-Route::get('open-posting-period', [PostingPeriodController::class, 'openPostingPeriod']); */
 Route::delete('branch-collection/{branchCollection}', [CollectionBreakdownController::class, 'deleteBranchCollection']);
 Route::delete('account-officer-collection/{accountOfficerCollection}', [CollectionBreakdownController::class, 'deleteAccountOffficerCollection']);
-
-/* Route::post('collection-breakdown/{collectionBreakdown}', [CollectionBreakdownController::class, 'update']); */
 
 Route::post('reports/subsidiarySaveorEdit', [ReportsController::class, 'subsidiarySaveorEdit'])->name('reports.subsidiarySaveorEdit');
 Route::get('reports/reportPrint', [ReportsController::class, 'reportPrint'])->name('reports.reportPrint');
@@ -199,7 +191,6 @@ Route::get('reports/cashTransactionBlotter/showcashblotter/{id}', [ReportsContro
 Route::get('reports/cashTransactionBlotter/editcashblotter/{id}', [ReportsController::class, 'editCashBlotter'])->name('reports.editCashBlotter');
 Route::get('reports/cashTransactionBlotter/geteditcashblotter/{id}', [ReportsController::class, 'getEditCashBlotter'])->name('reports.getEditCashBlotter');
 Route::get('reports/cashTransactionBlotter/fetchaccountofficer/{id}', [ReportsController::class, 'fetchAccountOfficer'])->name('reports.fetchAccountOfficer');
-/* Route::post('reports/revenue-minus-expense', [ReportsController::class, 'revenueMinusExpense'])->name('revenue-minus-expenses'); */
 
 Route::prefix('reports')->group(function () {
     Route::prefix('monthly-depreciation')->group(function () {
@@ -227,9 +218,6 @@ Route::resource('subsidiary-category', SubsidiaryCategoryController::class);
 
 Route::get('payment/create/{id}', [PaymentController::class, 'create'])->name('payment.create');
 Route::get('payment/customer/{id}', [PaymentController::class, 'customerPayment'])->name('payment.customer');
-// Route::get('payment/invoice', [PaymentController::class, ''])->name('');
-// Route::get('payment/supplier', [PaymentController::class, ''])->name('');
-// Route::get('payment/bill', [PaymentController::class, ''])->name('');
 Route::post('payment/store', [PaymentController::class, 'store'])->name('payment.store');
 
 
