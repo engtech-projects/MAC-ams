@@ -1806,51 +1806,6 @@
                     }
                     return total;
                 },
-                /* otherPaymentTotal: {
-                    get: function() {
-                        var otherPayment = this.collectionBreakdown.other_payment;
-                        let total = 0;
-                        let memo = 0;
-                        let check = 0;
-
-                        if (otherPayment.memo_amount == "") {
-                            otherPayment.memo_amount = 0;
-                        }
-                        if (otherPayment.check_amount == "") {
-                            otherPayment.check_amount = 0;
-                        }
-
-                        total = parseFloat(this.aoCollectionTotal) +
-                            parseFloat(otherPayment.memo_amount) +
-                            parseFloat(otherPayment.check_amount) +
-                            parseFloat(this.branchCollectionTotal) +
-                            parseFloat(this.posCollectionTotal)
-
-                        this.otherPaymentTotal = total;
-
-
-                    },
-                    set: function(newVal) {
-                        var otherPayment = this.collectionBreakdown.other_payment;
-                        let total = 0;
-                        let memo = 0;
-                        let check = 0;
-
-                        if (otherPayment.memo_amount == "") {
-                            otherPayment.memo_amount = 0;
-                        }
-                        if (otherPayment.check_amount == "") {
-                            otherPayment.check_amount = 0;
-                        }
-
-                        newVal = parseFloat(this.aoCollectionTotal) +
-                            parseFloat(otherPayment.memo_amount) +
-                            parseFloat(otherPayment.check_amount) +
-                            parseFloat(this.branchCollectionTotal) +
-                            parseFloat(this.posCollectionTotal)
-
-                    }
-                }, */
                 otherPaymentTotal: function() {
 
                     var otherPayment = this.collectionBreakdown.other_payment;
@@ -1967,7 +1922,6 @@
                 }
             },
             mounted() {
-                /*                 this.getBranchList(); */
                 this.data = @json($cash_blotter);
                 this.branches = @json($branches);
             }
