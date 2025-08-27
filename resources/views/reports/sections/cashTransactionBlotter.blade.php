@@ -105,16 +105,16 @@
                             </div>
                         </div>
 
-                        {{--                         @if (Gate::allows(['accounting-staff']) || Gate::allows(['manager'])) --}}
-                        <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6' : '2' }}"
-                            @click="processCreateCollection()">
-                            <div class="mt-4 text-right">
-                                <button type="button" class="btn btn-primary">New
-                                    Transaction</button>
-                            </div>
+                        @if (Gate::allows(['accounting-staff']) || Gate::allows(['manager']))
+                            <div class="col-md-{{ Gate::allows(['accounting-staff']) ? '6' : '2' }}"
+                                @click="processCreateCollection()">
+                                <div class="mt-4 text-right">
+                                    <button type="button" class="btn btn-primary">New
+                                        Transaction</button>
+                                </div>
 
-                        </div>
-                        {{-- @endif --}}
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -641,13 +641,6 @@
                                                         </td>
                                                         <td class="text-right">
                                                             @{{ formatCurrency(posCollectionTotal) }}
-                                                            {{-- <td class="text-right">
-                                                    <input type="number"
-                                                        v-model="collectionBreakdown.other_payment.pos_amount"
-                                                        ref="pos_amount" @keydown.enter="nextTextField('memo_amount')"
-                                                        class="form-control form-control-sm rounded-0 text-right">
-
-                                                </td> --}}
                                                     </tr>
 
                                                     <tr>
@@ -685,12 +678,6 @@
                                             </table>
                                         </div>
                                         <div class="text-right">
-
-                                            {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
-                                                style="margin-bottom: 20px;">
-                                                Cancel
-                                            </button> --}}
-
                                             <button type="button" @click="processCreateOrUpdate()"
                                                 class="btn btn-success" style="margin-bottom: 20px;"> Save</button>
                                         </div>
@@ -758,11 +745,6 @@
                                         <i class="fas fa-xs fa-print print-cashblotter"></i>
                                     </button>
                                     @if (Gate::allows('manager'))
-                                        {{-- <button class="mr-1 btn btn-xs btn-primary"
-                                        :disabled="d.cash_ending_balance - d.total != 0"
-                                        @click="updateStatus(d,'posted')">Post</button>
-                                    <button class="mr-1 btn btn-xs btn-warning"
-                                        @click="updateStatus(d,'unposted')">Unpost</button> --}}
                                         <button class="mr-1 btn btn-xs btn-primary"
                                             @click="updateStatus(d,'posted')">Post</button>
                                         <button class="mr-1 btn btn-xs btn-warning"
@@ -1195,22 +1177,6 @@
                         nextInput.focus();
                     }
                 },
-                calculateTotal: function() {
-                    /* var otherPayment = this.collectionBreakdown.other_payment;
-                    if (otherPayment.memo_amount == "") {
-                        otherPayment.memo_amount = 0;
-                    }
-                    if (otherPayment.check_amount == "") {
-                        otherPayment.check_amount = 0;
-                    }
-
-                    this.otherPayment.total = otherPayment.cash_amount + otherPayment.check_amount +
-                        otherPayment.pos_amount + otherPayment.memo_amount + otherPayment.interbranch_amount;
-
-                    this.otherPaymentTotal = this.otherPayment.total; */
-
-
-                },
                 amountConverter: function(amount) {
                     const formatter = new Intl.NumberFormat('en-US', {
                         style: 'currency',
@@ -1387,9 +1353,8 @@
                     })
                 },
                 resetForm: function() {
-
-                    this.collectionBreakdown.collection_id = null,
-                        this.collectionBreakdown.branch_id = null;
+                    this.collectionBreakdown.collection_id = null
+                    this.collectionBreakdown.branch_id = null
                     this.collectionBreakdown.transaction_date = '';
                     this.collectionBreakdown.p_1000 = 0;
                     this.collectionBreakdown.p_500 = 0;
