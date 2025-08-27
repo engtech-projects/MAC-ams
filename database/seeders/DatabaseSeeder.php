@@ -18,10 +18,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(UserSeeder::class);
+
         $this->call(AccessListSeeder::class);
         $this->call(SubModuleListSeeder::class);
-        $this->call(AccessibilitiesSeeder::class);
+        $this->call(UserSeeder::class);
+
 
         $currency =    [
             'PHP' => 'Philippine Peso',
