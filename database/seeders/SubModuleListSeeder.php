@@ -717,25 +717,22 @@ class SubModuleListSeeder extends Seeder
                 "al_id": 4,
                 "route": "reports\/monthly-depreciation-post-by-branch",
                 "description": "Motnhy Depreciation - Post by Branch"
-                },
-                {
-                "sml_id": 285,
-                "al_id": 4,
-                "route": "reports\/monthly-depreciation\/report",
-                "description": "Monthly Depreciation - Report"
                 }
-            ]
-        ';
+            ]';
 
         $data = json_decode($sml_json, true);
         try {
             DB::transaction(function () use ($data) {
-                collect($data)->map(function (array $row) {
-                    return Arr::only($row, ['al_id', 'route', 'description']);
-                })->chunk(1000)
-                    ->each(function (Collection $chunk) {
-                        SubModuleList::upsert($chunk->toArray(), ['al_id', 'access_id', 'user_id']);
-                    });
+                $result = collect($data)->map(function ($item) {
+                    return [
+                        'sml_id' => $item['sml_id'],
+                        'al_id' => $item['al_id'],
+                        'route' => $item['route'],
+                        'description' => $item['description'],
+                        'created_at' => now(),
+                    ];
+                });
+                SubModuleList::upsert($result->toArray(), ['sml_id'], ['al_id', 'route', 'description', 'created_at']);
             });
         } catch (\Exception $e) {
             var_dump(['message' => 'Transcation Failed', 'error' => $e->getMessage()]);
