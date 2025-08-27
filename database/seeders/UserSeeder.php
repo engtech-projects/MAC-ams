@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
         $userAccess = Accessibilities::where('user_id', 1)->pluck('sml_id');
         $subModules = SubModuleList::all()->pluck('sml_id');
         $toDelete = array_diff($userAccess->toArray(), $subModules->toArray());
-        $toInsert = array_diff($subModules->toArray(), $toDelete);
+        $toInsert = array_diff($subModules->toArray(), $userAccess);
 
         Accessibilities::where('sml_id', $toDelete)->where('user_id', $admin->id)->delete();
 
