@@ -10,6 +10,24 @@
             placeholder: 'Account',
             allowClear: true,
         });
+
+        $('.select-year').select2({
+            placeholder: 'Select Account',
+            allowClear: true,
+              tags: true,
+            createTag: function(params) {
+                // If user typed something not in the list
+                return {
+                    id: params.term,
+                    text: params.term,
+                    newOption: true
+                }
+            },
+            insertTag: function(data, tag) {
+                // Add the custom input to the dropdown
+                data.push(tag)
+            }
+        });
         $('#filter-logs').select2({
             placeholder: 'Account',
             allowClear: true,
