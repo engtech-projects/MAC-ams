@@ -18,22 +18,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::upsert(
-            [
-                [
-                    'id' => 1,
-                    'username' => 'admin',
-                    'password' => Hash::make('admin'),
-                    'salt'     => Str::random(10),
-                    'status'   => 'active',
-                    'role_id'  => 1,
-                ]
-            ],
-            ['id'],
-            ['role_id']
-        );
-
-
+        $this->call(UserSeeder::class);
         $this->call(AccessListSeeder::class);
         $this->call(SubModuleListSeeder::class);
         $this->call(AccessibilitiesSeeder::class);
