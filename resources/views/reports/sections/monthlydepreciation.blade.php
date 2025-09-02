@@ -805,7 +805,12 @@
                                         }
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
-                                            this.formatCurrency(parseFloat(due_amort)),
+                                            // Fix Amort and Remaining
+                                            this.formatCurrency(
+                                                parseFloat(subsidiary.used) === parseFloat(
+                                                    subsidiary.sub_no_depre) ?
+                                                0.00 :
+                                                parseFloat(subsidiary.monthly_due)),
                                             this.formatCurrency(subsidiary.salvage),
                                             subsidiary.rem,
                                             subsidiary.inv,
@@ -828,7 +833,13 @@
                                         total_amort += parseFloat(subsidiary.total_amort)
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                        total_due_amort += due_amort
+                                        // For Total Due Amort Fix
+                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary
+                                                .sub_no_depre)) {
+                                            total_due_amort += 0.00;
+                                        } else {
+                                            total_due_amort += parseFloat(subsidiary.monthly_due);
+                                        }
                                         total_sub_salvage += parseFloat(subsidiary.salvage)
                                         total_rem += parseFloat(subsidiary.rem)
                                         total_inv += parseFloat(subsidiary.inv)
@@ -1027,6 +1038,8 @@
                             this.formatCurrency(grandTotalDueAmort.toFixed(2)),
                             grandTotalRem
                         ];
+                        // For Grand Total
+                        rows.push(result);
 
                     }
                     return rows;
@@ -1266,6 +1279,8 @@
                     return current_month;
                 },
                 postMonthlyDepreciation: function(data) {
+                    //console.log(data)   
+                    console.log(this.subsidiaries)
                     this.resetForm()
                     if (data) {
                         var newData = [];
@@ -1292,7 +1307,7 @@
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
                             this.subsidiaries.dynamic = []
-                            window.reload();
+                           // window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
@@ -1733,16 +1748,22 @@
                             }
                         })
                         .then(response => {
+                            
                             this.subsidiaryAll = response.data.data;
                             const raw = response.data.data
                             const allItems = Object.values(raw)
                                 .flatMap(branches => Object.values(branches).flat());
                             this.subsidiaries.non_dynamic = allItems.map(item => {
+                                 console.log("ITEM RAW DATA:", item);
                                 var diff = item.rem - item.used;
 
                                 var dueAmort = item.due_amort;
                                 if (item.rem == 1) {
                                     dueAmort = item.unexpensed
+                                }
+
+                                if (item.rem == 0) {
+                                    dueAmort = 0.00;
                                 }
                                 return {
                                     'sub_id': item.sub_id,

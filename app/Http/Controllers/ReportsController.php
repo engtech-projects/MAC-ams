@@ -226,8 +226,8 @@ class ReportsController extends MainController
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
-            $subs['monthly_due'] = $value->monthly_due;
-            $subs['used'] = $value->used;
+            $subs['monthly_due'] = $value->monthly_due; 
+            $subs['used'] = $value->depreciation_payments->count();
 
             // Calculate prepaid expense payments first
             $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
@@ -482,16 +482,35 @@ class ReportsController extends MainController
                     }
                 }
 
-                if ($branchId === 4 && $details['journal_details_debit'] > 0) {
-                    $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
-                    $details["subsidiary_id"] = 1;
-                    $journalDetails[] = $details;
-                    $details["subsidiary_id"] = 2;
-                    $journalDetails[] = $details;
-                } else {
-                    $journalDetails[] = $details;
-                }
-                continue;
+            if ($request->branch_id === 4 &&
+                !empty($details['journal_details_debit']) &&
+                $details['journal_details_debit'] > 0
+            ) {
+                // Split debit into halves
+                list($half1, $half2) = $this->splitAmountInTwo($details['journal_details_debit']);
+
+                // First half → Subsidiary 1 (e.g., Butuan Branch)
+                $d1 = $details;
+                $d1['journal_details_debit'] = $half1;
+                $d1['subsidiary_id'] = 1; // MAIN BRANCH - BUTUAN
+                $journalDetails[] = $d1;
+
+                // Second half → Subsidiary 2 (e.g., Nasipit Branch)
+                $d2 = $details;
+                $d2['journal_details_debit'] = $half2;
+                $d2['subsidiary_id'] = 2; // BRANCH 2 - NASIPIT
+                $journalDetails[] = $d2;
+
+                // One Credit → Head Office, total amount
+                $c1 = $details;
+                $c1['journal_details_debit'] = 0;
+                $c1['journal_details_credit'] = $details['journal_details_debit']; // full amount
+                $c1['subsidiary_id'] = 999; // HEAD OFFICE
+                $journalDetails[] = $c1;
+
+            } else {
+                $journalDetails[] = $details;
+            }
             }
 
             $totalMonthlyAmort += $totalBranchDue;
