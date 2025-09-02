@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
                     'password' => Hash::make('admin'),
                     'salt'     => Str::random(10),
                     'status'   => 'active',
-                    'role_id'  => 1,
+                    'role_id'  => 4,
                 ]
             ],
             ['id'],
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
         $userAccess = Accessibilities::where('user_id', 1)->pluck('sml_id');
         $subModules = SubModuleList::all()->pluck('sml_id');
         $toDelete = array_diff($userAccess->toArray(), $subModules->toArray());
-        $toInsert = array_diff($subModules->toArray(), $userAccess);
+        $toInsert = array_diff($subModules->toArray(), $userAccess->toArray());
 
         Accessibilities::where('sml_id', $toDelete)->where('user_id', $admin->id)->delete();
 
