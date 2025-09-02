@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class PostingPeriodController extends Controller
@@ -17,31 +18,30 @@ class PostingPeriodController extends Controller
     public function index(Request $request)
     {
         $year = $request['year'];
-        $postingPeriods = PostingPeriod::where('posting_period', 'like', "$year-%")->get();
+        $postingPeriods = PostingPeriod::where('posting_period', 'like', "$year%")->get();
 
-
-        /* if ($postingPeriod->isEmpty()) {
-            $postingPeriod = [];
+        if ($postingPeriods->count() === 0) {
+            $postingPeriods = [];
             for ($month = 1; $month <= 12; $month++) {
                 $startDate = Carbon::createFromDate($request['year'], $month, 1);
                 $endDate = $startDate->copy()->endOfMonth();
                 try {
                     $data = PostingPeriod::create([
-                        'posting_period' => $startDate->format('F Y'),
+                        'posting_period' => $startDate->format('Y-m'),
                         'start_date'     => $startDate->format('Y-m-d'),
                         'end_date'       => $endDate->format('Y-m-d'),
                         'status'         => 'closed',
                         'created_at'     => now(),
                         'updated_at'     => now(),
                     ]);
-                    $postingPeriod[] = $data;
+                    $postingPeriods[] = $data;
                 } catch (Exception $e) {
                     return new JsonResponse([
                         'message' => $e->getMessage(),
                     ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
                 }
             }
-        } */
+        }
         return new JsonResponse([
             'data' => $postingPeriods,
             'message' => 'Successfully fetched.'
@@ -99,12 +99,28 @@ class PostingPeriodController extends Controller
     public function update(Request $request, PostingPeriod $postingPeriod)
     {
         $data = $request->all();
-        $postingPeriod->update([
-            'posting_period' => $data['posting_period'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'status' => $data['status']
-        ]);
+        $replicate = $postingPeriod->replicate();
+        try {
+            DB::transaction(function () use ($postingPeriod, $data, $replicate) {
+                $updated = $postingPeriod->update([
+                    'posting_period' => $data['posting_period'],
+                    'start_date' => $data['start_date'],
+                    'end_date' => $data['end_date'],
+                    'status' => $data['status']
+                ]);
+                if ($updated) {
+                    activity("Journal Entry")->event("cancelled")->performedOn($postingPeriod)
+                        ->withProperties(['attributes' => $postingPeriod, 'old' => $replicate])
+                        ->log("cancelled");
+                }
+            });
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => 'Transaction Failed.',
+                'error' => $e->getMessage()
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
         return new JsonResponse([
             'message' => 'Successfully updated.'
         ], JsonResponse::HTTP_OK);
