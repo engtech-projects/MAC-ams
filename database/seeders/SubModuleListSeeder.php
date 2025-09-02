@@ -671,52 +671,52 @@ class SubModuleListSeeder extends Seeder
                 {
                 "sml_id": 278,
                 "al_id": 4,
-                "route": "reports\/monthly-depreciation-report",
-                "description": "Monthly Depreciation",
-                "created_at": "09\/18\/2024",
-                "updated_at": "09\/18\/2024"
-                },
-                {
-                "sml_id": 279,
-                "al_id": 4,
-                "route": "reports\/monthly-depreciation-report-search",
-                "description": "Monthly Depreciation Search",
-                "created_at": "11\/05\/2024",
-                "updated_at": "11\/05\/2024"
-                },
-                {
-                "sml_id": 280,
-                "al_id": 4,
-                "route": "reports\/monthly-depreciation-report-post",
-                "description": "Monthly Depreciation Post",
-                "created_at": "11\/05\/2024",
-                "updated_at": "11\/05\/2024"
-                },
-                {
-                "sml_id": 281,
-                "al_id": 4,
                 "route": "reports\/closing-period",
                 "description": "Closing Period",
                 "created_at": "04\/23\/2025",
                 "updated_at": "04\/23\/2025"
                 },
                 {
-                "sml_id": 282,
+                "sml_id": 279,
+                "al_id": 4,
+                "route": "reports\/monthly-depreciation\/report",
+                "description": "Monthly Depreciation"
+                },
+                {
+                "sml_id": 280,
                 "al_id": 4,
                 "route": "reports\/monthly-depreciation\/search",
                 "description": "Monthly Depreciation - Search"
                 },
                 {
-                "sml_id": 283,
+                "sml_id": 281,
                 "al_id": 4,
                 "route": "reports\/monthly-depreciation\/post",
                 "description": "Monthly Depreciation - Post"
                 },
                 {
-                "sml_id": 284,
+                "sml_id": 282,
                 "al_id": 4,
-                "route": "reports\/monthly-depreciation-post-by-branch",
-                "description": "Motnhy Depreciation - Post by Branch"
+                "route": "reports\/monthly-depreciation\/post-by-branch",
+                "description": "Monthly Depreciation - Post by Branch"
+                },
+                {
+                "sml_id": 283,
+                "al_id": 5,
+                "route": "system-setup\/posting-periods",
+                "description": "Posting Period"
+                },
+                {
+                "sml_id": 284,
+                "al_id": 5,
+                "route": "system-setup\/posting-periods\/search",
+                "description": "Posting Period - Search"
+                },
+                {
+                "sml_id": 285,
+                "al_id": 5,
+                "route": "system-setup\/activity-logs",
+                "description": "Activity Logs"
                 }
             ]';
 
