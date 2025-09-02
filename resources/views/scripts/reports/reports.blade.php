@@ -889,17 +889,27 @@
                 },
                 url: "{{ route('journal.JournalEntryFetch') }}",
                 dataType: "json",
+                beforeSend: function() {
+                    // Show loading row
+                    $('#tbl-create-journalview-container').html(`
+                        <tr id="loading-row">
+                            <td colspan="5" class="text-center">
+                                <i class="fa fa-spinner fa-spin"></i> Fetching journal entries...
+                            </td>
+                        </tr>
+                    `);
+                },
                 success: function(response) {
-                    console.log(response);
                     if (response.message == 'fetch') {
                         var total_debit = 0;
                         var total_credit = 0;
+
                         $('#tbl-create-journalview-container').html('');
                         $('#journalVoucherContent').html('');
                         $('#vjournal_remarks').html('');
+                        $('#posted-content').html('');
+
                         $.each(response.data, function(k, v) {
-                            console.log(v)
-                            $('#posted-content').html('');
                             var content = '';
                             $('#vjournal_date, #voucher_date').text(moment(v
                                 .journal_date).format('MMMM D, YYYY'));
@@ -956,7 +966,7 @@
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_number}</label></td>
 									<td class='editable-table-data' value="" >	<label class="label-normal" >${vv.account.account_name}</label> </td>
 
-									<td class='editable-table-data' value="" >
+									<td class='editable-table-data' value="" > <label class="label-normal" > ${(vv.subsidiary && vv.subsidiary.sub_name) ? vv.subsidiary.sub_name : ''}</label> </td>
 
 									</td>
                                     <td class='editable-table-data' value="" >	<label class="label-normal" >${amountConverter(vv.journal_details_debit)}</label> </td>
@@ -991,8 +1001,11 @@
                                     .toFixed(2))).toFixed(2)))
                             ))
                         });
-                    }
-                    $('#journalModalView').modal('show')
+                        setTimeout(function() {
+                            $('#journalModalView').modal('show');
+                        }, 100);
+                            }
+                   
                 },
                 error: function() {
                     console.log("Error");

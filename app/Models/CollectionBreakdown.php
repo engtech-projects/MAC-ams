@@ -43,6 +43,21 @@ class CollectionBreakdown extends Model
         "status",
         "flag"
     ];
+    protected static $recordEvents = ['deleted', 'created', 'updated'];
+
+
+    public function getModelName()
+    {
+
+        return class_basename($this);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
+            ->useLogName('Cash Transaction Blotter - Collection Breakdown');
+    }
 
 
     public function account_officer_collections()

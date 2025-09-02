@@ -19,12 +19,16 @@ class ActivityLogController extends Controller
     {
 
         $activityLogs = Activity::when($request['event'], function ($query) use ($request) {
-            $query->where('event', $request['event']);
+            $event = $request['event'];
+            if ($request['event'] == 'updated') {
+                $query->where('event', $event)->orWhere('event', 'edit');
+            } else {
+                $query->where('event', $request['event']);
+            }
         })->when($request['subject_type'], function ($query) use ($request) {
-            $type = preg_replace('/\s+/', '', $request['subject_type']);
-            $query->where('subject_type', $request['subject_type']);
+            $type = 'App\Models\\' . $request["subject_type"];
+            $query->where('subject_type', $type);
         })->get();
-
         $data = $activityLogs->map(function ($item) {
             return [
                 'id' => $item->id,
