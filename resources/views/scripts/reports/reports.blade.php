@@ -768,15 +768,15 @@
             $('#totalcashcount').text(formatCurrency(total))
         }
 
-        function amountConverter(amount) {
-            const formatter = new Intl.NumberFormat('en-US', {
+      function amountConverter(amount) {
+            const formatter = new Intl.NumberFormat('en-PH', {
                 style: 'currency',
                 currency: 'PHP',
-                minimumFractionDigits: 0
-
+                minimumFractionDigits: 2, // force .00
+                maximumFractionDigits: 2  // keep only 2 decimals
             });
 
-            return formatter.format(amount)
+            return formatter.format(amount || 0);
         }
 
         function formatCurrency(amount) {
@@ -919,11 +919,7 @@
                             $('.vjournal_cheque').text((v.cheque_no) ? v.cheque_no :
                                 'NO CHEQUE');
                             $('#vjournal_status').text(v.status);
-                            $('#vjournal_amount, #voucher_amount').text(parseFloat(v
-                                .amount).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            }));
+                           $('#vjournal_amount, #voucher_amount').text(amountConverter(v.amount));
                             $('#vjournal_payee, #voucher_pay').text(v.payee);
                             $('.voucher_amount_in_words').text(numberToWords(parseFloat(
                                 v.amount)));
