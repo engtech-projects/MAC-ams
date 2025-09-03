@@ -1762,6 +1762,7 @@
                                     dueAmort = item.unexpensed
                                 }
 
+                                // FIX ledger to due amort
                                 if (item.rem == 0) {
                                     dueAmort = 0.00;
                                 }
