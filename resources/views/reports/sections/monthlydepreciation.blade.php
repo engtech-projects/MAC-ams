@@ -1279,8 +1279,6 @@
                     return current_month;
                 },
                 postMonthlyDepreciation: function(data) {
-                    //console.log(data)   
-                    console.log(this.subsidiaries)
                     this.resetForm()
                     if (data) {
                         var newData = [];
@@ -1328,7 +1326,7 @@
                         }).then(response => {
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
-                            // window.reload();
+                            window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
@@ -1754,7 +1752,6 @@
                             const allItems = Object.values(raw)
                                 .flatMap(branches => Object.values(branches).flat());
                             this.subsidiaries.non_dynamic = allItems.map(item => {
-                                 console.log("ITEM RAW DATA:", item);
                                 var diff = item.rem - item.used;
 
                                 var dueAmort = item.due_amort;
