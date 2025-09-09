@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ci-pipe-staging
+          ref: ci-pipe-dev
       - name: Upload ftp
         uses : SamKirkland/FTP-Deploy-Action@4.3.2
         with:
