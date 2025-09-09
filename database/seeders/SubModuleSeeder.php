@@ -42,7 +42,7 @@ class SubModuleSeeder extends Seeder
             [
                 "sml_id" => "125",
                 "al_id" => "8",
-                "route" => "accounts",
+                "route" => "chart-of-accounts",
                 "description" => "Chart of Accounts Home",
 
             ],
