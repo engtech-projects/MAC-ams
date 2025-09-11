@@ -906,7 +906,7 @@
             $('#edit_journal_date').prop('readonly', true);
             isInitialSetup = true;
             $.ajax({
-                url: '/open-posting-period',
+                url: '/system-setup/posting-periods/open',
                 method: 'GET',
                 success: function(response) {
                     const dates = response.data || [];
@@ -991,12 +991,12 @@
                                                     echo '</optgroup><optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
                                                     $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
                                                 }
-                                        
+
                                                 // Add the subsidiary option to the current optgroup
                                                 echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
                                             }
                                         }
-                                        
+
                                         // Close the last optgroup if it exists
                                         if ($temp != '') {
                                             echo '</optgroup>';
@@ -1277,7 +1277,7 @@
             }
         });
 
-      
+
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
             var s_data = $(this).serialize();

@@ -226,8 +226,8 @@ class ReportsController extends MainController
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
-            $subs['monthly_due'] = $value->monthly_due;
-            $subs['used'] = $value->used;
+            $subs['monthly_due'] = $value->monthly_due; 
+            $subs['used'] = $value->depreciation_payments->count();
 
             // Calculate prepaid expense payments first
             $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
@@ -342,20 +342,6 @@ class ReportsController extends MainController
             'type' => $type,
         ]);
     }
-
-
-            function splitAmountInTwo($amount) {
-                // work in cents to avoid floating imprecision
-                $totalCents = (int) round($amount * 100);
-                $halfCents = intdiv($totalCents, 2); // floor division
-                $first = $halfCents / 100; // e.g., 1714.28
-                $second = ($totalCents - $halfCents) / 100; // remainder, e.g., 1714.29
-                return [$first, $second];
-            }
-
-
-
-
 
     private function createDynamicPayments($sub)
     {
@@ -482,15 +468,23 @@ class ReportsController extends MainController
                     }
                 }
 
-                if ($branchId === 4 && $details['journal_details_debit'] > 0) {
-                    $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
-                    $details["subsidiary_id"] = 1;
-                    $journalDetails[] = $details;
-                    $details["subsidiary_id"] = 2;
-                    $journalDetails[] = $details;
-                } else {
-                    $journalDetails[] = $details;
-                }
+                // Fixed on HEAD office balance
+             if ($branchId === 4 && $details['journal_details_debit'] > 0) {
+                $originalAmount = $details['journal_details_debit'];
+
+             // for head office balance no need function split
+                $half = round($originalAmount / 2, 2);
+                $details['journal_details_debit'] = $half;
+                $details["subsidiary_id"] = 1;
+                $journalDetails[] = $details;
+                $secondHalf = $originalAmount - $half; 
+                $details['journal_details_debit'] = $secondHalf;
+                $details["subsidiary_id"] = 2;
+                $journalDetails[] = $details;
+
+            } else {
+                $journalDetails[] = $details;
+            }
                 continue;
             }
 
