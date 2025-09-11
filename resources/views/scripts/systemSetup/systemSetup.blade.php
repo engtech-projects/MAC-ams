@@ -14,6 +14,88 @@
             placeholder: 'Account',
             allowClear: true,
         });
+        $('#gender').select2({
+            placeholder: 'Select Gender',
+            width: '100%',
+        });
+        $('#role_id').select2({
+            placeholder: 'Select Role',
+            width: '100%',
+        });
+        $('#branch_selection').select2({
+            placeholder: "Select Branch",
+            width: '100%'
+        });
+
+        function updateButtonText(isUserSelected) {
+            const submitButton = $('input[type="submit"]');
+            if (isUserSelected) {
+                submitButton.val("UPDATE");
+                toggleStatusControls(true);
+            } else {
+                submitButton.val("SAVE");
+                toggleStatusControls(false);
+            }
+        }
+
+        function togglePasswordRequirement(isUpdate) {
+            const passwordField = $('#password');
+            if (isUpdate) {
+                passwordField.removeAttr('required');
+                passwordField.attr('placeholder', 'Leave blank to keep current password');
+            } else {
+                passwordField.attr('required', 'required');
+                passwordField.attr('placeholder', 'Password');
+            }
+        }
+
+        $('#searchBarUser').on('input', function() {
+            if (!$(this).val()) {
+                reset();
+            }
+        });
+
+        var currentStatus = 'active';
+        function updateStatusButton(status) {
+            const toggleButton = $('#toggleStatusButton');
+            const statusField = $('#status');
+            
+            if (status === 'active') {
+                toggleButton.val('DEACTIVATE').removeClass('btn-success').addClass('btn-danger');
+                statusField.val('Active');
+                currentStatus = 'active';
+            } else {
+                toggleButton.val('ACTIVATE').removeClass('btn-danger').addClass('btn-success');
+                statusField.val('Inactive');
+                currentStatus = 'inactive';
+            }
+        }
+        $(document).on('click', '#toggleStatusButton', function(e) {
+            e.preventDefault();
+            if (currentStatus === 'active') {
+                updateStatusButton('inactive');
+            } else {
+                updateStatusButton('active');
+            }
+        });
+        function toggleStatusControls(showStatusButton) {
+            const toggleButtonContainer = $('#toggleStatusButton').parent();
+            const submitButtonContainer = $('#submitButton').parent();
+            const statusField = $('#status');
+            
+            if (showStatusButton) {
+                toggleButtonContainer.show();
+                toggleButtonContainer.css('flex', '1');
+                submitButtonContainer.css('flex', '1');
+                statusField.val(currentStatus === 'active' ? 'Active' : 'Inactive');
+            } else {
+                toggleButtonContainer.hide();
+                submitButtonContainer.css('flex', '2');
+                statusField.val('Active');
+                currentStatus = 'active';
+                updateStatusButton('active');
+            }
+        }
 
         $('#systemSetupAccessibility').DataTable({
             pageLength: 1000
@@ -45,27 +127,44 @@
             posting.done(function(response) {
                 $('.btn_plus').removeClass('d-none');
                 $('.btn_minus').addClass('d-none');
-
-                $.each(JSON.parse(response), function(k, v) {
-                    $('#userId').val(v.user_info.id);
-                    $('#fname').val(v.fname);
-                    $('#mname').val(v.mname);
-                    $('#lname').val(v.lname);
-                    $('#gender').val(v.gender);
-                    $('#displayname').val(v.displayname);
-                    $('#email').val(v.email_address);
-                    $('#phone_number').val(v.phone_number);
-                    $('#username').val(v.user_info.username);
-
-                    $.each(v.user_info.accessibilities, function(kk, vv) {
-                        $('#btn_plus_' + vv.sml_id).addClass('d-none');
-                        $('#btn_minus_' + vv.sml_id).removeClass('d-none');
-                    });
-                });
-
-
+                
+                if (response.user_info && response.user_info.id) {
+                    $('#userId').val(response.user_info.id);
+                    $('#username').val(response.user_info.username);
+                    var selectedBranches = [];
+                    if (response.user_info.user_branch && response.user_info.user_branch.length > 0) {
+                        response.user_info.user_branch.forEach(function(branch) {
+                            selectedBranches.push(branch.branch_id.toString());
+                        });
+                    }
+                    $('#branch_selection').val(selectedBranches).trigger('change');
+                    $('#role_id').val(response.user_info.role_id).trigger('change');
+                    var userStatus = response.user_info.status || 'active';
+                    currentStatus = userStatus;
+                    updateStatusButton(userStatus);
+                    if (response.user_info.accessibilities) {
+                        $.each(response.user_info.accessibilities, function(kk, vv) {
+                            $('#btn_plus_' + vv.sml_id).addClass('d-none');
+                            $('#btn_minus_' + vv.sml_id).removeClass('d-none');
+                        });
+                    }
+                } else {
+                    alert('Error: User info not found');
+                    currentStatus = 'active';
+                    updateStatusButton('active');
+                }
+                
+                $('#fname').val(response.fname);
+                $('#mname').val(response.mname);
+                $('#lname').val(response.lname);
+                $('#gender').val(response.gender).trigger('change');
+                $('#displayname').val(response.displayname);
+                $('#email').val(response.email_address);
+                $('#phone_number').val(response.phone_number);
+                updateButtonText(true);
+                togglePasswordRequirement(true);
             });
-        })
+        });
         $(document).on('click', '.btn-subModuleList', function(e) {
             var sml_id = $(this).attr('value');
             if ($('#userId').val() != '') {
@@ -94,11 +193,28 @@
 
         $(document).on('submit', '#userMasterFileForm', function(e) {
             e.preventDefault();
-            var datastring = $(this).serialize();
+            
+            var formData = new FormData(this);
+            formData.append('status', currentStatus);
+
+            var selectedBranches = $('#branch_selection').val();
+            if (selectedBranches && selectedBranches.length > 0) {
+                formData.delete('branch_ids[]'); // Remove any existing branch_ids
+                selectedBranches.forEach(function(branchId) {
+                    formData.append('branch_ids[]', branchId);
+                });
+            }
+            
+            if ($('#userId').val() && !$('#password').val()) {
+                formData.delete('password');
+            }
+            
             $.ajax({
                 type: "POST",
                 url: "{{ route('SystemSetupController.userMasterFile.createOrUpdate') }}",
-                data: datastring,
+                data: formData,
+                processData: false,
+                contentType: false,
                 dataType: "json",
                 success: function(data) {
                     if (data == 'create') {
@@ -110,8 +226,26 @@
                         reset();
                     }
                 },
-                error: function() {
-                    console.log("Error");
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        var response = xhr.responseJSON;
+                        toastr.error(response.message);
+                        
+                        if (response.message.includes('Username')) {
+                            $('#username').addClass('is-invalid');
+                            $('#username').one('input', function() {
+                                $(this).removeClass('is-invalid');
+                            });
+                        } else if (response.message.includes('branch')) {
+                            $('#branch_selection').next('.select2-container').find('.select2-selection').addClass('is-invalid');
+                            $('#branch_selection').one('change', function() {
+                                $(this).next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+                            });
+                        }
+                    } else {
+                        toastr.error('An error occurred. Please try again.');
+                        console.log("Error", xhr);
+                    }
                 }
             });
         });
@@ -323,14 +457,19 @@
                 get.done(function(response) {
 
                     $('#searchContent').html("");
-                    $.each(JSON.parse(response), function(k, v) {
+                    $.each(response, function(k, v) {
+                        var lname = v.lname || '';
+                        var fname = v.fname || '';
+                        var mname = v.mname || '';
+                        
+                        var displayName = ucFirst(lname) + ' ' + ucFirst(fname) + 
+                                         (mname ? ' (' + ucFirst(mname) + ')' : '');
+                        
                         $('#searchContent').append(
                             '<li class="text-info list-group-item"><a href="#" class="SearchName" user-id="' +
-                            v.personal_info_id + '" value="' + ucFirst(v.lname) + ' ' +
-                            ucFirst(v.fname) + ' (' + ucFirst(v.mname) +
-                            ')" style="color:#3d9970!important; href="#">' + ucFirst(v
-                                .lname) + ' ' + ucFirst(v.fname) + ' (' + ucFirst(v
-                                .mname) + ')</a></li>');
+                            v.personal_info_id + '" value="' + displayName + 
+                            '" style="color:#3d9970!important;">' + displayName + '</a></li>'
+                        );
                     });
 
                 });
@@ -339,6 +478,8 @@
                 $('#searchContent').html("");
                 $('.btn_plus').addClass('d-none');
                 $('.btn_minus').addClass('d-none');
+                updateButtonText(false);
+                togglePasswordRequirement(false);
             }
         });
 
@@ -349,6 +490,15 @@
             $('.btn_minus').addClass('d-none');
             $('#userId').val('');
             $('#searchBarUser').val('');
+            $('#gender').val(null).trigger('change');
+            $('#branch_selection').val(null).trigger('change');
+            $('#role_id').val(null).trigger('change');
+            updateButtonText(false);
+            togglePasswordRequirement(false);
+            updateStatusButton('active');
+            toggleStatusControls(false);
+            $('#username').removeClass('is-invalid');
+            $('#branch_selection').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
         }
 
         function ucFirst(txt) {
