@@ -572,7 +572,7 @@
                     window.location.href = this.baseUrl + "/reports/trialBalance?asof=" + this.filter.asof;
                 },
                 getOpenPostingPeriod: function() {
-                    axios.get('system-setup/posting-periods/open', {
+                    axios.get('/system-setup/posting-periods/open', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -596,7 +596,7 @@
             async mounted() {
                 var journal_date = null;
                 try {
-                    const response = await axios.get('system-setup/posting-periods/open');
+                    const response = await axios.get('/system-setup/posting-periods/open');
                     this.posting_period = response.data.data;
                 } catch (error) {
 
@@ -632,7 +632,7 @@
             /* mounted() {
                 var data = {}
                 this.getOpenPostingPeriod();
-                axios.get('system-setup/posting-periods/open', {
+                axios.get('/system-setup/posting-periods/open', {
                     headers: {
                         'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                             .content
