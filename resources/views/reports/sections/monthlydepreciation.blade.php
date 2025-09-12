@@ -807,10 +807,14 @@
                                             this.formatCurrency(subsidiary.unexpensed),
                                             // Fix Amort and Remaining
                                             this.formatCurrency(
-                                                parseFloat(subsidiary.used) === parseFloat(
-                                                    subsidiary.sub_no_depre) ?
-                                                0.00 :
-                                                parseFloat(subsidiary.monthly_due)),
+                                                subsidiary.due_amort !== undefined && subsidiary.due_amort !== null
+                                                    ? parseFloat(subsidiary.due_amort)   // ✅ if due_amort exists, show it
+                                                    : (
+                                                        parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)
+                                                            ? 0.00
+                                                            : parseFloat(subsidiary.monthly_due)  // ✅ otherwise fallback
+                                                    )
+                                            ),
                                             this.formatCurrency(subsidiary.salvage),
                                             subsidiary.rem,
                                             subsidiary.inv,
@@ -1486,15 +1490,21 @@
                 },
                 processPayment() {
 
-                    this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                    const newBalance = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                    
+                    this.sub.amount_to_depreciate = newBalance;
+                    this.sub.amort = newBalance;
+
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
                         item => item.sub_id !== this.sub.sub_id
                     );
+
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
                     const subId = selectedItem[13];
                     const current_rem = selectedItem[11];
+
                     if (this.sub.rem > current_rem) {
                         toastr.warning(`The number of remaining balance should not be greater than ${current_rem}`);
                         return false;
@@ -1505,9 +1515,13 @@
                         const index = rows.findIndex(item => item.sub_id === subId);
                         if (index !== -1) {
                             const updated = {
-                                ...rows[index]
-                            };
+                                ...rows[index]  };
+                            
+                            this.$set(updated, "amort", newBalance);
                             updated.due_amort = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                            updated.used = (parseInt(updated.used) || 0) + (parseInt(this.sub.rem) || 0);
+                            updated.rem = (parseInt(updated.sub_no_depre || 0)) - (parseInt(updated.used) || 0);
+                            updated.unexpensed = (parseInt(updated.unexpensed || 0)) - newBalance;
 
                             const newArray = [...rows];
                             newArray[index] = updated;
