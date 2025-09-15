@@ -29,9 +29,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(AccessListSeeder::class);
-        $this->call(SubModuleListSeeder::class);
+        $this->call(SubModuleSeeder::class);
         $this->call(MonthlyDueSeeder::class);
-        $this->call(AccessibilitiesSeeder::class);
 
         $currency =    [
             'PHP' => 'Philippine Peso',
