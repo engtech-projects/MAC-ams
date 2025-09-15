@@ -32,7 +32,6 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
-        <!-- <h1 v-text='monthlyDepreciationReportType'></h1> -->
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -64,17 +63,6 @@
                                                                         @{{ sub_cat.description }}
                                                                     </option>
                                                                 </select>
-                                                                {{-- <select name="sub_cat_id"
-                                                                    class="form-control form-control-sm"
-                                                                    v-model="filter.sub_cat_id" id="sub_cat_id">
-                                                                    <option value="" disabled selected>-Select
-                                                                        Category-</option>
-                                                                    @foreach ($subsidiary_categories as $sub_category)
-                                                                        <option value="{{ $sub_category->sub_cat_id }}">
-                                                                            {{ $sub_category->description }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -93,17 +81,6 @@
                                                                         @{{ branch.branch_code + '-' + branch.branch_name }}
                                                                     </option>
                                                                 </select>
-                                                                {{-- <select name="branch_id" v-model="filter.branch_id"
-                                                                    class="form-control form-control-sm" id="branch">
-                                                                    <option value="" disabled selected>-Select Branch-
-                                                                    </option>
-                                                                    @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch->branch_id }}">
-                                                                            {{ $branch->branch_code }} -
-                                                                            {{ $branch->branch_name }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select> --}}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -162,7 +139,6 @@
 
                             <div class="row">
                                 <div class="col-md-12 table-responsive">
-                                    {{--  @{{ subsidiaries[filter.category?.sub_cat_name] }} --}}
                                     <table class="table">
                                         <thead>
                                             <th>No.</th>
@@ -192,39 +168,6 @@
                                                     :colspan="ps.length == 2 && j == 1 ? 8 : ''">
                                                     @{{ p }}
                                                 </td>
-                                                {{-- <template v-if="filter.category?.sub_cat_name === prepaid_expense">
-                                                    <td v-for="(p, j) in ps" v-if="j <= 12" :key="j"
-                                                        :class="rowStyleSubsidiaryListing(p, j, ps)"
-                                                        :colspan="ps.length == 2 && j == 1 ? 8 : ''">
-
-
-                                                        <template v-if="j === 7 && filter.category?.sub_cat_name">
-                                                            @{{ typeof p === 'object' && p !== null ? (p.amount ?? 0) : p }}
-                                                        </template>
-                                                        <template v-else-if="ps[0] === 'BRANCH TOTAL'">
-                                                            @{{ p }}
-                                                        </template>
-                                                        <template v-else-if="Array.isArray(p)">
-                                                            @{{ p.join(', ') }}
-                                                        </template>
-                                                        <template v-else-if="typeof p === 'object' && p !== null">
-                                                            @{{ p.id === null ? 0 : (p.amount ?? p.total?.total_prepaid_exepnse ?? 0) }}
-                                                        </template>
-                                                        <template v-else>
-                                                            @{{ p }}
-                                                        </template>
-
-                                                    </td>
-                                                </template>
-                                                <template v-else>
-                                                    <td v-for="p,i in ps" v-if="i<=12"
-                                                        :class="rowStyleSubsidiaryListing(p, i, ps)"
-                                                        :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
-                                                    </td>
-                                                </template> --}}
-
-
-
                                                 <td v-if="ps[2]" v-show="filter.branch && searching">
                                                     <button class="btn btn-danger btn-xs" @click='deleteSub(ps[13])'>
                                                         <i class="fa fa-trash fa-xs"></i>
@@ -238,12 +181,6 @@
                                                 </td>
 
                                                 <td v-if="ps[0] == 'BRANCH TOTAL'" v-show="filter.branch && searching">
-                                                    <button v-show="ps.length > 13" class="btn btn-primary"
-                                                        @click="post(ps[14])">
-                                                        Post
-                                                    </button>
-
-
                                                     <button v-show="ps.length >= 13"
                                                         class="btn
                                                         btn-success"
@@ -251,38 +188,28 @@
                                                         data-target="#createSubsidiaryModal">
                                                         Add
                                                     </button>
-                                                    {{-- <button v-show="processSubsidiary.length === 0" class="btn btn-success"
-                                                        data-toggle="modal" data-target="#createSubsidiaryModal"
-                                                        @click="add(null)">
-                                                        Add
-                                                    </button> --}}
 
                                                 </td>
+
                                                 <td
-                                                    v-show="!filter.branch && ps[0] != 'BRANCH TOTAL' && ps[0] != 'GRAND TOTAL' && ps[0] != '' && searching && i>=2">
+                                                    v-show="!filter.branch && ps.length !=1 && ps[0] != 'BRANCH TOTAL' && ps[0] != 'GRAND TOTAL' && ps[0] != '' && searching && i>=2">
                                                     <button class="btn btn-success btn-xs"
                                                         data-target="#payDepreciationModal" @click='pay(ps,i)'>
+
                                                         <i class="fa fa-solid fa-file-invoice text-white"></i>
                                                     </button>
                                                 </td>
                                             </tr>
-                                            {{-- <tr v-show="processSubsidiary === false">
-                                                <td colspan="15">
-                                                    <b>
-                                                        <center>No data available in table.</center>
-                                                    </b>
-                                                </td>
-                                                <td v-if="filter.category && filter.branch && filter.to && searching">
-                                                    <button class="btn btn-success" data-toggle="modal"
-                                                        data-target="#createSubsidiaryModal"
-                                                        @click="add(filter.sub_cat_id)">
-                                                        Add
+                                            <tr>
+                                                <td>
+                                                    <button class="btn btn-primary"
+                                                        v-show="subsidiaryAll && Object.keys(subsidiaryAll).length > 0 && !filter.branch"
+                                                        @click="postMonthlyDepreciation(processSubsidiary)">
+                                                        Post
                                                     </button>
                                                 </td>
-                                            <tr> --}}
 
-
-
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -413,14 +340,6 @@
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage">
                                     </div>
-                                    <!-- <div class="col-md-6" v-if="isEdit">
-
-                                                                                                                                                            <label for="message-text" class="col-form-label">Salvage:
-                                                                                                                                                                <span class="text-danger ms-2" style="font-size: 0.875rem;">*note: when life
-                                                                                                                                                                    expand (rate/ 100) * unexpensed</span>
-                                                                                                                                                            </label>
-                                                                                                                                                            <input type="text" v-model="ratePercentage" class="form-control">
-                                                                                                                                                        </div> -->
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
                                         <label for="message-text" class="col-form-label">Salvage:
@@ -500,9 +419,11 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Number of remaining bal to
                                             pay:</label>
-                                        <input type="number" class="form-control" v-model="rem" ref="rem">
-                                        <small class="text-danger">
-                                            ❌ Must be less than or equal to remaining value.
+
+                                        <input type="number" class="form-control" v-model="sub.rem" min="1">
+                                        <small class="text-success">
+                                            Must be less than or equal to remaining value.
+
                                         </small>
                                     </div>
 
@@ -510,7 +431,7 @@
                                     <div class="col-md-12">
                                         <label for="message-text" class="col-form-label">Total of remaining balance:
                                         </label>
-                                        <input type="text" disabled :value="rem_bal" class="form-control"
+                                        <input type="text" disabled v-model="newRemBalance" class="form-control"
                                             id="sub_acct_no">
                                     </div>
 
@@ -529,13 +450,22 @@
         </div>
 
     </section>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <!-- /.content -->
     <script>
         new Vue({
             el: '#app',
             data: {
-                sub: null,
+                sub: {
+                    'sub_id': null,
+                    'amount': 0,
+                    'unexpensed': 0,
+                    'expensed': 0,
+                    'rem': 0,
+                    'monthly_due': 0,
+                    'amort': 0,
+                    'used': 0
+                },
                 branches: @json($branches),
                 sub_categories: @json($subsidiary_categories),
                 reportType: '',
@@ -593,21 +523,41 @@
                 balance: 0,
                 url: "{{ route('reports.post-monthly-depreciation') }}",
                 search: "{{ route('reports.monthly-depreciation-report-search') }}",
-                rem: 1,
+                rem: 0,
+                remDefault: 0,
+                bal: 0,
                 index: null,
+                subsidiaries: {
+                    non_dynamic: [],
+                    dynamic: [],
+                    category: null,
+                    date: null,
+                    branches: []
+                },
+                subsidiaryList: {
+                    sub_to_depreciate: [],
+                    category: null,
+                    date: null,
+                },
             },
             computed: {
-                rem_bal() {
-                    var monthly_due = 0
-                    if (this.sub) {
-                        monthly_due = Number(this.sub[4].replace(/[^0-9.-]+/g, ""));
-                    }
-
-                    return this.rem * monthly_due
-                },
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
                 },
+                newRemBalance() {
+                    var monthly_due = 0;
+                    if (this.sub.sub_id) {
+                        var diff = this.sub.amort - this.sub.used;
+                        monthly_due = this.sub.monthly_due * this.sub.rem
+                        if (this.sub.rem == this.remDefault) {
+                            monthly_due = this.sub.unexpensed
+                        }
+
+                    }
+                    return this.formatCurrency(monthly_due);
+                },
+
+
                 formattedUnexpensed() {
                     return this.subsidiary.unexpensed || '₱0.00';
                 },
@@ -734,7 +684,6 @@
                         .sub_no_depre;
 
                     return isNaN(this.monthlyAmortization) ? 0 : this.formatCurrency(this.monthlyAmortization);
-                    //return isNaN(this.monthlyAmortization) ? 0 : this.monthlyAmortization.toFixed(2);
                 },
 
 
@@ -799,9 +748,7 @@
 
                     for (var i in this.subsidiaryAll) {
                         var branches = data[i];
-
                         rows.push([i]);
-
                         for (var j in branches) {
                             var branch = branches[j];
                             rows.push([j]);
@@ -851,13 +798,14 @@
                                         } else {
                                             val.push(this.formatCurrency(subsidiary.expensed))
                                         }
+
+                                        var due_amort = subsidiary.due_amort;
+                                        if (subsidiary.rem == 1) {
+                                            due_amort = subsidiary.unexpensed
+                                        }
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
-                                            this.formatCurrency(
-                                                parseFloat(subsidiary.used) === parseFloat(
-                                                    subsidiary.sub_no_depre) ?
-                                                0.00 :
-                                                parseFloat(subsidiary.monthly_due)),
+                                            this.formatCurrency(parseFloat(due_amort)),
                                             this.formatCurrency(subsidiary.salvage),
                                             subsidiary.rem,
                                             subsidiary.inv,
@@ -865,23 +813,22 @@
                                             subsidiary.sub_salvage,
                                             subsidiary.sub_code,
                                             subsidiary.sub_cat_id,
-                                            subsidiary.sub_per_branch)
+                                            subsidiary.sub_per_branch,
+                                            subsidiary.used,
+                                            payment_ids,
+                                            branch[0].branch_id,
+                                            branch[0].branch_code,
+                                            subsidiary.branch,
+                                            subsidiary.monthly_due)
                                         rows.push(val);
-
-
                                         totalAmount += parseFloat(subsidiary.sub_amount),
-                                            total_monthly_amort += parseFloat(subsidiary.monthly_amort)
+                                            total_monthly_amort += parseFloat(subsidiary.monthly_due)
                                         total_no_depre += parseInt(subsidiary.sub_no_depre)
                                         total_no_amort += parseFloat(subsidiary.sub_no_amort)
                                         total_amort += parseFloat(subsidiary.total_amort)
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                        if (parseFloat(subsidiary.used) === parseFloat(subsidiary
-                                                .sub_no_depre)) {
-                                            total_due_amort += 0.00;
-                                        } else {
-                                            total_due_amort += parseFloat(subsidiary.monthly_due);
-                                        }
+                                        total_due_amort += due_amort
                                         total_sub_salvage += parseFloat(subsidiary.salvage)
                                         total_rem += parseFloat(subsidiary.rem)
                                         total_inv += parseFloat(subsidiary.inv)
@@ -934,7 +881,8 @@
                                 'TOTAL MONTHLY',
                                 'TOTAL AMORT',
                                 'TOTAL USED',
-                                this.filter.category && this.filter.category.sub_cat_name === this
+                                this.filter.category && this.filter.category.sub_cat_name ===
+                                this
                                 .prepaid_expense ? 'TOTAL PREPAID EXP.' : 'TOTAL EXPENSED',
                                 'TOTAL UNEXPENSED',
                                 'TOTAL DUE AMORT',
@@ -954,7 +902,6 @@
                                 total_rem,
                                 total_inv, branch, data
                             ]);
-
                         }
                         rows.push(['GRAND TOTAL', '', '',
                             this.formatCurrency(gTotalAmount),
@@ -1036,15 +983,17 @@
                             let branchSubSalvage = 0;
                             for (var k in subsidiary) {
                                 if (this.filter.category?.sub_cat_name === this.prepaid_expense) {
-                                    branchTotalExpensed += parseFloat(subsidiary[k].prepaid_expense);
+                                    branchTotalExpensed += parseFloat(subsidiary[k]
+                                        .prepaid_expense);
                                 } else {
                                     branchTotalExpensed += parseFloat(subsidiary[k].expensed);
                                 }
                                 branchTotalAmount += parseFloat(subsidiary[k].sub_amount);
                                 branchTotalUnexpensed += parseFloat(subsidiary[k].unexpensed);
                                 branchSubSalvage += parseFloat(subsidiary[k].salvage);
-                               
-                                if (parseFloat(subsidiary[k].used) === parseFloat(subsidiary[k].sub_no_depre)) {
+
+                                if (parseFloat(subsidiary[k].used) === parseFloat(subsidiary[k]
+                                        .sub_no_depre)) {
                                     branchTotalDueAmort += 0.00;
                                 } else {
                                     branchTotalDueAmort += parseFloat(subsidiary[k].monthly_due);
@@ -1079,7 +1028,6 @@
                             grandTotalRem
                         ];
 
-                        rows.push(result);
                     }
                     return rows;
 
@@ -1119,7 +1067,8 @@
                     }
 
                     const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
-                    const newLife = parseInt(this.subsidiary.new_life ?? this.subsidiary.sub_no_depre ?? 1);
+                    const newLife = parseInt(this.subsidiary.new_life ?? this.subsidiary
+                        .sub_no_depre ?? 1);
 
                     // FIX: Better handling of empty/erased rates
                     const oldRate = parseFloat(this.subsidiary.original_salvage_rate || 0) || 0;
@@ -1128,7 +1077,8 @@
                     let newRateInput = this.subsidiary.sub_salvage;
                     let newRate = 0;
 
-                    if (newRateInput !== null && newRateInput !== undefined && newRateInput !== '') {
+                    if (newRateInput !== null && newRateInput !== undefined && newRateInput !==
+                        '') {
                         // Only parse if there's actually a value
                         if (typeof newRateInput === 'string') {
                             newRateInput = newRateInput.trim(); // Remove whitespace
@@ -1178,7 +1128,8 @@
                             // Only subtract new salvage from unexpensed (don't touch expensed)
                             expensed = storedExpensed; // Keep expensed unchanged
                             const newSalvage = (newRate / 100) * amount;
-                            unexpensed = storedUnexpensed - newSalvage; // Subtract salvage from unexpensed
+                            unexpensed = storedUnexpensed -
+                                newSalvage; // Subtract salvage from unexpensed
 
                         } else if (oldRate === 0 && newRate === 0) {
                             // Case: No prior rate and still no rate - keep original stored values
@@ -1214,7 +1165,8 @@
                         } else {
                             // Case: Same rate or life change only OR oldRate=0 and newRate=0 (no change)
                             const hasValidNewLife = newLife > 0 && !isNaN(newLife);
-                            const originalLife = this.subsidiary.sub_no_depre || this.subsidiary.original_life;
+                            const originalLife = this.subsidiary.sub_no_depre || this.subsidiary
+                                .original_life;
 
                             if (hasValidNewLife && newLife != originalLife) {
                                 // Check if new life is less than or equal to used months
@@ -1224,7 +1176,8 @@
                                     unexpensed = storedUnexpensed;
                                 } else {
                                     // Life changed and is valid: KEEP existing expensed (already depreciated)
-                                    expensed = storedExpensed; // Don't touch what's already been expensed
+                                    expensed =
+                                        storedExpensed; // Don't touch what's already been expensed
 
                                     const salvageValue = (newRate / 100) * amount;
                                     const totalDepreciableAmount = amount - salvageValue;
@@ -1250,8 +1203,10 @@
                     unexpensed = Math.max(0, unexpensed);
 
                     // Round to 2 decimal places and format back to currency
-                    this.subsidiary.expensed = this.formatCurrency(Math.round(expensed * 100) / 100);
-                    this.subsidiary.unexpensed = this.formatCurrency(Math.round(unexpensed * 100) / 100);
+                    this.subsidiary.expensed = this.formatCurrency(Math.round(expensed * 100) /
+                        100);
+                    this.subsidiary.unexpensed = this.formatCurrency(Math.round(unexpensed * 100) /
+                        100);
                 },
                 onSearch: function() {
                     this.searching = false;
@@ -1261,7 +1216,8 @@
                     this.resetForm();
                 },
                 toAddPrepaidAmount() {
-                    var prepaidAmount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g, ""))
+                    var prepaidAmount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g,
+                        ""))
                     prepaidAmount = parseFloat(this.prepaid_amount) + prepaidAmount
                     this.prepaid_amount = this.formatCurrency(prepaidAmount);
                 },
@@ -1273,13 +1229,6 @@
                     });
 
                     return formatter.format(number)
-                    /* const formatter = new Intl.NumberFormat('en-US', {
-                        style: 'decimal',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                    });
-
-                    return formatter.format(number); */
                 },
                 rowStyles: function(element) {
                     var style = '';
@@ -1316,13 +1265,49 @@
                             "sub_month").defaultValue;
                     return current_month;
                 },
+                postMonthlyDepreciation: function(data) {
+                    this.resetForm()
+                    if (data) {
+                        var newData = [];
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i][0] == "BRANCH TOTAL") {
+                                newData.push(data[i][14])
+                            }
+                        }
+                        this.subsidiaryList.category = this.filter.category
+                        this.subsidiaryList.date = this.filter.to
+                        this.subsidiaries.category = this.filter.category;
+                        this.subsidiaries.date = this.filter.to
+                        this.subsidiaries.non_dynamic.map(item => {
+                            item.rem = 1
+                            return item;
+                        })
+                        axios.post('post', this.subsidiaries, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector(
+                                        'meta[name="csrf-token"]')
+                                    .content
+                            }
+                        }).then(response => {
+                            toastr.success(response.data.message);
+                            this.newSub = response.data.data;
+                            this.subsidiaries.dynamic = []
+                            window.reload();
+                        }).catch(err => {
+                            console.error(err)
+                        })
+                    } else {
+                        toastr.warning("No data available");
+                    }
+                },
                 post: function(data) {
                     this.resetForm()
                     if (data) {
                         data.branch_id = this.filter.branch.branch_id;
-                        axios.post(this.url, data, {
+                        axios.post('post', data, {
                             headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                'X-CSRF-TOKEN': document.head.querySelector(
+                                        'meta[name="csrf-token"]')
                                     .content
                             }
                         }).then(response => {
@@ -1351,7 +1336,8 @@
                     const salvageRate = Number(this.subsidiary.sub_salvage) || 0;
                     const salvage = (salvageRate / 100) * unexpensed;
 
-                    const remaining = this.remaining_life || 1; // computed property or fallback to 1!
+                    const remaining = this.remaining_life ||
+                        1; // computed property or fallback to 1!
 
                     const amort = (unexpensed - salvage) / remaining;
                     return isNaN(amort) ? 0 : amort;
@@ -1399,8 +1385,6 @@
                 formatTextField() {
                     this.subsidiary.sub_amount = this.formatCurrency(this.subsidiary.sub_amount);
                     this.subAmount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
-                    /*                     this.prepaid_amount = this.formatCurrency(this.prepaid_amount);
-                                        this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, "")) */
 
                 },
 
@@ -1413,9 +1397,12 @@
                 },
                 formatTextToNumberFormat() {
                     if (this.isString(this.to_add_prepaid_amount)) {
-                        this.to_add_prepaid_amount = Number(this.to_add_prepaid_amount.replace(/[^0-9\.-]+/g, ""))
-                        this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g, ""));
-                        this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, ""))
+                        this.to_add_prepaid_amount = Number(this.to_add_prepaid_amount.replace(
+                            /[^0-9\.-]+/g, ""))
+                        this.prepaid_amount = Number(this.prepaid_amount.replace(/[^0-9\.-]+/g,
+                            ""));
+                        this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(
+                            /[^0-9\.-]+/g, ""))
                     }
 
 
@@ -1456,9 +1443,28 @@
                 pay: function(sub, index) {
                     if (sub[11] > 0) {
                         $('#payDepreciationModal').modal('show');
-                        this.index = index;
-                        this.sub = sub;
-                        console.log(sub);
+                        this.index = index
+                        this.remDefault = sub[11]
+                        this.sub = {
+                            'sub_id': sub[13],
+                            'amount': Number(sub[3].replace(/[^0-9\.-]+/g, "")),
+                            'unexpensed': Number(sub[8].replace(/[^0-9\.-]+/g, "")),
+                            'expensed': Number(sub[7].replace(/[^0-9\.-]+/g, "")),
+                            'rem': Number(sub[11]),
+                            'monthly_due': Number(sub[4].replace(/[^0-9\.-]+/g, "")),
+                            'amort': Number(sub[5].replace(/[^0-9\.-]+/g, "")),
+                            'used': sub[18],
+                            'payment_ids': sub[19],
+                            'branch_id': sub[20],
+                            'branch_code': sub[21],
+                            'branch': sub[22]
+                        }
+                        this.subsidiaries.dynamic = this.subsidiaries.dynamic.filter(
+                            item => item.sub_id !== sub[13]
+                        );
+                        this.subsidiaries.dynamic.push(this.sub);
+
+
                     } else {
                         toastr.warning("Depreaciation Payment already paid.");
                         return false;
@@ -1466,33 +1472,41 @@
 
                 },
                 processPayment() {
+
+                    this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                    this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
+                        item => item.sub_id !== this.sub.sub_id
+                    );
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
+
                     const subId = selectedItem[13];
-                    var current_rem = selectedItem[11];
-                    if (this.rem > current_rem) {
-                        toastr.warning("The number of remaining balance should not be greater than " + current_rem);
+                    const current_rem = selectedItem[11];
+                    if (this.sub.rem > current_rem) {
+                        toastr.warning(`The number of remaining balance should not be greater than ${current_rem}`);
                         return false;
                     }
                     for (const [branchName, rows] of Object.entries(branchList)) {
                         if (!Array.isArray(rows)) continue;
+
                         const index = rows.findIndex(item => item.sub_id === subId);
                         if (index !== -1) {
                             const updated = {
                                 ...rows[index]
                             };
-                            updated.monthly_due = this.rem_bal;
-                            const newArray = [...branchList[branchName]];
+                            updated.due_amort = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
 
+                            const newArray = [...rows];
                             newArray[index] = updated;
-                            branchList[branchName] = newArray;
+
+                            this.$set(branchList, branchName, newArray);
                         }
-
                     }
-                    this.subsidiaryAll[this.filter.category.sub_cat_name] = branchList;
+                    this.$set(this.subsidiaryAll, this.filter.category.sub_cat_name, branchList);
                     $('#payDepreciationModal').modal('hide');
-
                 },
+
+
                 resetForm: function() {
                     this.subsidiary = {
                         sub_name: '',
@@ -1524,11 +1538,6 @@
                     this.subsidiary.prepaid_expense = parseFloat(
                         String(prepaid).replace(/[₱,]/g, '') || '0'
                     );
-                    //this.subsidiary.prepaid_expense = parseFloat(String(this.prepaid_amount).replace(/[₱,]/g, ''))
-                    // this.subsidiary.prepaid_expense = parseFloat(
-                    //             this.prepaid_amount.replace(/[₱,]/g, '')
-                    //             );
-
                     if (typeof this.subsidiary.sub_amount === 'string') {
                         var amount = Number(amount.replace(/[^0-9\.-]+/g, ""))
                     }
@@ -1536,10 +1545,10 @@
                     this.subsidiary.branch = this.filter.branch
                     this.subsidiary.sub_cat_id = this.filter.category.sub_cat_id
 
-                    /* this.subsidiary.sub_amount = Number(this.subsidiary.sub_amount.replace(/[^0-9\.-]+/g, "")) */
                     axios.post('/subsidiary', this.subsidiary, {
                         headers: {
-                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                            'X-CSRF-TOKEN': document.head.querySelector(
+                                    'meta[name="csrf-token"]')
                                 .content
                         }
                     }).then(response => {
@@ -1580,7 +1589,8 @@
                 },
                 updateSubsidiary: function(data) {
                     var filters = this.filter;
-                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                    var subsidiaries = this.subsidiaryAll[filters.category.sub_cat_name][filters
+                        .branch
                         .branch_alias
                     ]
                     subsidiaries = subsidiaries.map(sub =>
@@ -1589,7 +1599,9 @@
                             ...data,
                         } : sub
                     );
-                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch.branch_alias] =
+                    this.subsidiaryAll[filters.category.sub_cat_name][filters.branch
+                            .branch_alias
+                        ] =
                         subsidiaries;
 
                 },
@@ -1625,14 +1637,19 @@
                     const used = parseInt(this.subsidiary.sub_no_amort ?? 0);
 
                     if (newLife > 0 && newLife < used) {
-                        toastr.error("New life must be greater than or equal to months already used.");
+                        toastr.error(
+                            "New life must be greater than or equal to months already used."
+                        );
                         return; // stop the update
                     }
 
-                    if (this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' && this
+                    if (this.filter.category?.sub_cat_name === 'Additional Prepaid Expense' &&
+                        this
                         .to_add_prepaid_amount) {
-                        var unexpensed = Number(this.subsidiary.unexpensed.replace(/[^0-9\.-]+/g, ""));
-                        var toAddAmountStr = this.to_add_prepaid_amount ? String(this.to_add_prepaid_amount) :
+                        var unexpensed = Number(this.subsidiary.unexpensed.replace(
+                            /[^0-9\.-]+/g, ""));
+                        var toAddAmountStr = this.to_add_prepaid_amount ? String(this
+                                .to_add_prepaid_amount) :
                             '0';
                         var toAddAmount = Number(toAddAmountStr.replace(/[^0-9\.-]+/g, ""));
 
@@ -1647,7 +1664,8 @@
                     this.subsidiary.prepaid_expense = this.prepaid_amount;
                     this.subsidiary.prepaid_expense_payment = this.to_add_prepaid_amount;
                     this.subsidiary.category = this.filter.category;
-                    this.subsidiary.original_salvage_rate = parseFloat(this.subsidiary.sub_salvage ?? 0);
+                    this.subsidiary.original_salvage_rate = parseFloat(this.subsidiary
+                        .sub_salvage ?? 0);
                     this.subsidiary.original_life = parseInt(this.subsidiary.sub_no_depre ?? 1);
 
                     this.recomputeExpUnexp();
@@ -1716,6 +1734,32 @@
                         })
                         .then(response => {
                             this.subsidiaryAll = response.data.data;
+                            const raw = response.data.data
+                            const allItems = Object.values(raw)
+                                .flatMap(branches => Object.values(branches).flat());
+                            this.subsidiaries.non_dynamic = allItems.map(item => {
+                                var diff = item.rem - item.used;
+
+                                var dueAmort = item.due_amort;
+                                if (item.rem == 1) {
+                                    dueAmort = item.unexpensed
+                                }
+                                return {
+                                    'sub_id': item.sub_id,
+                                    'amount': item.sub_amount,
+                                    'unexpensed': item.unexpensed,
+                                    'expensed': item.expensed,
+                                    'rem': item.rem,
+                                    'monthly_due': item.monthly_due,
+                                    'amort': item.sub_no_amort,
+                                    'amount_to_depreciate': dueAmort,
+                                    'used': item.sub_no_depre,
+                                    'payment_ids': item.payment_ids,
+                                    'branch_id': item.branch_id,
+                                    'branch_code': item.sub_per_branch,
+                                    'branch': item.branch
+                                }
+                            })
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -1745,6 +1789,6 @@
 
 
 @section('footer-scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
+    <script src="{{ asset('js/xlsx.full.min.js') }}"></script>
     @include('scripts.reports.reports')
 @endsection

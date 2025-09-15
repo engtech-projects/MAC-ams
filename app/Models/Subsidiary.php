@@ -64,23 +64,28 @@ class Subsidiary extends Model
     public function getDepreciation($categoryId, $branch, $date)
     {
         $date = Carbon::parse($date);
-        $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId) {
-            $query->where('sub_cat_id', $categoryId);
-        })->with(['depreciation_payments' => function ($query) use ($date) {
-            $query->when($date, function ($query) use ($date) {
-                $month = $date->month;
-                $year = $date->year;
-                $query->whereDate('date_paid', '<=', $date);
-                /* $query->whereMonth('date_paid', '>=', $month)->whereYear('date_paid', $year); */
-            });
-        }, 'prepaid_expense.prepaid_expense_payments'])
-            ->when(isset($branch), function ($query) use ($branch) {
-                $query->where('sub_per_branch', $branch->branch_code);
-            })->when(isset($date), function ($query) use ($date) {
-                $query->whereDate('sub_date', '<=', $date);
-            })->whereHas('subsidiary_category', function ($query) {
-                $query->where('sub_cat_type', 'depre');
-            })->whereNotNull('sub_per_branch')->with(['subsidiary_accounts'])->get();
+        try {
+            $subsidiary = Subsidiary::when($categoryId, function ($query) use ($categoryId) {
+                $query->where('sub_cat_id', $categoryId);
+            })->with(['depreciation_payments' => function ($query) use ($date) {
+                $query->when($date, function ($query) use ($date) {
+                    $month = $date->month;
+                    $year = $date->year;
+                    $query->whereDate('date_paid', '<=', $date);
+                    /* $query->whereMonth('date_paid', '>=', $month)->whereYear('date_paid', $year); */
+                });
+            }, 'prepaid_expense.prepaid_expense_payments'])
+                ->when(isset($branch), function ($query) use ($branch) {
+                    $query->where('sub_per_branch', $branch->branch_code);
+                })->when(isset($date), function ($query) use ($date) {
+                    $query->whereDate('sub_date', '<=', $date);
+                })->whereHas('subsidiary_category', function ($query) {
+                    $query->where('sub_cat_type', 'depre');
+                })->whereNotNull('sub_per_branch')->with(['subsidiary_accounts'])->get();
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+
         return $subsidiary;
     }
 
@@ -138,6 +143,10 @@ class Subsidiary extends Model
     public function getTotalDepreciableAmountAttribute()
     {
         return round($this->sub_amount - $this->salvage, 2);
+    }
+    public function getUsedAttribute()
+    {
+        return $this->depreciation_payments()->count();
     }
     /* protected function monthlyDue(): Attribute
     {
