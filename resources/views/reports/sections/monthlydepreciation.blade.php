@@ -807,13 +807,13 @@
                                             this.formatCurrency(subsidiary.unexpensed),
                                             // Fix Amort and Remaining
                                             this.formatCurrency(
-                                                subsidiary.due_amort !== undefined && subsidiary.due_amort !== null
-                                                    ? parseFloat(subsidiary.due_amort)   // ✅ if due_amort exists, show it
-                                                    : (
-                                                        parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)
-                                                            ? 0.00
-                                                            : parseFloat(subsidiary.monthly_due)  // ✅ otherwise fallback
-                                                    )
+                                               parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)
+                                                ? 0.00
+                                                : (
+                                                    subsidiary.due_amort !== undefined && subsidiary.due_amort !== null
+                                                        ? parseFloat(subsidiary.due_amort)   // ✅ show due_amort if it exists
+                                                        : parseFloat(subsidiary.monthly_due) // ✅ fallback to monthly_due
+                                                )
                                             ),
                                             this.formatCurrency(subsidiary.salvage),
                                             subsidiary.rem,
@@ -838,9 +838,10 @@
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
                                         // For Total Due Amort Fix
-                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary
-                                                .sub_no_depre)) {
+                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)) {
                                             total_due_amort += 0.00;
+                                        } else if (subsidiary.due_amort !== undefined && subsidiary.due_amort !== null) {
+                                            total_due_amort += parseFloat(subsidiary.due_amort);
                                         } else {
                                             total_due_amort += parseFloat(subsidiary.monthly_due);
                                         }

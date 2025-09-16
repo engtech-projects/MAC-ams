@@ -518,6 +518,13 @@ class ReportsController extends MainController
     {
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
+       
+        if ($as_of->isSaturday()) {
+            $as_of->subDay();
+        } elseif ($as_of->isSunday()) {
+            $as_of->subDays(2);
+        }
+
         $branchCode = $request->branch_code;
         $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
         $subCategory = SubsidiaryCategory::find($request->category_id);
