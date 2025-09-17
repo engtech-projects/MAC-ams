@@ -37,7 +37,7 @@
                     <label class="label-normal" for="mname">Middle Name</label>
                     <div class="input-group">
                         <input type="text" class="form-control form-control-sm rounded-0" name="mname"
-                            id="mname" placeholder="Middle Name">
+                            id="mname" placeholder="Middle Name" required>
                     </div>
                 </div>
 
@@ -53,9 +53,9 @@
                         <label class="label-normal" for="gender">Gender</label>
                         <div class="input-group">
                             <select name="gender" class="form-control form-control-sm" id="gender">
-                                <option value="" disabled selected>-select Gender-</option>
-                                <option value="male">male</option>
-                                <option value="female">female</option>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
                             </select>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                         <label class="label-normal" for="email">Nickname</label>
                         <div class="input-group">
                             <input type="text" class="form-control form-control-sm rounded-0" name="displayname"
-                                id="displayname" placeholder="Display Name" required>
+                                id="displayname" placeholder="Display Name">
                         </div>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                         <label class="label-normal" for="email">Email</label>
                         <div class="input-group">
                             <input type="email" class="form-control form-control-sm rounded-0" name="email"
-                                id="email" placeholder="Email" required>
+                                id="email" placeholder="Email">
                         </div>
                     </div>
                     <div class="form-group" style="flex:1;">
@@ -100,19 +100,45 @@
                 </div>
 
                 <div class="form-group" style="margin-right:10px;flex:1;">
-                        <label class="label-normal" for="gender">Gender</label>
-                        <div class="input-group">
-                            <select name="branch_id" class="form-control form-control-sm" id="gender">
-                                <option value="" disabled selected>Select Branch</option>
-                                @foreach ($branch as $item)
-                                    <option value="{{ $item->branch_id }}">{{ $item->branch_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <label class="label-normal" for="branch_selection">Branch</label>
+                    <div class="input-group mb-2">
+                        <select id="branch_selection" class="form-control form-control-sm" name="branch_ids[]" multiple required>
+                            @foreach ($branch as $item)
+                                <option value="{{ $item->branch_id }}">{{ $item->branch_name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                <div class="input-group">
-                    <input type="submit" style="flex:1" class="btn btn-success form-control-sm form-control"
-                        value="SAVE/UPDATE">
+                </div>
+                <div class="form-group" style="margin-right:10px;flex:1;">
+                    <label class="label-normal" for="role_id">Role</label>
+                    <div class="input-group">
+                        <select name="role_id" class="form-control form-control-sm" id="role_id" required>
+                            <option value="" disabled selected>Select Role</option>
+                            <option value="1">System Administrator</option>
+                            <option value="2">Accountant</option>
+                            <option value="3">Accounting Staff</option>
+                            <option value="4">Manager</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-right:10px;flex:1;">
+                    <label class="label-normal" for="status">Status</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm rounded-0" name="status"
+                            id="status" value="Active" disabled>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                    <div class="input-group" style="flex:1;display:none;">
+                        <input type="button" id="toggleStatusButton" style="flex:1;" 
+                               class="btn btn-success form-control-sm form-control" 
+                               value="ACTIVATE">
+                    </div>
+                    <div class="input-group" style="flex:2;">
+                        <input type="submit" id="submitButton" style="flex:1" 
+                               class="btn btn-success form-control-sm form-control" 
+                               value="SAVE">
+                    </div>
                 </div>
             </div>
         </form>

@@ -144,10 +144,26 @@ class SystemSetupController extends MainController
     public function userMasterFileCreateOrUpdate(Request $request)
     {
         $user_id = $request->userId;
+        $query = User::where('username', $request->username);
+        if ($user_id != '') {
+            $query->where('id', '!=', $user_id);
+        }
 
-        $branch = [
-            "branch_id" => $request->branch_id
-        ];
+        if ($query->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Username already exists'
+            ], 422);
+        }
+        
+        $branch_ids = $request->branch_ids ?? [];
+
+        if (empty($branch_ids)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'At least one branch must be selected'
+            ], 422);
+        }
 
         if ($user_id == '') {
             $person = new PersonalInfo;
@@ -158,25 +174,34 @@ class SystemSetupController extends MainController
             $person->displayname = $request->displayname;
             $person->email_address = $request->email;
             $person->phone_number = $request->phone_number;
-
             $person->save();
 
             $user = new User;
             $user->username = $request->username;
             $user->password = bcrypt($request->password);
             $user->status = 'active';
-            $user->role_id = '1';
+            $user->role_id = $request->role_id;
             $user->salt = Str::random(10);
-            $user = $person->userInfo()->save($user);
-            $user->userBranch()->attach($branch);
+            $user->personal_info_id = $person->personal_info_id;
+            $user->save();
+
+            if (!empty($branch_ids)) {
+                $user->userBranch()->attach($branch_ids);
+            }
 
             return json_encode('create');
         } else {
             $user = User::find($user_id);
             $user->username = $request->username;
-            $user->password = bcrypt($request->password);
-            $user->userBranch()->attach($branch);
-            $user->push();
+            if (!empty($request->password)) {
+                $user->password = bcrypt($request->password);
+            }
+            $user->status = $request->status;
+            $user->role_id = $request->role_id;
+            $user->save();
+
+            $user->userBranch()->sync($branch_ids);
+
             PersonalInfo::where('personal_info_id', $user->personal_info_id)->update([
                 'fname' => $request->fname,
                 'mname' => $request->mname,
@@ -242,13 +267,41 @@ class SystemSetupController extends MainController
     }
     public function searchAccount(Request $request)
     {
-        return json_encode(PersonalInfo::where(DB::raw("CONCAT(lname, ', ',fname, ' (', mname, ')' )"), 'LIKE', "%" . $request->name . "%")
-            ->with('userInfo')->orderBy('lname')->limit(10)->get());
+        $name = strtolower(trim($request->name));
+        
+        if (empty($name)) {
+            return response()->json([]);
+        }
+        
+        $searchTerms = array_filter(explode(' ', $name));
+        $query = PersonalInfo::query();
+        
+        // For each search term, it must match at least one name field
+        foreach ($searchTerms as $term) {
+            $query->where(function($q) use ($term) {
+                $q->whereRaw("LOWER(fname) LIKE ?", ["%{$term}%"])
+                  ->orWhereRaw("LOWER(mname) LIKE ?", ["%{$term}%"])
+                  ->orWhereRaw("LOWER(lname) LIKE ?", ["%{$term}%"])
+                  ->orWhereRaw("LOWER(displayname) LIKE ?", ["%{$term}%"]);
+            });
+        }
+        
+        $accounts = $query->with('userInfo')
+                         ->orderBy('lname')
+                         ->get();
+        return response()->json($accounts);
     }
     public function fetchInfo(Request $request)
     {
-        return json_encode(PersonalInfo::where('personal_info_id', $request->p_id)
-            ->with('userInfo')->orderBy('lname')->limit(10)->get());
+        $personalInfo = PersonalInfo::where('personal_info_id', $request->p_id)
+            ->with([
+                'userInfo.accessibilities', 
+                'userInfo.userBranch', 
+                'userInfo.userRole'
+            ])
+            ->first();
+        
+        return response()->json($personalInfo);
     }
 
     public function currencyUpdate(Request $request)

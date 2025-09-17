@@ -2,30 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
-use Illuminate\Http\Request;
 use Hash;
 use Session;
-use DB;
+use Exception;
+use Carbon\Carbon;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use App\Models\AccountType;
 use App\Models\Accounts;
-use App\Models\Supplier;
 use App\Models\Customer;
 use App\Models\Employee;
-use App\Models\Transactions;
-use App\Models\TransactionType;
-use App\Models\TransactionStatus;
+use App\Models\Supplier;
+use App\Models\Accounting;
 use App\Models\Subsidiary;
+use App\Models\AccountType;
 use App\Models\JournalBook;
 use App\Models\journalEntry;
-use App\Models\journalEntryDetails;
-use App\Models\Accounting;
+use App\Models\Transactions;
+use Illuminate\Http\Request;
 use App\Models\PostingPeriod;
-use Carbon\Carbon;
+use App\Models\TransactionType;
+use Illuminate\Validation\Rule;
+use App\Models\TransactionStatus;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\LogOptions;
+use App\Models\journalEntryDetails;
+use Illuminate\Support\Facades\Auth;
 
 class JournalController extends MainController
 {
@@ -39,27 +40,6 @@ class JournalController extends MainController
     {
         $journalNumber = $journalBook->generateJournalNumber();
         return response()->json(['data' => $journalNumber]);
-    }
-    public function create()
-    {
-        $transactionType = TransactionType::where('transaction_type', 'journal')->first();
-        $data = [
-            'title' => 'Journal Entry',
-            'customers' => Customer::all(),
-            'suppliers' => Supplier::all(),
-            'employees' => Employee::all(),
-            'assets' => Accounts::assets(),
-            'liabilities' => Accounts::liabilities(),
-            'equity' => Accounts::equity(),
-            'income' => Accounts::income(),
-            'expenses' => Accounts::expense(),
-            'transactionType' => $transactionType
-        ];
-        return view('journal.createjournal', $data);
-    }
-    public function store(Request $request)
-    {
-        return $request;
     }
     public function journalEntry(Request $request)
     {
@@ -75,20 +55,6 @@ class JournalController extends MainController
 
     public function saveJournalEntry(journalEntry $journalEntry, Request $request)
     {
-        // // Define custom validation messages
-        // // $customMessages = [
-        // //     'journal_entry.journal_no.unique' => 'The reference number has already been taken.',
-        // // ];
-
-        // // Validate the request data
-        // $request->validate([
-        //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
-        // ], $customMessages);
-        // // Validate the request data
-        // $request->validate([
-        //     'journal_entry.journal_no' => 'required|unique:journal_entry,journal_no',
-        // ], $customMessages);
-
         $request->validate([
             'journal_entry.journal_date' => 'required|date'
         ]);
@@ -100,14 +66,18 @@ class JournalController extends MainController
                 $journal_date = $request->journal_entry['journal_date'];
                 $isOpen = $period->isInPostingPeriod($journal_date, $open);
                 if ($isOpen) {
-                    $journalEntry = $journalEntry->createJournalEntry($request->input());
-                    $matchFound = true;
+                    $created = $journalEntry->createJournalEntry($request->input());
+                    if ($created) {
+                        activity("Journal Entry")->event("created")->performedOn($journalEntry)
+                            ->log("created");
+                        $matchFound = true;
+                    }
                 }
             }
             if (!$matchFound) {
                 return response()->json([
                     'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
-                ], 201);
+                ], 400);
             }
         }
         return response()->json([
@@ -127,12 +97,26 @@ class JournalController extends MainController
         $journal->status = 'cancelled';
         $replicate = $journal->replicate();
 
-        if ($journal->save()) {
-            activity("Journal Entry")->event("cancelled")->performedOn($journal)
-                ->withProperties(['attributes' => $journal, 'old' => $replicate])
-                ->log("cancelled");
+        try {
+            DB::transaction(function () use ($journal, $replicate) {
+                $updated = $journal->update([
+                    'journal_status' => 'cancelled'
+                ]);
+                if ($updated) {
+                    activity("Journal Entry")->event("cancelled")->performedOn($journal)
+                        ->withProperties(['attributes' => $journal, 'old' => $replicate])
+                        ->log("cancelled");
+                }
+            });
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => 'Transaction Failed.',
+                'error' => $e->getMessage()
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
-        return response()->json(['message' => 'error']);
+        return new JsonResponse([
+            'message' => 'Successfully updated.',
+        ], JsonResponse::HTTP_OK);
     }
     public function JournalEntryEdit(Request $request)
     {
@@ -156,18 +140,13 @@ class JournalController extends MainController
             $matchFound = false;
             foreach ($open_periods as $open) {
                 $journal_date = $request->journal_entry['journal_date'];
-
                 $isOpen = $period->isInPostingPeriod($journal_date, $open);
-                // if ($journalEntry->journal_date == $journal_date) {
-                //     $isOpen = true;
-                // }
                 if ($isOpen) {
                     try {
                         DB::transaction(function () use ($request, $journalEntry, $replicate) {
                             $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
                             $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
-
-                            $journalEntry->update([
+                            $updated = $journalEntry->update([
                                 'journal_no' => $request->journal_entry['edit_journal_no'],
                                 'journal_date' => $request->journal_entry['journal_date'],
                                 'branch_id' => $request->journal_entry['edit_branch_id'],
@@ -180,32 +159,31 @@ class JournalController extends MainController
                                 'payee' => $request->journal_entry['edit_payee'],
                                 'remarks' => $request->journal_entry['edit_remarks'],
                             ]);
-
-                            // Update journal entry details
                             $journalEntry->details()->delete();
                             $journalEntry->details()->createMany($request->details);
-                            activity("Journal Entry")->event("edit")->performedOn($journalEntry)
-                                ->withProperties(['attributes' => $journalEntry, 'old' => $replicate])
-                                ->log("updated");
+                            if ($updated) {
+                                activity("Journal Entry")->event("edit")->performedOn($journalEntry)
+                                    ->withProperties(['attributes' => $journalEntry, 'old' => $replicate])
+                                    ->log("updated");
+                            }
                         });
                         $matchFound = true;
                     } catch (Exception $e) {
-                        return response()->json([
-                            'success' => true,
-                            'message' => $e->getMessage()
-                        ], 500);
+                        return new JsonResponse([
+                            'message' => 'Transaction Failed.',
+                            'error' => $e->getMessage()
+                        ], JsonResponse::HTTP_BAD_REQUEST);
                     }
                 }
             }
             if (!$matchFound) {
-                return response()->json([
+                return new JsonResponse([
                     'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
-                    'success' => false,
-                ], 201);
+                    'error' => $e->getMessage(),
+                    'success' => false
+                ], JsonResponse::HTTP_BAD_REQUEST);
             }
         }
-        activity()
-            ->log('Edit');
         return response()->json([
             'message' => 'Journal Entry updated successfully.',
             'success' => true,

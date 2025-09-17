@@ -298,8 +298,8 @@
 
                 @if (checkUserHasAccessModule('module', 'Chart of Accounts'))
                     <li class="nav-item ">
-                        <a href="{{ url('accounts') }}"
-                            class="nav-link {{ request()->is('accounts') ? 'active' : '' }}">
+                        <a href="{{ url('chart-of-accounts') }}"
+                            class="nav-link {{ request()->is('chart-of-accounts') ? 'active' : '' }}">
                             <i class="nav-icon fas fa fa-book"></i>
                             <p>
                                 Chart of Accounts

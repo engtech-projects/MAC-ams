@@ -22,6 +22,6 @@ class PersonalInfo extends Model
     	'phone_number',
     ];
 	public function userInfo(){
-		return $this->hasOne(User::class, 'personal_info_id');
+		return $this->hasOne(User::class, 'personal_info_id', 'personal_info_id');
     }
 }

@@ -87,15 +87,15 @@
                         @if (Gate::allows('manager'))
                             <div class="col-md-4">
                                 <label for="branch">Select Branch</label>
-                                <select-branch @setselectedbranch="getSelectedBranch" ref="branchFilter"/>
+                                <select-branch @setselectedbranch="getSelectedBranch" ref="branchFilter" />
                             </div>
                         @endif
 
                         <div class="col-md-4">
                             <label for="branch">Transaction Date</label>
                             <div class="input-group">
-                                <input type="date" v-model="selectedDate" id="transaction_date"
-                                    name="transaction_date" class="form-control form-control-sm">
+                                <input type="date" v-model="selectedDate" id="transaction_date" name="transaction_date"
+                                    class="form-control form-control-sm">
                             </div>
 
                         </div>
@@ -334,7 +334,8 @@
                                                         </td>
                                                     </tr>
 
-                                                    <tr v-for="(officerCollection, i) in collectionBreakdown.account_officer_collections" :key="i">
+                                                    <tr v-for="(officerCollection, i) in collectionBreakdown.account_officer_collections"
+                                                        :key="i">
                                                         <td>
                                                             <div v-if="officerCollection.isEditing">
                                                                 <input type="text" class="form-control form-control-sm"
@@ -366,7 +367,8 @@
                                                             </div>
                                                         </td>
                                                         <td class="text-center align-middle p-0">
-                                                            <div class="d-flex justify-content-center align-items-center p-0" style="gap: 4px;">
+                                                            <div class="d-flex justify-content-center align-items-center p-0"
+                                                                style="gap: 4px;">
                                                                 <button type="button" class="btn btn-success btn-sm p-0"
                                                                     style="width: 20px; height: 28px;"
                                                                     v-if="!officerCollection.isEditing"
@@ -374,8 +376,7 @@
                                                                     <i class="fas fa-pen fa-xs"></i>
                                                                 </button>
                                                                 <button type="button" class="btn btn-success btn-sm p-0"
-                                                                    style="width: 20px; height: 28px;"
-                                                                    v-else
+                                                                    style="width: 20px; height: 28px;" v-else
                                                                     @click="saveOfficerCollection(i)">
                                                                     <i class="fas fa-save fa-xs"></i>
                                                                 </button>
@@ -423,15 +424,16 @@
                                                             <select class="form-control form-control-sm rounded-0"
                                                                 v-model="branch_collection.branch_id"
                                                                 id="branch_id_collection">
-                                                                <option value="" disabled selected>-Select Branch-</option>
+                                                                <option value="" disabled selected>-Select Branch-
+                                                                </option>
                                                                 @foreach ($branches as $branch)
-                                                                    <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}</option>
+                                                                    <option value="{{ $branch->branch_id }}">
+                                                                        {{ $branch->branch_name }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </td>
                                                         <td>
-                                                            <input type="number"
-                                                                v-model="branch_collection.total_amount"
+                                                            <input type="number" v-model="branch_collection.total_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 id="branchcollection_amount">
                                                         </td>
@@ -443,15 +445,18 @@
                                                         </td>
                                                     </tr>
 
-                                                    <tr v-for="(branchCollection, i) in collectionBreakdown.branch_collections" :key="i">
+                                                    <tr v-for="(branchCollection, i) in collectionBreakdown.branch_collections"
+                                                        :key="i">
                                                         <td>
                                                             <div v-if="branchCollection.isEditing">
                                                                 <select class="form-control form-control-sm rounded-0"
                                                                     v-model="branchCollection.branch.branch_id"
                                                                     id="branch_id_collection_edit">
-                                                                    <option value="" disabled selected>-Select Branch-</option>
+                                                                    <option value="" disabled selected>-Select
+                                                                        Branch-</option>
                                                                     @foreach ($branches as $branch)
-                                                                        <option value="{{ $branch->branch_id }}">{{ $branch->branch_name }}</option>
+                                                                        <option value="{{ $branch->branch_id }}">
+                                                                            {{ $branch->branch_name }}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </div>
@@ -470,21 +475,20 @@
                                                             </div>
                                                         </td>
                                                         <td class="text-center align-middle p-1">
-                                                            <div class="d-flex justify-content-center align-items-center" style="gap: 4px;">
+                                                            <div class="d-flex justify-content-center align-items-center"
+                                                                style="gap: 4px;">
                                                                 <button v-if="!branchCollection.isEditing"
                                                                     class="btn btn-success btn-sm p-0"
                                                                     style="width: 20px; height: 28px;"
                                                                     @click="editBranchCollection(i, branchCollection)">
                                                                     <i class="fas fa-pen fa-xs"></i>
                                                                 </button>
-                                                                <button v-else
-                                                                    class="btn btn-success btn-sm p-0"
+                                                                <button v-else class="btn btn-success btn-sm p-0"
                                                                     style="width: 20px; height: 28px;"
                                                                     @click="saveBranchCollection(i, branchCollection.branch.branch_id)">
                                                                     <i class="fas fa-save fa-xs"></i>
                                                                 </button>
-                                                                <button type="button"
-                                                                    class="btn btn-danger btn-sm p-0"
+                                                                <button type="button" class="btn btn-danger btn-sm p-0"
                                                                     style="width: 20px; height: 28px;"
                                                                     @click="removeBranchCollection(i)">
                                                                     <i class="fas fa-trash fa-xs"></i>
@@ -509,273 +513,256 @@
 
                                         </div>
 
-                                    <!-- POS COLLECTION -->
-                                    <div class="col-md-12">
-                                        <table class="table table-bordered table-sm" id="account-officer-table">
-                                            <thead class="table-header">
-                                                <tr>
-                                                    <th width="200">POS Collection</th>
-                                                    <th>Total Amount</th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <input type="text" v-model="pos_collections.or_no"
-                                                            class="form-control form-control-sm rounded-0 text-right"
-                                                            id="pos_collection_or_no" placeholder="OR No.">
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" v-model="pos_collections.total_amount"
-                                                            class="form-control form-control-sm rounded-0 text-right"
-                                                            id="pos_collection_total_amount">
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <button type="button" class="btn btn-xs btn-primary"
-                                                            @click="addPosCollection()">
-                                                            <i class="fas fa-plus fa-xs"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-
-                                                <tr v-for="(posCollection, i) in collectionBreakdown.pos_collections" :key="i">
-                                                    <td>
-                                                        <div v-if="posCollection.isEditing">
-                                                            <input type="text" v-model="posCollection.or_no"
+                                        <!-- POS COLLECTION -->
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm" id="account-officer-table">
+                                                <thead class="table-header">
+                                                    <tr>
+                                                        <th width="200">POS Collection</th>
+                                                        <th>Total Amount</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="text" v-model="pos_collections.or_no"
                                                                 class="form-control form-control-sm rounded-0 text-right"
-                                                                placeholder="OR No.">
-                                                        </div>
-                                                        <div v-else>
-                                                            <h6 v-text="posCollection.or_no"></h6>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div v-if="posCollection.isEditing">
-                                                            <input type="number" class="form-control form-control-sm"
-                                                                v-model="posCollection.total_amount">
-                                                        </div>
-                                                        <div v-else>
-                                                            <h6>@{{ formatCurrency(posCollection.total_amount) }}</h6>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center align-middle p-1">
-                                                        <div class="d-flex justify-content-center align-items-center p-0 m-0" style="gap: 4px;">
-                                                            <button type="button" class="btn btn-success btn-sm p-0"
-                                                                style="width: 20px; height: 28px;"
-                                                                v-if="!posCollection.isEditing"
-                                                                @click="editPosCollection(i)">
-                                                                <i class="fas fa-pen fa-xs"></i>
+                                                                id="pos_collection_or_no" placeholder="OR No.">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" v-model="pos_collections.total_amount"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                id="pos_collection_total_amount">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="button" class="btn btn-xs btn-primary"
+                                                                @click="addPosCollection()">
+                                                                <i class="fas fa-plus fa-xs"></i>
                                                             </button>
-                                                            <button type="button" class="btn btn-success btn-sm p-0"
-                                                                style="width: 20px; height: 28px;"
-                                                                v-else
-                                                                @click="savePosCollection(i)">
-                                                                <i class="fas fa-save fa-xs"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-danger btn-sm p-0"
-                                                                style="width: 20px; height: 28px;"
-                                                                @click="removePosCollection(i)">
-                                                                <i class="fas fa-trash fa-xs"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                        </td>
+                                                    </tr>
 
-                                                <tr id="footer-row">
-                                                    <!-- Optional footer row -->
-                                                </tr>
-                                            </tbody>
-                                            <tfoot>
-                                                <tr class="bg-primary">
-                                                    <td class="text-uppercase">total</td>
-                                                    <td class="text-right" colspan="2" id="totalPosCollection">
-                                                        @{{ formatCurrency(posCollectionTotal) }}
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
-                                    </table>
+                                                    <tr v-for="(posCollection, i) in collectionBreakdown.pos_collections"
+                                                        :key="i">
+                                                        <td>
+                                                            <div v-if="posCollection.isEditing">
+                                                                <input type="text" v-model="posCollection.or_no"
+                                                                    class="form-control form-control-sm rounded-0 text-right"
+                                                                    placeholder="OR No.">
+                                                            </div>
+                                                            <div v-else>
+                                                                <h6 v-text="posCollection.or_no"></h6>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div v-if="posCollection.isEditing">
+                                                                <input type="number" class="form-control form-control-sm"
+                                                                    v-model="posCollection.total_amount">
+                                                            </div>
+                                                            <div v-else>
+                                                                <h6>@{{ formatCurrency(posCollection.total_amount) }}</h6>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center align-middle p-1">
+                                                            <div class="d-flex justify-content-center align-items-center p-0 m-0"
+                                                                style="gap: 4px;">
+                                                                <button type="button" class="btn btn-success btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    v-if="!posCollection.isEditing"
+                                                                    @click="editPosCollection(i)">
+                                                                    <i class="fas fa-pen fa-xs"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-success btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;" v-else
+                                                                    @click="savePosCollection(i)">
+                                                                    <i class="fas fa-save fa-xs"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-danger btn-sm p-0"
+                                                                    style="width: 20px; height: 28px;"
+                                                                    @click="removePosCollection(i)">
+                                                                    <i class="fas fa-trash fa-xs"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
 
+                                                    <tr id="footer-row">
+                                                        <!-- Optional footer row -->
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">total</td>
+                                                        <td class="text-right" colspan="2" id="totalPosCollection">
+                                                            @{{ formatCurrency(posCollectionTotal) }}
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+
+                                        </div>
+                                        <!--/POS COLLECTION-->
+                                        <div class="col-md-12">
+                                            <table class="table table-bordered table-sm" id="account-officer-table">
+                                                <thead>
+
+                                                    <th colspan="2"> Payment Summary</th>
+
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <p>CASH</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            @{{ formatCurrency(aoCollectionTotal) }}
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+
+                                                        <td>
+                                                            <p>CHECK</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.check_amount"
+                                                                @keydown.enter="nextTextField('pos_amount')"
+                                                                ref="check_amount" @change="calculateTotal()"
+                                                                class="form-control form-control-sm rounded-0 text-right"
+                                                                required placeholder="0.00">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <p>POS</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            @{{ formatCurrency(posCollectionTotal) }}
+                                                    </tr>
+
+                                                    <tr>
+
+                                                        <td>
+                                                            <p>MEMO</p>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <input type="number"
+                                                                v-model="collectionBreakdown.other_payment.memo_amount"
+                                                                ref="memo_amount" @keydown.enter="nextTextField('p_10')"
+                                                                @change="calculateTotal()"
+                                                                class="form-control form-control-sm rounded-0 text-right">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            INTERBRANCH
+                                                        </td>
+                                                        <td class="text-right">
+                                                            @{{ formatCurrency(branchCollectionTotal) }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="bg-primary">
+                                                        <td class="text-uppercase">
+                                                            total
+                                                        </td>
+                                                        <td class="text-right" colspan="3">
+                                                            @{{ formatCurrency(otherPaymentTotal) }}
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                        <div class="text-right">
+                                            <button type="button" @click="processCreateOrUpdate()"
+                                                class="btn btn-success" style="margin-bottom: 20px;"> Save</button>
+                                        </div>
+
+
+
+
+                                    </div>
                                 </div>
-                                <!--/POS COLLECTION-->
-                                <div class="col-md-12">
-                                    <table class="table table-bordered table-sm" id="account-officer-table">
-                                        <thead>
-
-                                            <th colspan="2"> Payment Summary</th>
-
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <p>CASH</p>
-                                                </td>
-                                                <td class="text-right">
-                                                    @{{ formatCurrency(aoCollectionTotal) }}
-                                                </td>
-
-                                            </tr>
-                                            <tr>
-
-                                                <td>
-                                                    <p>CHECK</p>
-                                                </td>
-                                                <td class="text-right">
-                                                    <input type="number"
-                                                        v-model="collectionBreakdown.other_payment.check_amount"
-                                                        @keydown.enter="nextTextField('pos_amount')" ref="check_amount"
-                                                        @change="calculateTotal()"
-                                                        class="form-control form-control-sm rounded-0 text-right" required
-                                                        placeholder="0.00">
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>
-                                                    <p>POS</p>
-                                                </td>
-                                                <td class="text-right">
-                                                    @{{ formatCurrency(posCollectionTotal) }}
-                                                    {{-- <td class="text-right">
-                                                    <input type="number"
-                                                        v-model="collectionBreakdown.other_payment.pos_amount"
-                                                        ref="pos_amount" @keydown.enter="nextTextField('memo_amount')"
-                                                        class="form-control form-control-sm rounded-0 text-right">
-
-                                                </td> --}}
-                                            </tr>
-
-                                            <tr>
-
-                                                <td>
-                                                    <p>MEMO</p>
-                                                </td>
-                                                <td class="text-right">
-                                                    <input type="number"
-                                                        v-model="collectionBreakdown.other_payment.memo_amount"
-                                                        ref="memo_amount" @keydown.enter="nextTextField('p_10')"
-                                                        @change="calculateTotal()"
-                                                        class="form-control form-control-sm rounded-0 text-right">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    INTERBRANCH
-                                                </td>
-                                                <td class="text-right">
-                                                    @{{ formatCurrency(branchCollectionTotal) }}
-                                                </td>
-                                            </tr>
-                                            <tr class="bg-primary">
-                                                <td class="text-uppercase">
-                                                    total
-                                                </td>
-                                                <td class="text-right" colspan="3">
-                                                    @{{ formatCurrency(otherPaymentTotal) }}
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-
-                                    </table>
-                                </div>
-                                <div class="text-right">
-
-                                    {{--                                         <button type="button" @click="resetForm()" class="btn btn-warning"
-                                                style="margin-bottom: 20px;">
-                                                Cancel
-                                            </button> --}}
-
-                                    <button type="button" @click="processCreateOrUpdate()" class="btn btn-success"
-                                        style="margin-bottom: 20px;"> Save</button>
-                                </div>
-
-
-
 
                             </div>
                         </div>
-
                     </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12 mt-5">
+                    <table id="cash-blotter-tbls" class="table table-sm table-bordered">
+                        <thead>
+                            <th>Branch</th>
+                            <th>Transaction Date</th>
+                            <th>Cash Ending Balance</th>
+                            <th>Total Entries</th>
+                            <th> Difference (+/-) </th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody v-if="loading">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-3">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading collections...
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody v-else-if="collectionsBreakdown && collectionsBreakdown.length > 0">
+                            <tr v-for="d in collectionsBreakdown" :key="d.collection_id">
+                                <td>@{{ getBranchName(d.branch_id) }}</td>
+                                <td>@{{ d.transaction_date }}</td>
+                                <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
+                                <td>@{{ formatCurrency(d.total) }}</td>
+                                <td>@{{ formatDifference(d.cash_ending_balance - d.total) }}</td>
+                                <td>@{{ d.status }}</td>
+                                <td>
+                                    <button @click="showCashBlotter(d.collection_id, d.branch_id)"
+                                        class="mr-1 btn btn-xs btn-success">
+                                        <i class="fas fa-xs fa-eye" data-toggle="modal"
+                                            data-target="#cashBlotterPreviewModal"></i>
+                                    </button>
+                                    <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
+                                        <i class="fas fa-xs fa-pen"></i>
+                                    </button>
+                                    <button @click="deleteCollectionBreakdown(d,d.collection_id, d.branch_id)"
+                                        class="mr-1 btn btn-xs btn-danger">
+                                        <i class="fas fa-xs fa-trash"></i>
+                                    </button>
+
+                                    <button class="mr-1 btn btn-xs btn-primary">
+                                        <i class="fas fa-xs fa-download download-cashblotter"></i>
+                                    </button>
+                                    <button class="mr-1 btn btn-xs btn-default">
+                                        <i class="fas fa-xs fa-print print-cashblotter"></i>
+                                    </button>
+                                    @if (Gate::allows('manager'))
+                                        <button class="mr-1 btn btn-xs btn-primary"
+                                            @click="updateStatus(d,'posted')">Post</button>
+                                        <button class="mr-1 btn btn-xs btn-warning"
+                                            @click="updateStatus(d,'unposted')">Unpost</button>
+                                    @endif
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody v-else>
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-3">
+                                    No records found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-        </div>
-
-        </div>
-
-
-        <div class="row">
-            <div class="col-md-12 mt-5">
-                <table id="cash-blotter-tbls" class="table table-sm table-bordered">
-                    <thead>
-                        <th>Branch</th>
-                        <th>Transaction Date</th>
-                        <th>Cash Ending Balance</th>
-                        <th>Total Entries</th>
-                        <th> Difference (+/-) </th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </thead>
-                    <tbody v-if="loading">
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-3">
-                                <i class="fas fa-spinner fa-spin"></i> Loading collections...
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tbody v-else-if="collectionsBreakdown && collectionsBreakdown.length > 0">
-                        <tr v-for="d in collectionsBreakdown" :key="d.collection_id">
-                            <td>@{{ getBranchName(d.branch_id) }}</td>
-                            <td>@{{ d.transaction_date }}</td>
-                            <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
-                            <td>@{{ formatCurrency(d.total) }}</td>
-                            <td>@{{ formatDifference(d.cash_ending_balance - d.total) }}</td>
-                            <td>@{{ d.status }}</td>
-                            <td>
-                                <button @click="showCashBlotter(d.collection_id, d.branch_id)"
-                                    class="mr-1 btn btn-xs btn-success">
-                                    <i class="fas fa-xs fa-eye" data-toggle="modal"
-                                        data-target="#cashBlotterPreviewModal"></i>
-                                </button>
-                                <button @click="editCollectionBreakdown(d)" class="mr-1 btn btn-xs btn-warning">
-                                    <i class="fas fa-xs fa-pen"></i>
-                                </button>
-                                <button @click="deleteCollectionBreakdown(d,d.collection_id, d.branch_id)"
-                                    class="mr-1 btn btn-xs btn-danger">
-                                    <i class="fas fa-xs fa-trash"></i>
-                                </button>
-
-                                <button class="mr-1 btn btn-xs btn-primary">
-                                    <i class="fas fa-xs fa-download download-cashblotter"></i>
-                                </button>
-                                <button class="mr-1 btn btn-xs btn-default">
-                                    <i class="fas fa-xs fa-print print-cashblotter"></i>
-                                </button>
-                                @if (Gate::allows('manager'))
-                                    {{-- <button class="mr-1 btn btn-xs btn-primary"
-                                        :disabled="d.cash_ending_balance - d.total != 0"
-                                        @click="updateStatus(d,'posted')">Post</button>
-                                    <button class="mr-1 btn btn-xs btn-warning"
-                                        @click="updateStatus(d,'unposted')">Unpost</button> --}}
-                                    <button class="mr-1 btn btn-xs btn-primary"
-                                        @click="updateStatus(d,'posted')">Post</button>
-                                    <button class="mr-1 btn btn-xs btn-warning"
-                                        @click="updateStatus(d,'unposted')">Unpost</button>
-                                @endif
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tbody v-else>
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-3">
-                                No records found.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
         </div>
         <div class="modal fade" id="cashBlotterPreviewModal" tabindex="2" role="dialog"
             aria-labelledby="JDetailsVoucherLabel" aria-hidden="true">
@@ -1190,22 +1177,6 @@
                         nextInput.focus();
                     }
                 },
-                calculateTotal: function() {
-                    /* var otherPayment = this.collectionBreakdown.other_payment;
-                    if (otherPayment.memo_amount == "") {
-                        otherPayment.memo_amount = 0;
-                    }
-                    if (otherPayment.check_amount == "") {
-                        otherPayment.check_amount = 0;
-                    }
-
-                    this.otherPayment.total = otherPayment.cash_amount + otherPayment.check_amount +
-                        otherPayment.pos_amount + otherPayment.memo_amount + otherPayment.interbranch_amount;
-
-                    this.otherPaymentTotal = this.otherPayment.total; */
-
-
-                },
                 amountConverter: function(amount) {
                     const formatter = new Intl.NumberFormat('en-US', {
                         style: 'currency',
@@ -1218,9 +1189,9 @@
                 addBranchCollection() {
                     this.isEditing = false;
                     let missingField = !this.branch_collection.branch_id ? "Branch" :
-                                        !this.branch_collection.total_amount ? "Total Amount" : null;
+                        !this.branch_collection.total_amount ? "Total Amount" : null;
                     if (missingField) {
-                            toastr.error(`Please add ${missingField}`);
+                        toastr.error(`Please add ${missingField}`);
                     } else {
                         const branch = this.branches.find(b => b.branch_id == this.branch_collection.branch_id);
                         this.collectionBreakdown.branch_collections.push({
@@ -1240,8 +1211,8 @@
 
                 addAccountOfficerCollection: function() {
                     let missingField = !this.officer_collection.representative ? "Account Officer" :
-                                       !this.officer_collection.note ? "Remarks" :
-                                       !this.officer_collection.total ? "Total Amount" : null;
+                        !this.officer_collection.note ? "Remarks" :
+                        !this.officer_collection.total ? "Total Amount" : null;
                     if (missingField) {
                         toastr.error(`Please add ${missingField}`);
                     } else {
@@ -1264,7 +1235,7 @@
                 addPosCollection() {
                     this.isEditing = false;
                     let missingField = !this.pos_collections.or_no ? "OR no." :
-                                       !this.pos_collections.total_amount ? "Total Amount" : null;
+                        !this.pos_collections.total_amount ? "Total Amount" : null;
                     if (missingField) {
                         toastr.error(`Please add ${missingField}`);
                     } else {
@@ -1306,7 +1277,7 @@
                 savePosCollection: function(index) {
                     let pos = this.collectionBreakdown.pos_collections[index];
                     let missingField = !pos.or_no ? "OR no." :
-                                       !pos.total_amount ? "Total Amount" : null;
+                        !pos.total_amount ? "Total Amount" : null;
                     if (missingField) {
                         toastr.error(`Please add ${missingField}`);
                         return;
@@ -1317,8 +1288,8 @@
                 saveOfficerCollection: function(index) {
                     let officer = this.collectionBreakdown.account_officer_collections[index];
                     let missingField = !officer.representative ? "Account Officer" :
-                                       !officer.note ? "Remarks" :
-                                       !officer.total ? "Total Amount" : null;
+                        !officer.note ? "Remarks" :
+                        !officer.total ? "Total Amount" : null;
                     if (missingField) {
                         toastr.error(`Please add ${missingField}`);
                         return;
@@ -1370,7 +1341,7 @@
                         this.selectedDate = this.collectionBreakdown.transaction_date;
 
                         if (this.$refs.branchFilter) {
-                          this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
+                            this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
                         }
 
                         this.$nextTick(() => {
@@ -1382,9 +1353,8 @@
                     })
                 },
                 resetForm: function() {
-
-                    this.collectionBreakdown.collection_id = null,
-                    this.collectionBreakdown.branch_id = null;
+                    this.collectionBreakdown.collection_id = null
+                    this.collectionBreakdown.branch_id = null
                     this.collectionBreakdown.transaction_date = '';
                     this.collectionBreakdown.p_1000 = 0;
                     this.collectionBreakdown.p_500 = 0;
@@ -1458,7 +1428,7 @@
                             isEqual(element, collection));
                     this.collectionBreakdown.account_officer_collections = updatedArray;
                 },
-                    formatDifference(value) {
+                formatDifference(value) {
                     // Normalize -0 to 0 before rounding
                     if (Math.abs(value) < 0.005) {
                         value = 0;
@@ -1522,26 +1492,26 @@
                         }).then(response => {
                             var cb = response.data.data.collections;
 
-                            if (!cb.other_payment) {
-                                cb.other_payment = {
-                                    cash_amount: 0,
-                                    check_amount: 0,
-                                    pos_amount: 0,
-                                    memo_amount: 0,
-                                    interbranch_amount: 0
-                                };
-                            }
+                                if (!cb.other_payment) {
+                                    cb.other_payment = {
+                                        cash_amount: 0,
+                                        check_amount: 0,
+                                        pos_amount: 0,
+                                        memo_amount: 0,
+                                        interbranch_amount: 0
+                                    };
+                                }
 
-                            this.initializeEditingState(cb);
+                                this.initializeEditingState(cb);
 
-                            this.collectionBreakdown = cb;
-                            this.calculateCashCount(cb);
-                            this.openModal();
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            this.closeModal();
-                        });
+                                this.collectionBreakdown = cb;
+                                this.calculateCashCount(cb);
+                                this.openModal();
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                this.closeModal();
+                            });
                     }
                 },
                 initializeEditingState: function(collectionBreakdown) {
@@ -1549,7 +1519,8 @@
                     if (collectionBreakdown.account_officer_collections) {
                         collectionBreakdown.account_officer_collections.forEach((item, index) => {
                             if (item.isEditing === undefined) {
-                                this.$set(collectionBreakdown.account_officer_collections[index], 'isEditing', false);
+                                this.$set(collectionBreakdown.account_officer_collections[index],
+                                    'isEditing', false);
                             }
                         });
                     }
@@ -1557,7 +1528,8 @@
                     if (collectionBreakdown.pos_collections) {
                         collectionBreakdown.pos_collections.forEach((item, index) => {
                             if (item.isEditing === undefined) {
-                                this.$set(collectionBreakdown.pos_collections[index], 'isEditing', false);
+                                this.$set(collectionBreakdown.pos_collections[index], 'isEditing',
+                                    false);
                             }
                         });
                     }
@@ -1565,7 +1537,8 @@
                     if (collectionBreakdown.branch_collections) {
                         collectionBreakdown.branch_collections.forEach((item, index) => {
                             if (item.isEditing === undefined) {
-                                this.$set(collectionBreakdown.branch_collections[index], 'isEditing', false);
+                                this.$set(collectionBreakdown.branch_collections[index], 'isEditing',
+                                    false);
                             }
                         });
                     }
@@ -1594,7 +1567,8 @@
                                 this.filterCollections();
                             });
                         }).catch(err => {
-                            toastr.error(err.response?.data?.message || 'Failed to delete collection breakdown.');
+                            toastr.error(err.response?.data?.message ||
+                                'Failed to delete collection breakdown.');
                         })
                     }
                 },
@@ -1642,7 +1616,7 @@
                         this.selectedDate = this.collectionBreakdown.transaction_date;
 
                         if (this.$refs.branchFilter) {
-                          this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
+                            this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
                         }
 
                         // this.$nextTick(() => {
@@ -1831,51 +1805,6 @@
                     }
                     return total;
                 },
-                /* otherPaymentTotal: {
-                    get: function() {
-                        var otherPayment = this.collectionBreakdown.other_payment;
-                        let total = 0;
-                        let memo = 0;
-                        let check = 0;
-
-                        if (otherPayment.memo_amount == "") {
-                            otherPayment.memo_amount = 0;
-                        }
-                        if (otherPayment.check_amount == "") {
-                            otherPayment.check_amount = 0;
-                        }
-
-                        total = parseFloat(this.aoCollectionTotal) +
-                            parseFloat(otherPayment.memo_amount) +
-                            parseFloat(otherPayment.check_amount) +
-                            parseFloat(this.branchCollectionTotal) +
-                            parseFloat(this.posCollectionTotal)
-
-                        this.otherPaymentTotal = total;
-
-
-                    },
-                    set: function(newVal) {
-                        var otherPayment = this.collectionBreakdown.other_payment;
-                        let total = 0;
-                        let memo = 0;
-                        let check = 0;
-
-                        if (otherPayment.memo_amount == "") {
-                            otherPayment.memo_amount = 0;
-                        }
-                        if (otherPayment.check_amount == "") {
-                            otherPayment.check_amount = 0;
-                        }
-
-                        newVal = parseFloat(this.aoCollectionTotal) +
-                            parseFloat(otherPayment.memo_amount) +
-                            parseFloat(otherPayment.check_amount) +
-                            parseFloat(this.branchCollectionTotal) +
-                            parseFloat(this.posCollectionTotal)
-
-                    }
-                }, */
                 otherPaymentTotal: function() {
 
                     var otherPayment = this.collectionBreakdown.other_payment;
@@ -1992,7 +1921,6 @@
                 }
             },
             mounted() {
-                /*                 this.getBranchList(); */
                 this.data = @json($cash_blotter);
                 this.branches = @json($branches);
             }
