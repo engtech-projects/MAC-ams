@@ -1310,7 +1310,7 @@
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
                             this.subsidiaries.dynamic = []
-                           // window.reload();
+                            window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
