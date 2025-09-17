@@ -343,7 +343,7 @@ class ReportsController extends MainController
         ]);
     }
 
-    private function createDynamicPayments($sub)
+    private function createDynamicPayments($sub,$as_of)
     {
         $rem = intVal($sub['rem']);
         $payments = [];
@@ -357,7 +357,7 @@ class ReportsController extends MainController
             $balance -= $monthly_due;
             $payments[] = [
                 'amount' => $monthly_due,
-                'date_paid' => now()
+                'date_paid' => $as_of
             ];
         }
         return $payments;
@@ -410,7 +410,7 @@ class ReportsController extends MainController
                 if ($subsidiary) {
                     if ($subsidiary->due_amort > 0) {
                         if (intVal($sub['rem']) > 1) {
-                            $dynamic_payments = $this->createDynamicPayments($sub);
+                            $dynamic_payments = $this->createDynamicPayments($sub,$as_of);
                             $subsidiary->depreciation_payments()->createMany($dynamic_payments);
                         } else {
                             $subsidiary->depreciation_payments()->create([

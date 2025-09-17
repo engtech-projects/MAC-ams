@@ -1520,9 +1520,9 @@
                             
                             this.$set(updated, "amort", newBalance);
                             updated.due_amort = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
-                            updated.used = (parseInt(updated.used) || 0) + (parseInt(this.sub.rem) || 0);
-                            updated.rem = (parseInt(updated.sub_no_depre || 0)) - (parseInt(updated.used) || 0);
-                            updated.unexpensed = (parseInt(updated.unexpensed || 0)) - newBalance;
+                            //updated.used = (parseInt(updated.used) || 0) + (parseInt(this.sub.rem) || 0);
+                            //updated.rem = (parseInt(updated.sub_no_depre || 0)) - (parseInt(updated.used) || 0);
+                          //  updated.unexpensed = (parseInt(updated.unexpensed || 0)) - newBalance;
 
                             const newArray = [...rows];
                             newArray[index] = updated;
