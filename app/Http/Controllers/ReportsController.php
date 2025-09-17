@@ -380,6 +380,13 @@ class ReportsController extends MainController
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $attributes['category']['sub_cat_id'])->first();
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
+           if ($as_of->isSaturday()) {
+            $as_of->subDay();
+        } elseif ($as_of->isSunday()) {
+            $as_of->subDays(2);
+        }
+
+        
         $journalEntry = new JournalEntry();
 
         $accountName = null;
@@ -408,7 +415,7 @@ class ReportsController extends MainController
                         } else {
                             $subsidiary->depreciation_payments()->create([
                                 'amount' => $subsidiary->monthly_due,
-                                'date_paid' => now(),
+                                'date_paid' => $as_of
                             ]);
                         }
                     }
