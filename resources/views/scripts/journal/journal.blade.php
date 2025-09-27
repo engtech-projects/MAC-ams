@@ -708,7 +708,7 @@
                         editButton.prop('disabled', false); // Enable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     }
-                    // $('#journalEntryDetails').DataTable().ajax.reload(null, false);
+                    /* $('#journalEntryDetails').DataTable().ajax.reload(null, false); */
                 },
                 error: function(response) {
                     toastr.error(response.responseJSON.message);
@@ -829,14 +829,15 @@
                                 dataType: "json",
                                 success: function(response) {
                                     if (response.success) {
-                                            toastr.success(response.message);
-                                            saveJournalEntryDetails(response.id, 'update');
-                                             $('body').focus();
-                                            $('#journalModalEdit').modal('hide');
-                                        } else {
-                                            toastr.error(response.message);
-                                            $('#journalModalEdit').find('button[type="submit"]').focus();
-                                        }
+                                        toastr.success(response.message);
+                                        saveJournalEntryDetails(response.id, 'update');
+                                        $('body').focus();
+                                        $('#journalModalEdit').modal('hide');
+                                    } else {
+                                        toastr.error(response.message);
+                                        $('#journalModalEdit').find('button[type="submit"]')
+                                            .focus();
+                                    }
                                 },
                                 error: function(jqXHR) {
                                     if (jqXHR.status === 422) {
@@ -1277,7 +1278,7 @@
             }
         });
 
-      
+
         $('#SearchJournalForm').submit(function(e) {
             e.preventDefault();
             var s_data = $(this).serialize();

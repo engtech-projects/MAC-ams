@@ -67,6 +67,8 @@ class CollectionBreakdownController extends Controller
                     ]);
                 }
                 DB::commit();
+                activity("Cash Transaction Blotter")->event('created')->performedOn($collection)
+                    ->log("Colllection Breakdown - Create");
             } catch (\Exception $exception) {
                 DB::rollBack();
                 return new JsonResponse(["message" => $exception->getMessage()]);
@@ -78,6 +80,7 @@ class CollectionBreakdownController extends Controller
     public function update(CreateOrUpdateCollectionRequest $request, CollectionBreakdown $collectionBreakdown)
     {
         $data = $request->validated();
+        $replicate = $collectionBreakdown;
         try {
             // Handle deletions first
             $this->handleCollectionDeletions($collectionBreakdown, $data);
@@ -91,6 +94,9 @@ class CollectionBreakdownController extends Controller
             $this->processPosCollections($collectionBreakdown, $data);
             $this->processOtherPayments($collectionBreakdown, $data);
 
+            activity("Cash Transaction Blotter")->event('updated')->performedOn($collectionBreakdown)
+                ->withProperties(['attributes' => $collectionBreakdown, 'old' => $replicate])
+                ->log("Colllection Breakdown - Edit");
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -100,38 +106,46 @@ class CollectionBreakdownController extends Controller
     protected function handleCollectionDeletions($collectionBreakdown, $data)
     {
         // Account Officer Collections
-        $incomingAoIds = isset($data['account_officer_collections']) 
+        $incomingAoIds = isset($data['account_officer_collections'])
             ? collect($data['account_officer_collections'])->pluck('collection_ao_id')->filter()->toArray()
             : [];
         $existingAoIds = $collectionBreakdown->account_officer_collections()->pluck('collection_ao_id')->toArray();
         $toDeleteAoIds = array_diff($existingAoIds, $incomingAoIds);
         if (!empty($toDeleteAoIds)) {
             AccountOfficerCollection::whereIn('collection_ao_id', $toDeleteAoIds)->delete();
+            activity("Cash Transaction Blotter")->event('deleted')->performedOn($collectionBreakdown)
+                ->log("AO Colllection - Delete");
         }
 
         // Branch Collections
-        $incomingBranchIds = isset($data['branch_collections']) 
+        $incomingBranchIds = isset($data['branch_collections'])
             ? collect($data['branch_collections'])->pluck('id')->filter()->toArray()
             : [];
         $existingBranchIds = $collectionBreakdown->branch_collections->pluck('id')->toArray();
         $toDeleteBranchIds = array_diff($existingBranchIds, $incomingBranchIds);
         if (!empty($toDeleteBranchIds)) {
             BranchCollection::destroy($toDeleteBranchIds);
+            activity("Cash Transaction Blotter")->event('deleted')->performedOn($collectionBreakdown)
+                ->log("Branch Colllection - Delete");
         }
 
         // POS Collections
-        $incomingPosIds = isset($data['pos_collections']) 
+        $incomingPosIds = isset($data['pos_collections'])
             ? collect($data['pos_collections'])->pluck('id')->filter()->toArray()
             : [];
         $existingPosIds = $collectionBreakdown->pos_collections->pluck('id')->toArray();
         $toDeletePosIds = array_diff($existingPosIds, $incomingPosIds);
         if (!empty($toDeletePosIds)) {
             PosCollection::destroy($toDeletePosIds);
+            activity("Cash Transaction Blotter")->event('deleted')->performedOn($collectionBreakdown)
+                ->log("POS Colllection - Delete");
         }
     }
 
     protected function processAccountOfficerCollections($collectionBreakdown, $data)
     {
+
+        $replicate = $collectionBreakdown->replicate();
         if (!isset($data["account_officer_collections"])) return;
 
         foreach ($data["account_officer_collections"] as $aco) {
@@ -144,6 +158,9 @@ class CollectionBreakdownController extends Controller
                         "grp" => $aco["grp"],
                         "collection_id" => $aco["collection_id"],
                     ]);
+                activity("Cash Transaction Blotter")->event('updated')->performedOn($collectionBreakdown)
+                    ->withProperties(['attributes' => $collectionBreakdown, 'old' => $replicate])
+                    ->log("Branch Colllection Breakdown - Delete");
             } else {
                 AccountOfficerCollection::create([
                     "representative" => $aco["representative"],
@@ -152,6 +169,8 @@ class CollectionBreakdownController extends Controller
                     "note" => $aco["note"],
                     "total" => $aco["total"],
                 ]);
+                activity("Cash Transaction Blotter")->event('created')->performedOn($collectionBreakdown)
+                    ->log("AO Colllection - Create");
             }
         }
     }

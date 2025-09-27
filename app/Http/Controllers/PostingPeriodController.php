@@ -102,16 +102,17 @@ class PostingPeriodController extends Controller
         $replicate = $postingPeriod->replicate();
         try {
             DB::transaction(function () use ($postingPeriod, $data, $replicate) {
-                $updated = $postingPeriod->update([
+                $postingPeriod->update([
                     'posting_period' => $data['posting_period'],
                     'start_date' => $data['start_date'],
                     'end_date' => $data['end_date'],
                     'status' => $data['status']
                 ]);
-                if ($updated) {
-                    activity("Journal Entry")->event("cancelled")->performedOn($postingPeriod)
-                        ->withProperties(['attributes' => $postingPeriod, 'old' => $replicate])
-                        ->log("cancelled");
+                if ($postingPeriod) {
+                    $changes = getChanges($postingPeriod, $replicate);
+                    activity("System Setup")->event("updated")->performedOn($postingPeriod)
+                        ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                        ->log("Posting Period - Update");
                 }
             });
         } catch (\Exception $e) {
@@ -129,6 +130,7 @@ class PostingPeriodController extends Controller
     public function store(Request $request)
     {
         $postingPeriods = [];
+        $postingPeriod = new PostingPeriod();
         for ($month = 1; $month <= 12; $month++) {
             $startDate = Carbon::createFromDate($request['year'], $month, 1);
             $endDate = $startDate->copy()->endOfMonth();
@@ -147,6 +149,10 @@ class PostingPeriodController extends Controller
                     'message' => $e->getMessage(),
                 ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
+        }
+        if (count($postingPeriods) >= 1) {
+            activity("System Setup")->event('created')->performedOn($postingPeriod)
+                ->log("Posting Period - Create");
         }
         return new JsonResponse([
             'data' => $postingPeriods,
