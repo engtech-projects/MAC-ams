@@ -1484,12 +1484,13 @@
                         toastr.error("Unable to edit posted transaction.");
                         this.closeModal();
                     } else {
-                        axios.get('/collection-breakdown/' + collectionBreakdown.collection_id, {
-                                headers: {
-                                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
-                                        .content
-                                }
-                            }).then(response => {
+                        axios.get('/MAC-ams/collection-breakdown/' + collectionBreakdown
+                                .collection_id, {
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                            .content
+                                    }
+                                }).then(response => {
                                 var cb = response.data.data.collections;
 
                                 if (!cb.other_payment) {
@@ -1601,7 +1602,7 @@
                         this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
                         this.collectionBreakdown.total = totalCash;
                     }
-                    axios.put('/collection-breakdown/' + this.collectionBreakdown.collection_id, this
+                    axios.put('/MAC-ams/collection-breakdown/' + this.collectionBreakdown.collection_id, this
                         .collectionBreakdown, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')

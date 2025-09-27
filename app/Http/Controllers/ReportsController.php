@@ -344,14 +344,15 @@ class ReportsController extends MainController
     }
 
 
-            function splitAmountInTwo($amount) {
-                // work in cents to avoid floating imprecision
-                $totalCents = (int) round($amount * 100);
-                $halfCents = intdiv($totalCents, 2); // floor division
-                $first = $halfCents / 100; // e.g., 1714.28
-                $second = ($totalCents - $halfCents) / 100; // remainder, e.g., 1714.29
-                return [$first, $second];
-            }
+    function splitAmountInTwo($amount)
+    {
+        // work in cents to avoid floating imprecision
+        $totalCents = (int) round($amount * 100);
+        $halfCents = intdiv($totalCents, 2); // floor division
+        $first = $halfCents / 100; // e.g., 1714.28
+        $second = ($totalCents - $halfCents) / 100; // remainder, e.g., 1714.29
+        return [$first, $second];
+    }
 
 
 
@@ -1278,6 +1279,9 @@ class ReportsController extends MainController
             'amount' => 0,
             'payee' => $journalEntry::CLOSING_SOURCE
         ]);
+
+        activity("Closing Period")->event('created')->performedOn($entry)
+            ->log("Journal Entry - Create");
         $details = [];
         foreach ($accounts as $i => $category) {
             foreach ($category['types'] as $type) {
