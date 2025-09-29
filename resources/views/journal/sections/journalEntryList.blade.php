@@ -890,7 +890,7 @@
             },
             methods: {
                 getOpenPostingPeriod: function() {
-                    axios.get('/open-posting-period', {
+                    axios.get('/system-setup/posting-periods/open', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -912,7 +912,7 @@
                 },
                 openModal: function() {
                     alert("asd");
-                    axios.get('/open-posting-period', {
+                    axios.get('/system-setup/posting-periods/open', {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -941,7 +941,7 @@
             },
             async created() {
                 /* try {
-                    const response = await axios.get('/open-posting-period');
+                    const response = await axios.get('/system-setup/posting-periods/open');
                     this.posting_period = response.data.data;
                 } catch (error) {
                     console.err('Error:', error);
@@ -962,7 +962,7 @@
     </script>
 
     <!-- /.content -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('#SearchJournalForm').submit();

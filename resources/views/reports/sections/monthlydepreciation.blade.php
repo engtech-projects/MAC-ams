@@ -450,7 +450,7 @@
         </div>
 
     </section>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <!-- /.content -->
     <script>
         new Vue({
@@ -805,7 +805,16 @@
                                         }
                                         val.push(
                                             this.formatCurrency(subsidiary.unexpensed),
-                                            this.formatCurrency(parseFloat(due_amort)),
+                                            // Fix Amort and Remaining
+                                            this.formatCurrency(
+                                               parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)
+                                                ? 0.00
+                                                : (
+                                                    subsidiary.due_amort !== undefined && subsidiary.due_amort !== null
+                                                        ? parseFloat(subsidiary.due_amort)   // ✅ show due_amort if it exists
+                                                        : parseFloat(subsidiary.monthly_due) // ✅ fallback to monthly_due
+                                                )
+                                            ),
                                             this.formatCurrency(subsidiary.salvage),
                                             subsidiary.rem,
                                             subsidiary.inv,
@@ -828,7 +837,14 @@
                                         total_amort += parseFloat(subsidiary.total_amort)
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
-                                        total_due_amort += due_amort
+                                        // For Total Due Amort Fix
+                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)) {
+                                            total_due_amort += 0.00;
+                                        } else if (subsidiary.due_amort !== undefined && subsidiary.due_amort !== null) {
+                                            total_due_amort += parseFloat(subsidiary.due_amort);
+                                        } else {
+                                            total_due_amort += parseFloat(subsidiary.monthly_due);
+                                        }
                                         total_sub_salvage += parseFloat(subsidiary.salvage)
                                         total_rem += parseFloat(subsidiary.rem)
                                         total_inv += parseFloat(subsidiary.inv)
@@ -1027,6 +1043,8 @@
                             this.formatCurrency(grandTotalDueAmort.toFixed(2)),
                             grandTotalRem
                         ];
+                        // For Grand Total
+                        rows.push(result);
 
                     }
                     return rows;
@@ -1313,7 +1331,7 @@
                         }).then(response => {
                             toastr.success(response.data.message);
                             this.newSub = response.data.data;
-                            // window.reload();
+                            window.reload();
                         }).catch(err => {
                             console.error(err)
                         })
@@ -1473,15 +1491,21 @@
                 },
                 processPayment() {
 
-                    this.sub.amount_to_depreciate = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                    const newBalance = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
+                    
+                    this.sub.amount_to_depreciate = newBalance;
+                    this.sub.amort = newBalance;
+
                     this.subsidiaries.non_dynamic = this.subsidiaries.non_dynamic.filter(
                         item => item.sub_id !== this.sub.sub_id
                     );
+
                     const branchList = this.subsidiaryAll[this.filter.category.sub_cat_name];
                     const selectedItem = this.processSubsidiary[this.index];
 
                     const subId = selectedItem[13];
                     const current_rem = selectedItem[11];
+
                     if (this.sub.rem > current_rem) {
                         toastr.warning(`The number of remaining balance should not be greater than ${current_rem}`);
                         return false;
@@ -1492,10 +1516,10 @@
                         const index = rows.findIndex(item => item.sub_id === subId);
                         if (index !== -1) {
                             const updated = {
-                                ...rows[index]
-                            };
+                                ...rows[index]  };
+                            
+                            this.$set(updated, "amort", newBalance);
                             updated.due_amort = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
-
                             const newArray = [...rows];
                             newArray[index] = updated;
 
@@ -1733,6 +1757,7 @@
                             }
                         })
                         .then(response => {
+                            
                             this.subsidiaryAll = response.data.data;
                             const raw = response.data.data
                             const allItems = Object.values(raw)
@@ -1743,6 +1768,11 @@
                                 var dueAmort = item.due_amort;
                                 if (item.rem == 1) {
                                     dueAmort = item.unexpensed
+                                }
+
+                                // FIX ledger to due amort
+                                if (item.rem == 0) {
+                                    dueAmort = 0.00;
                                 }
                                 return {
                                     'sub_id': item.sub_id,
@@ -1789,6 +1819,6 @@
 
 
 @section('footer-scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
+    <script src="{{ asset('js/xlsx.full.min.js') }}"></script>
     @include('scripts.reports.reports')
 @endsection

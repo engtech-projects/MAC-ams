@@ -226,8 +226,8 @@ class ReportsController extends MainController
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
-            $subs['monthly_due'] = $value->monthly_due;
-            $subs['used'] = $value->used;
+            $subs['monthly_due'] = $value->monthly_due; 
+            $subs['used'] = $value->depreciation_payments->count();
 
             // Calculate prepaid expense payments first
             $totalPostedPayments = $value->prepaid_expense ? $value->prepaid_expense->prepaid_expense_payments->where('status', 'posted')->sum('amount') : 0;
@@ -343,22 +343,7 @@ class ReportsController extends MainController
         ]);
     }
 
-
-    function splitAmountInTwo($amount)
-    {
-        // work in cents to avoid floating imprecision
-        $totalCents = (int) round($amount * 100);
-        $halfCents = intdiv($totalCents, 2); // floor division
-        $first = $halfCents / 100; // e.g., 1714.28
-        $second = ($totalCents - $halfCents) / 100; // remainder, e.g., 1714.29
-        return [$first, $second];
-    }
-
-
-
-
-
-    private function createDynamicPayments($sub)
+    private function createDynamicPayments($sub,$as_of)
     {
         $rem = intVal($sub['rem']);
         $payments = [];
@@ -372,7 +357,7 @@ class ReportsController extends MainController
             $balance -= $monthly_due;
             $payments[] = [
                 'amount' => $monthly_due,
-                'date_paid' => now()
+                'date_paid' => $as_of
             ];
         }
         return $payments;
@@ -395,6 +380,13 @@ class ReportsController extends MainController
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $attributes['category']['sub_cat_id'])->first();
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
+           if ($as_of->isSaturday()) {
+            $as_of->subDay();
+        } elseif ($as_of->isSunday()) {
+            $as_of->subDays(2);
+        }
+
+        
         $journalEntry = new JournalEntry();
 
         $accountName = null;
@@ -418,12 +410,12 @@ class ReportsController extends MainController
                 if ($subsidiary) {
                     if ($subsidiary->due_amort > 0) {
                         if (intVal($sub['rem']) > 1) {
-                            $dynamic_payments = $this->createDynamicPayments($sub);
+                            $dynamic_payments = $this->createDynamicPayments($sub,$as_of);
                             $subsidiary->depreciation_payments()->createMany($dynamic_payments);
                         } else {
                             $subsidiary->depreciation_payments()->create([
                                 'amount' => $subsidiary->monthly_due,
-                                'date_paid' => now(),
+                                'date_paid' => $as_of
                             ]);
                         }
                     }
@@ -483,15 +475,23 @@ class ReportsController extends MainController
                     }
                 }
 
-                if ($branchId === 4 && $details['journal_details_debit'] > 0) {
-                    $details['journal_details_debit'] = round($details['journal_details_debit']  / 2, 2);
-                    $details["subsidiary_id"] = 1;
-                    $journalDetails[] = $details;
-                    $details["subsidiary_id"] = 2;
-                    $journalDetails[] = $details;
-                } else {
-                    $journalDetails[] = $details;
-                }
+                // Fixed on HEAD office balance
+             if ($branchId === 4 && $details['journal_details_debit'] > 0) {
+                $originalAmount = $details['journal_details_debit'];
+
+             // for head office balance no need function split
+                $half = round($originalAmount / 2, 2);
+                $details['journal_details_debit'] = $half;
+                $details["subsidiary_id"] = 1;
+                $journalDetails[] = $details;
+                $secondHalf = $originalAmount - $half; 
+                $details['journal_details_debit'] = $secondHalf;
+                $details["subsidiary_id"] = 2;
+                $journalDetails[] = $details;
+
+            } else {
+                $journalDetails[] = $details;
+            }
                 continue;
             }
 
@@ -525,6 +525,13 @@ class ReportsController extends MainController
     {
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
+       
+        if ($as_of->isSaturday()) {
+            $as_of->subDay();
+        } elseif ($as_of->isSunday()) {
+            $as_of->subDays(2);
+        }
+
         $branchCode = $request->branch_code;
         $subId = Subsidiary::where('sub_per_branch', $branchCode)->pluck('sub_id')->first();
         $subCategory = SubsidiaryCategory::find($request->category_id);
