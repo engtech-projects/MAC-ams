@@ -343,7 +343,7 @@ class ReportsController extends MainController
         ]);
     }
 
-    private function createDynamicPayments($sub)
+    private function createDynamicPayments($sub,$as_of)
     {
         $rem = intVal($sub['rem']);
         $payments = [];
@@ -357,7 +357,7 @@ class ReportsController extends MainController
             $balance -= $monthly_due;
             $payments[] = [
                 'amount' => $monthly_due,
-                'date_paid' => now()
+                'date_paid' => $as_of
             ];
         }
         return $payments;
@@ -380,6 +380,13 @@ class ReportsController extends MainController
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $attributes['category']['sub_cat_id'])->first();
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
+           if ($as_of->isSaturday()) {
+            $as_of->subDay();
+        } elseif ($as_of->isSunday()) {
+            $as_of->subDays(2);
+        }
+
+        
         $journalEntry = new JournalEntry();
 
         $accountName = null;
@@ -403,12 +410,12 @@ class ReportsController extends MainController
                 if ($subsidiary) {
                     if ($subsidiary->due_amort > 0) {
                         if (intVal($sub['rem']) > 1) {
-                            $dynamic_payments = $this->createDynamicPayments($sub);
+                            $dynamic_payments = $this->createDynamicPayments($sub,$as_of);
                             $subsidiary->depreciation_payments()->createMany($dynamic_payments);
                         } else {
                             $subsidiary->depreciation_payments()->create([
                                 'amount' => $subsidiary->monthly_due,
-                                'date_paid' => now(),
+                                'date_paid' => $as_of
                             ]);
                         }
                     }
