@@ -1,0 +1,29 @@
+DROP TABLE IF EXISTS `branch`;
+CREATE TABLE `branch`  (
+  `branch_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `branch_code` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `branch_name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `branch_manager` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `branch_address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `status` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `deleted` tinyint(4) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`branch_id`) USING BTREE,
+  UNIQUE INDEX `branch_branch_code_unique`(`branch_code`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+
+TRUNCATE TABLE branch;
+INSERT INTO branch ( branch_code, branch_name, branch_address, STATUS, deleted ) (
+	SELECT
+		PER_CODE AS "branch_code",
+		PER_NAME AS "branch_name",
+		PER_ADDR AS "branch_address",
+		"active",
+		0 
+	FROM
+		glper 
+	WHERE
+	CAT_CODE = "BRNCH" 
+	)
