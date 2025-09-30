@@ -189,6 +189,12 @@
                                                         Add
                                                     </button>
 
+                                                    <button
+                                                        v-show="processSubsidiary.length >3 && filter.branch && searching"
+                                                        class="btn btn-primary" @click="post(ps[14])">
+                                                        Post
+                                                    </button>   
+
                                                 </td>
 
                                                 <td

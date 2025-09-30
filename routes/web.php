@@ -201,6 +201,8 @@ Route::prefix('reports')->group(function () {
     });
 });
 
+Route::post('reports/monthly-depreciation-report-post', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
+
 Route::prefix('system-setup')->group(function () {
     Route::prefix('posting-periods')->group(function () {
         Route::resource('posting-period', PostingPeriodController::class);
