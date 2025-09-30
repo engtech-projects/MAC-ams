@@ -415,12 +415,6 @@
                                                     <input model="journal_date" name="journal_date" type="text"
                                                         id="edit_journal_date"
                                                         class="form-control form-control-sm rounded-0">
-                                                    {{-- <input type="date" class="form-control form-control-sm rounded-0"
-                                                    name="edit_journal_date" id="edit_journal_date"
-                                                    placeholder="Journal Date" required> --}}
-
-                                                    {{--  <input type="date" ref="datepicker"
-                                                    class="form-control form-control-sm rounded-0" name="journal_date"> --}}
                                                 </div>
                                             </div>
                                             <div class="col-md-2 col-xs-12">
@@ -676,28 +670,21 @@
                         }
                     }).then(response => {
                         this.data = response.data.transactions;
-                        console.log(this.data);
-                        /* window.location.reload(); */
-                        //  this.resetForm();
+
                     }).catch(err => {
                         toastr.error(err.response.data);
 
                     })
 
-                    /* window.location.href = this.baseUrl + "/reports/generalLedger?from=" + this.filter.from +
-                        '&&to=' + this.filter.to + '&&account_id=' + this.filter.account_id; */
+
                 },
                 logbook: function(e) {
                     console.log(e);
                 }
             },
             mounted() {
-                console.log(this.data)
-                // for(var i in this.data){
-                // 	if(this.data[i]){
-                // 		console.log(this.data[i]);
-                // 	}
-                // }
+
+
             }
         });
     </script>

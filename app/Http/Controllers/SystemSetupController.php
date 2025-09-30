@@ -169,7 +169,7 @@ class SystemSetupController extends MainController
                 'message' => 'Username already exists'
             ], 422);
         }
-        
+
         $branch_ids = $request->branch_ids ?? [];
 
         if (empty($branch_ids)) {
@@ -299,39 +299,39 @@ class SystemSetupController extends MainController
     public function searchAccount(Request $request)
     {
         $name = strtolower(trim($request->name));
-        
+
         if (empty($name)) {
             return response()->json([]);
         }
-        
+
         $searchTerms = array_filter(explode(' ', $name));
         $query = PersonalInfo::query();
-        
+
         // For each search term, it must match at least one name field
         foreach ($searchTerms as $term) {
-            $query->where(function($q) use ($term) {
+            $query->where(function ($q) use ($term) {
                 $q->whereRaw("LOWER(fname) LIKE ?", ["%{$term}%"])
-                  ->orWhereRaw("LOWER(mname) LIKE ?", ["%{$term}%"])
-                  ->orWhereRaw("LOWER(lname) LIKE ?", ["%{$term}%"])
-                  ->orWhereRaw("LOWER(displayname) LIKE ?", ["%{$term}%"]);
+                    ->orWhereRaw("LOWER(mname) LIKE ?", ["%{$term}%"])
+                    ->orWhereRaw("LOWER(lname) LIKE ?", ["%{$term}%"])
+                    ->orWhereRaw("LOWER(displayname) LIKE ?", ["%{$term}%"]);
             });
         }
-        
+
         $accounts = $query->with('userInfo')
-                         ->orderBy('lname')
-                         ->get();
+            ->orderBy('lname')
+            ->get();
         return response()->json($accounts);
     }
     public function fetchInfo(Request $request)
     {
         $personalInfo = PersonalInfo::where('personal_info_id', $request->p_id)
             ->with([
-                'userInfo.accessibilities', 
-                'userInfo.userBranch', 
+                'userInfo.accessibilities',
+                'userInfo.userBranch',
                 'userInfo.userRole'
             ])
             ->first();
-        
+
         return response()->json($personalInfo);
     }
 
