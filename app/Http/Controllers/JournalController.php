@@ -69,7 +69,7 @@ class JournalController extends MainController
                     $created = $journalEntry->createJournalEntry($request->input());
                     if ($created) {
                         activity("Journal Entry")->event("created")->performedOn($journalEntry)
-                            ->log("created");
+                            ->log("Journal Entry - Create");
                         $matchFound = true;
                     }
                 }
@@ -103,9 +103,10 @@ class JournalController extends MainController
                     'journal_status' => 'cancelled'
                 ]);
                 if ($updated) {
-                    activity("Journal Entry")->event("cancelled")->performedOn($journal)
-                        ->withProperties(['attributes' => $journal, 'old' => $replicate])
-                        ->log("cancelled");
+                    $changes = getChanges($journal, $replicate);
+                    activity("Journal Entry List")->event("updated")->performedOn($journal)
+                        ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                        ->log("Journal Entry - Cancel");
                 }
             });
         } catch (\Exception $e) {
@@ -162,9 +163,10 @@ class JournalController extends MainController
                             $journalEntry->details()->delete();
                             $journalEntry->details()->createMany($request->details);
                             if ($updated) {
-                                activity("Journal Entry")->event("edit")->performedOn($journalEntry)
-                                    ->withProperties(['attributes' => $journalEntry, 'old' => $replicate])
-                                    ->log("updated");
+                                $changes = getChanges($journalEntry, $replicate);
+                                activity("Journal Entry List")->event("updated")->performedOn($journalEntry)
+                                    ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                                    ->log("Journal Entry - Update");
                             }
                         });
                         $matchFound = true;
@@ -192,17 +194,20 @@ class JournalController extends MainController
 
     public function JournalEntryPostUnpost(Request $request)
     {
+
         $journal = JournalEntry::find($request->journal_id);
         $replicate = $journal->replicate();
 
         // Toggle the status between 'posted' and 'unposted'
-        $journal->status = ($journal->status === 'posted') ? 'unposted' : 'posted';
-        $logDescription = $journal->status === 'posted' ? 'post' : 'unpost';
-
-        if ($journal->save()) {
-            activity("Journal Entry")->event($logDescription)->performedOn($journal)
+        $status = $journal->status == 'posted' ? 'unposted' : 'posted';
+        $journal->update([
+            'status' => $status
+        ]);
+        if ($journal) {
+            $log_prefix = $journal->getChanges()['status'] = 'posted' ? 'Post' : 'Unpost';
+            activity("Journal Entry List")->event("updated")->performedOn($journal)
                 ->withProperties(['attributes' => $journal, 'old' => $replicate])
-                ->log("updated");
+                ->log("Journal Entry - " . ucfirst($journal->status));
             return response()->json(['message' => $journal->status]);
         }
         return response()->json(['message' => 'error']);

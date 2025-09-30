@@ -629,7 +629,7 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.check_amount"
                                                                 @keydown.enter="nextTextField('pos_amount')"
-                                                                ref="check_amount" @change="calculateTotal()"
+                                                                ref="check_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
                                                         </td>
@@ -652,7 +652,6 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.memo_amount"
                                                                 ref="memo_amount" @keydown.enter="nextTextField('p_10')"
-                                                                @change="calculateTotal()"
                                                                 class="form-control form-control-sm rounded-0 text-right">
                                                         </td>
                                                     </tr>
@@ -1328,7 +1327,7 @@
                     this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
                     this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
                     this.collectionBreakdown.total = totalCash;
-                    axios.post('/collections', this.collectionBreakdown, {
+                    axios.post('cash-blotter/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -1485,12 +1484,14 @@
                         toastr.error("Unable to edit posted transaction.");
                         this.closeModal();
                     } else {
-                        axios.get('/collection-breakdown/' + collectionBreakdown.collection_id, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
-                            }
-                        }).then(response => {
-                            var cb = response.data.data.collections;
+                        axios.get('/collection-breakdown/' + collectionBreakdown
+                                .collection_id, {
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                            .content
+                                    }
+                                }).then(response => {
+                                var cb = response.data.data.collections;
 
                                 if (!cb.other_payment) {
                                     cb.other_payment = {

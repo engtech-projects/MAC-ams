@@ -1286,6 +1286,9 @@ class ReportsController extends MainController
             'amount' => 0,
             'payee' => $journalEntry::CLOSING_SOURCE
         ]);
+
+        activity("Closing Period")->event('created')->performedOn($entry)
+            ->log("Journal Entry - Create");
         $details = [];
         foreach ($accounts as $i => $category) {
             foreach ($category['types'] as $type) {

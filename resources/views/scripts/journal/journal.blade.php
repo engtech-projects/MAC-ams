@@ -708,7 +708,6 @@
                         editButton.prop('disabled', false); // Enable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     }
-                    // $('#journalEntryDetails').DataTable().ajax.reload(null, false);
                 },
                 error: function(response) {
                     toastr.error(response.responseJSON.message);
@@ -829,14 +828,15 @@
                                 dataType: "json",
                                 success: function(response) {
                                     if (response.success) {
-                                            toastr.success(response.message);
-                                            saveJournalEntryDetails(response.id, 'update');
-                                             $('body').focus();
-                                            $('#journalModalEdit').modal('hide');
-                                        } else {
-                                            toastr.error(response.message);
-                                            $('#journalModalEdit').find('button[type="submit"]').focus();
-                                        }
+                                        toastr.success(response.message);
+                                        saveJournalEntryDetails(response.id, 'update');
+                                        $('body').focus();
+                                        $('#journalModalEdit').modal('hide');
+                                    } else {
+                                        toastr.error(response.message);
+                                        $('#journalModalEdit').find('button[type="submit"]')
+                                            .focus();
+                                    }
                                 },
                                 error: function(jqXHR) {
                                     if (jqXHR.status === 422) {
@@ -991,12 +991,12 @@
                                                     echo '</optgroup><optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
                                                     $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
                                                 }
-
+                                        
                                                 // Add the subsidiary option to the current optgroup
                                                 echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
                                             }
                                         }
-
+                                        
                                         // Close the last optgroup if it exists
                                         if ($temp != '') {
                                             echo '</optgroup>';

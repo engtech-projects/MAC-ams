@@ -1,5 +1,7 @@
 <?php
 
+use Spatie\Activitylog\Models\Activity;
+
 function prepZero($value)
 {
     return sprintf("%02d", $value);
@@ -101,6 +103,33 @@ function checkUserHasAccessModule($type, $moduleName)
         }
         return false;
     }
+}
+function getChanges($model, $replicate)
+{
+
+    $attributes = $model->getChanges();
+    $old = [];
+    foreach ($attributes as $key => $value) {
+        $old[$key] = $replicate[$key];
+    }
+    return [
+        'attributes' => $attributes,
+        'old' => $old
+    ];
+}
+function activityLogWithProperties($model, $attributes, $replicate)
+{
+    $attributes = $model->getChanges();
+    $old = [];
+    foreach ($attributes as $key => $value) {
+        $old[$key] = $replicate[$key];
+    }
+    activity($attributes['log_name'])->event($attributes['event'])->performedOn($model)
+        ->withProperties(['attributes' => $attributes, 'old' => $old])
+        ->tap(function (Activity $activity) {
+            $activity->transaction_date = $this->transactionDate();
+        })
+        ->log($attributes['log']);
 }
 function sortList($data, $index)
 {

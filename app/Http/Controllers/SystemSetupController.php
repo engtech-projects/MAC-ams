@@ -77,16 +77,22 @@ class SystemSetupController extends MainController
     public function accountingUpdate(Request $request)
     {
         $accounting = null;
+        $replicate = null;
         if (!Accounting::first()) {
             $accounting = new Accounting;
         } else {
             $accounting = Accounting::first();
+            $replicate = $accounting->replicate();
         }
         $accounting->start_date = $request->start_date;
         $accounting->end_date = $request->end_date;
         $accounting->method = $request->method;
         $accounting->save();
 
+        $changes = getChanges($accounting, $replicate);
+        activity("System Setup")->event("updated")->performedOn($accounting)
+            ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+            ->log("Accounting - Update");
         Session::flash('success', 'Accounting info updated successfully.');
         return redirect(route('systemSetup'));
     }
@@ -109,6 +115,8 @@ class SystemSetupController extends MainController
                 $book->book_head = $request->book_head;
                 $book->book_flag = $request->book_flag;
                 $book->save();
+                activity("Journal Book")->event("created")->performedOn($book)
+                    ->log("Journal Book - Create");
                 return json_encode(['status' => 'create', 'book_id' => $book->book_id]);
             } else {
                 return json_encode(['status' => 'book_code_duplicate', 'book_id' => '']);
@@ -116,6 +124,7 @@ class SystemSetupController extends MainController
         } else {
             if (!$status) {
                 $book = JournalBook::find($book_id);
+                $replicate = $book->replicate();
                 $book->book_code = $request->book_code;
                 $book->book_name = $request->book_name;
                 $book->book_src = $request->book_src;
@@ -123,6 +132,11 @@ class SystemSetupController extends MainController
                 $book->book_head = $request->book_head;
                 $book->book_flag = $request->book_flag;
                 $book->save();
+
+                $changes = getChanges($book, $replicate);
+                activity("Journal Book")->event("updated")->performedOn($book)
+                    ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                    ->log("Journal Book - Update");
                 return json_encode(['status' => 'update', 'book_id' => $book->book_id]);
             } else {
                 return json_encode(['status' => 'book_code_duplicate', 'book_id' => '']);
@@ -155,7 +169,7 @@ class SystemSetupController extends MainController
                 'message' => 'Username already exists'
             ], 422);
         }
-        
+
         $branch_ids = $request->branch_ids ?? [];
 
         if (empty($branch_ids)) {
@@ -175,6 +189,8 @@ class SystemSetupController extends MainController
             $person->email_address = $request->email;
             $person->phone_number = $request->phone_number;
             $person->save();
+            activity("System Setup")->event("created")->performedOn($person)
+                ->log("Personal Info - Create");
 
             $user = new User;
             $user->username = $request->username;
@@ -192,6 +208,7 @@ class SystemSetupController extends MainController
             return json_encode('create');
         } else {
             $user = User::find($user_id);
+            $replicate = $user->replicate();
             $user->username = $request->username;
             if (!empty($request->password)) {
                 $user->password = bcrypt($request->password);
@@ -211,6 +228,10 @@ class SystemSetupController extends MainController
                 'email_address' => $request->email,
                 'phone_number' => $request->phone_number
             ]);
+            $changes = getChanges($user, $replicate);
+            activity("System Setup")->event("updated")->performedOn($user)
+                ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                ->log("Journal Book - Update");
             return json_encode('update');
         }
     }
@@ -229,16 +250,23 @@ class SystemSetupController extends MainController
             $cat->description = $request->cat_description;
 
             $cat->save();
+            activity("System Setup")->event("created")->performedOn($cat)
+                ->log("Category - Create");
 
             return json_encode(['status' => 'create', 'sub_cat_id' => $cat->sub_cat_id]);
         } else {
             $cat = SubsidiaryCategory::find($cat_id);
+            $replicate = $cat->replicate();
             $cat->sub_cat_code = $request->sub_cat_code;
             $cat->sub_cat_name = $request->sub_cat_name;
             $cat->sub_cat_type = $request->sub_cat_type;
             $cat->description = $request->cat_description;
 
             $cat->save();
+            $changes = getChanges($cat, $replicate);
+            activity("System Setup")->event("updated")->performedOn($cat)
+                ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                ->log("Category - Update");
             return json_encode(['status' => 'update', 'sub_cat_id' => $cat->sub_cat_id]);
         }
     }
@@ -252,7 +280,10 @@ class SystemSetupController extends MainController
     public function deleteCategoryFile(Request $request)
     {
         $cat_id = $request->catId;
-        return json_encode(SubsidiaryCategory::find($cat_id)->delete());
+        $category = SubsidiaryCategory::find($cat_id)->delete();
+        activity("System Setup")->event("deleted")->performedOn($category)
+            ->log("Category - Delete");
+        return json_encode($category);
     }
 
     public function userMasterFileCreateOrUpdateAccessibility(Request $request)
@@ -268,39 +299,39 @@ class SystemSetupController extends MainController
     public function searchAccount(Request $request)
     {
         $name = strtolower(trim($request->name));
-        
+
         if (empty($name)) {
             return response()->json([]);
         }
-        
+
         $searchTerms = array_filter(explode(' ', $name));
         $query = PersonalInfo::query();
-        
+
         // For each search term, it must match at least one name field
         foreach ($searchTerms as $term) {
-            $query->where(function($q) use ($term) {
+            $query->where(function ($q) use ($term) {
                 $q->whereRaw("LOWER(fname) LIKE ?", ["%{$term}%"])
-                  ->orWhereRaw("LOWER(mname) LIKE ?", ["%{$term}%"])
-                  ->orWhereRaw("LOWER(lname) LIKE ?", ["%{$term}%"])
-                  ->orWhereRaw("LOWER(displayname) LIKE ?", ["%{$term}%"]);
+                    ->orWhereRaw("LOWER(mname) LIKE ?", ["%{$term}%"])
+                    ->orWhereRaw("LOWER(lname) LIKE ?", ["%{$term}%"])
+                    ->orWhereRaw("LOWER(displayname) LIKE ?", ["%{$term}%"]);
             });
         }
-        
+
         $accounts = $query->with('userInfo')
-                         ->orderBy('lname')
-                         ->get();
+            ->orderBy('lname')
+            ->get();
         return response()->json($accounts);
     }
     public function fetchInfo(Request $request)
     {
         $personalInfo = PersonalInfo::where('personal_info_id', $request->p_id)
             ->with([
-                'userInfo.accessibilities', 
-                'userInfo.userBranch', 
+                'userInfo.accessibilities',
+                'userInfo.userBranch',
                 'userInfo.userRole'
             ])
             ->first();
-        
+
         return response()->json($personalInfo);
     }
 
@@ -308,8 +339,13 @@ class SystemSetupController extends MainController
     {
         Currency::where('status', '=', 'active')->update(['status' => '']);
         $currency = Currency::find($request->currency);
+        $replicate = $currency->replicate();
         $currency->status = 'active';
         $currency->save();
+        $changes = getChanges($currency, $replicate);
+        activity("System Setup")->event("updated")->performedOn($currency)
+            ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+            ->log("Currency - Update");
         Session::flash('success', 'Currency updated successfully.');
         return redirect(route('systemSetup'));
     }

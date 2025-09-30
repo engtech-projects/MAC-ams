@@ -11,13 +11,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class JournalBook extends Model
 {
     use HasFactory;
-    use LogsActivity;
 
 
     const GENERAL_LEDGER_BOOK = 5;
     const CASH_BLOTTER_BOOKS = [1, 9, 6, 8, 7, 4];
     const LOAN_PAYMENTS_BOOK = 9;
-    const CASH_PAID_BOOK = [1, 6,4, 8, 7, 5];
+    const CASH_PAID_BOOK = [1, 6, 4, 8, 7, 5];
     const POS_PAYMENT_BOOK = [9];
     const COLLECTION_DEPOSITS_BOOK = 7;
     const INTER_BRANCH_BOOKS = [9, 4];
@@ -41,12 +40,6 @@ class JournalBook extends Model
     ];
     protected static $recordEvents = ['deleted', 'created', 'updated'];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
-            ->useLogName('Journal Book');
-    }
 
     public static function getBookWithJournalCount()
     {

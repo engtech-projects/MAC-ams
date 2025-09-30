@@ -182,38 +182,32 @@
         </div> --}}
 
         <div class="modal fade" id="postingPeriodConfirmation" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Confirmation Message (Only shows 'from' year) -->
-                <p>Are you sure you want to close the period for year <strong>@{{ getYearFromDate(from) }}</strong>?</p>
-                
-                <!-- Journal Date Input -->
-                <div class="form-group">
-                    <label for="journalDate">Journal Date</label>
-                    <input 
-                        type="date" 
-                        id="journalDate" 
-                        name = "journalDate"
-                        class="form-control" 
-                        v-model="journalDate"
-                        required
-                    >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Confirmation Message (Only shows 'from' year) -->
+                        <p>Are you sure you want to close the period for year <strong>@{{ getYearFromDate(from) }}</strong>?</p>
+
+                        <!-- Journal Date Input -->
+                        <div class="form-group">
+                            <label for="journalDate">Journal Date</label>
+                            <input type="date" id="journalDate" name = "journalDate" class="form-control"
+                                v-model="journalDate" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="closingPeriod()">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @click="closingPeriod()">Yes</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            </div>
         </div>
-    </div>
-</div>
     </section>
 
 
@@ -255,7 +249,7 @@
                         to: this.to,
                         journalDate: this.journalDate,
                     }
-                    axios.post('/MAC-ams/reports/closing-period', data, {
+                    axios.post('/reports/closing-period', data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
