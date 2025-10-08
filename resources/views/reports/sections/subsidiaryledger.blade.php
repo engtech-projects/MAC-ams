@@ -880,6 +880,7 @@
                                     @csrf
                                     <input type="hidden" class="form-control form-control-sm rounded-0"
                                         name="edit_journal_id" id="edit_journal_id" placeholder="">
+                                    <input type="hidden" name="source_page" id="source_page" value="Subsidiary Ledger">
                                     <div class="row">
                                         <div class="col-md-8 frm-header">
                                             <h4><b>Journal Entry (Edit)</b></h4>
@@ -888,7 +889,7 @@
                                             <label class="label-normal" for="date">Journal Date</label>
                                             <div class="input-group">
                                                 <input type="date" class="form-control form-control-sm rounded-0"
-                                                    name="edit_journal_date" id="edit_journal_date"
+                                                    name="journal_date" id="edit_journal_date"
                                                     placeholder="Journal Date" required>
                                             </div>
                                         </div>

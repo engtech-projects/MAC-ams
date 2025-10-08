@@ -4,15 +4,12 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CashBlotter extends Model
 {
     use HasFactory;
-    use LogsActivity;
 
     protected $primaryKey = 'cashblotter_id';
     protected $table = 'cash_blotter';
@@ -27,13 +24,6 @@ class CashBlotter extends Model
     {
 
         return class_basename($this);
-    }
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
-            ->useLogName('Cash Blotter');
     }
 
     public static function fetchCashBlotter()
