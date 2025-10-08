@@ -410,19 +410,19 @@
                                                                 <th>Role</th>
                                                                 <th>Event</th>
                                                                 <th>Date & Time</th>
-                                                                <th width="13%">Action</th>
+                                                                <th>Action</th>
                                                             </thead>
                                                             <tbody>
                                                                 <tr v-for="activityLog in activityLogs"
-                                                                    :key="activityLog.id">
+                                                                    :key="activityLog.id" style="vertical-align: middle;">
                                                                     <td>@{{ activityLog.log_name }}</td>
                                                                     <td>@{{ activityLog.description }}</td>
                                                                     <td>@{{ activityLog.subject_type }}</td>
-                                                                    <td>@{{ activityLog.causer }}</td>
+                                                                    <td width="17%">@{{ activityLog.causer }}</td>
                                                                     <td>@{{ activityLog.user_role.role_name }}</td>
-                                                                    <td style="text-transform: capitalize;">@{{ activityLog.event }}</td>
-                                                                    <td>@{{ activityLog.created_at }}</td>
-                                                                    <td>
+                                                                    <td width="7%" style="text-transform: capitalize;">@{{ activityLog.event }}</td>
+                                                                    <td width="9%">@{{ activityLog.created_at }}</td>
+                                                                    <td width="1%" class="text-center">
 
                                                                         <button type="button"
                                                                             class="btn btn-xs btn-success"
@@ -440,7 +440,7 @@
                                                             <ul class="pagination justify-content-center">
                                                                 <li class="page-item" :class="{ disabled: pagination.current_page === 1 }">
                                                                     <a class="page-link" href="#" @click.prevent="changePage(pagination.current_page - 1)">
-                                                                        Previous
+                                                                        Prev
                                                                     </a>
                                                                 </li>
                                                                 

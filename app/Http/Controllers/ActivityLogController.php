@@ -25,7 +25,7 @@ class ActivityLogController extends Controller
             $query->where('log_name', $request['log_name']);
         })
         ->orderBy('created_at', 'desc')
-        ->paginate(15);
+        ->paginate(10);
         $data = $activityLogs->map(function ($item) {
             return [
                 'id' => $item->id,
