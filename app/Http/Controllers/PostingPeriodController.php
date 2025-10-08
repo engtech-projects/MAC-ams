@@ -19,32 +19,47 @@ class PostingPeriodController extends Controller
     {
         $year = $request['year'];
         $postingPeriods = PostingPeriod::where('posting_period', 'like', "$year%")->get();
+        $wasCreated = false;
 
         if ($postingPeriods->count() === 0) {
             $postingPeriods = [];
-            for ($month = 1; $month <= 12; $month++) {
-                $startDate = Carbon::createFromDate($request['year'], $month, 1);
-                $endDate = $startDate->copy()->endOfMonth();
-                try {
-                    $data = PostingPeriod::create([
-                        'posting_period' => $startDate->format('Y-m'),
-                        'start_date'     => $startDate->format('Y-m-d'),
-                        'end_date'       => $endDate->format('Y-m-d'),
-                        'status'         => 'closed',
-                        'created_at'     => now(),
-                        'updated_at'     => now(),
-                    ]);
-                    $postingPeriods[] = $data;
-                } catch (Exception $e) {
-                    return new JsonResponse([
-                        'message' => $e->getMessage(),
-                    ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-                }
+            $postingPeriod = new PostingPeriod();
+            
+            try {
+                DB::transaction(function () use ($request, &$postingPeriods, $postingPeriod) {
+                    for ($month = 1; $month <= 12; $month++) {
+                        $startDate = Carbon::createFromDate($request['year'], $month, 1);
+                        $endDate = $startDate->copy()->endOfMonth();
+
+                        $data = PostingPeriod::create([
+                            'posting_period' => $startDate->format('Y-m'),
+                            'start_date' => $startDate->format('Y-m-d'),
+                            'end_date' => $endDate->format('Y-m-d'),
+                            'status' => 'closed',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                        $postingPeriods[] = $data;
+                    }
+                    activity("System Setup")->event('created')->performedOn($postingPeriod)
+                        ->withProperties([
+                            'model_snapshot' => $postingPeriods
+                        ])
+                        ->log("Posting Period - Create");
+                });
+                $wasCreated = true;
+            } catch (Exception $e) {
+                return new JsonResponse([
+                    'message' => $e->getMessage(),
+                ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
         return new JsonResponse([
             'data' => $postingPeriods,
-            'message' => 'Successfully fetched.'
+            'message' => $wasCreated 
+                ? "Successfully created 12 posting periods for year {$year}." 
+                : 'Successfully fetched.',
+            'was_created' => $wasCreated
         ], JsonResponse::HTTP_OK);
     }
 
@@ -69,28 +84,6 @@ class PostingPeriodController extends Controller
     {
 
         $postingPeriod = PostingPeriod::whereYear('posting_period', $request['year'])->get();
-        /* if ($postingPeriod->isEmpty()) {
-            $postingPeriod = [];
-            for ($month = 1; $month <= 12; $month++) {
-                $startDate = Carbon::createFromDate($request['year'], $month, 1);
-                $endDate = $startDate->copy()->endOfMonth();
-                try {
-                    $data = PostingPeriod::create([
-                        'posting_period' => $startDate->format('F Y'),
-                        'start_date'     => $startDate->format('Y-m-d'),
-                        'end_date'       => $endDate->format('Y-m-d'),
-                        'status'         => 'closed',
-                        'created_at'     => now(),
-                        'updated_at'     => now(),
-                    ]);
-                    $postingPeriod[] = $data;
-                } catch (Exception $e) {
-                    return new JsonResponse([
-                        'message' => $e->getMessage(),
-                    ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-                }
-            }
-        } */
         return new JsonResponse([
             'data' => $postingPeriod,
             'message' => 'Successfully fetched.'
@@ -108,10 +101,14 @@ class PostingPeriodController extends Controller
                     'end_date' => $data['end_date'],
                     'status' => $data['status']
                 ]);
-                if ($postingPeriod) {
-                    $changes = getChanges($postingPeriod, $replicate);
+                $changes = getChanges($postingPeriod, $replicate);
+                unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+                if (!empty($changes['attributes'])) {
                     activity("System Setup")->event("updated")->performedOn($postingPeriod)
-                        ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                        ->withProperties([
+                            'model_snapshot' => $postingPeriod->toArray(),
+                            'attributes' => $changes['attributes'],
+                            'old' => $changes['old']])
                         ->log("Posting Period - Update");
                 }
             });

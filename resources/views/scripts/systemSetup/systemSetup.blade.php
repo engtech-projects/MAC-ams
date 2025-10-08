@@ -3,12 +3,17 @@
 <script type="text/javascript">
     (function($) {
         $('#select-account-credit').select2({
-            placeholder: 'Account',
+            placeholder: 'Account (Credit)',
             allowClear: true,
         });
         $('#select-account-debit').select2({
-            placeholder: 'Account',
+            placeholder: 'Account (Debit)',
             allowClear: true,
+        });
+        $('#sub_cat_type').select2({
+            placeholder: 'Category Type',
+            allowClear: true,
+            width: '100%',
         });
 
         $('.select-year').select2({
@@ -115,8 +120,12 @@
             }
         }
 
-        $('#systemSetupAccessibility').DataTable({
-            pageLength: 1000
+        var table = $('#systemSetupAccessibility').DataTable({
+            pageLength: 15,
+            lengthChange: false
+        });
+        table.on('draw', function() {
+            applyAccessibilityButtonStates();
         });
         $('form').attr('autocomplete', 'off');
         var journalBookTbl = $('#journalBookTble').DataTable();
@@ -135,6 +144,8 @@
                 alert("Sorry, your browser does not support Web Storage...");
             }
         });
+
+        var selectedAccessibilities = [];
         $(document).on('click', '.SearchName', function(e) {
             e.preventDefault();
             $('#searchBarUser').val($(this).attr('value'));
@@ -143,9 +154,8 @@
                 p_id: $(this).attr('user-id')
             });
             posting.done(function(response) {
-                $('.btn_plus').removeClass('d-none');
-                $('.btn_minus').addClass('d-none');
-                
+                resetAllAccessibilityButtons();
+                selectedAccessibilities = [];
                 if (response.user_info && response.user_info.id) {
                     $('#userId').val(response.user_info.id);
                     $('#username').val(response.user_info.username);
@@ -161,10 +171,11 @@
                     currentStatus = userStatus;
                     updateStatusButton(userStatus);
                     if (response.user_info.accessibilities) {
-                        $.each(response.user_info.accessibilities, function(kk, vv) {
-                            $('#btn_plus_' + vv.sml_id).addClass('d-none');
-                            $('#btn_minus_' + vv.sml_id).removeClass('d-none');
+                        response.user_info.accessibilities.forEach(function(accessibility) {
+                            var sml_id = parseInt(accessibility.sml_id);
+                            selectedAccessibilities.push(sml_id);
                         });
+                        applyAccessibilityButtonStates();
                     }
                 } else {
                     alert('Error: User info not found');
@@ -183,31 +194,57 @@
                 togglePasswordRequirement(true);
             });
         });
-        $(document).on('click', '.btn-subModuleList', function(e) {
-            var sml_id = $(this).attr('value');
-            if ($('#userId').val() != '') {
-                var posting = $.post(
-                    "{{ route('SystemSetupController.usermasterfile.createOrUpdateAccessibility') }}", {
-                        _token: "{{ csrf_token() }}",
-                        sml_id: $(this).attr('value'),
-                        user_id: $('#userId').val()
-                    });
-                posting.done(function(response) {
-                    if (response == 'added') {
-                        $('#btn_plus_' + sml_id).addClass('d-none');
-                        $('#btn_minus_' + sml_id).removeClass('d-none');
-                        toastr.success('Successfully Added');
-                    } else if (response == 'removed') {
-                        $('#btn_plus_' + sml_id).removeClass('d-none');
-                        $('#btn_minus_' + sml_id).addClass('d-none');
-                        toastr.success('Successfully Removed');
-                    }
-                });
-            } else {
-                alert('Error');
-            }
 
+        function resetAllAccessibilityButtons() {
+            selectedAccessibilities = [];
+            var table = $('#systemSetupAccessibility').DataTable();
+            table.rows().every(function() {
+                var row = this.node();
+                $(row).find('.btn_plus').removeClass('d-none');
+                $(row).find('.btn_minus').addClass('d-none');
+            });
+        }
+        function applyAccessibilityButtonStates() {
+            var table = $('#systemSetupAccessibility').DataTable();
+            table.rows().every(function() {
+                var row = this.node();
+                var $plusBtn = $(row).find('.btn_plus');
+                var $minusBtn = $(row).find('.btn_minus');
+                if ($plusBtn.length > 0) {
+                    var sml_id = parseInt($plusBtn.attr('value'));
+                    if (selectedAccessibilities.includes(sml_id)) {
+                        $plusBtn.addClass('d-none');
+                        $minusBtn.removeClass('d-none');
+                    } else {
+                        $plusBtn.removeClass('d-none');
+                        $minusBtn.addClass('d-none');
+                    }
+                }
+            });
+        }
+        function toggleAccessibility(sml_id) {
+            var $btnPlus = $('#btn_plus_' + sml_id);
+            var $btnMinus = $('#btn_minus_' + sml_id);
+            
+            if ($btnPlus.hasClass('d-none')) {
+                $btnPlus.removeClass('d-none');
+                $btnMinus.addClass('d-none');
+                selectedAccessibilities = selectedAccessibilities.filter(id => id !== sml_id);
+            } else {
+                $btnPlus.addClass('d-none');
+                $btnMinus.removeClass('d-none');
+                if (!selectedAccessibilities.includes(sml_id)) {
+                    selectedAccessibilities.push(sml_id);
+                }
+            }
+        }
+        $(document).on('click', '.btn-subModuleList', function(e) {
+            e.preventDefault();
+            toggleAccessibility(parseInt($(this).attr('value')));
         });
+        function getSelectedAccessibilities() {
+            return selectedAccessibilities;
+        }
 
         $(document).on('submit', '#userMasterFileForm', function(e) {
             e.preventDefault();
@@ -217,11 +254,17 @@
 
             var selectedBranches = $('#branch_selection').val();
             if (selectedBranches && selectedBranches.length > 0) {
-                formData.delete('branch_ids[]'); // Remove any existing branch_ids
+                formData.delete('branch_ids[]');
                 selectedBranches.forEach(function(branchId) {
                     formData.append('branch_ids[]', branchId);
                 });
             }
+            
+            var accessibilityIds = getSelectedAccessibilities();
+            formData.delete('accessibility_ids[]');
+            accessibilityIds.forEach(function(sml_id) {
+                formData.append('accessibility_ids[]', sml_id);
+            });
             
             if ($('#userId').val() && !$('#password').val()) {
                 formData.delete('password');
@@ -236,7 +279,7 @@
                 dataType: "json",
                 success: function(data) {
                     if (data == 'create') {
-                        $('#searchBarUser').val();
+                        $('#searchBarUser').val('');
                         toastr.success('Successfully Created');
                         reset();
                     } else if (data == 'update') {
@@ -328,37 +371,58 @@
                 data: datastring,
                 dataType: "json",
                 success: function(result) {
-                    if (result.status == 'create') {
-                        toastr.success('Successfully Created');
-                    } else if (result.status == 'update') {
-                        toastr.success('Successfully Updated');
-                        categoryFileTbl.row($("button[value ='" + result.sub_cat_id + "']")
-                                .parents('tr'))
-                            .remove().draw();
-                        $('#catId').val('');
+                    if (result.status != "sub_cat_code_duplicate") {
+                        if (result.status == 'create') {
+                            toastr.success('Successfully Created');
+                        } else if (result.status == 'update') {
+                            toastr.success('Successfully Updated');
+                            categoryFileTbl.row($("button[value='" + result.sub_cat_id + "']").parents('tr'))
+                                .remove().draw();
+                            $('#catId').val('');
+                        } else {
+                            toastr.error(result.message);
+                        }
+                        if (result.status == 'create' || result.status == 'update') {
+                            var catTypeDisplay = $('#sub_cat_type').val() === 'depre' ? 'Depreciation' : '';
+                            var creditAccountText = $('#select-account-credit option:selected').text();
+                            var debitAccountText = $('#select-account-debit option:selected').text();
+                            categoryFileTbl.row.add([
+                                `<strong>${$('#sub_cat_code').val()}</strong>`,
+                                $('#sub_cat_name').val(),
+                                catTypeDisplay,
+                                $('#cat_description').val(),
+                                creditAccountText,
+                                debitAccountText,
+                                `<div class="row">
+                                    <div class="col-md-4">
+                                        <button value="${result.sub_cat_id}" vtype="edit" class="btn btn-categoryA btn-info btn-sm">
+                                            <i class="fa fa-pen"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button value="${result.sub_cat_id}" vtype="delete" class="btn btn-categoryA btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>`
+                            ]).draw().node();
+                            $('#categoryFileForm')[0].reset();
+                            $('#sub_cat_type').val('').trigger('change');
+                            $('#select-account-credit').val('').trigger('change');
+                            $('#select-account-debit').val('').trigger('change');
+                            $('#submitBtn').val('SAVE');
+                        }
                     } else {
-                        toastr.error(result.message);
-                    }
-                    if (result.status == 'create' || result.status == 'update') {
-                        categoryFileTbl.row.add([
-                            $('#sub_cat_code').val(),
-                            $('#sub_cat_name').val(),
-                            $('#sub_cat_type').val(),
-                            $('#cat_description').val(),
-                            `<div class="row">
-								<div class="col-md-4">
-									<button value="${result.sub_cat_id}" vtype="edit" class="btn btn-categoryA btn-info btn-sm"><i class="fa  fa-pen"></i></button>
-								</div>
-								<div class="col-md-4">
-									<button value="${result.sub_cat_id}" vtype="delete" class="btn btn-categoryA btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-								</div>
-							</div>`
-                        ]).draw().node();
-                        $('#categoryFileForm')[0].reset();
+                        toastr.error('Category code already exists. Please enter a unique code.');
                     }
                 },
-                error: function() {
-                    console.log("Error");
+                error: function(xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        toastr.error(xhr.responseJSON.message);
+                    } else {
+                        toastr.error('An error occurred while processing your request.');
+                    }
+                    console.error("Error:", xhr);
                 }
             });
         });
@@ -377,20 +441,28 @@
                     },
                     dataType: "json",
                     success: function(data) {
-                        if (data) {
-                            $('#catId').val(data[0].sub_cat_id);
-                            $('#sub_cat_code').val(data[0].sub_cat_code);
-                            $('#sub_cat_name').val(data[0].sub_cat_name);
-                            $('#sub_cat_type').val(data[0].sub_cat_type);
-                            $('#cat_description').val(data[0].description);
+                        if (data && data.length > 0) {
+                            var category = data[0];
+                            $('#catId').val(category.sub_cat_id);
+                            $('#sub_cat_code').val(category.sub_cat_code);
+                            $('#sub_cat_name').val(category.sub_cat_name);
+                            $('#sub_cat_type').val(category.sub_cat_type).trigger('change');
+                            $('#cat_description').val(category.description);
+                            $('#select-account-credit').val(category.account_credit || "").trigger('change');
+                            $('#select-account-debit').val(category.account_debit || "").trigger('change');
+                            $('#submitCatBtn').val('UPDATE');
+                            $('#cancelCatBtn').show();
+                        } else {
+                            toastr.error('Category data not found.');
                         }
                     },
-                    error: function() {
-                        console.log("Error");
+                    error: function(xhr) {
+                        toastr.error('Failed to load category data.');
+                        console.error("Error:", xhr);
                     }
                 });
             } else if (type === 'delete') {
-                if (confirm("Are You Sure want to delete this Category ?")) {
+                if (confirm("Are you sure you want to delete this category?")) {
                     $.ajax({
                         type: "GET",
                         url: "{{ route('SystemSetupController.categoryFile.deleteCategory') }}",
@@ -399,20 +471,37 @@
                         },
                         dataType: "json",
                         success: function(data) {
-                            if (data) {
-                                toastr.success('Subsidiary Category Successfully Remove');
-                                categoryFileTbl.row($("button[value ='" + id + "']").parents(
-                                        'tr'))
+                            if (data && data.status !== 'error') {
+                                toastr.success('Category successfully deleted.');
+                                categoryFileTbl.row($("button[value='" + id + "']").parents('tr'))
                                     .remove().draw();
+                            } else {
+                                toastr.error(data.message || 'Failed to delete category.');
                             }
                         },
-                        error: function() {
-                            console.log("Error");
+                        error: function(xhr) {
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                toastr.error(xhr.responseJSON.message);
+                            } else {
+                                toastr.error('An error occurred while deleting the category.');
+                            }
+                            console.error("Error:", xhr);
                         }
                     });
                 }
             }
-        })
+        });
+        $(document).on('click', '#cancelCatBtn', function(e) {
+            $('#catId').val('');
+            $('#sub_cat_code').val('');
+            $('#sub_cat_name').val('');
+            $('#sub_cat_type').val('').trigger('change');
+            $('#cat_description').val('');
+            $('#select-account-credit').val('').trigger('change');
+            $('#select-account-debit').val('').trigger('change');
+            $('#submitCatBtn').val('SAVE');
+            $('#cancelCatBtn').hide();
+        });
         $(document).on('click', '.btn-bookA', function(e) {
             e.preventDefault();
             var type = $(this).attr('vtype');
@@ -436,6 +525,7 @@
                             $('#book_head').val(data[0].book_head);
 
                             $('#submitBtn').val('UPDATE');
+                            $('#cancelBkBtn').show();
                         }
                     },
                     error: function() {
@@ -465,6 +555,17 @@
                     });
                 }
             }
+        });
+        $(document).on('click', '#cancelBkBtn', function(e) {
+            $('#bookId').val('');
+            $('#book_code').val('');
+            $('#book_name').val('');
+            $('#book_src').val('');
+            $('#book_ref').val('');
+            $('#book_flag').val('');
+            $('#book_head').val('');
+            $('#submitBtn').val('SAVE');
+            $('#cancelBkBtn').hide();
         });
         $('#searchBarUser').keyup(function(e) {
             var value = $(this).val();
@@ -504,8 +605,7 @@
         function reset() {
             $('#userMasterFileForm')[0].reset();
             $('#searchContent').html("");
-            $('.btn_plus').addClass('d-none');
-            $('.btn_minus').addClass('d-none');
+            resetAllAccessibilityButtons();
             $('#userId').val('');
             $('#searchBarUser').val('');
             $('#gender').val(null).trigger('change');
@@ -517,6 +617,9 @@
             toggleStatusControls(false);
             $('#username').removeClass('is-invalid');
             $('#branch_selection').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+            var accstable = $('#systemSetupAccessibility').DataTable();
+            accstable.search('').draw();
+            accstable.page('first').draw('page');
         }
 
         function ucFirst(txt) {

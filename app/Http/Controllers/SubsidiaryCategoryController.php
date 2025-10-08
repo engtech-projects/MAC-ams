@@ -30,29 +30,7 @@ class SubsidiaryCategoryController extends Controller
      */
     public function store(SubsidiaryCategoryRequest $request)
     {
-        $data = $request->validated();
-        try {
-            $category = SubsidiaryCategory::create($data);
-            $categoryAccounts = [
-                $data['account_id_credit'] => ['transaction_type' => 'credit'],
-                $data['account_id_debit'] => ['transaction_type' => 'debit'],
-            ];
-            $category->accounts()->attach($categoryAccounts);
-            /*   activity()
-                ->performedOn($category)
-                ->log('created');
-            $lastActivity = Activity::all()->last(); //returns the last logged activity
-
-            $lastActivity->subject; //returns the model that was passed to `performedOn`;
-            dd($lastActivity); */
-        } catch (\Throwable $th) {
-            return new JsonResponse([
-                'message' => $th->getMessage()
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-        return new JsonResponse([
-            'message' => "Successfully created."
-        ], JsonResponse::HTTP_OK);
+        //
     }
 
     /**
