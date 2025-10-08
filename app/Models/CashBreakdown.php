@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -39,12 +38,6 @@ class CashBreakdown extends Model
         return class_basename($this);
     }
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
-            ->useLogName('Cash Transaction Blotter - Cash Breakdown');
-    }
     public static function fetchCashBreakdownByCashblotterId($cashblotter_id)
     {
         $cash_breakdown = CashBreakdown::where('cashblotter_id', '=', $cashblotter_id)->first();

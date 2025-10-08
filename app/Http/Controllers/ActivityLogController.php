@@ -19,16 +19,13 @@ class ActivityLogController extends Controller
     {
 
         $activityLogs = Activity::when($request['event'], function ($query) use ($request) {
-            $event = $request['event'];
-            if ($request['event'] == 'updated') {
-                $query->where('event', $event)->orWhere('event', 'edit');
-            } else {
-                $query->where('event', $request['event']);
-            }
-        })->when($request['subject_type'], function ($query) use ($request) {
-            $type = 'App\Models\\' . $request["subject_type"];
-            $query->where('subject_type', $type);
-        })->get();
+            $query->where('event', $request['event']);
+        })
+        ->when($request['log_name'], function ($query) use ($request) {
+            $query->where('log_name', $request['log_name']);
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(15);
         $data = $activityLogs->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -38,19 +35,24 @@ class ActivityLogController extends Controller
                 'subject' => $item->subject?->id,
                 'subject' => [
                     'id' => $item->subject_id,
-                    'data' => $item->subject
+                    'data' => $activity->properties['model_snapshot'] ?? null
                 ],
                 'event' => $item->event,
                 'causer_type' => Str::headline(class_basename($item->causer_type)),
-                'causer' => $item->causer->username,
-                'causer' => $item->causer->username,
+                'causer' => $item->causer->personal_info->fname ? trim($item->causer->personal_info->fname . ' ' . $item->causer->personal_info->mname . ' ' . $item->causer->personal_info->lname) . ' (' .$item->causer->username. ')': $item->causer->username,
                 'user_role' => $item->causer->userRole,
                 'properties' => $item->changes(),
-                'created_at' => $item->created_at->format('H:i d, M Y')
+                'created_at' => $item->created_at->format('Y-m-d g:i A')
             ];
         });
         return new JsonResponse([
             'data' => $data,
+            'current_page' => $activityLogs->currentPage(),
+            'last_page' => $activityLogs->lastPage(),
+            'per_page' => $activityLogs->perPage(),
+            'total' => $activityLogs->total(),
+            'from' => $activityLogs->firstItem(),
+            'to' => $activityLogs->lastItem(),
             'message' => "Successfully fetched."
         ], JsonResponse::HTTP_OK);
     }
@@ -84,15 +86,14 @@ class ActivityLogController extends Controller
             'subject' => $activity->subject?->id,
             'subject' => [
                 'id' => $activity->subject_id,
-                'data' => $activity->subject
+                'data' => $activity->properties['model_snapshot'] ?? null
             ],
             'event' => $activity->event,
             'causer_type' => Str::headline(class_basename($activity->causer_type)),
-            'causer' => $activity->causer->username,
-            'causer' => $activity->causer->username,
+            'causer' => $activity->causer->personal_info->fname ? trim($activity->causer->personal_info->fname . ' ' . $activity->causer->personal_info->mname . ' ' . $activity->causer->personal_info->lname) . ' (' .$activity->causer->username. ')': $activity->causer->username,
             'user_role' => $activity->causer->userRole,
             'properties' => $activity->changes(),
-            'created_at' => $activity->created_at->format('H:i d, M Y')
+            'created_at' => $activity->created_at->format('Y-m-d g:i A')
         ];
         return new JsonResponse([
             'data' => $activity,

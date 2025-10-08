@@ -3,26 +3,17 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Accounting extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
     protected $primaryKey = "accounting_id";
     protected $table = "accounting";
 
 
     protected static $recordEvents = ['deleted', 'created', 'updated'];
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
-            ->useLogName('Journal Book');
-    }
 
     public static function getFiscalYear()
     {

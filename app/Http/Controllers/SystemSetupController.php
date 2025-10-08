@@ -51,6 +51,7 @@ class SystemSetupController extends MainController
         } else {
             $company = Company::first();
         }
+        $companyReplicate = $company->exists ? $company->replicate() : null;
         $company->logo = '';
         $company->company_name = $request->company_name;
         $company->company_email = $request->company_email;
@@ -62,6 +63,7 @@ class SystemSetupController extends MainController
         } else {
             $address = CompanyAddress::first();
         }
+        $addressReplicate = $address->exists ? $address->replicate() : null;
         $address->street = $request->address;
         $address->city = $request->city;
         $address->province = $request->town;
@@ -69,6 +71,43 @@ class SystemSetupController extends MainController
         $address->country = $request->country;
         $address->company_id = $company->company_id;
         $address->save();
+
+        $allChanges = [];
+        $allOld = [];
+        if ($companyReplicate) {
+            $companyChanges = getChanges($company, $companyReplicate);
+            unset($companyChanges['attributes']['updated_at'], $companyChanges['old']['updated_at']);
+            if (!empty($companyChanges['attributes'])) {
+                $allChanges['company'] = $companyChanges['attributes'];
+                $allOld['company'] = $companyChanges['old'];
+            }
+        } else {
+            $allChanges['company'] = $company->toArray();
+            $allOld['company'] = [];
+        }
+        if ($addressReplicate) {
+            $addressChanges = getChanges($address, $addressReplicate);
+            unset($addressChanges['attributes']['updated_at'], $addressChanges['old']['updated_at']);
+            if (!empty($addressChanges['attributes'])) {
+                $allChanges['address'] = $addressChanges['attributes'];
+                $allOld['address'] = $addressChanges['old'];
+            }
+        } else {
+            $allChanges['address'] = $address->toArray();
+            $allOld['address'] = [];
+        }
+        if (!empty($companyChanges['attributes'])) {
+            activity("System Setup")->event("updated")->performedOn($company)
+                ->withProperties([
+                'model_snapshot' => [
+                    'company' => $company->toArray(),
+                    'address' => $address->toArray()
+                ],
+                'attributes' => $allChanges,
+                'old' => $allOld
+                ])
+                ->log("Company Settings - Update");
+        }
 
         Session::flash('success', 'Company info updated successfully.');
         return redirect(route('systemSetup'));
@@ -90,9 +129,15 @@ class SystemSetupController extends MainController
         $accounting->save();
 
         $changes = getChanges($accounting, $replicate);
-        activity("System Setup")->event("updated")->performedOn($accounting)
-            ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
-            ->log("Accounting - Update");
+        unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+        if (!empty($changes['attributes'])) {
+            activity("System Setup")->event("updated")->performedOn($accounting)
+                ->withProperties([
+                    'model_snapshot' => $accounting->toArray(),
+                    'attributes' => $changes['attributes'],
+                    'old' => $changes['old']])
+                ->log("Accounting - Update");
+        }
         Session::flash('success', 'Accounting info updated successfully.');
         return redirect(route('systemSetup'));
     }
@@ -115,7 +160,8 @@ class SystemSetupController extends MainController
                 $book->book_head = $request->book_head;
                 $book->book_flag = $request->book_flag;
                 $book->save();
-                activity("Journal Book")->event("created")->performedOn($book)
+                activity("System Setup")->event("created")->performedOn($book)
+                    ->withProperties(['model_snapshot' => $book->toArray()])
                     ->log("Journal Book - Create");
                 return json_encode(['status' => 'create', 'book_id' => $book->book_id]);
             } else {
@@ -134,9 +180,16 @@ class SystemSetupController extends MainController
                 $book->save();
 
                 $changes = getChanges($book, $replicate);
-                activity("Journal Book")->event("updated")->performedOn($book)
-                    ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
-                    ->log("Journal Book - Update");
+                unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+                if (!empty($changes['attributes'])) {
+                    activity("System Setup")->event("updated")->performedOn($book)
+                        ->withProperties([
+                            'model_snapshot' => $book->toArray(),
+                            'attributes' => $changes['attributes'], 
+                            'old' => $changes['old']
+                        ])
+                        ->log("Journal Book - Update");
+                }
                 return json_encode(['status' => 'update', 'book_id' => $book->book_id]);
             } else {
                 return json_encode(['status' => 'book_code_duplicate', 'book_id' => '']);
@@ -152,7 +205,18 @@ class SystemSetupController extends MainController
     public function deleteBook(Request $request)
     {
         $book_id = $request->bookId;
-        return json_encode(JournalBook::find($book_id)->delete());
+        $book = JournalBook::find($book_id);
+        if ($book) {
+            activity("System Setup")->event("deleted")->performedOn($book)
+                ->withProperties([
+                    'model_snapshot' => $book->toArray(),
+                    'old' => $book->toArray()
+                ])
+                ->log("Journal Book - Delete");
+            $deleted = $book->delete();
+            return json_encode($deleted);
+        }
+        return json_encode(false);
     }
 
     public function userMasterFileCreateOrUpdate(Request $request)
@@ -171,6 +235,7 @@ class SystemSetupController extends MainController
         }
 
         $branch_ids = $request->branch_ids ?? [];
+        $accessibility_ids = $request->accessibility_ids ?? [];
 
         if (empty($branch_ids)) {
             return response()->json([
@@ -189,8 +254,6 @@ class SystemSetupController extends MainController
             $person->email_address = $request->email;
             $person->phone_number = $request->phone_number;
             $person->save();
-            activity("System Setup")->event("created")->performedOn($person)
-                ->log("Personal Info - Create");
 
             $user = new User;
             $user->username = $request->username;
@@ -204,11 +267,61 @@ class SystemSetupController extends MainController
             if (!empty($branch_ids)) {
                 $user->userBranch()->attach($branch_ids);
             }
+            if (!empty($accessibility_ids)) {
+                foreach ($accessibility_ids as $sml_id) {
+                    Accessibilities::create([
+                        'user_id' => $user->id,
+                        'sml_id' => $sml_id,
+                        'date_created' => Carbon::now()
+                    ]);
+                }
+            }
+            $user->load('userBranch');
+            $branchesData = $user->userBranch->map(function($branch) {
+                return [
+                    'branch_id' => $branch->branch_id,
+                    'branch_name' => $branch->branch_name ?? $branch->name
+                ];
+            });
+            $accessibilitiesData = Accessibilities::where('user_id', $user->id)
+                ->get()
+                ->map(function($accessibility) {
+                    return [
+                        'sml_id' => $accessibility->sml_id,
+                    ];
+            });
+            $userSnapshot = $user->getAttributes();
+            $personSnapshot = $person->getAttributes();
+            $modelSnapshot = array_merge($userSnapshot, [
+                'personal_info' => $personSnapshot,
+                'branches' => $branchesData->toArray(),
+                'accessibilities' => $accessibilitiesData->toArray()
+            ]);
+            activity("System Setup")->event("created")->performedOn($user)
+                ->withProperties([
+                    'model_snapshot' => $modelSnapshot
+                ])
+                ->log("User Master File - Create");
 
             return json_encode('create');
         } else {
             $user = User::find($user_id);
             $replicate = $user->replicate();
+            $oldPerson = PersonalInfo::where('personal_info_id', $user->personal_info_id)->first();
+            $oldPersonData = $oldPerson ? $oldPerson->getAttributes() : [];
+            $oldBranches = $user->userBranch->map(function($branch) {
+                return [
+                    'branch_id' => $branch->branch_id,
+                    'branch_name' => $branch->branch_name ?? $branch->name
+                ];
+            })->toArray();
+            $oldAccessibilities = Accessibilities::where('user_id', $user->id)
+                ->get()
+                ->map(function($accessibility) {
+                    return [
+                        'sml_id' => $accessibility->sml_id,
+                    ];
+            })->toArray();
             $user->username = $request->username;
             if (!empty($request->password)) {
                 $user->password = bcrypt($request->password);
@@ -216,9 +329,19 @@ class SystemSetupController extends MainController
             $user->status = $request->status;
             $user->role_id = $request->role_id;
             $user->save();
-
             $user->userBranch()->sync($branch_ids);
-
+            if ($request->has('accessibility_ids')) {
+                Accessibilities::where('user_id', $user->id)->delete();
+                if (!empty($accessibility_ids)) {
+                    foreach ($accessibility_ids as $sml_id) {
+                        Accessibilities::create([
+                            'user_id' => $user->id,
+                            'sml_id' => $sml_id,
+                            'date_created' => Carbon::now()
+                        ]);
+                    }
+                }
+            }
             PersonalInfo::where('personal_info_id', $user->personal_info_id)->update([
                 'fname' => $request->fname,
                 'mname' => $request->mname,
@@ -229,44 +352,166 @@ class SystemSetupController extends MainController
                 'phone_number' => $request->phone_number
             ]);
             $changes = getChanges($user, $replicate);
-            activity("System Setup")->event("updated")->performedOn($user)
-                ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
-                ->log("Journal Book - Update");
+            unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+            $user->load('userBranch');
+            $newPerson = PersonalInfo::where('personal_info_id', $user->personal_info_id)->first();
+            $newPersonData = $newPerson ? $newPerson->getAttributes() : [];
+            
+            $newBranches = $user->userBranch->map(function($branch) {
+                return [
+                    'branch_id' => $branch->branch_id,
+                    'branch_name' => $branch->branch_name ?? $branch->name
+                ];
+            })->toArray();
+            $newAccessibilities = Accessibilities::where('user_id', $user->id)
+                ->get()
+                ->map(function($accessibility) {
+                    return [
+                        'sml_id' => $accessibility->sml_id,
+                    ];
+            })->toArray();
+            $personChanged = false;
+            $personChanges = [];
+            foreach ($newPersonData as $key => $value) {
+                if ($key !== 'updated_at' && isset($oldPersonData[$key]) && $oldPersonData[$key] != $value) {
+                    $personChanged = true;
+                    $personChanges[$key] = $value;
+                }
+            }
+            $branchesChanged = $oldBranches != $newBranches;
+            $accessibilitiesChanged = $oldAccessibilities != $newAccessibilities;
+            $userSnapshot = $user->getAttributes();
+            $modelSnapshot = array_merge($userSnapshot, [
+                'personal_info' => $newPersonData,
+                'branches' => $newBranches,
+                'accessibilities' => $newAccessibilities
+            ]);
+            if (!empty($changes['attributes']) || $personChanged || $branchesChanged || $accessibilitiesChanged) {
+                $properties = [
+                    'model_snapshot' => $modelSnapshot,
+                    'attributes' => $changes['attributes'], 
+                    'old' => $changes['old']
+                ];
+                if ($personChanged) {
+                    $properties['attributes']['personal_info'] = $personChanges;
+                    $oldPersonChanges = [];
+                    foreach ($personChanges as $key => $value) {
+                        $oldPersonChanges[$key] = $oldPersonData[$key];
+                    }
+                    $properties['old']['personal_info'] = $oldPersonChanges;
+                }
+                if ($branchesChanged) {
+                    $properties['attributes']['branches'] = $newBranches;
+                    $properties['old']['branches'] = $oldBranches;
+                }
+                if ($accessibilitiesChanged) {
+                    $properties['attributes']['accessibilities'] = $newAccessibilities;
+                    $properties['old']['accessibilities'] = $oldAccessibilities;
+                }
+                activity("System Setup")->event("updated")->performedOn($user)
+                    ->withProperties($properties)
+                    ->log("User Master File - Update");
+            }
+
             return json_encode('update');
         }
     }
     public function categoryFileCreateOrUpdate(Request $request)
     {
         $cat_id = $request->catId;
-        if (count(SubsidiaryCategory::where('sub_cat_id', $request->cat_id)->get()) > 0) {
-            return json_encode(['status' => 'error', 'message' => 'Category File Code Already Exist']);
+        $isDuplicate = SubsidiaryCategory::where('sub_cat_code', $request->sub_cat_code)
+            ->when($cat_id, function($query) use ($cat_id) {
+                return $query->where('sub_cat_id', '!=', $cat_id);
+            })
+            ->exists();
+        if ($isDuplicate) {
+            return json_encode([
+                'status' => 'sub_cat_code_duplicate', 
+                'message' => 'Category code already exists. Please enter a unique code.'
+            ]);
         }
-
-        if ($cat_id == '') {
+        if (empty($cat_id)) {
             $cat = new SubsidiaryCategory;
             $cat->sub_cat_code = $request->sub_cat_code;
             $cat->sub_cat_name = $request->sub_cat_name;
             $cat->sub_cat_type = $request->sub_cat_type;
             $cat->description = $request->cat_description;
-
             $cat->save();
-            activity("System Setup")->event("created")->performedOn($cat)
-                ->log("Category - Create");
 
+            $categoryAccounts = [
+                $request->account_id => ['transaction_type' => 'credit'],
+                $request->account_id_debit => ['transaction_type' => 'debit'],
+            ];
+            $cat->accounts()->attach($categoryAccounts);
+            $cat->load('accounts');
+            $accountsData = $cat->accounts->map(function($account) {
+                return [
+                    'account_id' => $account->account_id,
+                    'account_name' => $account->account_name,
+                    'transaction_type' => $account->pivot->transaction_type
+                ];
+            });
+            $modelSnapshot = $cat->getAttributes();
+            activity("System Setup")->event("created")->performedOn($cat)
+                ->withProperties([
+                    'model_snapshot' => array_merge($modelSnapshot, [
+                            'accounts' => $accountsData->toArray()
+                        ])
+                ])
+                ->log("Category File - Create");
             return json_encode(['status' => 'create', 'sub_cat_id' => $cat->sub_cat_id]);
         } else {
             $cat = SubsidiaryCategory::find($cat_id);
             $replicate = $cat->replicate();
+            $oldAccounts = $cat->accounts->map(function($account) {
+                return [
+                    'account_id' => $account->account_id,
+                    'account_name' => $account->account_name,
+                    'transaction_type' => $account->pivot->transaction_type
+                ];
+            })->toArray();
             $cat->sub_cat_code = $request->sub_cat_code;
             $cat->sub_cat_name = $request->sub_cat_name;
             $cat->sub_cat_type = $request->sub_cat_type;
             $cat->description = $request->cat_description;
-
             $cat->save();
+            
+            $categoryAccounts = [
+                $request->account_id => ['transaction_type' => 'credit'],
+                $request->account_id_debit => ['transaction_type' => 'debit'],
+            ];
+            $cat->accounts()->sync($categoryAccounts);
+            $categoryAccounts = [
+                $request->account_id => ['transaction_type' => 'credit'],
+                $request->account_id_debit => ['transaction_type' => 'debit'],
+            ];
             $changes = getChanges($cat, $replicate);
-            activity("System Setup")->event("updated")->performedOn($cat)
-                ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
-                ->log("Category - Update");
+            unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+            $cat->load('accounts');
+            $newAccounts = $cat->accounts->map(function($account) {
+                return [
+                    'account_id' => $account->account_id,
+                    'account_name' => $account->account_name,
+                    'transaction_type' => $account->pivot->transaction_type
+                ];
+            })->toArray();
+            $modelSnapshot = $cat->getAttributes();
+            $accountsChanged = $oldAccounts != $newAccounts;
+            if (!empty($changes['attributes']) || $accountsChanged) {
+                $properties = [
+                    'model_snapshot' => array_merge($modelSnapshot, ['accounts' => $newAccounts]),
+                    'attributes' => $changes['attributes'], 
+                    'old' => $changes['old']
+                ];
+                if ($accountsChanged) {
+                    $properties['attributes']['accounts'] = $newAccounts;
+                    $properties['old']['accounts'] = $oldAccounts;
+                }
+                
+                activity("System Setup")->event("updated")->performedOn($cat)
+                    ->withProperties($properties)
+                    ->log("Category File - Update");
+            }
             return json_encode(['status' => 'update', 'sub_cat_id' => $cat->sub_cat_id]);
         }
     }
@@ -274,28 +519,65 @@ class SystemSetupController extends MainController
     public function fetchCategoryInfo(Request $request)
     {
         $cat_id = $request->catId;
-        return json_encode(SubsidiaryCategory::where('sub_cat_id', $cat_id)->get());
+        
+        $category = SubsidiaryCategory::with('accounts')
+            ->where('sub_cat_id', $cat_id)
+            ->first();
+        
+        if ($category) {
+            $accounts = $category->accounts->groupBy('pivot.transaction_type');
+            
+            return json_encode([[
+                'sub_cat_id' => $category->sub_cat_id,
+                'sub_cat_code' => $category->sub_cat_code,
+                'sub_cat_name' => $category->sub_cat_name,
+                'sub_cat_type' => $category->sub_cat_type,
+                'description' => $category->description,
+                'account_credit' => $accounts->get('credit')?->first()?->account_id,
+                'account_debit' => $accounts->get('debit')?->first()?->account_id,
+            ]]);
+        }
+        
+        return json_encode([]);
     }
 
     public function deleteCategoryFile(Request $request)
     {
         $cat_id = $request->catId;
-        $category = SubsidiaryCategory::find($cat_id)->delete();
+        $category = SubsidiaryCategory::with('accounts')->find($cat_id);
+        if (!$category) {
+            return json_encode(['status' => 'error', 'message' => 'Category not found.']);
+        }
+        if ($category->subsidiaries()->exists()) {
+            return json_encode([
+                'status' => 'error', 
+                'message' => 'Cannot delete. This category is already used in other records.'
+            ]);
+        }
+        $accountsData = $category->accounts->map(function($account) {
+            return [
+                'account_id' => $account->account_id,
+                'account_name' => $account->account_name,
+                'transaction_type' => $account->pivot->transaction_type
+            ];
+        });
+        $modelSnapshot = $category->getAttributes();
         activity("System Setup")->event("deleted")->performedOn($category)
-            ->log("Category - Delete");
-        return json_encode($category);
+            ->withProperties([
+                'model_snapshot' => array_merge($modelSnapshot, [
+                        'accounts' => $accountsData->toArray()
+                    ]),
+                'old' => array_merge($modelSnapshot, [
+                        'accounts' => $accountsData->toArray()
+                    ])
+            ])
+            ->log("Category File - Delete");
+
+        $category->accounts()->detach();
+        $category->delete();
+        return json_encode(['status' => 'success', 'message' => 'Successfully deleted.']);
     }
 
-    public function userMasterFileCreateOrUpdateAccessibility(Request $request)
-    {
-        if (Accessibilities::where(['user_id' => $request->user_id, 'sml_id' => $request->sml_id])->count() > 0) {
-            Accessibilities::where(['user_id' => $request->user_id, 'sml_id' => $request->sml_id])->delete();
-            return 'removed';
-        } else {
-            Accessibilities::create(['user_id' => $request->user_id, 'sml_id' => $request->sml_id, 'date_created' => Carbon::now()]);
-            return 'added';
-        }
-    }
     public function searchAccount(Request $request)
     {
         $name = strtolower(trim($request->name));
@@ -324,15 +606,47 @@ class SystemSetupController extends MainController
     }
     public function fetchInfo(Request $request)
     {
-        $personalInfo = PersonalInfo::where('personal_info_id', $request->p_id)
-            ->with([
-                'userInfo.accessibilities',
-                'userInfo.userBranch',
-                'userInfo.userRole'
-            ])
+        $personalInfo = PersonalInfo::where('personal_info_id', $request->p_id)->first();
+        if (!$personalInfo) {
+            return response()->json(['error' => 'Personal info not found'], 404);
+        }
+        $response = [
+            'fname' => $personalInfo->fname,
+            'mname' => $personalInfo->mname,
+            'lname' => $personalInfo->lname,
+            'gender' => $personalInfo->gender,
+            'displayname' => $personalInfo->displayname,
+            'email_address' => $personalInfo->email_address,
+            'phone_number' => $personalInfo->phone_number,
+            'user_info' => null
+        ];
+        $user = User::where('personal_info_id', $request->p_id)
+            ->with(['userBranch']) 
             ->first();
-
-        return response()->json($personalInfo);
+        if ($user) {
+            $accessibilities = Accessibilities::where('user_id', $user->id)
+                ->get()
+                ->map(function($accessibility) {
+                    return [
+                        'sml_id' => $accessibility->sml_id,
+                        'date_created' => $accessibility->date_created
+                    ];
+                });
+            $response['user_info'] = [
+                'id' => $user->id,
+                'username' => $user->username,
+                'status' => $user->status,
+                'role_id' => $user->role_id,
+                'user_branch' => $user->userBranch->map(function($branch) {
+                    return [
+                        'branch_id' => $branch->branch_id,
+                        'branch_name' => $branch->branch_name ?? $branch->name
+                    ];
+                })->toArray(),
+                'accessibilities' => $accessibilities->toArray()
+            ];
+        }
+        return response()->json($response);
     }
 
     public function currencyUpdate(Request $request)
@@ -343,9 +657,15 @@ class SystemSetupController extends MainController
         $currency->status = 'active';
         $currency->save();
         $changes = getChanges($currency, $replicate);
-        activity("System Setup")->event("updated")->performedOn($currency)
-            ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
-            ->log("Currency - Update");
+        unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+        if (!empty($changes['attributes'])) {
+            activity("System Setup")->event("updated")->performedOn($currency)
+                ->withProperties([
+                    'model_snapshot' => $currency->toArray(),
+                    'attributes' => $changes['attributes'],
+                    'old' => $changes['old']])
+                ->log("Currency - Update");
+        }
         Session::flash('success', 'Currency updated successfully.');
         return redirect(route('systemSetup'));
     }
