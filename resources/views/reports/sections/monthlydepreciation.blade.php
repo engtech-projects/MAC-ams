@@ -482,9 +482,12 @@
                 filter: {
                     branch: null,
                     subsidiary_id: '',
-                    category: null,
+                    category: {
+                        "sub_cat_id": 51,
+                        "sub_cat_name": "Additional Prepaid Expense"
+                    },
                     from: '',
-                    to: '',
+                    to: '2025-01-02',
                     account_id: '',
                     type: ''
                 },
@@ -814,10 +817,10 @@
                                                     subsidiary.due_amort !== undefined && subsidiary
                                                     .due_amort !== null ?
                                                     parseFloat(subsidiary
-                                                    .due_amort) // ✅ show due_amort if it exists
+                                                        .due_amort) // ✅ show due_amort if it exists
                                                     :
                                                     parseFloat(subsidiary
-                                                    .monthly_due) // ✅ fallback to monthly_due
+                                                        .monthly_due) // ✅ fallback to monthly_due
                                                 )
                                             ),
                                             this.formatCurrency(subsidiary.salvage),
@@ -844,7 +847,7 @@
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
                                         // For Total Due Amort Fix
                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary
-                                            .sub_no_depre)) {
+                                                .sub_no_depre)) {
                                             total_due_amort += 0.00;
                                         } else if (subsidiary.due_amort !== undefined && subsidiary
                                             .due_amort !== null) {
