@@ -226,7 +226,7 @@ class ReportsController extends MainController
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
-            $subs['monthly_due'] = $value->monthly_due; 
+            $subs['monthly_due'] = $value->monthly_due;
             $subs['used'] = $value->depreciation_payments->count();
 
             // Calculate prepaid expense payments first
@@ -386,7 +386,7 @@ class ReportsController extends MainController
             $as_of->subDays(2);
         }
 
-        
+
         $journalEntry = new JournalEntry();
 
         $accountName = null;
@@ -439,7 +439,8 @@ class ReportsController extends MainController
                 $subCategory = $subsidiaryCategory->sub_cat_code;
                 $accountNumber = Accounts::DEPRECIATION_ACCOUNTS[$subCategory] ?? Accounts::DEPRECIATION_DEFAULT_ACCOUNT;
                 if ($subCategory === SubsidiaryCategory::INSUR_ADD) {
-                    $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
+                    /* $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id; */
+                    $subId = $sub['branch_code'] === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
                 }
                 $accountName = Accounts::where('account_number', $accountNumber)->pluck('account_name')->first();
                 $totalBranchDue += $sub['amount_to_depreciate'];
@@ -484,7 +485,7 @@ class ReportsController extends MainController
                 $details['journal_details_debit'] = $half;
                 $details["subsidiary_id"] = 1;
                 $journalDetails[] = $details;
-                $secondHalf = $originalAmount - $half; 
+                $secondHalf = $originalAmount - $half;
                 $details['journal_details_debit'] = $secondHalf;
                 $details["subsidiary_id"] = 2;
                 $journalDetails[] = $details;
@@ -525,7 +526,7 @@ class ReportsController extends MainController
     {
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
-       
+
         if ($as_of->isSaturday()) {
             $as_of->subDay();
         } elseif ($as_of->isSunday()) {
@@ -962,13 +963,13 @@ class ReportsController extends MainController
             $branchId = session()->get("auth_user_branch");
         }
         $collections = CollectionBreakdown::getCollectionBreakdownByBranch(
-            $transactionDate, 
-            $branchId, 
+            $transactionDate,
+            $branchId,
             $perPage
         );
         $message = $collections->total() > 0 ? "Collections fetched." : "No record found.";
         return response()->json([
-            'message' => $message, 
+            'message' => $message,
             'data' => [
                 'collections' => $collections->items(),
                 'branch' => $branchId ? Branch::find($branchId) : null,
