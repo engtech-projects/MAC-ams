@@ -482,12 +482,9 @@
                 filter: {
                     branch: null,
                     subsidiary_id: '',
-                    category: {
-                        "sub_cat_id": 51,
-                        "sub_cat_name": "Additional Prepaid Expense"
-                    },
+                    category: null,
                     from: '',
-                    to: '2025-01-02',
+                    to: '',
                     account_id: '',
                     type: ''
                 },
@@ -810,17 +807,12 @@
                                             this.formatCurrency(subsidiary.unexpensed),
                                             // Fix Amort and Remaining
                                             this.formatCurrency(
-                                                parseFloat(subsidiary.used) === parseFloat(subsidiary
-                                                    .sub_no_depre) ?
-                                                0.00 :
-                                                (
-                                                    subsidiary.due_amort !== undefined && subsidiary
-                                                    .due_amort !== null ?
-                                                    parseFloat(subsidiary
-                                                        .due_amort) // ✅ show due_amort if it exists
-                                                    :
-                                                    parseFloat(subsidiary
-                                                        .monthly_due) // ✅ fallback to monthly_due
+                                               parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)
+                                                ? 0.00
+                                                : (
+                                                    subsidiary.due_amort !== undefined && subsidiary.due_amort !== null
+                                                        ? parseFloat(subsidiary.due_amort)   // ✅ show due_amort if it exists
+                                                        : parseFloat(subsidiary.monthly_due) // ✅ fallback to monthly_due
                                                 )
                                             ),
                                             this.formatCurrency(subsidiary.salvage),
@@ -846,11 +838,9 @@
                                         total_used += parseInt(subsidiary.used)
                                         total_unexpensed += parseFloat(subsidiary.unexpensed)
                                         // For Total Due Amort Fix
-                                        if (parseFloat(subsidiary.used) === parseFloat(subsidiary
-                                                .sub_no_depre)) {
+                                         if (parseFloat(subsidiary.used) === parseFloat(subsidiary.sub_no_depre)) {
                                             total_due_amort += 0.00;
-                                        } else if (subsidiary.due_amort !== undefined && subsidiary
-                                            .due_amort !== null) {
+                                        } else if (subsidiary.due_amort !== undefined && subsidiary.due_amort !== null) {
                                             total_due_amort += parseFloat(subsidiary.due_amort);
                                         } else {
                                             total_due_amort += parseFloat(subsidiary.monthly_due);
@@ -1502,7 +1492,7 @@
                 processPayment() {
 
                     const newBalance = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
-
+                    
                     this.sub.amount_to_depreciate = newBalance;
                     this.sub.amort = newBalance;
 
@@ -1526,9 +1516,8 @@
                         const index = rows.findIndex(item => item.sub_id === subId);
                         if (index !== -1) {
                             const updated = {
-                                ...rows[index]
-                            };
-
+                                ...rows[index]  };
+                            
                             this.$set(updated, "amort", newBalance);
                             updated.due_amort = Number(this.newRemBalance.replace(/[^0-9\.-]+/g, ""));
                             const newArray = [...rows];
@@ -1768,7 +1757,7 @@
                             }
                         })
                         .then(response => {
-
+                            
                             this.subsidiaryAll = response.data.data;
                             const raw = response.data.data
                             const allItems = Object.values(raw)
