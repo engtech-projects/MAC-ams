@@ -961,31 +961,12 @@ class ReportsController extends MainController
         } else {
             $branchId = session()->get("auth_user_branch");
         }
-        /* $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
         $message = $collections->count() > 0 ? "Collections fetched." : "No record found.";
         return response()->json(['message' => $message, 'data' => [
             'collections' => $collections,
             'branch' => $branchId ? Branch::find($branchId) : null
-        ]]); */
-        $collections = CollectionBreakdown::getCollectionBreakdownByBranch(
-            $transactionDate,
-            $branchId,
-            $perPage
-        );
-        $message = $collections->total() > 0 ? "Collections fetched." : "No record found.";
-        return response()->json([
-            'message' => $message,
-            'data' => [
-                'collections' => $collections->items(),
-                'branch' => $branchId ? Branch::find($branchId) : null,
-                'current_page' => $collections->currentPage(),
-                'last_page' => $collections->lastPage(),
-                'per_page' => $collections->perPage(),
-                'total' => $collections->total(),
-                'from' => $collections->firstItem(),
-                'to' => $collections->lastItem(),
-            ]
-        ]);
+        ]]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)
