@@ -482,9 +482,12 @@
                 filter: {
                     branch: null,
                     subsidiary_id: '',
-                    category: null,
-                    from: '',
-                    to: '',
+                    category: {
+                        "sub_cat_id": 51,
+                        "sub_cat_name": "Additional Prepaid Expense"
+                    },
+                    from: '2025-14-10',
+                    to: '2025-10-14',
                     account_id: '',
                     type: ''
                 },
@@ -531,8 +534,8 @@
                     non_dynamic: [],
                     dynamic: [],
                     category: null,
-                    date: null,
-                    branches: []
+                    date: '2025-14-10',
+                    branches: [],
                 },
                 subsidiaryList: {
                     sub_to_depreciate: [],
@@ -1313,6 +1316,7 @@
                         this.subsidiaryList.date = this.filter.to
                         this.subsidiaries.category = this.filter.category;
                         this.subsidiaries.date = this.filter.to
+                        this.subsidiaries.branch = this.filter.branch
                         this.subsidiaries.non_dynamic.map(item => {
                             item.rem = 1
                             return item;
