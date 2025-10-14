@@ -629,7 +629,7 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.check_amount"
                                                                 @keydown.enter="nextTextField('pos_amount')"
-                                                                ref="check_amount" @change="calculateTotal()"
+                                                                ref="check_amount"
                                                                 class="form-control form-control-sm rounded-0 text-right"
                                                                 required placeholder="0.00">
                                                         </td>
@@ -652,7 +652,6 @@
                                                             <input type="number"
                                                                 v-model="collectionBreakdown.other_payment.memo_amount"
                                                                 ref="memo_amount" @keydown.enter="nextTextField('p_10')"
-                                                                @change="calculateTotal()"
                                                                 class="form-control form-control-sm rounded-0 text-right">
                                                         </td>
                                                     </tr>
@@ -723,7 +722,7 @@
                                 <td>@{{ formatCurrency(d.cash_ending_balance) }}</td>
                                 <td>@{{ formatCurrency(d.total) }}</td>
                                 <td>@{{ formatDifference(d.cash_ending_balance - d.total) }}</td>
-                                <td>@{{ d.status }}</td>
+                                <td style="width: 80px;text-transform: capitalize;">@{{ d.status }}</td>
                                 <td>
                                     <button @click="showCashBlotter(d.collection_id, d.branch_id)"
                                         class="mr-1 btn btn-xs btn-success">
@@ -745,10 +744,11 @@
                                         <i class="fas fa-xs fa-print print-cashblotter"></i>
                                     </button>
                                     @if (Gate::allows('manager'))
-                                        <button class="mr-1 btn btn-xs btn-primary"
-                                            @click="updateStatus(d,'posted')">Post</button>
-                                        <button class="mr-1 btn btn-xs btn-warning"
-                                            @click="updateStatus(d,'unposted')">Unpost</button>
+                                        <button 
+                                            :class="['mr-1 btn btn-xs', d.status === 'posted' ? 'btn-warning' : 'btn-primary']" style="width: 80px;"
+                                            @click="updateStatus(d, d.status === 'posted' ? 'unposted' : 'posted')">
+                                            @{{ d.status === 'posted' ? 'Unpost' : 'Post' }}
+                                        </button>
                                     @endif
                                 </td>
                             </tr>
@@ -761,6 +761,56 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div v-if="pagination.last_page > 1" class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-muted">
+                            Showing @{{ pagination.from }} to @{{ pagination.to }} of @{{ pagination.total }} entries
+                        </div>
+                        <div class="btn-group">
+                            <button 
+                                class="btn btn-sm btn-outline-secondary" 
+                                @click="changePage(1)"
+                                :disabled="pagination.current_page === 1">
+                                First
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-outline-secondary" 
+                                @click="changePage(pagination.current_page - 1)"
+                                :disabled="pagination.current_page === 1">
+                                Previous
+                            </button>
+                            <button 
+                                v-for="page in visiblePages" 
+                                :key="page"
+                                class="btn btn-sm"
+                                :class="page === pagination.current_page ? 'btn-primary' : 'btn-outline-secondary'"
+                                @click="changePage(page)">
+                                @{{ page }}
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-outline-secondary" 
+                                @click="changePage(pagination.current_page + 1)"
+                                :disabled="pagination.current_page === pagination.last_page">
+                                Next
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-outline-secondary" 
+                                @click="changePage(pagination.last_page)"
+                                :disabled="pagination.current_page === pagination.last_page">
+                                Last
+                            </button>
+                        </div>
+                        <select 
+                            class="form-control form-control-sm" 
+                            style="width: 100px;"
+                            v-model="pagination.per_page"
+                            @change="changePerPage(pagination.per_page)">
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1168,9 +1218,27 @@
                 statusUpdate: false,
                 loading: false,
                 selectedBranch: '',
-                selectedDate: ''
+                selectedDate: '',
+                pagination: {
+                    current_page: 1,
+                    last_page: 1,
+                    per_page: 15,
+                    total: 0,
+                    from: 0,
+                    to: 0
+                }
             },
             methods: {
+                changePage: function(page) {
+                    if (page === '...' || page < 1 || page > this.pagination.last_page) return;
+                    this.pagination.current_page = parseInt(page);
+                    this.filterCollections();
+                },
+                changePerPage: function(perPage) {
+                    this.pagination.per_page = parseInt(perPage);
+                    this.pagination.current_page = 1;
+                    this.filterCollections();
+                },
                 nextTextField: function(textField) {
                     const nextInput = this.$refs[textField]
                     if (nextInput) {
@@ -1328,7 +1396,7 @@
                     this.collectionBreakdown.other_payment.cash_amount = parseFloat(this.aoCollectionTotal);
                     this.collectionBreakdown.other_payment.pos_amount = parseFloat(this.posCollectionTotal);
                     this.collectionBreakdown.total = totalCash;
-                    axios.post('/collections', this.collectionBreakdown, {
+                    axios.post('cash-blotter/collections', this.collectionBreakdown, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
                                 .content
@@ -1485,12 +1553,14 @@
                         toastr.error("Unable to edit posted transaction.");
                         this.closeModal();
                     } else {
-                        axios.get('/collection-breakdown/' + collectionBreakdown.collection_id, {
-                            headers: {
-                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
-                            }
-                        }).then(response => {
-                            var cb = response.data.data.collections;
+                        axios.get('/collection-breakdown/' + collectionBreakdown
+                                .collection_id, {
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                            .content
+                                    }
+                                }).then(response => {
+                                var cb = response.data.data.collections;
 
                                 if (!cb.other_payment) {
                                     cb.other_payment = {
@@ -1611,17 +1681,9 @@
                         toastr.success(response.data.message);
                         this.isUpdateStatus = false;
                         this.closeModal();
-
-                        this.selectedBranch = this.collectionBreakdown.branch_id;
-                        this.selectedDate = this.collectionBreakdown.transaction_date;
-
-                        if (this.$refs.branchFilter) {
-                            this.$refs.branchFilter.branch_id = this.collectionBreakdown.branch_id;
-                        }
-
-                        // this.$nextTick(() => {
-                        //     this.filterCollections();
-                        // });
+                        this.$nextTick(() => {
+                            this.filterCollections();
+                        });
                     }).catch(err => {
                         toastr.error(err.response.data.message);
                     })
@@ -1647,22 +1709,37 @@
                 },
                 filterCollections: function() {
                     this.loading = true;
-                    var data = {
+                    const data = {
                         transaction_date: this.selectedDate,
-                        branch_id: this.selectedBranch
-                    }
-                    var url = "{{ route('reports.cashTransactionBlotter') }}"
+                        branch_id: this.selectedBranch,
+                        per_page: this.pagination.per_page,
+                        page: this.pagination.current_page
+                    };
+                    const url = "{{ route('reports.cashTransactionBlotter') }}";
                     axios.post(url, data)
                         .then(response => {
-                            this.data = response.data.data
+                            const responseData = response.data.data;
+                            this.data = {
+                                collections: responseData.collections,
+                                branch: responseData.branch
+                            };
+                            this.pagination = {
+                                current_page: responseData.current_page,
+                                last_page: responseData.last_page,
+                                per_page: responseData.per_page,
+                                total: responseData.total,
+                                from: responseData.from,
+                                to: responseData.to
+                            };
                             toastr.success(response.data.message);
-                        }).catch(error => {
+                        })
+                        .catch(error => {
                             console.error(error);
+                            toastr.error('Failed to filter collections');
                         })
                         .finally(() => {
                             this.loading = false;
                         });
-
                 },
                 showCashBlotter: function(id, branch_id) {
                     var url = "{{ route('reports.showCashBlotter', ['id' => 'cid']) }}".replace('cid', id);
@@ -1748,6 +1825,33 @@
                 }
             },
             computed: {
+                visiblePages: function() {
+                    const current = this.pagination.current_page;
+                    const last = this.pagination.last_page;
+                    const delta = 2;
+                    const pages = [];
+                    
+                    for (let i = Math.max(2, current - delta); i <= Math.min(last - 1, current + delta); i++) {
+                        pages.push(i);
+                    }
+                    
+                    if (current - delta > 2) {
+                        pages.unshift('...');
+                    }
+                    if (current + delta < last - 1) {
+                        pages.push('...');
+                    }
+                    
+                    pages.unshift(1);
+                    if (last > 1) {
+                        pages.push(last);
+                    }
+                    
+                    return pages.filter(p => p !== '...' || pages.indexOf(p) === pages.lastIndexOf(p));
+                },
+                collectionsBreakdown: function() {
+                    return this.data.collections || this.data
+                },
                 total_interbranch_collection: function() {
                     return this.collections.branch_collections ? this.collections.branch_collections.reduce((
                             sum, item) => sum + item.total_amount,

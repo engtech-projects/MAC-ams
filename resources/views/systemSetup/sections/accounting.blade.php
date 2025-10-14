@@ -27,7 +27,7 @@
 				<div class="form-group" style="">
 					<label class="label-normal" for="method">Method</label>
 					<select name="method" class="form-control form-control-sm" id="">
-						<option value="" disabled selected></option>
+						<option value="" disabled {{ empty($accounting->method) ? 'selected' : '' }}>Select Method</option>
 						@if($accounting)
 						<option value="accrual" {{$accounting->method == 'accrual' ? 'selected' : ''}}>Accrual</option>
 						<option value="cash" {{$accounting->method == 'cash' ? 'selected' : ''}}>Cash</option>

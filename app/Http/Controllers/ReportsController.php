@@ -962,6 +962,7 @@ class ReportsController extends MainController
     public function searchCashTransactionBlotter(Request $request)
     {
         $transactionDate = $request["transaction_date"];
+        $perPage = $request->input('per_page', 15);
         $branchId = null;
         if (Gate::allows('manager')) {
             if (isset($request->branch_id)) {
@@ -970,12 +971,25 @@ class ReportsController extends MainController
         } else {
             $branchId = session()->get("auth_user_branch");
         }
-        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
-        $message = $collections->count() > 0 ? "Collections fetched." : "No record found.";
-        return response()->json(['message' => $message, 'data' => [
-            'collections' => $collections,
-            'branch' => $branchId ? Branch::find($branchId) : null
-        ]]);
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch(
+            $transactionDate,
+            $branchId,
+            $perPage
+        );
+        $message = $collections->total() > 0 ? "Collections fetched." : "No record found.";
+        return response()->json([
+            'message' => $message,
+            'data' => [
+                'collections' => $collections->items(),
+                'branch' => $branchId ? Branch::find($branchId) : null,
+                'current_page' => $collections->currentPage(),
+                'last_page' => $collections->lastPage(),
+                'per_page' => $collections->perPage(),
+                'total' => $collections->total(),
+                'from' => $collections->firstItem(),
+                'to' => $collections->lastItem(),
+            ]
+        ]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)
@@ -1296,6 +1310,7 @@ class ReportsController extends MainController
             'amount' => 0,
             'payee' => $journalEntry::CLOSING_SOURCE
         ]);
+
         $details = [];
         foreach ($accounts as $i => $category) {
             foreach ($category['types'] as $type) {
@@ -1339,6 +1354,10 @@ class ReportsController extends MainController
         $details[] = $lastIndex;
         try {
             $entry->details()->createMany($details);
+            $entry->load('details');
+            activity("Income Statement")->event("created")->performedOn($entry)
+                ->withProperties(['model_snapshot' => $entry->toArray()])
+                ->log("Closing Period - Create");
         } catch (\Exception $e) {
             return response()->json([
                 'data' => $e->getMessage(),
@@ -1348,7 +1367,7 @@ class ReportsController extends MainController
 
         return response()->json([
             "data" => $accounts,
-            "message" => "Closing Period entry successfully created."
+            "message" => "Period closed successfully."
         ]);
     }
 
