@@ -1787,7 +1787,7 @@
                             this.subsidiaries.non_dynamic = allItems.map(item => {
                                 var diff = item.rem - item.used;
 
-                                var dueAmort = item.due_amort;
+                                var dueAmort =  item.due_amort;
                                 if (item.rem == 1) {
                                     dueAmort = item.unexpensed
                                 }
@@ -1796,6 +1796,7 @@
                                 if (item.rem == 0) {
                                     dueAmort = 0.00;
                                 }
+                                console.log(item);
                                 return {
                                     'sub_id': item.sub_id,
                                     'amount': item.sub_amount,
@@ -1804,7 +1805,7 @@
                                     'rem': item.rem,
                                     'monthly_due': item.monthly_due,
                                     'amort': item.sub_no_amort,
-                                    'amount_to_depreciate': dueAmort,
+                                    'amount_to_depreciate': this.filter.category?.sub_cat_name == 'Additional Prepaid Expense' ? item.unposted_payments : dueAmort,
                                     'used': item.sub_no_depre,
                                     'payment_ids': item.payment_ids,
                                     'branch_id': item.branch_id,
