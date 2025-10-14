@@ -407,11 +407,12 @@ class ReportsController extends MainController
                 ->sum('amount_to_depreciate');
         } else {
         }
+        $totalPrepaidExpense = collect($attributes['non_dynamic'])
+            ->merge($attributes['dynamic'])
+            ->sum('amount_to_depreciate');
         foreach ($branch_sub as $branchKey => $branch) {
 
-            $totalPrepaidExpense = collect($attributes['non_dynamic'])
-                ->merge($attributes['dynamic'])
-                ->sum('amount_to_depreciate');
+
             $totalBranchDue = 0;
             $branchId = null;
             foreach ($branch as $subKey => $sub) {
@@ -428,8 +429,7 @@ class ReportsController extends MainController
                             ]);
                         }
                     }
-                    if ($category_id === 51) {
-                        foreach ($request->sub_ids as $subId) {
+                    if ($attributes['category']['sub_cat_name'] == SubsidiaryCategory::ADDTIONAL_PREPAID_EXP) {
                             if ($subsidiary->prepaid_expense) {
                                 $payment = $subsidiary->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->first();
                                 if ($payment) {
@@ -437,7 +437,6 @@ class ReportsController extends MainController
                                 }
                                 $subsidiary->prepaid_expense->save();
                             }
-                        }
                     }
                     if ($subsidiary->sub_no_depre > $subsidiary->sub_no_amort) {
                         $subsidiary->sub_no_amort = $subsidiary->sub_no_amort + $sub['rem'];
