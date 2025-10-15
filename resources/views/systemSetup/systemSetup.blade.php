@@ -539,13 +539,13 @@
                                                         v-model="editRow.start_date"
                                                         :min="getStartMonth(editRow.start_date)"
                                                         :max="getEndMonth(row.end_date)" />
-                                                    <span v-else>@{{ row.start_date }}</span>
+                                                    <span v-else>@{{ formatDate(row.start_date) }}</span>
                                                 </td>
                                                 <td>
                                                     <input class="form-control" v-if="editIndex === index" type="date"
                                                         v-model="editRow.end_date" :min="getStartMonth(editRow.start_date)"
                                                         :max="getEndMonth(editRow.end_date)">
-                                                    <span v-else>@{{ row.end_date }}</span>
+                                                    <span v-else>@{{ formatDate(row.end_date) }}</span>
                                                 </td>
                                                 <td>
                                                     <select class="form-control" v-if="editIndex === index"
@@ -1016,6 +1016,12 @@
                         console.error(err)
                     })
                 },
+
+                formatDate(dateString){
+                    if (!dateString) return '';
+                        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                        return new Date(dateString).toLocaleDateString('en-US', options);
+                }
             },
             mounted() {
                 this.fetchPostingPeriods();
