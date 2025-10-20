@@ -16,7 +16,6 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class journalEntry extends Model
 {
     use HasFactory;
-    use LogsActivity;
     protected $table = 'journal_entry';
     protected $primaryKey = 'journal_id';
     public $timestamps = true;
@@ -41,18 +40,10 @@ class journalEntry extends Model
         'payee',
         'remarks',
     ];
-    protected static $recordEvents = ['deleted'];
 
     public function getModelName()
     {
         return Str::headline(class_basename($this));
-    }
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) =>  $eventName)
-            ->useLogName('Journal Entry');
     }
 
     public function branch()

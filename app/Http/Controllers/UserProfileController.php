@@ -23,9 +23,13 @@ class UserProfileController extends MainController
     {
         // dd($request->all());
         $user = User::find(Auth::user()->id);
+        $replicate = $user->replicate();
         $user->username = $request->username;
         $user->save();
-
+        $changes = getChanges($user, $replicate);
+        activity("System Setup")->event("updated")->performedOn($user)
+            ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+            ->log("User - Update");
         Session::flash('success', 'Username updated successfully.');
         return redirect(route('user.profile'));
     }
@@ -40,11 +44,15 @@ class UserProfileController extends MainController
             return redirect()->route('user.profile');
         } else {
             $user = User::find(Auth::user()->id);
+            $replicate = $user->replicate();
             $user->password = bcrypt($request->new);
             $user->save();
+            $changes = getChanges($user, $replicate);
+            activity("System Setup")->event("updated")->performedOn($user)
+                ->withProperties(['attributes' => $changes['attributes'], 'old' => $changes['old']])
+                ->log("User - Update");
             Session::flash('success', 'Password has been successfully updated.');
             return redirect()->route('user.profile');
         }
-
     }
 }

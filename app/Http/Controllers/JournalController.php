@@ -68,8 +68,10 @@ class JournalController extends MainController
                 if ($isOpen) {
                     $created = $journalEntry->createJournalEntry($request->input());
                     if ($created) {
-                        activity("Journal Entry")->event("created")->performedOn($journalEntry)
-                            ->log("created");
+                        $created->load('details');
+                        activity("Journal Entry")->event("created")->performedOn($created)
+                            ->withProperties(['model_snapshot' => $created->toArray()])
+                            ->log("Journal Entry - Create");
                         $matchFound = true;
                     }
                 }
@@ -94,36 +96,41 @@ class JournalController extends MainController
     public function JournalEntryCancel(Request $request)
     {
         $journal = JournalEntry::find($request->id);
-        $journal->status = 'cancelled';
+        $journal->load('details');
         $replicate = $journal->replicate();
 
         try {
             DB::transaction(function () use ($journal, $replicate) {
-                $updated = $journal->update([
-                    'journal_status' => 'cancelled'
-                ]);
-                if ($updated) {
-                    activity("Journal Entry")->event("cancelled")->performedOn($journal)
-                        ->withProperties(['attributes' => $journal, 'old' => $replicate])
-                        ->log("cancelled");
+                $journal->update(['status' => 'cancelled']);
+                $changes = getChanges($journal, $replicate);
+                unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+                if (!empty($changes['attributes'])) {
+                    activity("Journal Entry List")->event("updated")->performedOn($journal)
+                        ->withProperties([
+                            'model_snapshot' => $journal->toArray(),
+                            'attributes' => $changes['attributes'], 
+                            'old' => $changes['old']
+                        ])
+                        ->log("Journal Entry - Cancel");
                 }
             });
+            return new JsonResponse([
+                'message' => 'cancelled',
+            ], JsonResponse::HTTP_OK);
         } catch (\Exception $e) {
             return new JsonResponse([
                 'message' => 'Transaction Failed.',
                 'error' => $e->getMessage()
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
-        return new JsonResponse([
-            'message' => 'Successfully updated.',
-        ], JsonResponse::HTTP_OK);
     }
     public function JournalEntryEdit(Request $request)
     {
 
         $journalEntry = JournalEntry::findOrFail($request->journal_entry['edit_journal_id']);
+        $journalEntry->load('details');
         $replicate = $journalEntry->replicate();
-
+        $sourcePage = $request->input('journal_entry.source_page', 'unknown');
         $period = new PostingPeriod();
         $open_periods = $period->openStatus()->get();
 
@@ -143,10 +150,14 @@ class JournalController extends MainController
                 $isOpen = $period->isInPostingPeriod($journal_date, $open);
                 if ($isOpen) {
                     try {
-                        DB::transaction(function () use ($request, $journalEntry, $replicate) {
+                        DB::transaction(function () use ($request, $journalEntry, $replicate, $sourcePage) {
                             $amount = preg_replace('/[₱,]/', '', $request->journal_entry['edit_amount']);
                             $amount = fmod((float)$amount, 1) == 0 ? (int)$amount : number_format((float)$amount, 2, '.', '');
-                            $updated = $journalEntry->update([
+                            $oldDetails = collect($journalEntry->details->toArray())->map(function($detail) {
+                                unset($detail['id'], $detail['journal_details_id'], $detail['created_at'], $detail['updated_at']);
+                                return $detail;
+                            })->toArray();
+                            $journalEntry->update([
                                 'journal_no' => $request->journal_entry['edit_journal_no'],
                                 'journal_date' => $request->journal_entry['journal_date'],
                                 'branch_id' => $request->journal_entry['edit_branch_id'],
@@ -161,10 +172,25 @@ class JournalController extends MainController
                             ]);
                             $journalEntry->details()->delete();
                             $journalEntry->details()->createMany($request->details);
-                            if ($updated) {
-                                activity("Journal Entry")->event("edit")->performedOn($journalEntry)
-                                    ->withProperties(['attributes' => $journalEntry, 'old' => $replicate])
-                                    ->log("updated");
+                            $journalEntry->load('details');
+                            $newDetails = collect($journalEntry->details->toArray())->map(function($detail) {
+                                unset($detail['id'], $detail['journal_details_id'], $detail['created_at'], $detail['updated_at']);
+                                return $detail;
+                            })->toArray();
+                            $changes = getChanges($journalEntry, $replicate);
+                            unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+                            if (json_encode($oldDetails) !== json_encode($newDetails)) {
+                                $changes['old']['details'] = $oldDetails;
+                                $changes['attributes']['details'] = $newDetails;
+                            }
+                            if (!empty($changes['attributes'])) {
+                                activity($sourcePage)->event("updated")->performedOn($journalEntry)
+                                    ->withProperties([
+                                        'model_snapshot' => $journalEntry->toArray(),
+                                        'attributes' => $changes['attributes'], 
+                                        'old' => $changes['old']
+                                    ])
+                                    ->log("Journal Entry - Update");
                             }
                         });
                         $matchFound = true;
@@ -179,9 +205,8 @@ class JournalController extends MainController
             if (!$matchFound) {
                 return new JsonResponse([
                     'message' => 'Unable to proceed transaction, posting period and status is not open for this entry',
-                    'error' => $e->getMessage(),
                     'success' => false
-                ], JsonResponse::HTTP_BAD_REQUEST);
+            ], JsonResponse::HTTP_BAD_REQUEST);
             }
         }
         return response()->json([
@@ -192,20 +217,36 @@ class JournalController extends MainController
 
     public function JournalEntryPostUnpost(Request $request)
     {
+
         $journal = JournalEntry::find($request->journal_id);
+        $journal->load('details');
         $replicate = $journal->replicate();
-
-        // Toggle the status between 'posted' and 'unposted'
-        $journal->status = ($journal->status === 'posted') ? 'unposted' : 'posted';
-        $logDescription = $journal->status === 'posted' ? 'post' : 'unpost';
-
-        if ($journal->save()) {
-            activity("Journal Entry")->event($logDescription)->performedOn($journal)
-                ->withProperties(['attributes' => $journal, 'old' => $replicate])
-                ->log("updated");
-            return response()->json(['message' => $journal->status]);
+        $newStatus = $journal->status == 'posted' ? 'unposted' : 'posted';
+        $logAction = $newStatus == 'posted' ? 'Post' : 'Unpost';
+        try {
+            DB::transaction(function () use ($journal, $replicate, $newStatus, $logAction) {
+                $journal->update(['status' => $newStatus]);
+                $changes = getChanges($journal, $replicate);
+                unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+                if (!empty($changes['attributes'])) {
+                    activity("Journal Entry List")->event("updated")->performedOn($journal)
+                        ->withProperties([
+                            'model_snapshot' => $journal->toArray(),
+                            'attributes' => $changes['attributes'], 
+                            'old' => $changes['old']
+                        ])
+                        ->log("Journal Entry - " . $logAction);
+                }
+            });
+            
+            return response()->json(['message' => $newStatus]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'error',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        return response()->json(['message' => 'error']);
     }
     public function searchJournalEntry(Request $request)
     {

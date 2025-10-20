@@ -708,7 +708,6 @@
                         editButton.prop('disabled', false); // Enable the edit button
                         cancelButton.prop('disabled', false); // Enable the cancel button
                     }
-                    // $('#journalEntryDetails').DataTable().ajax.reload(null, false);
                 },
                 error: function(response) {
                     toastr.error(response.responseJSON.message);
@@ -829,14 +828,16 @@
                                 dataType: "json",
                                 success: function(response) {
                                     if (response.success) {
-                                            toastr.success(response.message);
-                                            saveJournalEntryDetails(response.id, 'update');
-                                             $('body').focus();
-                                            $('#journalModalEdit').modal('hide');
-                                        } else {
-                                            toastr.error(response.message);
-                                            $('#journalModalEdit').find('button[type="submit"]').focus();
-                                        }
+                                        toastr.success(response.message);
+                                        saveJournalEntryDetails(response.id, 'update');
+                                        $('body').focus();
+                                        $('#journalModalEdit').modal('hide');
+                                        $('#searchJournal').click();
+                                    } else {
+                                        toastr.error(response.message);
+                                        $('#journalModalEdit').find('button[type="submit"]')
+                                            .focus();
+                                    }
                                 },
                                 error: function(jqXHR) {
                                     if (jqXHR.status === 422) {
@@ -965,8 +966,7 @@
 									<a href="#" class="editable-row-item journal_details_account_no">${vv.account.account_number}</a>
 								</td>
 								<td class='editable-table-data' value="" >
-									<select  fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id} account_id" class="select-account form-control form-control-sm editable-row-item COASelect ">
-										<option value="${vv.account.account_id}" selected>${vv.account.account_number} - ${vv.account.account_name}</option>
+									<select fieldName="account_id" id="subsidiary_acct_${vv.journal_details_id}" class="select-account form-control form-control-sm editable-row-item COASelect ">
 										@foreach ($chartOfAccount as $account)
 											<option value="{{ $account->account_id }}" acct-num="{{ $account->account_number }}">{{ $account->account_number }} - {{ $account->account_name }}</option>
 										@endforeach
@@ -991,12 +991,12 @@
                                                     echo '</optgroup><optgroup label="' . $subsidiary->toArray()['subsidiary_category']['sub_cat_name'] . '">';
                                                     $temp = $subsidiary->toArray()['subsidiary_category']['sub_cat_name'];
                                                 }
-
+                                        
                                                 // Add the subsidiary option to the current optgroup
                                                 echo '<option value="' . $subsidiary->sub_id . '">' . $subsidiary->toArray()['subsidiary_category']['sub_cat_code'] . ' - ' . $subsidiary->sub_name . '</option>';
                                             }
                                         }
-
+                                        
                                         // Close the last optgroup if it exists
                                         if ($temp != '') {
                                             echo '</optgroup>';
@@ -1012,10 +1012,6 @@
 									</button>
 								</td>
 							</tr>`);
-                                $('#subsidiary_acct_' + vv.journal_details_id)
-                                    .val(vv.account_id);
-                                $('#subsidiary_' + vv.journal_details_id).val(vv
-                                    .subsidiary_id);
                                 total_debit = parseFloat(total_debit) +
                                     parseFloat(vv.journal_details_debit)
                                 total_credit = parseFloat(total_credit) +
@@ -1064,6 +1060,12 @@
                         $('.select-subsidiary').select2({
                             placeholder: 'Select S/L',
                             allowClear: true,
+                        });
+                        $.each(response.data, function(k, v) {
+                            $.each(v.journal_entry_details, function(kk, vv) {
+                                $('#subsidiary_acct_' + vv.journal_details_id).val(vv.account_id).trigger('change');
+                                $('#subsidiary_' + vv.journal_details_id).val(vv.subsidiary_id).trigger('change');
+                            });
                         });
                     }
                 },

@@ -146,13 +146,13 @@
     <div class="col-md-8 col-xs-12">
         <div class="box">
             <h4 style="font-size:16px;text-transform:uppercase;margin-bottom:24px;">ACCESSIBILITY</h4>
-            <div class="col-md-12" style="min-height:560px; max-height:560px; overflow:auto;">
+            <div class="col-md-12" style="max-height:810px; overflow:auto;">
                 <table class="table table-bordered" id="systemSetupAccessibility">
                     <thead>
                         <tr>
-                            <th>Module</th>
-                            <th>Description</th>
-                            <th>Action</th>
+                            <th style="text-align: center;">Module</th>
+                            <th style="text-align: center;">Description</th>
+                            <th style="text-align: center;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -162,14 +162,14 @@
                                     <th style="vertical-align : middle;text-align:center;" scope="row"
                                         rowspan="">{{ $accessList->module_name }}</th>
                                     <td>{{ $subModuleList['description'] }}</td>
-                                    <td>
+                                    <td style="text-align: center;">
                                         <button id="btn_plus_{{ $subModuleList['sml_id'] }}"
                                             value="{{ $subModuleList['sml_id'] }}"
-                                            class="d-none  btn_plus  btn-subModuleList btn btn-success btn-xs"><i
+                                            class="btn_plus btn-subModuleList btn btn-success btn-xs"><i
                                                 class="fa fa-plus"></i></button>
                                         <button id="btn_minus_{{ $subModuleList['sml_id'] }}"
                                             value="{{ $subModuleList['sml_id'] }}"
-                                            class="d-none btn_minus btn-subModuleList  btn btn-danger btn-xs"><i
+                                            class="d-none btn_minus btn-subModuleList btn btn-danger btn-xs"><i
                                                 class="fa fa-minus"></i></button>
                                     </td>
                                 </tr>

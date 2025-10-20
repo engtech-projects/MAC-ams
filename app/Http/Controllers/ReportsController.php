@@ -226,7 +226,7 @@ class ReportsController extends MainController
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
-            $subs['monthly_due'] = $value->monthly_due; 
+            $subs['monthly_due'] = $value->monthly_due;
             $subs['used'] = $value->depreciation_payments->count();
 
             // Calculate prepaid expense payments first
@@ -343,7 +343,7 @@ class ReportsController extends MainController
         ]);
     }
 
-    private function createDynamicPayments($sub,$as_of)
+    private function createDynamicPayments($sub, $as_of)
     {
         $rem = intVal($sub['rem']);
         $payments = [];
@@ -380,13 +380,13 @@ class ReportsController extends MainController
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $attributes['category']['sub_cat_id'])->first();
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
-           if ($as_of->isSaturday()) {
+        if ($as_of->isSaturday()) {
             $as_of->subDay();
         } elseif ($as_of->isSunday()) {
             $as_of->subDays(2);
         }
 
-        
+
         $journalEntry = new JournalEntry();
 
         $accountName = null;
@@ -401,7 +401,17 @@ class ReportsController extends MainController
         $totalMonthlyAmort = 0;
         $totalPrepaidExpense = 0;
         $branch_sub = collect($attributes['subsidiaries'])->groupBy('branch_code');
+        if ($attributes['branch'] && $attributes['category']['sub_cat_name'] == 'Additional Prepaid Expense') {
+            $totalPrepaidExpense = collect($attributes['non_dynamic'])
+                ->merge($attributes['dynamic'])
+                ->sum('amount_to_depreciate');
+        } else {
+        }
+        $totalPrepaidExpense = collect($attributes['non_dynamic'])
+            ->merge($attributes['dynamic'])
+            ->sum('amount_to_depreciate');
         foreach ($branch_sub as $branchKey => $branch) {
+
 
             $totalBranchDue = 0;
             $branchId = null;
@@ -410,7 +420,7 @@ class ReportsController extends MainController
                 if ($subsidiary) {
                     if ($subsidiary->due_amort > 0) {
                         if (intVal($sub['rem']) > 1) {
-                            $dynamic_payments = $this->createDynamicPayments($sub,$as_of);
+                            $dynamic_payments = $this->createDynamicPayments($sub, $as_of);
                             $subsidiary->depreciation_payments()->createMany($dynamic_payments);
                         } else {
                             $subsidiary->depreciation_payments()->create([
@@ -419,8 +429,7 @@ class ReportsController extends MainController
                             ]);
                         }
                     }
-                    if ($category_id === 51) {
-                        foreach ($request->sub_ids as $subId) {
+                    if ($attributes['category']['sub_cat_name'] == SubsidiaryCategory::ADDTIONAL_PREPAID_EXP) {
                             if ($subsidiary->prepaid_expense) {
                                 $payment = $subsidiary->prepaid_expense->prepaid_expense_payments->where('status', 'unposted')->first();
                                 if ($payment) {
@@ -428,7 +437,6 @@ class ReportsController extends MainController
                                 }
                                 $subsidiary->prepaid_expense->save();
                             }
-                        }
                     }
                     if ($subsidiary->sub_no_depre > $subsidiary->sub_no_amort) {
                         $subsidiary->sub_no_amort = $subsidiary->sub_no_amort + $sub['rem'];
@@ -439,7 +447,7 @@ class ReportsController extends MainController
                 $subCategory = $subsidiaryCategory->sub_cat_code;
                 $accountNumber = Accounts::DEPRECIATION_ACCOUNTS[$subCategory] ?? Accounts::DEPRECIATION_DEFAULT_ACCOUNT;
                 if ($subCategory === SubsidiaryCategory::INSUR_ADD) {
-                    $subId = $branch->branch_code === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $request->branch_id;
+                    $subId = $sub['branch_code'] === Branch::BRANCH_CODE_HEAD_OFFICE ? Branch::BRANCH_HEAD_OFFICE_ID : $attributes['branch']['branch_id'];
                 }
                 $accountName = Accounts::where('account_number', $accountNumber)->pluck('account_name')->first();
                 $totalBranchDue += $sub['amount_to_depreciate'];
@@ -459,9 +467,11 @@ class ReportsController extends MainController
 
                 if ($subsidiaryCategory->sub_cat_code === SubsidiaryCategory::INSUR_ADD) {
                     if ($account->pivot->transaction_type == 'credit') {
-                        $details['journal_details_credit'] = 0;
+                        $details['journal_details_credit'] = $totalPrepaidExpense;
+                        $details['journal_details_debit'] = 0;
                     } else {
-                        $details['journal_details_debit'] =  0;
+                        $details['journal_details_credit'] = 0;
+                        $details['journal_details_debit'] = $totalPrepaidExpense;
                     }
                     $totalPrepaidExpense += 0;
                 } else {
@@ -476,22 +486,21 @@ class ReportsController extends MainController
                 }
 
                 // Fixed on HEAD office balance
-             if ($branchId === 4 && $details['journal_details_debit'] > 0) {
-                $originalAmount = $details['journal_details_debit'];
+                if ($branchId === 4 && $details['journal_details_debit'] > 0) {
+                    $originalAmount = $details['journal_details_debit'];
 
-             // for head office balance no need function split
-                $half = round($originalAmount / 2, 2);
-                $details['journal_details_debit'] = $half;
-                $details["subsidiary_id"] = 1;
-                $journalDetails[] = $details;
-                $secondHalf = $originalAmount - $half; 
-                $details['journal_details_debit'] = $secondHalf;
-                $details["subsidiary_id"] = 2;
-                $journalDetails[] = $details;
-
-            } else {
-                $journalDetails[] = $details;
-            }
+                    // for head office balance no need function split
+                    $half = round($originalAmount / 2, 2);
+                    $details['journal_details_debit'] = $half;
+                    $details["subsidiary_id"] = 1;
+                    $journalDetails[] = $details;
+                    $secondHalf = $originalAmount - $half;
+                    $details['journal_details_debit'] = $secondHalf;
+                    $details["subsidiary_id"] = 2;
+                    $journalDetails[] = $details;
+                } else {
+                    $journalDetails[] = $details;
+                }
                 continue;
             }
 
@@ -525,7 +534,7 @@ class ReportsController extends MainController
     {
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
-       
+
         if ($as_of->isSaturday()) {
             $as_of->subDay();
         } elseif ($as_of->isSunday()) {
@@ -952,6 +961,7 @@ class ReportsController extends MainController
     public function searchCashTransactionBlotter(Request $request)
     {
         $transactionDate = $request["transaction_date"];
+        $perPage = $request->input('per_page', 15);
         $branchId = null;
         if (Gate::allows('manager')) {
             if (isset($request->branch_id)) {
@@ -960,12 +970,25 @@ class ReportsController extends MainController
         } else {
             $branchId = session()->get("auth_user_branch");
         }
-        $collections = CollectionBreakdown::getCollectionBreakdownByBranch($transactionDate, $branchId);
-        $message = $collections->count() > 0 ? "Collections fetched." : "No record found.";
-        return response()->json(['message' => $message, 'data' => [
-            'collections' => $collections,
-            'branch' => $branchId ? Branch::find($branchId) : null
-        ]]);
+        $collections = CollectionBreakdown::getCollectionBreakdownByBranch(
+            $transactionDate,
+            $branchId,
+            $perPage
+        );
+        $message = $collections->total() > 0 ? "Collections fetched." : "No record found.";
+        return response()->json([
+            'message' => $message,
+            'data' => [
+                'collections' => $collections->items(),
+                'branch' => $branchId ? Branch::find($branchId) : null,
+                'current_page' => $collections->currentPage(),
+                'last_page' => $collections->lastPage(),
+                'per_page' => $collections->perPage(),
+                'total' => $collections->total(),
+                'from' => $collections->firstItem(),
+                'to' => $collections->lastItem(),
+            ]
+        ]);
     }
 
     public function showCashTransactionBlotter($id, Request $request)
@@ -1286,6 +1309,7 @@ class ReportsController extends MainController
             'amount' => 0,
             'payee' => $journalEntry::CLOSING_SOURCE
         ]);
+
         $details = [];
         foreach ($accounts as $i => $category) {
             foreach ($category['types'] as $type) {
@@ -1329,6 +1353,10 @@ class ReportsController extends MainController
         $details[] = $lastIndex;
         try {
             $entry->details()->createMany($details);
+            $entry->load('details');
+            activity("Income Statement")->event("created")->performedOn($entry)
+                ->withProperties(['model_snapshot' => $entry->toArray()])
+                ->log("Closing Period - Create");
         } catch (\Exception $e) {
             return response()->json([
                 'data' => $e->getMessage(),
@@ -1338,7 +1366,7 @@ class ReportsController extends MainController
 
         return response()->json([
             "data" => $accounts,
-            "message" => "Closing Period entry successfully created."
+            "message" => "Period closed successfully."
         ]);
     }
 

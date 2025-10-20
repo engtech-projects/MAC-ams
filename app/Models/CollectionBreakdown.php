@@ -52,14 +52,6 @@ class CollectionBreakdown extends Model
         return class_basename($this);
     }
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
-            ->useLogName('Cash Transaction Blotter - Collection Breakdown');
-    }
-
-
     public function account_officer_collections()
     {
         return $this->hasMany(AccountOfficerCollection::class, 'collection_id');
@@ -88,34 +80,39 @@ class CollectionBreakdown extends Model
         $collection = CollectionBreakdown::with(['account_officer_collections', 'branch_collections.branch', 'other_payment', 'pos_collections'])->where('collection_id', $id)->first();
         return $collection;
     }
-    public static function getCollectionBreakdownByBranch($transactionDate, $branchId = null)
+    public static function getCollectionBreakdownByBranch($transactionDate, $branchId = null, $perPage = 15)
     {
-        // Fetch collection breakdowns
-        $collections = CollectionBreakdown::with(['account_officer_collections', 'branch_collections.branch', 'other_payment'])->when($branchId, function ($query, $branchId) {
+        $query = CollectionBreakdown::with([
+            'account_officer_collections', 
+            'branch_collections.branch', 
+            'other_payment',
+            'pos_collections'
+        ])
+        ->when($branchId, function ($query, $branchId) {
             $query->where('branch_id', $branchId);
         })
-            ->when($transactionDate, function ($query, $transactionDate) {
-                $query->where('transaction_date', $transactionDate);
-            }, function ($query) {
-                // If no transaction date is provided, filter from 2024-01-01 onwards
-                $query->where('transaction_date', '>=', '2024-01-01');
-            })
-            ->orderBy('transaction_date', 'desc')
-            ->get();
-
-        // Loop through each collection and append the cash ending balance
-        foreach ($collections as $collection) {
-            // Assuming journalEntry is a class with getCashEndingBalanceByBranch method
-
-            $journalEntry = new journalEntry();
-
-            // Retrieve cash ending balance by branch and transaction date
-            $cashEndingBalance = $journalEntry->getCashEndingBalanceByBranch($collection->branch_id, $collection->transaction_date);
-
-            // Append the cash ending balance to the collection object
+        ->when($transactionDate, function ($query, $transactionDate) {
+            $query->where('transaction_date', $transactionDate);
+        }, function ($query) {
+            $query->where('transaction_date', '>=', '2024-01-01');
+        })
+        ->orderBy('transaction_date', 'desc');
+        $collections = $query->paginate($perPage);
+        $journalEntry = new journalEntry();
+        foreach ($collections->items() as $collection) {
+            $cashEndingBalance = $journalEntry->getCashEndingBalanceByBranch(
+                $collection->branch_id, 
+                $collection->transaction_date
+            );
             $collection->cash_ending_balance = $cashEndingBalance;
+            $aoTotal = $collection->account_officer_collections->sum('total');
+            $branchTotal = $collection->branch_collections->sum('total_amount');
+            $posTotal = $collection->pos_collections->sum('total_amount');
+            $checkAmount = $collection->other_payment->check_amount ?? 0;
+            $memoAmount = $collection->other_payment->memo_amount ?? 0;
+            
+            $collection->total = $aoTotal + $branchTotal + $posTotal + $checkAmount + $memoAmount;
         }
-
         return $collections;
     }
     public static function getCollections($transactionDate, $branchId = null)
