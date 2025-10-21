@@ -76,6 +76,7 @@
         new Vue({
             el: '#app',
             data: {
+                isLoading:false,
                 branches: null,
                 defaultSelect: "Select Branch",
                 setDefaultSelect: true,

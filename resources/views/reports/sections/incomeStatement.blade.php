@@ -29,10 +29,14 @@
     <!-- Main content -->
     <section class="content" id="app">
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+            <div v-if="isLoading" class="loading-overlay">
+                <p>Loading... </p>
+                <div class="spinner"></div>
+            </div>
             <div class="row">
 
                 <?php
-                
+
                 // echo '<pre>';
                 // var_export($currentEarnings);
                 // echo '</pre>';
@@ -182,38 +186,32 @@
         </div> --}}
 
         <div class="modal fade" id="postingPeriodConfirmation" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Confirmation Message (Only shows 'from' year) -->
-                <p>Are you sure you want to close the period for year <strong>@{{ getYearFromDate(from) }}</strong>?</p>
-                
-                <!-- Journal Date Input -->
-                <div class="form-group">
-                    <label for="journalDate">Journal Date</label>
-                    <input 
-                        type="date" 
-                        id="journalDate" 
-                        name = "journalDate"
-                        class="form-control" 
-                        v-model="journalDate"
-                        required
-                    >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Confirmation Message (Only shows 'from' year) -->
+                        <p>Are you sure you want to close the period for year <strong>@{{ getYearFromDate(from) }}</strong>?</p>
+
+                        <!-- Journal Date Input -->
+                        <div class="form-group">
+                            <label for="journalDate">Journal Date</label>
+                            <input type="date" id="journalDate" name = "journalDate" class="form-control"
+                                v-model="journalDate" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="closingPeriod()">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @click="closingPeriod()">Yes</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            </div>
         </div>
-    </div>
-</div>
     </section>
 
 
@@ -221,6 +219,7 @@
         new Vue({
             el: '#app',
             data: {
+                isLoading: false,
                 incomeStatement: @json($incomeStatement),
                 net_income: @json($incomeStatement['net_income']['value']),
                 from: @json($from),
@@ -248,6 +247,7 @@
                     $('#postingPeriodConfirmation').modal('show');
                 },
                 closingPeriod: function() {
+                    this.isLoading = true;
                     var data = {
                         income_statement: this.incomeStatement,
                         net_income: this.net_income,
@@ -266,7 +266,9 @@
                     }).catch(err => {
                         toastr.error(err.response.data.message);
 
-                    })
+                    }).finally(() => {
+                        this.isLoading = false;
+                    });
                 },
             },
         })
