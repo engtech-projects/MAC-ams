@@ -32,8 +32,6 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
-        @{{ isLoading }}
-
         <div v-if="isLoading" class="loading-overlay">
             <p>Loading... </p>
             <div class="spinner"></div>
@@ -1814,7 +1812,6 @@
                                     dueAmort = item.unexpensed
                                 }
 
-                                // FIX ledger to due amort
                                 if (item.rem == 0) {
                                     dueAmort = 0.00;
                                 }

@@ -226,7 +226,7 @@ class ReportsController extends MainController
             $subs['sub_no_amort'] = $value->sub_no_amort;
             $subs['sub_cat_id'] = $value->sub_cat_id;
             $subs['monthly_amort'] = $value->monthly_due;
-            $subs['monthly_due'] = $value->monthly_due; 
+            $subs['monthly_due'] = $value->monthly_due;
             $subs['used'] = $value->depreciation_payments->count();
 
             // Calculate prepaid expense payments first
@@ -343,7 +343,7 @@ class ReportsController extends MainController
         ]);
     }
 
-    private function createDynamicPayments($sub,$as_of)
+    private function createDynamicPayments($sub, $as_of)
     {
         $rem = intVal($sub['rem']);
         $payments = [];
@@ -380,13 +380,13 @@ class ReportsController extends MainController
 
         $subsidiaryCategory = SubsidiaryCategory::with(['accounts'])->where('sub_cat_id', $attributes['category']['sub_cat_id'])->first();
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
-           if ($as_of->isSaturday()) {
+        if ($as_of->isSaturday()) {
             $as_of->subDay();
         } elseif ($as_of->isSunday()) {
             $as_of->subDays(2);
         }
 
-        
+
         $journalEntry = new JournalEntry();
 
         $accountName = null;
@@ -410,7 +410,7 @@ class ReportsController extends MainController
                 if ($subsidiary) {
                     if ($subsidiary->due_amort > 0) {
                         if (intVal($sub['rem']) > 1) {
-                            $dynamic_payments = $this->createDynamicPayments($sub,$as_of);
+                            $dynamic_payments = $this->createDynamicPayments($sub, $as_of);
                             $subsidiary->depreciation_payments()->createMany($dynamic_payments);
                         } else {
                             $subsidiary->depreciation_payments()->create([
@@ -476,22 +476,21 @@ class ReportsController extends MainController
                 }
 
                 // Fixed on HEAD office balance
-             if ($branchId === 4 && $details['journal_details_debit'] > 0) {
-                $originalAmount = $details['journal_details_debit'];
+                if ($branchId === 4 && $details['journal_details_debit'] > 0) {
+                    $originalAmount = $details['journal_details_debit'];
 
-             // for head office balance no need function split
-                $half = round($originalAmount / 2, 2);
-                $details['journal_details_debit'] = $half;
-                $details["subsidiary_id"] = 1;
-                $journalDetails[] = $details;
-                $secondHalf = $originalAmount - $half; 
-                $details['journal_details_debit'] = $secondHalf;
-                $details["subsidiary_id"] = 2;
-                $journalDetails[] = $details;
-
-            } else {
-                $journalDetails[] = $details;
-            }
+                    // for head office balance no need function split
+                    $half = round($originalAmount / 2, 2);
+                    $details['journal_details_debit'] = $half;
+                    $details["subsidiary_id"] = 1;
+                    $journalDetails[] = $details;
+                    $secondHalf = $originalAmount - $half;
+                    $details['journal_details_debit'] = $secondHalf;
+                    $details["subsidiary_id"] = 2;
+                    $journalDetails[] = $details;
+                } else {
+                    $journalDetails[] = $details;
+                }
                 continue;
             }
 
@@ -525,7 +524,7 @@ class ReportsController extends MainController
     {
 
         $as_of = Carbon::parse($request->as_of)->endOfMonth();
-       
+
         if ($as_of->isSaturday()) {
             $as_of->subDay();
         } elseif ($as_of->isSunday()) {
@@ -896,6 +895,39 @@ class ReportsController extends MainController
         return view('reports.sections.trialBalance', $data);
     }
 
+    public function trialBalanceSearch(Request $request)
+    {
+        $accounts = [];
+        $acc = new Accounts();
+        $fiscalYear = Accounting::getFiscalyear();
+        $tDate =  $request->input("asof") ? new Carbon($request->input("asof")) : Carbon::parse(TransactionDate::get_date());
+        $accounts = $acc->getTrialBalance([$fiscalYear->start_date, $tDate]);
+        $currentPage = $request->page ? $request->page : 1;
+        $perPage = 25;
+        $data = [
+            'title' => 'Subsidiary Ledger',
+            'trialBalance' => $accounts,
+            'paginated' => new LengthAwarePaginator(
+                array_slice($accounts, ($currentPage - 1) * $perPage, $perPage),
+                count($accounts),
+                $perPage,
+                $currentPage,
+                [
+                    'path' => url()->current(),
+                    // Set the current URL as the base URL for pagination links
+                ]
+            ),
+            'trialbalanceList' => '',
+            'transactionDate' => $tDate->toDateString(),
+        ];
+
+        return new JsonResponse([
+            'data' => $data,
+            'message' => "Successfully fetched.",
+            'success' => true
+        ], JsonResponse::HTTP_OK);
+    }
+
 
     public function bankReconcillation(Request $request)
     {
@@ -1227,7 +1259,7 @@ class ReportsController extends MainController
         $from = $accounting->start_date;
         $now = Carbon::now();
         $to =  $request->input("date") ? new Carbon($request->input("date")) : $now;
-        $balanceSheet = $coa->balanceSheet([$from, $to]);
+        $balanceSheet = $coa->balanceSheet([Carbon::parse($from), $to]);
         $data = [
             'title' => 'MAC-AMS | Balance Sheet',
             'requests' => ['from' => $from, 'to' => $to],
@@ -1237,6 +1269,28 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.balanceSheet', $data);
+    }
+
+    public function generateBalanceSheet(Request $request)
+    {
+        $coa = new Accounts();
+        $accounting = Accounting::getFiscalYear();
+        $from = $accounting->start_date;
+        $now = Carbon::now();
+        $to =  $request->input("date") ? Carbon::parse($request->input('date')) : $now;
+        $balanceSheet = $coa->balanceSheet([$from, $to]);
+        $data = [
+            'requests' => ['from' => $from, 'to' => $to],
+            'fiscalYear' => $accounting,
+            'balanceSheet' => $balanceSheet,
+            'current_date' => $to->toDateString(),
+        ];
+
+        return new JsonResponse([
+            'data' => $data,
+            'message' => 'Successfully fetched.',
+            'success' => true
+        ], JsonResponse::HTTP_OK);
     }
 
     public function incomeStatement(Request $request)

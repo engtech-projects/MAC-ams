@@ -199,6 +199,13 @@ Route::prefix('reports')->group(function () {
         Route::post('search', [ReportsController::class, 'search'])->name('reports.monthly-depreciation-report-search');
         Route::post('post-by-branch', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
     });
+
+    Route::prefix('trial-balance')->group(function () {
+        Route::post('search', [ReportsController::class, 'trialBalanceSearch'])->name('reports.trial-balance-search');
+    });
+    Route::prefix('balance-sheet')->group(function () {
+        Route::post('generate', [ReportsController::class, 'generateBalanceSheet'])->name('reports.balance-sheet');
+    });
 });
 
 Route::prefix('system-setup')->group(function () {
