@@ -19,6 +19,7 @@ use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\SubsidiaryController;
 use App\Http\Controllers\AccountsApiController;
+use App\Http\Controllers\AccountTypeController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\JournalBookController;
 use App\Http\Controllers\SystemSetupController;
@@ -56,12 +57,16 @@ Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard'
 
 
 
+//Account Type
+Route::resource('account-type', AccountTypeController::class);
+
 // AccountsController
 Route::resource('chart-of-accounts', AccountsController::class);
 Route::resource('accounts', AccountsApiController::class);
 Route::get('accounts-datatable', [AccountsController::class, 'populate'])->name('accounts.populate');
 Route::get('accounts/getAccountTypeContent', [AccountsController::class, 'getAccountTypeContent'])->name('accounts.getAccountTypeContent');
 Route::post('accounts/saveType', [AccountsController::class, 'saveType'])->name('accounts.saveType');
+Route::post('accounts/create-account', [AccountsController::class, 'store'])->name('accounts.saveType');
 Route::post('accounts/saveClass', [AccountsController::class, 'saveClass'])->name('accounts.saveClass');
 Route::post('set-status', [AccountsController::class, 'setStatus'])->name('accounts.setStatus');
 Route::post('accounts/import', [AccountsController::class, 'import'])->name('accounts.import');

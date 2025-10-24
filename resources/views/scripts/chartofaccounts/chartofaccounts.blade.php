@@ -100,7 +100,7 @@
         // oTable = $('#tbl-chart-of-accounts').DataTable(config);
         // $('.dataTables_filter input').addClass('rounded-0');
 
-        $(document).on('click', '.btn-create-account', function(e) {
+      /*   $(document).on('click', '.btn-create-account', function(e) {
             e.preventDefault();
             var modal = $('#modal-create-account');
             var target = $(this);
@@ -113,7 +113,7 @@
             });
             modal.modal('show');
         });
-
+ */
         $(document).on('click', '#btn-create-class', function(e) {
             e.preventDefault();
             var modal = $('#modal-create-account');
