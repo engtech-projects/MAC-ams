@@ -350,47 +350,43 @@
                                         <div class="col-md-12 frm-header">
                                             <h3 class="card-title"><b>Activity Logs</b></h3>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12 ml-3 mb-3">
                                             <form>
-                                                <div class="row">
-                                                    <div class="col-md-5 col-xs-12">
-                                                        <div class="box">
-                                                            <div class="form-group">
-                                                                <div class="row">
-                                                                    <div class="col-md-6">
-                                                                        <select class="form-control"
-                                                                            v-model="filter.log_name">
-                                                                            <option value="" disabled selected>Module Name</option>
-                                                                            <option value="">All Modules</option>
-                                                                            <option value="Journal Entry">Journal Entry</option>
-                                                                            <option value="Journal Entry List">Journal Entry List</option>
-                                                                            <option value="Subsidiary Ledger">Subsidiary Ledger</option>
-                                                                            <option value="General Ledger">General Ledger</option>
-                                                                            <option value="Income Statement">Income Statement</option>
-                                                                            <option value="Cashier's Transaction Blotter">Cashier's Transaction Blotter</option>
-                                                                            <option value="System Setup">System Setup</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <select class="form-control"
-                                                                            v-model="filter.event">
-                                                                            <option value="" disabled selected>Event</option>
-                                                                            <option value="">All Events</option>
-                                                                            <option value="created">Created</option>
-                                                                            <option value="updated">Updated</option>
-                                                                            <option value="deleted">Deleted</option>
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-2.5">
+                                                        <select class="form-control"
+                                                            v-model="filter.log_name">
+                                                            <option value="" disabled selected>Module Name</option>
+                                                            <option value="">All Modules</option>
+                                                            <option value="Journal Entry">Journal Entry</option>
+                                                            <option value="Journal Entry List">Journal Entry List</option>
+                                                            <option value="Subsidiary Ledger">Subsidiary Ledger</option>
+                                                            <option value="General Ledger">General Ledger</option>
+                                                            <option value="Income Statement">Income Statement</option>
+                                                            <option value="Cashier's Transaction Blotter">Cashier's Transaction Blotter</option>
+                                                            <option value="System Setup">System Setup</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <select class="form-control"
+                                                            v-model="filter.event">
+                                                            <option value="" disabled selected>Event</option>
+                                                            <option value="">All Events</option>
+                                                            <option value="created">Created</option>
+                                                            <option value="updated">Updated</option>
+                                                            <option value="deleted">Deleted</option>
 
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <input type="button" @click="searchActivityLog()"
-                                                                            class="btn btn-success" value="Search">
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-
-                                                        </div>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-5 d-flex align-items-center">
+                                                        <label class="mb-0 mr-2">From:</label>
+                                                        <input type="date" v-model="filter.date_from" class="form-control">
+                                                        <label class="mb-0 ml-2 mr-2">To:</label>
+                                                        <input type="date" v-model="filter.date_to" class="form-control">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input type="button" @click="searchActivityLog()"
+                                                            class="btn btn-success" value="Search">
                                                     </div>
                                                 </div>
                                             </form>
@@ -703,8 +699,10 @@
             el: '#app',
             data: {
                 filter: {
-                    'log_name': "",
-                    'event': ""
+                    'log_name': '',
+                    'event': '',
+                    'date_from': '',
+                    'date_to': ''
                 },
                 activityLogs: [],
                 activityLog: {},
@@ -797,6 +795,8 @@
                         params: {
                             'event': this.filter.event,
                             'log_name': this.filter.log_name,
+                            'date_from': this.filter.date_from,
+                            'date_to': this.filter.date_to,
                             'page': page
                         }
                     }).then(response => {

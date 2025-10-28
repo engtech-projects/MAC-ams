@@ -24,6 +24,12 @@ class ActivityLogController extends Controller
         ->when($request['log_name'], function ($query) use ($request) {
             $query->where('log_name', $request['log_name']);
         })
+        ->when($request['date_from'], function ($query) use ($request) {
+            $query->whereDate('created_at', '>=', $request['date_from']);
+        })
+        ->when($request['date_to'], function ($query) use ($request) {
+            $query->whereDate('created_at', '<=', $request['date_to']);
+        })
         ->orderBy('created_at', 'desc')
         ->paginate(10);
         $data = $activityLogs->map(function ($item) {

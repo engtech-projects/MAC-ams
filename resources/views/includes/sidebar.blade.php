@@ -320,16 +320,6 @@
                     </li>
                 @endif
 
-                <li class="nav-item">
-                    <a href="{{ route('accounting') }}"
-                        class="nav-link {{ request()->is('accounting') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-cogs"></i>
-                        <p>
-                            Accounting
-                        </p>
-                    </a>
-                </li>
-
             </ul>
         </nav>
     </div>

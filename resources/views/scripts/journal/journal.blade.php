@@ -1137,17 +1137,22 @@
                             $('.vjournal_cheque_date').text((v.cheque_date) ?
                                 moment(v.cheque_date).format('MM/DD/YYYY') :
                                 'NO CHEQUE');
-                            if (v.status == 'unposted') {
-                                content =
-                                    `<button value="${v.journal_id}"  class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
-                                    <button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
-                            } else if (v.status == 'cancelled') {
-                                content = ``
-                            } else {
-                                content =
-                                    `<button disabled  class="btn btn-flat btn-sm  bg-gradient-gray">Posted</button>
-										<button  class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`
-                            }
+                            @if (Gate::allows('manager'))
+                                if (v.status == 'unposted') {
+                                    content = `
+                                        <button value="${v.journal_id}" class="btn btn-flat btn-sm bg-gradient-success stStatus">Post</button>
+                                        <button class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
+                                } else if (v.status == 'cancelled') {
+                                    content = ``;
+                                } else {
+                                    content = `
+                                        <button disabled class="btn btn-flat btn-sm bg-gradient-gray">Posted</button>
+                                        <button class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
+                                }
+                            @else
+                                // Non-manager users cannot see Post/Unpost buttons
+                                content = `<button class="btn btn-flat btn-sm bg-gradient-info stsVoucher">View Journal Voucher</button>`;
+                            @endif
                             $('#posted-content').html(content);
                             $.each(v.journal_entry_details, function(kk, vv) {
                                 total_debit += parseFloat(vv
