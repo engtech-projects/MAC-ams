@@ -156,7 +156,7 @@ Route::get('reports/balance-sheet', [ReportsController::class, 'balanceSheet'])-
 Route::get('reports/journal_entry', [ReportsController::class, 'journalEntry'])->name('reports.journal_entry');
 Route::post('reports/generalLedgerFetchAccount', [ReportsController::class, 'generalLedgerFetchAccount'])->name('reports.generalLedgerFetchAccount');
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
-Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
+
 Route::post('reports/closing-period', [ReportsController::class, 'closingPeriod'])->name('reports.closingPeriod');
 Route::get('reports/bankReconcillation', [ReportsController::class, 'bankReconcillation'])->name('reports.bankReconcillation');
 Route::get('reports/journalledger', [ReportsController::class, 'journalLedger'])->name('reports.journalLedger');
@@ -205,6 +205,12 @@ Route::prefix('reports')->group(function () {
     });
     Route::prefix('balance-sheet')->group(function () {
         Route::post('generate', [ReportsController::class, 'generateBalanceSheet'])->name('reports.balance-sheet');
+    });
+/*     Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement'); */
+
+    Route::prefix('income-statement')->group(function () {
+        Route::get('/', [ReportsController::class, 'incomeStatement'])->name('reports.income-statement');
+        Route::post('generate', [ReportsController::class, 'generateIncomeStatement'])->name('reports.income-statement-generate');
     });
 });
 

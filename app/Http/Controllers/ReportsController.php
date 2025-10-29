@@ -1315,6 +1315,31 @@ class ReportsController extends MainController
 
         return view('reports.sections.incomeStatement', $data);
     }
+    public function generateIncomeStatement(Request $request)
+    {
+        $coa = new Accounts();
+        $accounting = Accounting::getFiscaltoday();
+
+        $from = isset($request->from) ? $request->from : $accounting->default_start;
+        $to = isset($request->to) ? $request->to : $accounting->default_end;
+
+        $incomeStatement = $coa->incomeStatement([$from, $to]);
+
+        $data = [
+            'title' => 'MAC-AMS | Income Statement',
+            'requests' => ['from' => $from, 'to' => $to],
+            'fiscalYear' => $accounting,
+            'incomeStatement' => $incomeStatement,
+            'from' => $from,
+            'to' => $to
+        ];
+
+        return new JsonResponse([
+            'data' => $data,
+            'message' => 'Successfully fetched.',
+            'success' => true
+        ], JsonResponse::HTTP_OK);
+    }
 
     public function closingPeriod(Request $request)
     {
