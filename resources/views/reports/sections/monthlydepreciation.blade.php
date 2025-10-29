@@ -209,11 +209,11 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <button class="btn btn-primary"
-                                                        v-show="subsidiaryAll && Object.keys(subsidiaryAll).length > 0 && !filter.branch"
+                                                    <button class="btn btn-primary" v-show="showPostButton"
                                                         @click="postMonthlyDepreciation(processSubsidiary)">
                                                         Post
                                                     </button>
+
                                                 </td>
 
                                             </tr>
@@ -502,9 +502,12 @@
                 filter: {
                     branch: null,
                     subsidiary_id: '',
-                    category: null,
-                    from: '',
-                    to: '',
+                    category: {
+                        "sub_cat_id": 51,
+                        "sub_cat_name": "Additional Prepaid Expense"
+                    },
+                    from: '2025-14-10',
+                    to: '2025-10-14',
                     account_id: '',
                     type: ''
                 },
@@ -551,8 +554,8 @@
                     non_dynamic: [],
                     dynamic: [],
                     category: null,
-                    date: null,
-                    branches: []
+                    date: '2025-14-10',
+                    branches: [],
                 },
                 subsidiaryList: {
                     sub_to_depreciate: [],
@@ -563,6 +566,16 @@
             computed: {
                 formattedExpensed() {
                     return this.subsidiary.expensed || '₱0.00';
+                },
+                showPostButton() {
+                    const hasSubsidiary = this.subsidiaryAll && Object.keys(this.subsidiaryAll).length > 0
+                    const category = this.filter.category?.sub_cat_name
+                    const branch = this.filter.branch
+
+                    return hasSubsidiary && (
+                        (category !== 'Additional Prepaid Expense' && !branch) ||
+                        (category === 'Additional Prepaid Expense' && branch)
+                    )
                 },
                 newRemBalance() {
                     var monthly_due = 0;
@@ -1323,6 +1336,7 @@
                         this.subsidiaryList.date = this.filter.to
                         this.subsidiaries.category = this.filter.category;
                         this.subsidiaries.date = this.filter.to
+                        this.subsidiaries.branch = this.filter.branch
                         this.subsidiaries.non_dynamic.map(item => {
                             item.rem = 1
                             return item;
@@ -1807,7 +1821,7 @@
                             this.subsidiaries.non_dynamic = allItems.map(item => {
                                 var diff = item.rem - item.used;
 
-                                var dueAmort = item.due_amort;
+                                var dueAmort =  item.due_amort;
                                 if (item.rem == 1) {
                                     dueAmort = item.unexpensed
                                 }
@@ -1815,6 +1829,7 @@
                                 if (item.rem == 0) {
                                     dueAmort = 0.00;
                                 }
+                                console.log(item);
                                 return {
                                     'sub_id': item.sub_id,
                                     'amount': item.sub_amount,
@@ -1823,7 +1838,7 @@
                                     'rem': item.rem,
                                     'monthly_due': item.monthly_due,
                                     'amort': item.sub_no_amort,
-                                    'amount_to_depreciate': dueAmort,
+                                    'amount_to_depreciate': this.filter.category?.sub_cat_name == 'Additional Prepaid Expense' ? item.unposted_payments : dueAmort,
                                     'used': item.sub_no_depre,
                                     'payment_ids': item.payment_ids,
                                     'branch_id': item.branch_id,

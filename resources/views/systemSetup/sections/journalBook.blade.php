@@ -73,6 +73,7 @@
 				<div class="box">
 					<div class="input-group">
 						<input type="submit" id="submitBtn" class="btn btn-success form-control" value="SAVE">
+						<input type="button" id="cancelBkBtn" class="btn btn-danger" style="display: none; margin-left: 10px;" value="CANCEL">
 					</div>
 				</div>
 		</div>

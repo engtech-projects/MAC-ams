@@ -47,9 +47,9 @@ class CollectionBreakdownController extends Controller
         $unposted = CollectionBreakdown::where(['status' => CollectionBreakdown::UNPOSTED_STATUS, 'branch_id' => $attributes['branch_id']])->orderBy('collection_id', 'DESC')->first();
         if ($unposted) {
             return new JsonResponse(["message" => "Failed to save transaction. There is transaction that need to post."], 400);
-        } else {
-            try {
-                DB::beginTransaction();
+        }
+        try {
+            DB::transaction(function () use ($attributes, $collection_ao) {
                 $collection = CollectionBreakdown::create($attributes);
                 $attributes['other_payment']['collection_id'] = $collection->collection_id;
                 $collection->other_payment()->create($attributes['other_payment']);
@@ -66,11 +66,15 @@ class CollectionBreakdownController extends Controller
                         "or_no" => $pc["or_no"],
                     ]);
                 }
-                DB::commit();
-            } catch (\Exception $exception) {
-                DB::rollBack();
-                return new JsonResponse(["message" => $exception->getMessage()]);
-            }
+                $collection->load(['other_payment', 'account_officer_collections', 'branch_collections', 'pos_collections']);
+                activity("Cashier's Transaction Blotter")->event('created')->performedOn($collection)
+                        ->withProperties([
+                            'model_snapshot' => $collection->toArray()
+                        ])
+                        ->log("Collection Breakdown - Create");
+            });
+        } catch (\Exception $exception) {
+            return new JsonResponse(["message" => $exception->getMessage()], 500);
         }
 
         return new JsonResponse(["message" => "Collection successfully saved."]);
@@ -78,19 +82,61 @@ class CollectionBreakdownController extends Controller
     public function update(CreateOrUpdateCollectionRequest $request, CollectionBreakdown $collectionBreakdown)
     {
         $data = $request->validated();
+        $collectionBreakdown->load(['other_payment', 'account_officer_collections', 'branch_collections', 'pos_collections']);
+        $replicate = $collectionBreakdown->replicate();
+        $oldRelationships = [
+            'other_payment' => $collectionBreakdown->other_payment ? $collectionBreakdown->other_payment->toArray() : null,
+            'account_officer_collections' => $collectionBreakdown->account_officer_collections->toArray(),
+            'branch_collections' => $collectionBreakdown->branch_collections->toArray(),
+            'pos_collections' => $collectionBreakdown->pos_collections->toArray(),
+        ];
         try {
-            // Handle deletions first
-            $this->handleCollectionDeletions($collectionBreakdown, $data);
-
-            // Update main collection breakdown
-            $collectionBreakdown->update($data);
-
-            // Process updates and creates
-            $this->processAccountOfficerCollections($collectionBreakdown, $data);
-            $this->processBranchCollections($collectionBreakdown, $data);
-            $this->processPosCollections($collectionBreakdown, $data);
-            $this->processOtherPayments($collectionBreakdown, $data);
-
+            DB::transaction(function () use ($collectionBreakdown, $data, $replicate, $oldRelationships) {
+                $this->handleCollectionDeletions($collectionBreakdown, $data);
+                $collectionBreakdown->update($data);
+                $this->processAccountOfficerCollections($collectionBreakdown, $data);
+                $this->processBranchCollections($collectionBreakdown, $data);
+                $this->processPosCollections($collectionBreakdown, $data);
+                $this->processOtherPayments($collectionBreakdown, $data);
+                $collectionBreakdown->refresh();
+                $collectionBreakdown->load(['other_payment', 'account_officer_collections', 'branch_collections', 'pos_collections']);
+                $newRelationships = [
+                    'other_payment' => $collectionBreakdown->other_payment ? $collectionBreakdown->other_payment->toArray() : null,
+                    'account_officer_collections' => $collectionBreakdown->account_officer_collections->toArray(),
+                    'branch_collections' => $collectionBreakdown->branch_collections->toArray(),
+                    'pos_collections' => $collectionBreakdown->pos_collections->toArray(),
+                ];
+                $changes = getChanges($collectionBreakdown, $replicate);
+                unset($changes['attributes']['updated_at'], $changes['old']['updated_at']);
+                $relationshipsChanged = false;
+                $relationshipChanges = [
+                    'old' => [],
+                    'attributes' => []
+                ];
+                foreach ($oldRelationships as $key => $oldValue) {
+                    $newValue = $newRelationships[$key];
+                    if (json_encode($oldValue) !== json_encode($newValue)) {
+                        $relationshipsChanged = true;
+                        $relationshipChanges['old'][$key] = $oldValue;
+                        $relationshipChanges['attributes'][$key] = $newValue;
+                    }
+                }
+                if ($relationshipsChanged) {
+                    $changes['old'] = array_merge($changes['old'], $relationshipChanges['old']);
+                    $changes['attributes'] = array_merge($changes['attributes'], $relationshipChanges['attributes']);
+                }
+                if (!empty($changes['attributes']) || $relationshipsChanged) {
+                    activity("Cashier's Transaction Blotter")
+                        ->event('updated')
+                        ->performedOn($collectionBreakdown)
+                        ->withProperties([
+                            'model_snapshot' => $collectionBreakdown->toArray(),
+                            'attributes' => $changes['attributes'],
+                            'old' => $changes['old']
+                        ])
+                        ->log("Collection Breakdown - Update");
+                }
+            });
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -99,8 +145,7 @@ class CollectionBreakdownController extends Controller
 
     protected function handleCollectionDeletions($collectionBreakdown, $data)
     {
-        // Account Officer Collections
-        $incomingAoIds = isset($data['account_officer_collections']) 
+        $incomingAoIds = isset($data['account_officer_collections'])
             ? collect($data['account_officer_collections'])->pluck('collection_ao_id')->filter()->toArray()
             : [];
         $existingAoIds = $collectionBreakdown->account_officer_collections()->pluck('collection_ao_id')->toArray();
@@ -108,9 +153,7 @@ class CollectionBreakdownController extends Controller
         if (!empty($toDeleteAoIds)) {
             AccountOfficerCollection::whereIn('collection_ao_id', $toDeleteAoIds)->delete();
         }
-
-        // Branch Collections
-        $incomingBranchIds = isset($data['branch_collections']) 
+        $incomingBranchIds = isset($data['branch_collections'])
             ? collect($data['branch_collections'])->pluck('id')->filter()->toArray()
             : [];
         $existingBranchIds = $collectionBreakdown->branch_collections->pluck('id')->toArray();
@@ -118,9 +161,7 @@ class CollectionBreakdownController extends Controller
         if (!empty($toDeleteBranchIds)) {
             BranchCollection::destroy($toDeleteBranchIds);
         }
-
-        // POS Collections
-        $incomingPosIds = isset($data['pos_collections']) 
+        $incomingPosIds = isset($data['pos_collections'])
             ? collect($data['pos_collections'])->pluck('id')->filter()->toArray()
             : [];
         $existingPosIds = $collectionBreakdown->pos_collections->pluck('id')->toArray();
@@ -232,13 +273,24 @@ class CollectionBreakdownController extends Controller
     public function destroy(CollectionBreakdown $collectionBreakdown)
     {
         try {
-            $collectionBreakdown->branch_collections()->delete();
-            $collectionBreakdown->pos_collections()->delete();
-            $collectionBreakdown->other_payment()->delete();
-            $collectionBreakdown->account_officer_collections()->delete();
-            $collectionBreakdown->delete();
+            $collectionBreakdown->load(['other_payment', 'account_officer_collections', 'branch_collections', 'pos_collections']);
+            $snapshot = $collectionBreakdown->toArray();
+            DB::transaction(function () use ($collectionBreakdown, $snapshot) {
+                $collectionBreakdown->branch_collections()->delete();
+                $collectionBreakdown->pos_collections()->delete();
+                $collectionBreakdown->other_payment()->delete();
+                $collectionBreakdown->account_officer_collections()->delete();
+                $collectionBreakdown->delete();
+
+                activity("Cashier's Transaction Blotter")->event('deleted')->performedOn($collectionBreakdown)
+                    ->withProperties([
+                        'model_snapshot' => $snapshot,
+                        'old' => $snapshot
+                    ])
+                    ->log("Collection Breakdown - Delete");
+            });
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => 'Deleted successfully.']);

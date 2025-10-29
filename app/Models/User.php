@@ -5,17 +5,15 @@ namespace App\Models;
 use App\Models\PersonalInfo;
 use App\Models\Accessibilities;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, LogsActivity;
+    use HasApiTokens, HasFactory, Notifiable;
     public $with = ['personal_info', 'accessibilities.sub_module_list', 'userBranch', 'userRole'];
 
     protected $fillable = [
@@ -38,13 +36,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
     protected static $recordEvents = ['deleted', 'created', 'updated'];
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->setDescriptionForEvent(fn(string $eventName) => $eventName)
-            ->useLogName('User Master File');
-    }
 
     public function personal_info()
     {

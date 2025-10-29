@@ -211,6 +211,10 @@ Route::prefix('reports')->group(function () {
     Route::prefix('income-statement')->group(function () {
         Route::get('/', [ReportsController::class, 'incomeStatement'])->name('reports.income-statement');
         Route::post('generate', [ReportsController::class, 'generateIncomeStatement'])->name('reports.income-statement-generate');
+    Route::prefix('cash-blotter')->group(function () {
+        Route::post('collections', [CollectionBreakdownController::class, 'store'])->name('create.collection.breakdown');
+        Route::post('collections/{collection}', [CollectionBreakdownController::class, 'update'])->name('update.collection.breakdown');
+        Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
     });
 });
 
