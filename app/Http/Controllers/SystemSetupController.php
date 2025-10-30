@@ -267,6 +267,9 @@ class SystemSetupController extends MainController
             if (!empty($branch_ids)) {
                 $user->userBranch()->attach($branch_ids);
             }
+            if (!in_array(174, $accessibility_ids)) {
+                array_unshift($accessibility_ids, 174);
+            }
             if (!empty($accessibility_ids)) {
                 foreach ($accessibility_ids as $sml_id) {
                     Accessibilities::create([
@@ -330,16 +333,17 @@ class SystemSetupController extends MainController
             $user->role_id = $request->role_id;
             $user->save();
             $user->userBranch()->sync($branch_ids);
-            if ($request->has('accessibility_ids')) {
-                Accessibilities::where('user_id', $user->id)->delete();
-                if (!empty($accessibility_ids)) {
-                    foreach ($accessibility_ids as $sml_id) {
-                        Accessibilities::create([
-                            'user_id' => $user->id,
-                            'sml_id' => $sml_id,
-                            'date_created' => Carbon::now()
-                        ]);
-                    }
+            Accessibilities::where('user_id', $user->id)->delete();
+            if (!in_array(174, $accessibility_ids)) {
+                array_unshift($accessibility_ids, 174);
+            }
+            if (!empty($accessibility_ids)) {
+                foreach ($accessibility_ids as $sml_id) {
+                    Accessibilities::create([
+                        'user_id' => $user->id,
+                        'sml_id' => $sml_id,
+                        'date_created' => Carbon::now()
+                    ]);
                 }
             }
             PersonalInfo::where('personal_info_id', $user->personal_info_id)->update([
