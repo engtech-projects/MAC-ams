@@ -905,6 +905,39 @@ class ReportsController extends MainController
         return view('reports.sections.trialBalance', $data);
     }
 
+    public function trialBalanceSearch(Request $request)
+    {
+        $accounts = [];
+        $acc = new Accounts();
+        $fiscalYear = Accounting::getFiscalyear();
+        $tDate =  $request->input("asof") ? new Carbon($request->input("asof")) : Carbon::parse(TransactionDate::get_date());
+        $accounts = $acc->getTrialBalance([$fiscalYear->start_date, $tDate]);
+        $currentPage = $request->page ? $request->page : 1;
+        $perPage = 25;
+        $data = [
+            'title' => 'Subsidiary Ledger',
+            'trialBalance' => $accounts,
+            'paginated' => new LengthAwarePaginator(
+                array_slice($accounts, ($currentPage - 1) * $perPage, $perPage),
+                count($accounts),
+                $perPage,
+                $currentPage,
+                [
+                    'path' => url()->current(),
+                    // Set the current URL as the base URL for pagination links
+                ]
+            ),
+            'trialbalanceList' => '',
+            'transactionDate' => $tDate->toDateString(),
+        ];
+
+        return new JsonResponse([
+            'data' => $data,
+            'message' => "Successfully fetched.",
+            'success' => true
+        ], JsonResponse::HTTP_OK);
+    }
+
 
     public function bankReconcillation(Request $request)
     {
@@ -1250,7 +1283,7 @@ class ReportsController extends MainController
         $from = $accounting->start_date;
         $now = Carbon::now();
         $to =  $request->input("date") ? new Carbon($request->input("date")) : $now;
-        $balanceSheet = $coa->balanceSheet([$from, $to]);
+        $balanceSheet = $coa->balanceSheet([Carbon::parse($from), $to]);
         $data = [
             'title' => 'MAC-AMS | Balance Sheet',
             'requests' => ['from' => $from, 'to' => $to],
@@ -1260,6 +1293,28 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.balanceSheet', $data);
+    }
+
+    public function generateBalanceSheet(Request $request)
+    {
+        $coa = new Accounts();
+        $accounting = Accounting::getFiscalYear();
+        $from = $accounting->start_date;
+        $now = Carbon::now();
+        $to =  $request->input("date") ? Carbon::parse($request->input('date')) : $now;
+        $balanceSheet = $coa->balanceSheet([$from, $to]);
+        $data = [
+            'requests' => ['from' => $from, 'to' => $to],
+            'fiscalYear' => $accounting,
+            'balanceSheet' => $balanceSheet,
+            'current_date' => $to->toDateString(),
+        ];
+
+        return new JsonResponse([
+            'data' => $data,
+            'message' => 'Successfully fetched.',
+            'success' => true
+        ], JsonResponse::HTTP_OK);
     }
 
     public function incomeStatement(Request $request)
@@ -1283,6 +1338,31 @@ class ReportsController extends MainController
         ];
 
         return view('reports.sections.incomeStatement', $data);
+    }
+    public function generateIncomeStatement(Request $request)
+    {
+        $coa = new Accounts();
+        $accounting = Accounting::getFiscaltoday();
+
+        $from = isset($request->from) ? $request->from : $accounting->default_start;
+        $to = isset($request->to) ? $request->to : $accounting->default_end;
+
+        $incomeStatement = $coa->incomeStatement([$from, $to]);
+
+        $data = [
+            'title' => 'MAC-AMS | Income Statement',
+            'requests' => ['from' => $from, 'to' => $to],
+            'fiscalYear' => $accounting,
+            'incomeStatement' => $incomeStatement,
+            'from' => $from,
+            'to' => $to
+        ];
+
+        return new JsonResponse([
+            'data' => $data,
+            'message' => 'Successfully fetched.',
+            'success' => true
+        ], JsonResponse::HTTP_OK);
     }
 
     public function closingPeriod(Request $request)

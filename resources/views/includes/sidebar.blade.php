@@ -136,7 +136,7 @@
                         request()->is('reports/generalLedger') ||
                         request()->is('reports/balance-sheet') ||
                         request()->is('reports/trialBalance') ||
-                        request()->is('reports/incomeStatement') ||
+                        request()->is('reports/income-statement') ||
                         request()->is('reports/cashTransactionBlotter') ||
                         request()->is('reports/bankReconcillation') ||
                         request()->is('reports/cashPosition') ||
@@ -212,10 +212,10 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (checkUserHasAccessModule('sub-module', 'reports/incomeStatement'))
+                            @if (checkUserHasAccessModule('sub-module', 'reports/income-statement'))
                                 <li class="nav-item">
-                                    <a href="{{ route('reports.incomeStatement') }}"
-                                        class="nav-link {{ request()->is('reports/incomeStatement') ? 'active' : '' }}">
+                                    <a href="{{ route('reports.income-statement') }}"
+                                        class="nav-link {{ request()->is('reports/income-statement') ? 'active' : '' }}">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Income Statement</p>
                                     </a>

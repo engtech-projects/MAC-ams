@@ -161,7 +161,7 @@ Route::get('reports/balance-sheet', [ReportsController::class, 'balanceSheet'])-
 Route::get('reports/journal_entry', [ReportsController::class, 'journalEntry'])->name('reports.journal_entry');
 Route::post('reports/generalLedgerFetchAccount', [ReportsController::class, 'generalLedgerFetchAccount'])->name('reports.generalLedgerFetchAccount');
 Route::get('reports/trialBalance', [ReportsController::class, 'trialBalance'])->name('reports.trialBalance');
-Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement');
+
 Route::post('reports/closing-period', [ReportsController::class, 'closingPeriod'])->name('reports.closingPeriod');
 Route::get('reports/bankReconcillation', [ReportsController::class, 'bankReconcillation'])->name('reports.bankReconcillation');
 Route::get('reports/journalledger', [ReportsController::class, 'journalLedger'])->name('reports.journalLedger');
@@ -204,13 +204,22 @@ Route::prefix('reports')->group(function () {
         Route::post('search', [ReportsController::class, 'search'])->name('reports.monthly-depreciation-report-search');
         Route::post('post-by-branch', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
     });
-    Route::prefix('cash-blotter')->group(function () {
-        Route::post('collections', [CollectionBreakdownController::class, 'store'])->name('create.collection.breakdown');
-        Route::post('collections/{collection}', [CollectionBreakdownController::class, 'update'])->name('update.collection.breakdown');
-        Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
+    Route::prefix('trial-balance')->group(function () {
+        Route::post('search', [ReportsController::class, 'trialBalanceSearch'])->name('reports.trial-balance-search');
+    });
+    Route::prefix('balance-sheet')->group(function () {
+        Route::post('generate', [ReportsController::class, 'generateBalanceSheet'])->name('reports.balance-sheet');
+    });
+    Route::prefix('income-statement')->group(function () {
+        Route::get('/', [ReportsController::class, 'incomeStatement'])->name('reports.income-statement');
+        Route::post('generate', [ReportsController::class, 'generateIncomeStatement'])->name('reports.income-statement-generate');
+        Route::prefix('cash-blotter')->group(function () {
+            Route::post('collections', [CollectionBreakdownController::class, 'store'])->name('create.collection.breakdown');
+            Route::post('collections/{collection}', [CollectionBreakdownController::class, 'update'])->name('update.collection.breakdown');
+            Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
+        });
     });
 });
-
 Route::prefix('system-setup')->group(function () {
     Route::prefix('posting-periods')->group(function () {
         Route::resource('posting-period', PostingPeriodController::class);

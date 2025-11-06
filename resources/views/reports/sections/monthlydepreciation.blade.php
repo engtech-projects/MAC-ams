@@ -32,6 +32,12 @@
     <!-- Main content -->
     <section class="content" id="app">
         <?php $url = env('APP_URL'); ?>
+        <div v-if="isLoading" class="loading-overlay">
+            <p>Loading... </p>
+            <div class="spinner"></div>
+        </div>
+
+
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
             <div class="row">
                 <div class="col-md-12">
@@ -73,7 +79,8 @@
                                                             <div class="input-group">
                                                                 <select v-model="filter.branch" @change="onSearch()"
                                                                     class="form-control form-control-sm" id="branch">
-                                                                    <option :value="null" disabled selected>SELECT
+                                                                    <option :value="null" disabled selected>
+                                                                        SELECT
                                                                         BRANCH
                                                                     </option>
                                                                     <option v-for="branch in branches"
@@ -246,7 +253,8 @@
                                             <tr v-for="(ps,i) in subsidiaryMonthlyDepreciation"
                                                 :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
                                                 <td v-if="i<=8" v-for="p,i in ps" :class="rowStyles(ps[0])"
-                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">
+                                                    @{{ p }}
                                                 </td>
 
                                             </tr>
@@ -279,12 +287,14 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="message-text" class="col-form-label">Inventory Number: </label>
+                                        <label for="message-text" class="col-form-label">Inventory Number:
+                                        </label>
                                         <input type="text" v-model="subsidiary.sub_code" class="form-control"
                                             id="sub_code" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="recipient-name" class="col-form-label">Particular Name: </label>
+                                        <label for="recipient-name" class="col-form-label">Particular Name:
+                                        </label>
                                         <input type="text" v-model="subsidiary.sub_name" class="form-control"
                                             id="sub_name" required>
                                         <input v-if="isEdit" type="hidden" name="_method" value="PUT">
@@ -336,7 +346,8 @@
                                     </div>
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name != 'Additional Prepaid Expense'">
-                                        <label for="message-text" class="col-form-label">Rate Percentage(%):</label>
+                                        <label for="message-text" class="col-form-label">Rate
+                                            Percentage(%):</label>
                                         <input type="number" v-model="subsidiary.sub_salvage" class="form-control"
                                             id="sub_salvage">
                                     </div>
@@ -369,7 +380,9 @@
                                     <div class="col-md-6"
                                         v-show="filter.category?.sub_cat_name === 'Additional Prepaid Expense' && isEdit">
                                         <label for="message-text" class="col-form-label">Expense <span
-                                                class="text-success ms-2" style="font-size: 0.875rem;">*(Note: Should be
+                                                class="text-success ms-2" style="font-size: 0.875rem;">*(Note:
+                                                Should
+                                                be
                                                 less than
                                                 @{{ subsidiary.unexpensed }})*</span></label>
                                         <input type="text" @change="formatToPrepaidAmountField()"
@@ -383,7 +396,8 @@
                                     </div>
                                     <div class="col-md-6"
                                         v-if="isEdit && filter.category?.sub_cat_name !== 'Additional Prepaid Expense'">
-                                        <label for="unexpensed-text" class="col-form-label"> Total Unexpensed: </label>
+                                        <label for="unexpensed-text" class="col-form-label"> Total Unexpensed:
+                                        </label>
                                         <input type="text" :value="formattedUnexpensed" class="form-control"
                                             id="unexpensed" readonly>
                                     </div>
@@ -417,7 +431,8 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label for="message-text" class="col-form-label">Number of remaining bal to
+                                        <label for="message-text" class="col-form-label">Number of remaining bal
+                                            to
                                             pay:</label>
 
                                         <input type="number" class="form-control" v-model="sub.rem" min="1">
@@ -429,7 +444,8 @@
 
 
                                     <div class="col-md-12">
-                                        <label for="message-text" class="col-form-label">Total of remaining balance:
+                                        <label for="message-text" class="col-form-label">Total of remaining
+                                            balance:
                                         </label>
                                         <input type="text" disabled v-model="newRemBalance" class="form-control"
                                             id="sub_acct_no">
@@ -447,11 +463,14 @@
             </div>
         </div>
 
-        </div>
+
+
+
 
     </section>
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
     <!-- /.content -->
+
     <script>
         new Vue({
             el: '#app',
@@ -479,6 +498,7 @@
                 subId: null,
                 newSub: null,
                 searching: false,
+                isLoading: false,
                 filter: {
                     branch: null,
                     subsidiary_id: '',
@@ -1321,6 +1341,7 @@
                             item.rem = 1
                             return item;
                         })
+                        this.isLoading = true;
                         axios.post('post', this.subsidiaries, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
@@ -1334,7 +1355,9 @@
                             window.reload();
                         }).catch(err => {
                             console.error(err)
-                        })
+                        }).finally(() => {
+                            this.isLoading = false;
+                        });
                     } else {
                         toastr.warning("No data available");
                     }
@@ -1343,6 +1366,7 @@
                     this.resetForm()
                     if (data) {
                         data.branch_id = this.filter.branch.branch_id;
+                        this.isLoading = true;
                         axios.post('post', data, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
@@ -1355,7 +1379,9 @@
                             window.reload();
                         }).catch(err => {
                             console.error(err)
-                        })
+                        }).finally(() => {
+                            this.isLoading = false;
+                        });
                     } else {
                         toastr.warning("No data available");
                     }
@@ -1590,7 +1616,7 @@
                     this.subsidiary.sub_amount = amount;
                     this.subsidiary.branch = this.filter.branch
                     this.subsidiary.sub_cat_id = this.filter.category.sub_cat_id
-
+                    this.isLoading = true;
                     axios.post('/subsidiary', this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
@@ -1615,7 +1641,9 @@
                             }
                         }
                         toastr.error(messages);
-                    })
+                    }).finally(() => {
+                        this.isLoading = false;
+                    });
                 },
                 addSubsidiary: function(data) {
                     const filters = this.filter;
@@ -1715,7 +1743,7 @@
                     this.subsidiary.original_life = parseInt(this.subsidiary.sub_no_depre ?? 1);
 
                     this.recomputeExpUnexp();
-
+                    this.isLoading = true;
                     axios.post('/subsidiary/' + subId, this.subsidiary, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
@@ -1751,10 +1779,13 @@
                             this.formatTextField();
                             this.formatToPrepaidAmountField();
                         });
-                    })
+                    }).finally(() => {
+                        this.isLoading = false;
+                    });
                 },
                 deleteSub: function(data) {
                     var url = @json(env('APP_URL'));
+                    this.isLoading = true;
                     axios.delete('/subsidiary/' + data, {
                         headers: {
                             'X-CSRF-TOKEN': document.head.querySelector(
@@ -1766,11 +1797,14 @@
                         this.deleteSubsidiary(data);
                     }).catch(err => {
                         toastr.success(err);
-                    })
+                    }).finally(() => {
+                        this.isLoading = false;
+                    });
                 },
 
                 fetchSubAll: function() {
                     this.filter.type = this.reportType;
+                    this.isLoading = true;
                     axios.post(this.search, this.filter, {
                             headers: {
                                 'X-CSRF-TOKEN': document.head.querySelector(
@@ -1792,7 +1826,6 @@
                                     dueAmort = item.unexpensed
                                 }
 
-                                // FIX ledger to due amort
                                 if (item.rem == 0) {
                                     dueAmort = 0.00;
                                 }
@@ -1816,6 +1849,8 @@
                         })
                         .catch(error => {
                             console.error('Error:', error);
+                        }).finally(() => {
+                            this.isLoading = false;
                         });
                 },
 

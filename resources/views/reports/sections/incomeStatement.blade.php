@@ -29,157 +29,156 @@
     <!-- Main content -->
     <section class="content" id="app">
         <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+            <div v-if="isLoading" class="loading-overlay">
+                <p>Loading... </p>
+                <div class="spinner"></div>
+            </div>
             <div class="row">
 
                 <?php
-                
-                // echo '<pre>';
-                // var_export($currentEarnings);
-                // echo '</pre>';
+
+
                 ?>
 
                 <div class="col-md-12 title-header">
                     <h4><b>Income Statement</b></h4>
                 </div>
-
-
-                <form method="get" id="frm-generate-income-statement" class="col-12">
-                    @csrf
-
-                    <div class="row">
-                        <div class="col-md-3 col-xs-12">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal">From</label>
-                                    <div class="input-group">
-                                        <input type="date" value="{{ $from }}" name="from"
-                                            class="form-control form-control-sm rounded-0" required>
-                                    </div>
+                <div class="row">
+                    <div class="col-md-3 col-xs-12">
+                        <div class="box">
+                            <div class="form-group">
+                                <label class="label-normal">From</label>
+                                <div class="input-group">
+                                    <input type="date" value="{{ $from }}" name="from"
+                                        class="form-control form-control-sm rounded-0" required>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-xs-12">
-                            <div class="box">
-                                <div class="form-group">
-                                    <label class="label-normal">To</label>
-                                    <div class="input-group">
-                                        <input type="date" value="{{ $to }}" name="to"
-                                            class="form-control form-control-sm rounded-0" required>
-                                    </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div class="box">
+                            <div class="form-group">
+                                <label class="label-normal">To</label>
+                                <div class="input-group">
+                                    <input type="date" value="{{ $to }}" name="to"
+                                        class="form-control form-control-sm rounded-0" required>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="col-md-2 col-xs-12">
-                            <div class="box pt-4">
-                                <input type="submit" class="btn btn-success" value="Search">
+                    <div class="col-md-2 col-xs-12">
+                        <div class="box pt-4">
+                            <button @click="genrateIncomeStatement()" class="btn btn-success"></button>
 
-                                <input type="button" class="btn btn-primary " @click="closingPeriodConfirmation()"
-                                    value="Closing Period">
-                            </div>
-
+                            <input type="button" class="btn btn-primary " @click="closingPeriodConfirmation()"
+                                value="Closing Period">
                         </div>
 
                     </div>
 
-                </form>
+                </div>
 
 
             </div>
 
             <div class="row justify-content-start">
                 <div class="col-md-8">
-
                     <table class="table table-sm border">
-
-                        @foreach ($incomeStatement['accounts'] as $category => $type)
-                            <thead>
-                                <tr>
-                                    <th class="indent-1" width="50%">{{ Str::upper($category) }}</th>
-                                    <th width="25%"></th>
-                                    <th width="25%"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                @foreach ($type['types'] as $group => $data)
-                                    <tr class="border-0">
-                                        <td class="indent-1">{{ Str::title($data['name']) }}</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    @foreach ($data['accounts'] as $key => $value)
-                                        <tr class="border-0">
-                                            <td class="indent-2">{{ Str::title($value['account_name']) }}</td>
-                                            <td class="text-right">{{ number_format($value['total'], 2) }}</td>
-                                            <td></td>
-                                        </tr>
-                                    @endforeach
-                                    <tr class="border-0">
-                                        <td colspan="3">&nbsp;</td>
-                                    </tr>
-                                    <tr style="border-style: double;">
-                                        <td class="indent-1">Total {{ Str::title($data['name']) }}</td>
-                                        <td></td>
-                                        <td class="text-bold text-right indent-1-r">{{ number_format($data['total'], 2) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3">&nbsp;</td>
-                                    </tr>
-                                @endforeach
-                                <tr style="border-style: double;">
-                                    <td class="indent-1 text-bold">Total {{ Str::title($category) }}</td>
+                        <tbody v-for="(type, category) in incomeStatement.accounts" :key="category">
+                            <tr>
+                                <th class="indent-1" width="50%">@{{ category.toUpperCase() }}</th>
+                                <th width="25%"></th>
+                                <th width="25%"></th>
+                            </tr>
+                            <template v-for="(data, group) in type.types">
+                                <tr :key="group + '-header'" class="border-0">
+                                    <td class="indent-1">@{{ capitalize(data.name) }}</td>
                                     <td></td>
-                                    <td class="text-bold text-right indent-1-r">{{ number_format($type['total'], 2) }}</td>
+                                    <td></td>
                                 </tr>
-                                <tr>
+                                <tr v-for="(value, key) in data.accounts" :key="group + '-' + key" class="border-0">
+                                    <td class="indent-2">@{{ capitalize(value.account_name) }}</td>
+                                    <td class="text-right">@{{ formatNumber(value.total) }}</td>
+                                    <td></td>
+                                </tr>
+
+                                <tr class="border-0" :key="group + '-spacer1'">
                                     <td colspan="3">&nbsp;</td>
                                 </tr>
-                            </tbody>
-                        @endforeach
-                        <thead>
+
+                                <tr style="border-style: double;" :key="group + '-total'">
+                                    <td class="indent-1">Total @{{ data.name }}</td>
+                                    <td></td>
+                                    <td class="text-bold text-right indent-1-r">@{{ formatNumber(data.total) }}</td>
+                                </tr>
+
+                                <tr :key="group + '-spacer2'">
+                                    <td colspan="3">&nbsp;</td>
+                                </tr>
+                            </template>
+
+                            <tr style="border-style: double;" :key="category + '-total'">
+                                <td class="indent-1 text-bold">Total @{{ capitalize(category) }}</td>
+                                <td></td>
+                                <td class="text-bold text-right indent-1-r">@{{ formatNumber(type.total) }}</td>
+                            </tr>
+
+                            <tr :key="category + '-spacer'">
+                                <td colspan="3">&nbsp;</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
                             <tr>
-                                <th class="indent-1" width="50%">{{ $incomeStatement['profit']['title'] }}</th>
+                                <th class="indent-1" width="50%">@{{ incomeStatement.profit.title }}</th>
                                 <th width="25%"></th>
                                 <th width="25%" class="text-right indent-1-r">
-                                    {{ number_format($incomeStatement['profit']['value'], 2) }}</th>
+                                    @{{ formatNumber(incomeStatement.profit.value) }}
+                                </th>
                             </tr>
                             <tr>
-                                <th class="indent-1" width="50%">{{ $incomeStatement['income_tax']['title'] }}</th>
-                                <th width="25%"></th>
-                                <th width="25%" class="text-right indent-1-r">
-                                    {{ number_format($incomeStatement['income_tax']['value'], 2) }}</th>
+                                <th class="indent-1">@{{ incomeStatement.income_tax.title }}</th>
+                                <th></th>
+                                <th class="text-right indent-1-r">@{{ formatNumber(incomeStatement.income_tax.value) }}</th>
                             </tr>
                             <tr>
                                 <th colspan="3">&nbsp;</th>
                             </tr>
                             <tr>
-                                <th class="indent-1" width="50%">{{ $incomeStatement['net_income']['title'] }}</th>
-                                <th width="25%"></th>
-                                <th width="25%" class="text-right indent-1-r">
-                                    {{ number_format($incomeStatement['net_income']['value'], 2) }}</th>
+                                <th class="indent-1">@{{ incomeStatement.net_income.title }}</th>
+                                <th></th>
+                                <th class="text-right indent-1-r">@{{ formatNumber(incomeStatement.net_income.value) }}</th>
                             </tr>
-                        </thead>
-
+                        </tfoot>
                     </table>
                 </div>
             </div>
         </div>
 
-        {{--         <div class="modal fade" id="postingPeriodConfirmation" tabindex="1" role="dialog" aria-labelledby="journalModal"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
+        <div class="modal fade" id="postingPeriodConfirmation" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
                 <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     <div class="modal-body">
-                        <div class="container-fluid ">
-                            <h6>Are you sure to close the period for year  <strong> @{{ getYearFromDate(from) }}</strong>?
-                            </h6>
+                        <p>Are you sure you want to close the period for year <strong>@{{ getYearFromDate(from) }}</strong>?</p>
+                        <div class="form-group">
+                            <label for="journalDate">Journal Date</label>
+                            <input type="date" id="journalDate" name = "journalDate" class="form-control"
+                                v-model="journalDate" required>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="closingPeriod()">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
 
         <div class="modal fade" id="postingPeriodConfirmation" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
@@ -215,6 +214,7 @@
         new Vue({
             el: '#app',
             data: {
+                isLoading: false,
                 incomeStatement: @json($incomeStatement),
                 net_income: @json($incomeStatement['net_income']['value']),
                 from: @json($from),
@@ -229,12 +229,46 @@
 
             },
             methods: {
+                capitalize(str) {
+                    if (!str) return "";
+                    return str
+                        .toLowerCase()
+                        .split(" ")
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(" ");
+                },
+                formatNumber(value) {
+                    if (value == null || value === "") return "0.00";
+                    return Number(value).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+                genrateIncomeStatement: async function() {
+                    this.isLoading = true
+                    await axios.post('/reports/income-statement/generate', {
+                        from: this.from,
+                        to: this.to
+                    }, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                .content
+                        }
+                    }).then(response => {
+                        toastr.success(response.data.message);
+                        this.incomeStatement = response.data.data.incomeStatement
+                    }).catch(err => {
+                        toastr.error(err.response.data.message);
+
+                    }).finally(() => {
+                        this.isLoading = false;
+                    });
+                },
                 getYearFromDate(dateString) {
                     if (!dateString) return '';
                     return new Date(dateString).getFullYear();
                 },
                 updateYearDisplay() {
-                    // Optional: Force reactivity if needed
                     this.$forceUpdate();
                 },
 
@@ -242,6 +276,7 @@
                     $('#postingPeriodConfirmation').modal('show');
                 },
                 closingPeriod: function() {
+                    this.isLoading = true;
                     var data = {
                         income_statement: this.incomeStatement,
                         net_income: this.net_income,
@@ -260,7 +295,9 @@
                     }).catch(err => {
                         toastr.error(err.response.data.message);
 
-                    })
+                    }).finally(() => {
+                        this.isLoading = false;
+                    });
                 },
             },
         })
