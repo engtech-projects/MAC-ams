@@ -69,7 +69,7 @@
 
                     <div class="col-md-2 col-xs-12">
                         <div class="box pt-4">
-                            <button @click="genrateIncomeStatement()" class="btn btn-success">Generate</button>
+                            <button @click="genrateIncomeStatement()" class="btn btn-success"></button>
 
                             <input type="button" class="btn btn-primary " @click="closingPeriodConfirmation()"
                                 value="Closing Period">
