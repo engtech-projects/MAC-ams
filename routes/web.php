@@ -199,25 +199,22 @@ Route::prefix('reports')->group(function () {
         Route::post('search', [ReportsController::class, 'search'])->name('reports.monthly-depreciation-report-search');
         Route::post('post-by-branch', [ReportsController::class, 'postMonthlyDepreciation'])->name('reports.post-monthly-depreciation');
     });
-
     Route::prefix('trial-balance')->group(function () {
         Route::post('search', [ReportsController::class, 'trialBalanceSearch'])->name('reports.trial-balance-search');
     });
     Route::prefix('balance-sheet')->group(function () {
         Route::post('generate', [ReportsController::class, 'generateBalanceSheet'])->name('reports.balance-sheet');
     });
-/*     Route::get('reports/incomeStatement', [ReportsController::class, 'incomeStatement'])->name('reports.incomeStatement'); */
-
     Route::prefix('income-statement')->group(function () {
         Route::get('/', [ReportsController::class, 'incomeStatement'])->name('reports.income-statement');
         Route::post('generate', [ReportsController::class, 'generateIncomeStatement'])->name('reports.income-statement-generate');
-    Route::prefix('cash-blotter')->group(function () {
-        Route::post('collections', [CollectionBreakdownController::class, 'store'])->name('create.collection.breakdown');
-        Route::post('collections/{collection}', [CollectionBreakdownController::class, 'update'])->name('update.collection.breakdown');
-        Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
+        Route::prefix('cash-blotter')->group(function () {
+            Route::post('collections', [CollectionBreakdownController::class, 'store'])->name('create.collection.breakdown');
+            Route::post('collections/{collection}', [CollectionBreakdownController::class, 'update'])->name('update.collection.breakdown');
+            Route::delete('collections/{collection}', [CollectionController::class, 'destroy'])->name('delete.collection');
+        });
     });
 });
-
 Route::prefix('system-setup')->group(function () {
     Route::prefix('posting-periods')->group(function () {
         Route::resource('posting-period', PostingPeriodController::class);
