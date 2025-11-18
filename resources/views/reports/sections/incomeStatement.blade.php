@@ -67,12 +67,11 @@
                         </div>
                     </div>
 
-                    <div class="col-md-2 col-xs-12">
-                        <div class="box pt-4">
-                            <button @click="genrateIncomeStatement()" class="btn btn-success"></button>
+                    <div class="col-md-6 col-xs-12">
+                        <div class="box pt-4 m-1">
+                            <button @click="genrateIncomeStatement()" class="btn btn-success">Generate</button>
 
-                            <input type="button" class="btn btn-primary " @click="closingPeriodConfirmation()"
-                                value="Closing Period">
+                            <button class="btn btn-primary " @click="closingPeriodConfirmation()">Closing Period</button>
                         </div>
 
                     </div>
