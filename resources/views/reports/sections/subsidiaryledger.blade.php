@@ -1,0 +1,1910 @@
+@extends('layouts.app')
+
+@section('content')
+    <style type="text/css">
+        .frm-header {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4ec891;
+        }
+
+        .search-custom {
+            display: block;
+            position: absolute;
+            z-index: 999;
+            width: 100%;
+            margin: 0px !important;
+            color: #3d9970 !;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .dataTables_filter {
+            float: right !important;
+        }
+
+        .buttons-print,
+        .buttons-html5 {
+            display: none;
+        }
+
+        .dropdown-item.btn-edit-account:not(.subsid-delete):hover {
+            background-color: #e8f4fe !important;
+            color: #0d6efd !important;
+        }
+        
+        /* Hover effect for Delete button */
+        .dropdown-item.subsid-delete:hover {
+            background-color: #ffebee !important;
+            color: #dc3545 !important;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .dataTables_filter {
+            display: block !important;
+        }
+    </style>
+
+    <!-- Main content -->
+    <section class="content" id="app">
+        <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <form id="subsidiaryForm" method="post">
+                        @csrf
+                        <input type="hidden" class="form-control form-control-sm rounded-0" name="sub_id" id="sub_id"
+                            placeholder="">
+                        <div class="row">
+                            <div class="col-md-8 frm-header">
+                                <h4><b>Subsidiary Ledger</b></h4>
+
+                            </div>
+                            <div class="col-md-4 frm-header">
+                                <label class="label-normal" for="reportType">Select Report</label>
+                                <div class="input-group">
+                                    <select v-model="reportType" name="reportType" class="form-control form-control-sm"
+                                        id="reportType">
+                                        <option value="" disabled selected>-Select Report-</option>
+                                        <option value="income_minus_expense">Income Minus Expense</option>
+                                        <option value="income_minus_expense_summary">Income Minus Expense (Summary)</option>
+                                        <option value="subsidiary_all_account">Subsidiary (All Account)</option>
+                                        <option value="subsidiary_per_account">Subsidiary (Per Account)</option>
+                                        <option value="subsidiary-ledger-listing-report">Subsidiary (Listing)</option>
+                                        <option value="subsidiary-ledger-summary-report">Subsidiary (Summary)</option>
+                                        <option value="schedule_of_account">Schedule of Account</option>
+                                        <option value="subsidiary_aging_account">Subsidiary Aging / Account</option>
+                                        <option value="aging_of_payables">Aging of Payables</option>
+                                        <option value="statment_of_receivables">Statement of Receivables</option>
+                                        <option value="statement_of_payables">Statemnt of Payables</option>
+                                        <option value="collection_details_report">Collection Details Report</option>
+                                        <option value="payment_details_report">Payment Details Report</option>
+                                        <option value="month_end_schedule_report">Month End Schedule Report</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div v-if="reportType==''" class="row col-md-12">
+                                <div class="col-md-1 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_code">Code</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm rounded-0"
+                                                    v-model="subsidiary.sub_code" placeholder="Code" name="sub_code" id="sub_code" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_name">Subsidiary Name</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm rounded-0"
+                                                    v-model="subsidiary.sub_name" placeholder="Subsidiary Name" name="sub_name" id="sub_name" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_address">Address</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sm rounded-0"
+                                                    v-model="subsidiary.sub_address" name="sub_address" id="sub_address"
+                                                    placeholder="Address">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_tel">Phone Number</label>
+                                            <div class="input-group">
+                                                <input type="Number" class="form-control form-control-sm rounded-0"
+                                                    v-model="subsidiary.sub_tel" name="sub_tel" id="sub_tel"
+                                                    placeholder="Phone Number">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_cat_id">Subsidiary Category</label>
+                                            <div class="input-group">
+                                                <select v-model="subsidiary.sub_cat_id" name="sub_cat_id" class="form-control form-control-sm" id="sub_cat_id" required>
+                                                    <option value="" disabled>-Select Category-</option>
+                                                    @foreach ($sub_categories as $sub_category)
+                                                        <option value="{{ $sub_category->sub_cat_id }}">
+                                                            {{ $sub_category->sub_cat_code }} -
+                                                            {{ $sub_category->sub_cat_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_per_branch">Branch</label>
+                                            <div class="input-group">
+                                                <select v-model="subsidiary.sub_per_branch" name="sub_per_branch" class="form-control form-control-sm" id="sub_per_branch" required>
+                                                    <option value="" disabled selected>-Select Branch-</option>
+                                                    <option value="00001">MAIN BRANCH - BUTUAN BRANCH</option>
+                                                    <option value="00002">BRANCH 2 - NASIPIT BRANCH</option>
+                                                    <option value="00003">BRANCH 3 - GINGOOG BRANCH</option>
+                                                    <option value="00000">HEAD OFFICE</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 col-xs-12">
+                                    <div class="box">
+                                        <div class="form-group">
+                                            <label class="label-normal" for="sub_amount">Amount</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control form-control-sm rounded-0"
+                                                    v-model="subsidiary.sub_amount" name="sub_amount" id="sub_amount" placeholder="Amount">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 text-right">
+                                    <div class="d-flex align-items-center mt-4">
+                                      <button
+                                        v-cloak
+                                        type="submit"
+                                        class="btn btn-success px-4 py-2"
+                                        :style="{ width: isEdit ? '100px' : '120px' }"
+                                      >
+                                        @{{ isEdit ? 'Update' : 'Save' }}
+                                      </button>
+
+                                      <button
+                                        v-cloak
+                                        type="button"
+                                        class="btn btn-danger"
+                                        @click="cancelEdit"
+                                        v-if="isEdit"
+                                        style="width: 40px; height: 38px; padding: 0; flex-shrink: 0;"
+                                      >
+                                        &times;
+                                      </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form @submit.prevent="submitForm" action="">
+                    <div v-show="['subsidiary_all_account', 'subsidiary_per_account', 'income_minus_expense', 'subsidiary-ledger-listing-report', 'subsidiary-ledger-summary-report', 'income_minus_expense_summary'].includes(reportType)"
+                        class="row col-md-12 no-print">
+                        <div class="col-md-2 col-xs-12"
+                            v-show="['subsidiary_all_account', 'subsidiary_per_account', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="sub_acct_no">Subsidiary</label>
+                                    <div class="input-group">
+                                        <select name="subsidiary_id" class="select2 form-control form-control-sm"
+                                            style="width:100%" id="subsidiaryDD">
+                                            @foreach ($subsidiaryData as $subdata)
+                                                <option value="{{ $subdata->sub_id }}">
+                                                    {{ $subdata->sub_code }} - {{ $subdata->sub_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-show="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'subsidiary-ledger-summary-report'].includes(reportType)"
+                            class="col-md-3 col-xs-12" style="margin-right:64px;">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="account">Account</label>
+                                    <div class="input-group">
+                                        <select name="account_id" class="select2 form-control form-control-sm"
+                                            id="subsidiaryFilterAccountTitle" {{--          v-model="filter.account_id" --}}
+                                            style="width: 100% !important;">
+                                            <option value="all">All Accounts</option>
+                                            @foreach ($accounts as $account)
+                                                @if ($account->type == 'L' || $account->type == 'R')
+                                                    <option value="{{ $account->account_id }}">
+                                                        {{ $account->account_number }} - {{ $account->account_name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-2 col-xs-12"
+                            v-if="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="date_from">From</label>
+                                    <div class="input-group">
+                                        <input v-model="filter.from" type="date"
+                                            class=" form-control form-control-sm rounded-0" name="from" id="sub_date"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-xs-12"
+                            v-if="['subsidiary_per_account', 'subsidiary-ledger-listing-report', 'income_minus_expense', 'income_minus_expense_summary'].includes(reportType)">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="date_to">To</label>
+                                    <div class="input-group">
+                                        <input v-model="filter.to" type="date"
+                                            class="form-control form-control-sm rounded-0" name="to" id="sub_date"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-xs-12"
+                            v-show="['subsidiary-ledger-summary-report'].includes(reportType)">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="sub_date">As of:</label>
+                                    <div class="input-group">
+                                        <input v-model="filter.asof" type="date"
+                                            class="form-control form-control-sm rounded-0" name="to" id="sub_date"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="col-md-2 col-xs-12">
+                            <div class="box">
+                                <div class="form-group">
+                                    <label class="label-normal" for="sub_date"></label>
+                                    <div class="input-group">
+                                        <button class="btn btn-flat btn-sm bg-gradient-success " type="submit"
+                                            style="margin-top:8px;width:100px;">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="co-md-12"></div>
+            <!-- <div class="col-md-12">
+                <button class="btn btn-success" id="subsidiaryPrintExcel" type="subsidiary_ledger">Print
+                    Excel</button>
+            </div> -->
+            <div class="col-md-12">
+                <div v-if="reportType=='income_minus_expense_summary'">
+                    <section class="content">
+                        <div class="container-fluid" style="padding:32px;background-color:#fff;min-height:900px;">
+                            <div class="row justify-content-start">
+                                <div class="col-md-8">
+                                    <table class="table table-sm border">
+                                        <table v-for="(type,category) in incomeStatementSummary.accounts"
+                                            class="table table-sm border">
+                                            <thead>
+                                                <tr>
+                                                    <th class="indent-1" width="50%">@{{ category.toUpperCase() }}</th>
+                                                    <th width="25%"></th>
+                                                    <th width="25%"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <template v-for="(data,group) in type.types">
+
+                                                    <tr class="border-0">
+                                                        <td class="indent-1">@{{ titleCase(data.name) }}</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <template v-for="(value,key) in data.accounts">
+                                                        <tr class="border-0">
+                                                            <td class="indent-2">@{{ titleCase(value.account_name) }}</td>
+                                                            <td class="text-right">@{{ value.total }}</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </template>
+                                                    <tr class="border-0">
+                                                        <td colspan="3">&nbsp;</td>
+                                                    </tr>
+                                                    <tr style="border-style: double;">
+                                                        <td class="indent-1">Total @{{ titleCase(data.name) }}</td>
+                                                        <td></td>
+                                                        <td class="text-bold text-right indent-1-r">
+                                                            @{{ data.formatted_total }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3">&nbsp;</td>
+                                                    </tr>
+                                                </template>
+                                                <tr style="border-style: double;">
+                                                    <td class="indent-1 text-bold">Total @{{ titleCase(category) }}</td>
+                                                    <td></td>
+                                                    <td class="text-bold text-right indent-1-r">@{{ type.total }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3">&nbsp;</td>
+                                                </tr>
+                                            </tbody>
+                                            <table>
+                                                <thead v-if="incomeStatementSummary!={}">
+                                                    <tr>
+                                                        <th class="indent-1" width="50%">@{{ incomeStatementSummary?.profit?.title }}
+                                                        </th>
+                                                        <th width="25%"></th>
+                                                        <th width="25%" class="text-right indent-1-r">
+                                                            @{{ incomeStatementSummary?.profit?.value }}</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="indent-1" width="50%">@{{ incomeStatementSummary?.income_tax?.title }}
+                                                        </th>
+                                                        <th width="25%"></th>
+                                                        <th width="25%" class="text-right indent-1-r">
+                                                            @{{ incomeStatementSummary?.income_tax?.value }}</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="3">&nbsp;</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="indent-1" width="50%">@{{ incomeStatementSummary?.net_income?.title }}
+                                                        </th>
+                                                        <th width="25%"></th>
+                                                        <th width="25%" class="text-right indent-1-r">
+                                                            @{{ incomeStatementSummary?.net_income?.value }}</th>
+                                                    </tr>
+                                                </thead>
+
+                                            </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Table -->
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12 table-responsive">
+                                <table v-if="reportType==''" id="subsidiaryledgerTbl" class="table ">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Subsidiary Name</th>
+                                            <th>Address</th>
+                                            <th style="width:10%;">Phone No.</th>
+                                            <th style="width:10%;">Branch</th>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($subsidiaryData as $data)
+                                            <tr>
+                                                <td>{{ $data->sub_code }}</td>
+                                                <td>{{ $data->sub_name }}</td>
+                                                <td>{{ $data->sub_address }}</td>
+                                                <td>{{ $data->sub_tel }}</td>
+                                                <td>{{ Str::after($data->branch, '-') }}</td>
+                                                <td>{{ isset($data->sub_date) ? Carbon::parse($data->sub_date)->format('m/d/Y') : '' }}</td>
+                                                <td>₱{{ number_format((float)$data->sub_amount, 2) }}</td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-xs btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fas fa-filter"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            <a class="dropdown-item btn-edit-account subsid-edit" data-value="{{ $data->sub_id }}" href="#" 
+                                                               style="transition: background-color 0.2s;">Edit</a>
+                                                            <a class="dropdown-item btn-edit-account subsid-delete" value="{{ $data->sub_id }}" href="#"
+                                                               style="transition: background-color 0.2s;">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+
+                                <table v-if="reportType=='subsidiary-ledger-listing-report'" style="table-layout: fixed;"
+                                    id="generalLedgerTbl" class="table">
+                                    <thead>
+                                        <th width="15%">Date</th>
+                                        <th>Reference</th>
+                                        <th width="26%">Preference Name</th>
+                                        <th>Source</th>
+                                        <th>Cheque Date</th>
+                                        <th>Cheque No.</th>
+                                        <th class="text-right">Debit</th>
+                                        <th class="text-right">Credit</th>
+                                        <th class="text-right">Balance</th>
+
+                                    </thead>
+                                    <tbody id="generalLedgerTblContainer">
+                                        {{-- <tr v-if="!subsidiaryAll.entries">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
+                                                </td>
+                                            </tr> --}}
+
+                                        <tr v-for="ps in listing"
+                                            :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                            {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
+                                            <td v-for="p,i in ps" :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table v-if="reportType=='subsidiary-ledger-summary-report'" style="table-layout: fixed;"
+                                    id="subsidiarySummaryReport" class="table">
+                                    <thead>
+                                        <th width="15%">Code</th>
+                                        <th width="25%">Reference Name</th>
+                                        <th class="text-right">Debit</th>
+                                        <th class="text-right">Credit</th>
+                                        <th class="text-right">Balance</th>
+
+
+                                    </thead>
+                                    <tbody id="generalLedgerTblContainer">
+                                        {{-- <tr v-if="!subsidiaryAll.entries">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
+                                                </td>
+                                            </tr> --}}
+
+                                        <tr v-for="ps in summary">
+                                            <td v-for="p,i in ps" :class="rowStyleSubsidiarySummary(p, i, ps)"
+                                                :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table v-if="reportType=='subsidiary_per_account'" style="table-layout: fixed;"
+                                    id="generalLedgerTbl" class="table">
+                                    <thead>
+                                        <th width="15%">Date</th>
+                                        <th>Reference</th>
+                                        <th width="26%">Preference Name</th>
+                                        <th>Source</th>
+                                        <th>Cheque Date</th>
+                                        <th>Cheque No.</th>
+                                        <th class="text-right">Debit</th>
+                                        <th class="text-right">Credit</th>
+                                        <th class="text-right">Balance</th>
+                                        <th class="text-right"></th>
+                                    </thead>
+                                    <tbody id="generalLedgerTblContainer">
+                                        {{-- <tr v-if="subsidiaryAll.length == 0">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
+                                                </td>
+                                            </tr> --}}
+                                        {{--
+                                            <tr v-for="ps in processedSubsidiary"
+                                                :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                                <td v-for="p,i in ps" :class="rowStyles(p, i, ps)"
+                                                    :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}</td>
+                                            </tr> --}}
+                                        <tr v-for="(ps,i) in subsidiaryLedger"
+                                            :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+                                            {{-- <td v-for="p,i in ps" :colspan="ps.length == 2 && i==1 ? 8 : ''">@{{ p }}</td> --}}
+
+                                            <td v-if="i<=8" v-for="p,i in ps"
+                                                :class="rowStyleSubsidiaryListing(p, i, ps)"
+                                                :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                            </td>
+                                            <td v-if="ps[2]"> <!-- Check if journal_no exists -->
+
+                                                <button v-if="ps[2]" :value="`${ps[9]}`"
+                                                    class="btn btn-flat btn-sm JnalView bg-gradient-success">
+                                                    <i class="fa fa-eye"></i> View
+                                                </button>
+                                                @if (Gate::allows('manager'))
+                                                    <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                        class="btn btn-flat btn-sm JnalEdit bg-gradient-warning text-white">
+                                                        <i class="fa fa-pen text-white"></i> Edit
+                                                    </button>
+                                                @endif
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table v-if="reportType=='subsidiary_all_account'" style="table-layout: fixed;"
+                                    id="generalLedgerTbl" class="table">
+                                    <thead>
+                                        <th width="15%">Date</th>
+                                        <th>Reference</th>
+                                        <th width="26%">Preference Name</th>
+                                        <th>Source</th>
+                                        <th>Cheque Date</th>
+                                        <th>Cheque No.</th>
+                                        <th class="text-right">Debit</th>
+                                        <th class="text-right">Credit</th>
+                                        <th class="text-right">Balance</th>
+                                        <th class="text-right"></th>
+                                    </thead>
+
+                                    <tbody id="generalLedgerTblContainer">
+                                        {{-- <tr v-if="!subsidiaryAll.entries">
+                                                <td colspan="7">
+                                                    <center>No data available in table.</b>
+                                                </td>
+                                            </tr> --}}
+
+                                        <tr v-for="(ps,i) in processedSubsidiary"
+                                            :class="ps[2] == 'Total' || ps[2] == 'Net Movement' ? 'text-bold' : ''">
+
+                                            <td v-if="i<=8" v-for="p,i in ps" :class="rowStyles(p, i, ps)"
+                                                :colspan="ps.length == 2 && i == 1 ? 8 : ''">@{{ p }}
+                                            </td>
+                                            <td v-if="ps[9]"> <!-- Check if journal_no exists -->
+                                                <button v-if="ps[9]" :value="`${ps[9]}`"
+                                                    class="btn btn-flat btn-xs JnalView bg-gradient-success">
+                                                    <i class="fa fa-eye"></i> View
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                                <table v-if="reportType=='income_minus_expense'" style="table-layout: fixed;"
+                                    id="generalLedgerTbl" class="table">
+                                    <thead>
+                                        <th width="15%">Date</th>
+                                        <th>Reference</th>
+                                        <th width="26%">Particular</th>
+                                        <th>Source</th>
+                                        <th>Cheque No. </th>
+                                        <th>Cheque Date</th>
+                                        <th>Amount</th>
+                                        <th>Cumulative</th>
+                                    </thead>
+                                    <tbody id="generalLedgerTblContainer">
+                                        <tr
+                                            v-if="processedIncomeExpense.revenue.length < 1&& processedIncomeExpense.expense.length < 1">
+                                            <td colspan="7">
+                                                <center>No data available in table.</b>
+                                            </td>
+                                        </tr>
+
+                                        <tr v-if="processedIncomeExpense.revenue.length > 0">
+                                            <td><b>REVENUE</b></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                        </tr>
+                                        <tr :Class="rowStylesIncomeExpense(i)"
+                                            v-for="i in processedIncomeExpense.revenue">
+                                            <td v-for="j in i">@{{ j }}</td>
+                                        </tr>
+                                        <tr>
+                                        <tr v-if="processedIncomeExpense.revenue.length > 0">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                        </tr>
+                                        <tr v-if="processedIncomeExpense.revenue.length > 0">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                            <td></td>
+
+                                        </tr>
+
+                                        <tr v-if="processedIncomeExpense.expense.length > 0">
+                                            <td><b>EXPENSE</b></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                        </tr>
+                                        <tr :Class="rowStylesIncomeExpense(l)"
+                                            v-for="l in processedIncomeExpense.expense">
+                                            <td v-for="m in l">@{{ m }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                </section>
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteSubsidiaryModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        Are you sure you want to delete this Subsidiary?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmDeleteSubsidiary" class="btn btn-danger">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.Table -->
+            </div>
+        </div>
+        <div class="modal fade" id="journalModalView" tabindex="1" role="dialog" aria-labelledby="journalModal"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container-fluid ">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-4 frm-header">
+                                        <h4><b>Journal Entry (Preview)</b></h4>
+                                    </div>
+                                    <div class="col-md-4 frm-header">
+                                        <label class="label-bold label-sty" for="date">Journal Date</label>
+                                        <div class="input-group">
+                                            <label class="label-bold" id="vjournal_date"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 frm-header">
+                                        <label class="label-bold label-sty" for="date">Journal Reference
+                                            No</label>
+                                        <div class="input-group">
+                                            <label class="label-bold" id="voucher_ref_no"></label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="branch_id">Branch</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal text-bold" id="vjournal_branch"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="">Book
+                                                    Reference</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_book_reference"></label>
+                                                </div>
+                                                <input type="hidden" name="book_id" id="journalEntryBookId">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-xs-12">
+
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="source">Source</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_source"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="cheque_no">Cheque No</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal vjournal_cheque"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="cheque_no">Cheque
+                                                    Date</label>
+                                                <div class="input-group">
+                                                    <label class="label-bold vjournal_cheque_date"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="amount">Amount</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" style="font-size:30px;">₱ <font
+                                                            id="vjournal_amount"></font></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="payee">Payee</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_payee">Book_no</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="remarks">Remarks</label>
+                                                <div class="input-group no-margin">
+                                                    <label class="label-normal" id="vjournal_remarks"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xs-12">
+                                        <div class="box">
+                                            <div class="form-group">
+                                                <label class="label-bold label-sty" for="status">Status</label>
+                                                <div class="input-group">
+                                                    <label class="label-normal" id="vjournal_status"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="co-md-12" style="height:10px;"></div>
+                            <div class="col-md-12">
+                                <div class="co-md-12" style="height:10px;"></div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered table-sm text-center" id="tbl-create-journal">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th style="width: 10%;">Account #</th>
+                                                    <th style="width: 30%;">Account Name</th>
+                                                    <th style="width: 30%;">S/L</th>
+                                                    <th style="width: 15%;">Debit</th>
+                                                    <th style="width: 15%;">Credit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbl-create-journalview-container">
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th width="200">TOTAL</th>
+                                                    <th width="150" id="vtotal_debit">0</th>
+                                                    <th width="150" id="vtotal_credit">0</th>
+                                                </tr>
+                                                <tr>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th width="200">BALANCE</th>
+                                                    <th width="150" id="vbalance_debit">0</th>
+                                                    <th width="150" id="vcredit"></th>
+                                                </tr>
+
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" style="height:20px;"></div>
+
+
+                            </div>
+                        </div>
+                        <!-- Button trigger modal -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="journalModalEdit" tabindex="1" role="dialog" aria-labelledby="journalModalEdit"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="col-md-12">
+                                <form id="journalEntryFormEdit" method="POST">
+                                    @csrf
+                                    <input type="hidden" class="form-control form-control-sm rounded-0"
+                                        name="edit_journal_id" id="edit_journal_id" placeholder="">
+                                    <input type="hidden" name="source_page" id="source_page" value="Subsidiary Ledger">
+                                    <div class="row">
+                                        <div class="col-md-8 frm-header">
+                                            <h4><b>Journal Entry (Edit)</b></h4>
+                                        </div>
+                                        <div class="col-md-4 frm-header">
+                                            <label class="label-normal" for="date">Journal Date</label>
+                                            <div class="input-group">
+                                                <input type="date" class="form-control form-control-sm rounded-0"
+                                                    name="journal_date" id="edit_journal_date"
+                                                    placeholder="Journal Date" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_branch_id">Branch</label>
+                                                    <div class="input-group">
+                                                        <select name="edit_branch_id"
+                                                            class="select2 form-control form-control-sm"
+                                                            id="edit_branch_id" required>
+                                                            <option value="" disabled>-Select Branch-
+                                                            </option>
+                                                            <option value="1">Butuan City Branch</option>
+                                                            <option value="2">Nasipit Branch</option>
+                                                            <option value="3">Gingoog Branch</option>
+                                                            <option value="4">Head Office</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="">Book Reference</label>
+                                                    <div class="input-group">
+
+                                                        <select required name="edit_book_id"
+                                                            class="select2 form-control form-control-sm" id="edit_book_id"
+                                                            style="width: 150px;">
+                                                            <option id="edit_book_id" value="" disabled>
+                                                            </option>
+                                                            @foreach ($journalBooks as $journalBook)
+                                                                <option value="{{ $journalBook->book_id }}"
+                                                                    _count="{{ $journalBook->book_code }}-{{ sprintf('%006s', $journalBook->ccount + 1) }}"
+                                                                    book-src="{{ $journalBook->book_src }}">
+                                                                    {{ $journalBook->book_code }} -
+                                                                    {{ $journalBook->book_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="">Reference No.</label>
+                                                    <div class="input-group">
+                                                        <input type="hidden" name="edit_journal_no"
+                                                            id="edit_journal_no">
+                                                        <label class="label-normal" id="edit_LrefNo"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_source">Source</label>
+                                                    <div class="input-group">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_source" id="edit_source" placeholder="Source"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_cheque_no">Cheque No</label>
+                                                    <div class="input-group">
+                                                        <input type="Text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_cheque_no" id="edit_cheque_no"
+                                                            placeholder="Cheque No">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_cheque_date">Cheque
+                                                        Date</label>
+                                                    <div class="input-group">
+                                                        <input type="date"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_cheque_date" id="edit_cheque_date"
+                                                            placeholder="Cheque Date">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_status">Status</label>
+                                                    <div class="input-group">
+                                                        <select name="edit_status" class="form-control form-control-sm"
+                                                            id="edit_status" required>
+                                                            <option value="unposted">Unposted</option>
+                                                            <option value="posted" selected>Posted</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_amount">Amount</label>
+                                                    <div class="input-group">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_amount" id="edit_amount" step="any"
+                                                            placeholder="Amount" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_payee">Payee</label>
+                                                    <div class="input-group">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_payee" id="edit_payee" placeholder="Payee">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xs-12">
+                                            <div class="box">
+                                                <div class="form-group">
+                                                    <label class="label-normal" for="edit_remarks">Remarks (<font
+                                                            style="color:red;">Separate with double colon (::) for the
+                                                            next
+                                                            remarks</font>)</label>
+                                                    <div class="input-group">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm rounded-0"
+                                                            name="edit_remarks" id="edit_remarks" placeholder="Remarks"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button id="edit_btn_submit" style="display:none;"> UPDATE</button>
+                                </form>
+                            </div>
+                            <div class="co-md-12" style="height:10px"></div>
+                            <div class="col-md-12">
+                                <div class="col-md-12 text-right">
+                                    <button class="btn btn-flat btn-sm bg-gradient-success" id="add_item">
+                                        <i class="fa fa-plus"></i>Add Details </button>
+                                </div>
+                                <div class="co-md-12" style="height:10px;"></div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered table-sm text-center"
+                                            id="tbl-create-journal-container" style="table-layout: fixed;">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th style="width: 10%;">Account #</th>
+                                                    <th style="width: 30%;">Account Name</th>
+                                                    <th style="width: 15%;">Debit</th>
+                                                    <th style="width: 15%;">Credit</th>
+                                                    <th style="width: 30%;">S/L</th>
+                                                    <th style="width: 5%;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbl-create-edit-container">
+
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="text-center">
+                                                    <th></th>
+                                                    <th>TOTAL</th>
+                                                    <th width="150">₱<span id="edit_total_debit">0.00</span></th>
+                                                    <th width="150">₱<span id="edit_total_credit">0.00</span></th>
+                                                    <th></th>
+                                                    <th class="text-right" width="50"></th>
+                                                </tr>
+                                                <tr class="text-center">
+                                                    <th></th>
+                                                    <th>BALANCE</th>
+                                                    <th>₱<span id="edit_balance_debit">0.00</span></th>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th class="text-right" width="50"></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-right">
+                                <button class="btn btn-flat btn-sm bg-gradient-success"
+                                    onclick="$('#edit_btn_submit').click()"> UPDATE JOURNAL</button>
+                            </div>
+                            <!-- Button trigger modal -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+        </div>
+    </section>
+    <!-- /.content -->
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}"></script>
+    <script>
+        window.app = new Vue({
+            el: '#app',
+            data: {
+                subsidiary: {
+                    sub_name: '',
+                    sub_cat_id: '',
+                    sub_code: '',
+                    sub_address: '',
+                    sub_per_branch: '',
+                    sub_amount: null,
+                    sub_tel: '',
+                },
+                balance: '',
+                branches: [],
+                reportType: '',
+                filter: {
+                    subsidiary_id: '',
+                    branch_id: '',
+                    from: '',
+                    to: '',
+                    asof: new Date().toISOString().split('T')[0],
+                    account_id: 'all',
+                    type: ''
+                },
+                incomeExpense: {
+                    income: [],
+                    expense: []
+                },
+                incomeStatementSummary: {},
+                subsidiaryAll: [],
+                subsidiarySummary: [],
+                balance: 0,
+                url: "{{ route('reports.subsidiary-ledger') }}",
+                isEdit: false,
+            },
+            methods: {
+                show(event) {
+                    this.isEdit = true;
+                    const value = event.target.dataset.value;
+                    axios.get('/subsidiary/' + value, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        })
+                        .then(response => {
+                            this.subsidiary = response.data.data
+                            document.getElementById('sub_id').value = this.subsidiary.sub_id;
+                            this.$nextTick(() => {
+                                $('#sub_cat_id').val(this.subsidiary.sub_cat_id).trigger('change');
+                                $('#sub_per_branch').val(this.subsidiary.sub_per_branch).trigger('change');
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                },
+                resetForm() {
+                    this.isEdit = false;
+                    this.subsidiary = {
+                        sub_code: '',
+                        sub_name: '',
+                        sub_address: '',
+                        sub_tel: '',
+                        sub_cat_id: '',
+                        sub_per_branch: '',
+                        sub_amount: ''
+                    };
+                    this.clearSelect2Values();
+                },
+                cancelEdit() {
+                    this.resetForm();
+                    $('#subsidiaryForm').trigger('reset');
+                    $('[name="sub_id"]').val('');
+                },
+                clearSelect2Values() {
+                    $('#sub_cat_id').val('').trigger('change');
+                    $('#sub_per_branch').val('').trigger('change');
+                },
+                getCurrentDate() {
+                    const date = new Date();
+                    const year = date.getFullYear();
+                    const month = ("0" + (date.getMonth() + 1)).slice(-2); // Ensure month is two digits
+                    const day = ("0" + date.getDate()).slice(-2); // Ensure day is two digits
+                    return `${year}-${month}-${day}`; // Return in 'yyyy-mm-dd' format
+                },
+
+                submitForm: function() {
+                    this.filter.account_id = $('#subsidiaryFilterAccountTitle').find(':selected').val()
+                    this.filter.subsidiary_id = $('#subsidiaryDD').find(':selected').val()
+                    if (this.reportType == 'income_minus_expense') {
+                        this.fetchIncomeExpense();
+                    } else {
+                        this.fetchSubAll();
+                    }
+                },
+                fetchSubAll: function() {
+                    this.filter.type = this.reportType;
+                    axios.post(this.url, this.filter, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        })
+                        .then(response => {
+                            if (this.reportType == 'subsidiary-ledger-listing-report') {
+                                this.subsidiaryAll = response.data.data;
+                                this.balance = response.data.balance;
+                            } else if (this.reportType == 'subsidiary-ledger-summary-report') {
+                                this.subsidiarySummary = response.data.data;
+                                this.balance = response.data.balance;
+                            } else if (this.reportType == 'income_minus_expense_summary') {
+                                this.incomeStatementSummary = response.data.incomeStatement;
+                            } else {
+                                this.subsidiaryAll = response.data.data[0];
+                                let bal = response.data.data[1];
+                                this.balance = parseFloat(bal);
+                            }
+
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                },
+                fetchIncomeExpense: function() {
+                    var data = {
+                        subsidiary_id: this.filter.subsidiary_id,
+                        date_from: this.filter.from,
+                        date_to: this.filter.to,
+                        type: this.reportType
+                    };
+                    axios.post(this.url, data, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            }
+                        })
+                        .then(response => {
+                            this.incomeExpense = response.data.data;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                },
+                rowStyles: function(p, i, r) {
+                    var style = '';
+                    if (i >= 6) {
+                        style += 'text-right';
+                    }
+                    if (i == 0 && !r[1].length) {
+                        style += ' text-bold';
+                    }
+                    return style;
+                },
+                rowStyleSubsidiaryListing: function(p, i, r) {
+                    var style = '';
+                    if (i >= 6) {
+                        style += 'text-right';
+                    }
+                    if (i == 0) {
+                        style += ' text-bold';
+                    }
+                    return style;
+                },
+                rowStyleSubsidiarySummary: function(p, i, r) {
+                    var style = '';
+                    if (i >= 2) {
+                        style += 'text-right';
+                    }
+                    if (i == 0) {
+                        style += ' text-bold';
+                    }
+                    return style;
+                },
+                rowStylesIncomeExpense: function(row) {
+                    if (row[0].length && !row[1].length) {
+                        return 'text-bold';
+                    }
+                    if (!row[0].length && (row[6].length || row[7].length)) {
+                        return 'text-bold';
+                    }
+                    return '';
+                },
+                formatCurrency: function(number) {
+                    const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                    });
+
+                    return formatter.format(number);
+                },
+                titleCase: function(str) {
+                    return str.replace(/\w\S*/g, function(txt) {
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                },
+            },
+            computed: {
+                processedSubsidiary: function() {
+                    var entries = {};
+                    var rows = [];
+                    if (this.subsidiaryAll) {
+                        entries = this.subsidiaryAll.entries;
+
+                    }
+                    for (var i in entries) {
+                        var entry = entries[i];
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+                        var netMovement = 0;
+                        rows.push([entry.account_number + ' - ' + entry.account_name ? entry.account_name
+                            .toUpperCase() : '' + ':', '', '', '', '', '', '', '', this.formatCurrency(
+                                entries[i].opening_balance)
+                        ]);
+                        for (var d in entry.data) {
+                            var data = entry.data[d];
+                            totalCredit += parseFloat(data.credit);
+                            totalDebit += parseFloat(data.debit);
+                            var row = [data.journal_date,
+                                data.journal_no,
+                                data.sub_name,
+                                data.source,
+                                data.cheque_date,
+                                data.cheque_no,
+                                data.debit != 0 ? this.formatCurrency(data.debit) : '',
+                                data.credit != 0 ? this.formatCurrency(data.credit) : '',
+                                data.balance ? this.formatCurrency(data.balance) : '0.00',
+                                data.journal_id
+                            ];
+                            rows.push(row);
+
+                            if (this.reportType == 'subsidiary_per_account') {
+                                data.payee != null ? rows.push(['', 'PAYEE: ' + data.payee]) : rows.push(['',
+                                    'PAYEE: NONE'
+                                ])
+                                rows.push(['', data.remarks ? data.remarks.toUpperCase() : ''])
+                            }
+                        }
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', '0.00'])
+                    }
+                    return rows;
+
+                },
+                subsidiaryLedger: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                    }
+
+
+                    let currentBalance = this.balance;
+
+
+                    for (var i in data) {
+                        var result = data[i];
+                        rows.push([result.branch_name, '', '', '', '', '', '', '', '']);
+                        rows.push([result.account_name, '', '', '', '', '', '', '', this.formatCurrency(this
+                            .balance)]);
+
+                        var entries = result.entries;
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+                        var netMovement = 0;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var count = entries.length;
+                            const credit = parseFloat(entry.credit.replace(/,/g, ""));
+                            const debit = parseFloat(entry.debit.replace(/,/g, ""));
+                            totalCredit += credit
+                            totalDebit += debit;
+                            if (entry.to_increase == 'debit') {
+                                currentBalance += debit;
+                                currentBalance -= credit;
+                            } else {
+                                currentBalance += credit;
+                                currentBalance -= debit;
+                            }
+                            var arr = [
+                                entry.journal_date,
+                                entry.journal_no,
+                                entry.sub_name,
+                                entry.source,
+                                entry.cheque_date,
+                                entry.cheque_no,
+                                entry.debit,
+                                entry.credit,
+                                this.formatCurrency(currentBalance),
+                                entry.journal_id
+                            ];
+
+                            rows.push(arr);
+
+                        }
+
+
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        if (arr) {
+                            rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
+                                parseFloat(
+                                    arr[8].replace(/,/g, "")))])
+
+                        }
+
+                    }
+
+
+                    return rows;
+                },
+                subledger: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                    }
+
+                    for (var i in data) {
+                        var subsidiary = data[i];
+                        rows.push([subsidiary.sub_code + ' - ' + subsidiary.sub_name, '', '', '', '', '', '',
+                            '', this.formatCurrency(this.balance)
+                        ]);
+
+                        var entries = subsidiary.entries;
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+                        var netMovement = 0;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var detailsList = entry.data;
+                            var count = entry.data.length;
+
+                            for (var h in detailsList) {
+
+
+                                var details = detailsList[h];
+                                totalCredit += parseFloat(details.credit);
+                                totalDebit += parseFloat(details.debit);
+
+                                var arr = [
+                                    details.journal_date,
+                                    details.journal_no,
+                                    details.sub_name,
+                                    details.source,
+                                    details.cheque_date,
+                                    details.cheque_no,
+                                    details.debit != 0 ? this.formatCurrency(details.debit) : '',
+                                    details.credit != 0 ? this.formatCurrency(details.credit) : '',
+                                    details.balance ? this.formatCurrency(details.balance) : '0.00',
+                                    details.journal_id
+                                ];
+                                if (count == parseInt(h) + 1) {
+                                    netMovement = details.balance;
+                                }
+                                rows.push(arr);
+                            }
+                        }
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', this.formatCurrency(
+                            netMovement)])
+                    }
+
+
+                    return rows;
+                },
+                listing: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        data = this.subsidiaryAll;
+                    }
+                    for (var i in data) {
+                        var subsidiary = data[i];
+
+                        rows.push([subsidiary.sub_code + ' - ' + subsidiary.sub_name]);
+
+                        var entries = subsidiary.entries;
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var detailsList = entry.data;
+
+
+                            for (var h in detailsList) {
+                                var details = detailsList[h];
+                                totalCredit += parseFloat(details.credit);
+                                totalDebit += parseFloat(details.debit);
+
+                                var arr = [
+                                    details.journal_date,
+                                    details.journal_no,
+                                    details.sub_name,
+                                    details.source,
+                                    details.cheque_date,
+                                    details.cheque_no,
+                                    details.debit != 0 ? this.formatCurrency(details.debit) : '',
+                                    details.credit != 0 ? this.formatCurrency(details.credit) : '',
+                                    details.balance ? this.formatCurrency(details.balance) : '0.00'
+                                ];
+
+                                // Push the unique row to rows
+                                rows.push(arr);
+                            }
+                        }
+                    }
+
+                    return rows;
+                },
+                summary: function() {
+                    var data = {};
+                    var rows = [];
+
+                    if (this.subsidiarySummary) {
+                        data = this.subsidiarySummary;
+                    }
+
+
+                    var grandTotal = 0;
+                    var grandTotalCredit = 0;
+                    var grandTotalDebit = 0;
+                    var grandTotalBalance = 0;
+
+                    for (var i in data) {
+                        var subsidiary = data[i];
+
+                        var entries = subsidiary.entries;
+                        var totalBalance = 0;
+                        for (var d in entries) {
+                            var entry = entries[d];
+                            var detailsList = entry.data;
+                            var totalCredit = 0;
+                            var totalDebit = 0;
+                            for (var h in detailsList) {
+                                var details = detailsList[h];
+                                totalCredit += parseFloat(details.credit);
+                                totalDebit += parseFloat(details.debit);
+                                totalBalance = details.balance;
+                            }
+                        }
+
+                        rows.push([
+                            subsidiary.sub_code,
+                            subsidiary.sub_name,
+                            this.formatCurrency(totalDebit),
+                            this.formatCurrency(totalCredit),
+                            this.formatCurrency(totalBalance)
+                        ]);
+                        grandTotalDebit += totalDebit;
+                        grandTotalCredit += totalCredit;
+                        grandTotalBalance += totalBalance;
+
+                    }
+                    rows.push(['Grand Total', '', this.formatCurrency(grandTotalDebit), this.formatCurrency(
+                            grandTotalCredit),
+                        this.formatCurrency(grandTotalBalance)
+                    ]);
+
+                    return rows;
+                },
+                processedSubsidiaryListing: function() {
+                    var subsidiaries = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        if (this.subsidiaryAll) {
+                            subsidiaries = this.subsidiaryAll;
+                        }
+                    }
+                    for (var i in subsidiaries) {
+                        var subsidiary = subsidiaries[i];
+                        var entry = subsidiaries[i];
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+                        rows.push([subsidiary.sub_code + ' - ' + subsidiary.sub_name]);
+                        for (var d in subsidiary) {
+                            var entries = subsidiary.entries;
+                            for (k in entries) {
+                                var entry = entries[k];
+                                for (j in entry.data) {
+                                    var detail = entry.data[j];
+                                    totalCredit += parseFloat(detail.credit);
+                                    totalDebit += parseFloat(detail.debit);
+                                    var row = [detail.journal_date,
+                                        detail.journal_no,
+                                        detail.sub_name,
+                                        detail.source,
+                                        detail.cheque_date,
+                                        detail.cheque_no,
+                                        detail.debit != 0 ? this.formatCurrency(detail.debit) : '',
+                                        detail.credit != 0 ? this.formatCurrency(detail.credit) :
+                                        '',
+                                        detail.balance ? this.formatCurrency(detail.balance) :
+                                        '0.00'
+                                    ];
+                                    rows.push(row);
+                                    if (this.reportType == 'subsidiary_per_account') {
+                                        data.payee != null ? rows.push(['', 'PAYEE: ' + data.payee]) :
+                                            rows
+                                            .push([
+                                                '',
+                                                'PAYEE: NONE'
+                                            ])
+                                        rows.push(['', data.remarks ? data.remarks.toUpperCase() : ''])
+                                    }
+                                }
+
+                            }
+
+                        }
+                        rows.push(['', '', 'Total', '', '', '', totalDebit != 0 ? this.formatCurrency(
+                                totalDebit) : '',
+                            totalCredit != 0 ? this.formatCurrency(totalCredit) : '',
+                            ''
+                        ]);
+                        rows.push(['', '', 'Net Movement', '', '', '', '', '', '0.00'])
+                    }
+                    return rows;
+                },
+                processedSubsidiarySummary: function() {
+                    var subsidiaries = {};
+                    var rows = [];
+
+                    if (this.subsidiaryAll) {
+                        if (this.subsidiaryAll) {
+                            subsidiaries = this.subsidiaryAll;
+                        }
+                    }
+                    var grandTotalDebit = 0;
+                    var grandTotalCredit = 0;
+                    for (var i in subsidiaries) {
+
+                        var subsidiary = subsidiaries[i];
+                        var entry = subsidiaries[i];
+                        var totalCredit = 0;
+                        var totalDebit = 0;
+
+                        for (var d in subsidiary) {
+
+                            var entries = subsidiary.entries;
+
+                            for (k in entries) {
+                                var entry = entries[k];
+                                for (j in entry.data) {
+                                    var detail = entry.data[j];
+                                    totalCredit += parseFloat(detail.credit);
+                                    totalDebit += parseFloat(detail.debit);
+
+
+
+                                }
+
+                            }
+
+
+                        }
+
+                        rows.push([subsidiary.sub_code, subsidiary.sub_name, totalDebit, totalCredit,
+                            totalDebit - totalCredit
+                        ]);
+                        grandTotalDebit += totalDebit;
+                        grandTotalCredit += totalCredit
+                    }
+
+                    rows.push(['Grand Total', '', grandTotalDebit != 0 ? this.formatCurrency(
+                            grandTotalDebit) : '',
+                        grandTotalCredit != 0 ? this.formatCurrency(grandTotalCredit) : '',
+                        grandTotalDebit - grandTotalCredit
+                    ]);
+
+                    return rows;
+                },
+                processedIncomeExpense: function() {
+                    var result = {
+                        revenue: [],
+                        expense: []
+                    }
+
+                    var cumulativeRevenue = 0;
+                    var cumulativeExpense = 0;
+                    var grandTotalRevenue = 0;
+                    var grandTotalExpense = 0;
+                    var amount = 0;
+
+
+                    if (this.incomeExpense.revenue) {
+                        this.incomeExpense.revenue.forEach(revenue => {
+                            result.revenue.push([revenue.account_name, '', '', '', '', '', '', ''])
+                            var totalAmount = 0;
+                            revenue.entries.forEach(entry => {
+                                var row = [];
+                                // var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                amount = entry.credit - entry.debit;
+                                totalAmount += parseFloat(amount);
+                                cumulativeRevenue += parseFloat(amount);
+
+                                row.push(entry.journal_date);
+                                row.push(entry.journal_no);
+                                row.push(entry.subsidiary_name);
+                                row.push(entry.source);
+                                row.push(entry.cheque_date);
+                                row.push(entry.cheque_no);
+
+                                row.push(this.formatCurrency(amount));
+                                row.push(this.formatCurrency(cumulativeRevenue));
+                                result.revenue.push(row);
+                            });
+                            grandTotalRevenue += totalAmount;
+
+                            if (revenue.entries.length) {
+                                result.revenue.push(['', '', '', '', '', '', this.formatCurrency(
+                                    totalAmount), this.formatCurrency(
+                                    cumulativeRevenue)])
+                                //  result.revenue.push(['', '', '', '', '', '', '', '0.00'])
+                            }
+                        });
+
+                        if (grandTotalRevenue > 0) {
+                            result.revenue.push(['GRAND TOTAL REVENUE', '', '', '', '', '', this.formatCurrency(
+                                grandTotalRevenue), this.formatCurrency(cumulativeRevenue)]);
+                        }
+                    }
+                    if (this.incomeExpense.expense) {
+                        this.incomeExpense.expense.forEach(expense => {
+                            result.expense.push([expense.account_name, '', '', '', '', '', '', ''])
+                            var totalAmount = 0;
+
+                            expense.entries.forEach(entry => {
+                                var row = [];
+                                var amount = entry.credit == 0 ? entry.debit : entry.credit;
+                                totalAmount += parseFloat(amount);
+                                cumulativeExpense += parseFloat(amount);
+
+                                row.push(entry.journal_date);
+                                row.push(entry.journal_no);
+                                row.push(entry.subsidiary_name);
+                                row.push(entry.source);
+                                row.push(entry.cheque_date);
+                                row.push(entry.cheque_no);
+                                row.push(this.formatCurrency(amount));
+                                row.push(this.formatCurrency(cumulativeExpense));
+                                result.expense.push(row);
+                            });
+                            grandTotalExpense += totalAmount;
+
+                            if (expense.entries.length) {
+                                result.expense.push(['', '', '', '', '', '', this.formatCurrency(
+                                    totalAmount), ''])
+                                // result.expense.push(['', '', '', '', '', '', '', '0.00'])
+                            }
+
+                        });
+
+                        if (grandTotalExpense > 0) {
+                            result.expense.push(['GRAND TOTAL EXPENSE', '', '', '', '', '', this.formatCurrency(
+                                grandTotalExpense), this.formatCurrency(cumulativeExpense)]);
+                        }
+                    }
+
+                    var netTotal = grandTotalRevenue - grandTotalExpense;
+                    result.expense.push(['REVENUE MINUS EXPENSE', '', '', '', '', '', this.formatCurrency(
+                        netTotal)]);
+                    return result;
+                }
+            },
+            mounted() {
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        // Use namespaced events to avoid conflicts
+                        $(document).on('reportTypeChanged.subsidiaryReport', (event, value) => {
+                            this.reportType = value;
+                        });
+                        
+                        $(document).on('subCatChanged.subsidiaryReport', (event, value) => {
+                            this.subsidiary.sub_cat_id = value;
+                        });
+                        
+                        $(document).on('subBranchChanged.subsidiaryReport', (event, value) => {
+                            this.subsidiary.sub_per_branch = value;
+                        });
+                    }, 100);
+                });
+            },
+            beforeDestroy() {
+                $(document).off('.subsidiaryReport');
+                
+                if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
+                    $('#subsidiaryledgerTbl').DataTable().destroy();
+                }
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            if ($('#reportType').length === 0) {
+                return;
+            }
+            
+            if ($.fn.select2) {
+                $('#reportType, #sub_cat_id, #sub_per_branch').each(function() {
+                    if ($(this).hasClass('select2-hidden-accessible')) {
+                        $(this).select2('destroy');
+                    }
+                });
+            }
+            
+            $('#reportType').select2({
+                placeholder: "Select Report Type",
+                allowClear: true,
+                width: '100%'
+            });
+            
+            $('#sub_cat_id').select2({
+                placeholder: "Select Category",
+                allowClear: true,
+                width: '100%'
+            });
+            
+            $('#sub_per_branch').select2({
+                placeholder: "Select Branch",
+                allowClear: true,
+                width: '100%'
+            });
+            
+            setTimeout(function() {
+                $('#reportType').on('change.subsidiaryReport', function() {
+                    $(document).trigger('reportTypeChanged', [$(this).val()]);
+                });
+                
+                $('#sub_cat_id').on('change.subsidiaryReport', function() {
+                    $(document).trigger('subCatChanged', [$(this).val()]);
+                });
+                
+                $('#sub_per_branch').on('change.subsidiaryReport', function() {
+                    $(document).trigger('subBranchChanged', [$(this).val()]);
+                });
+            }, 500);
+            
+            $('#reportType').on('change.subsidiaryReport', function() {
+                var reportType = $(this).val();
+                
+                if ($('#subsidiaryledgerTbl').length === 0) {
+                    return;
+                }
+                
+                if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
+                    $('#subsidiaryledgerTbl').DataTable().destroy();
+                }
+                
+                if (reportType === '') {
+                    setTimeout(function() {
+                        if ($('#subsidiaryledgerTbl').length) {
+                            $('#subsidiaryledgerTbl').DataTable({
+                                "searching": true,
+                                "destroy": true
+                            });
+                        }
+                    }, 100);
+                }
+            });
+            
+            $(window).on('beforeunload.subsidiaryReport', function() {
+                $(document).off('.subsidiaryReport');
+                $('#reportType, #sub_cat_id, #sub_per_branch').off('.subsidiaryReport');
+                
+                if ($.fn.DataTable.isDataTable('#subsidiaryledgerTbl')) {
+                    $('#subsidiaryledgerTbl').DataTable().destroy();
+                }
+            });
+        });
+    </script>
+@endsection
+
+
+@section('footer-scripts')
+    <script src="{{ asset('js/xlsx.full.min.js') }}"></script>
+    @include('scripts.reports.reports')
+    @include('scripts.journal.journal')
+@endsection
