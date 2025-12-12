@@ -888,7 +888,7 @@
                                             <label class="label-normal" for="date">Journal Date</label>
                                             <div class="input-group">
                                                 <input type="date" class="form-control form-control-sm rounded-0"
-                                                    name="edit_journal_date" id="edit_journal_date"
+                                                    name="  journal_date" id="edit_journal_date"
                                                     placeholder="Journal Date" required>
                                             </div>
                                         </div>
