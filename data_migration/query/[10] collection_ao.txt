@@ -1,0 +1,44 @@
+TRUNCATE TABLE collection_ao;
+INSERT INTO collection_ao ( collection_id, representative, grp, note, total ) (
+	SELECT
+		collection_id,
+		representative,
+		grp,
+		note,
+		total 
+	FROM
+		(
+		SELECT
+			cb.collection_id AS "collection_id",
+			glc.AO1 AS "representative",
+			"account officer" AS "grp",
+			"note" AS "note",
+			glc.AOP1 AS "total" 
+		FROM
+			collection_breakdown cb
+			JOIN glcash glc ON cb.branch_id = ( SELECT branch_id FROM branch WHERE branch_code = glc.PER_CODE ) 
+			AND cb.transaction_date = glc.BLOTTER_D UNION ALL
+		SELECT
+			cb.collection_id AS "collection_id",
+			glc.AO2 AS "representative",
+			"account officer" AS "grp",
+			"note" AS "note",
+			glc.AOP2 AS "total" 
+		FROM
+			collection_breakdown cb
+			JOIN glcash glc ON cb.branch_id = ( SELECT branch_id FROM branch WHERE branch_code = glc.PER_CODE ) 
+			AND cb.transaction_date = glc.BLOTTER_D UNION ALL
+		SELECT
+			cb.collection_id AS "collection_id",
+			glc.AO3 AS "representative",
+			"account officer" AS "grp",
+			"note" AS "note",
+			glc.AOP3 AS "total" 
+		FROM
+			collection_breakdown cb
+			JOIN glcash glc ON cb.branch_id = ( SELECT branch_id FROM branch WHERE branch_code = glc.PER_CODE ) 
+			AND cb.transaction_date = glc.BLOTTER_D 
+		ORDER BY
+			collection_id 
+		) src 
+	)

@@ -1,0 +1,14 @@
+TRUNCATE TABLE journal_entry_details;
+INSERT INTO journal_entry_details ( journal_id, account_id, subsidiary_id, journal_details_account_no, journal_details_title, journal_details_debit, journal_details_credit, journal_details_ref_no ) (
+	SELECT
+		( SELECT journal_id FROM journal_entry WHERE book_id = ( SELECT book_id FROM journal_book WHERE book_code = glj.BOOK_CODE ) AND ref_no = glj.REF_NO ) AS "journal_id",
+		( SELECT account_id FROM chart_of_accounts WHERE account_number = glj.ACCT_NO ) AS "account_id",
+		( SELECT sub_id FROM subsidiary WHERE sub_code = glj.PER_CODE ) AS "subsidiary_id",
+		glj.ACCT_NO AS "journal_details_account_no",
+		glj.TITLE AS "journal_details_title",
+		glj.DEBIT AS "journal_details_debit",
+		glj.CREDIT AS "journal_details_credit",
+		glj.REF_NO AS "journal_details_ref_no" 
+	FROM
+	gljour glj 
+	);

@@ -1,0 +1,142 @@
+@media print {
+    .no-print {
+        display: none;
+    }
+}
+
+.loading-overlay {
+    /* Position and size for a full-screen overlay */
+    position: fixed;
+    /* or absolute, if confined to a specific element */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* Visual styling */
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Semi-transparent white */
+    z-index: 1000;
+    /* Ensure it's on top of other elements */
+
+    /* Center content */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Example simple spinner (you'd typically use a more complex CSS animation) */
+.spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #2ce68f;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    animation: spin 1s linear infinite;
+    margin-top: 10px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* forms */
+.label-normal {
+    font-weight: 500 !important;
+}
+
+div.dataTables_wrapper div.dataTables_filter {
+    text-align: left !important;
+}
+
+.hide {
+    display: none !important;
+}
+
+.label-normal-fade {
+    font-weight: 500 !important;
+    color: #ccc;
+}
+
+.spacer-sm {
+    margin-top: 10px;
+}
+
+/* chart of accounts */
+.coa-action {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    border: none;
+}
+
+table tr td {
+    vertical-align: middle !important;
+}
+
+#faq .card {
+    margin-bottom: 0;
+    /* border: 0; */
+    box-shadow: none;
+    border-bottom: 1px solid #ddd;
+}
+
+#faq .card .card-header {
+    border: 0;
+    -webkit-box-shadow: 0 0 20px 0 rgba(213, 213, 213, 0.5);
+    box-shadow: 0 0 20px 0 rgba(213, 213, 213, 0.5);
+    border-radius: 2px;
+    padding: 0;
+}
+
+#faq .card .card-header .btn-header-link {
+    color: #222;
+    display: block;
+    text-align: left;
+    background: #f9f9f9;
+    color: #222;
+    padding: 20px;
+}
+
+#faq .card .card-header .btn-header-link .arrow {
+    content: "\f107";
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    display: none;
+    /* background: #FFE472; */
+    /* float: right; */
+}
+
+#faq .card .card-header .btn-header-link.collapsed {
+    background: #FFF;
+    color: #222;
+}
+
+#faq .card .card-header .btn-header-link.collapsed .arrow {
+    display: block;
+}
+
+#faq .card .card-header .btn-header-link.collapsed .arrow2 {
+    display: none;
+}
+
+#faq .card .collapsing {
+    background: #f9f9f9;
+    line-height: 30px;
+}
+
+#faq .card .collapse {
+    border: 0;
+}
+
+#faq .card .collapse.show {
+    background: #f9f9f9;
+    line-height: 30px;
+    color: #222;
+}

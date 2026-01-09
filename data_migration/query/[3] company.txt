@@ -1,0 +1,12 @@
+TRUNCATE TABLE company;
+TRUNCATE TABLE company_address;
+INSERT INTO company ( company_name ) ( SELECT COMPANY AS "company_name" FROM glsys );
+INSERT INTO company_address ( company_id, street, city, zip_code ) (
+	SELECT
+		LAST_INSERT_ID() AS "company_id",
+		ADDRESS AS "street",
+		CITY AS "city",
+		ZIP_CODE AS "zip" 
+	FROM
+	glsys 
+	)

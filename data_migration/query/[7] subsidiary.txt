@@ -1,0 +1,20 @@
+TRUNCATE TABLE subsidiary;
+INSERT INTO subsidiary ( sub_cat_id, sub_code, sub_name, sub_address, sub_tel, sub_acct_no, sub_per_branch, -- 	sub_life_used, ?
+	sub_date, sub_amount, sub_no_depre, sub_no_amort, sub_salvage, sub_date_post ) (
+	SELECT
+		( SELECT sub_cat_id FROM subsidiary_category sc WHERE g.CAT_CODE = sc.sub_cat_code ) AS "sub_cat_id",
+		PER_CODE AS "sub_code",
+		PER_NAME AS "sub_name",
+		PER_ADDR AS "sub_address",
+		PER_TEL AS "sub_tel",
+		ACCT_NO AS "sub_acct_no",
+		PER_BRNCH AS "sub_per_branch",
+		DATE AS "sub_date",
+		AMOUNT AS "sub_amount",
+		NO_AMORT AS "sub_no_amort",
+		NO_DEPRE AS "sub_no_depre",
+		SALVAGE AS "sub_salvage",
+		DATE_POST AS "sub_date_post" 
+	FROM
+	glper g 
+	)

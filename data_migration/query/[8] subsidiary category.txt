@@ -1,0 +1,8 @@
+TRUNCATE TABLE subsidiary_category;
+INSERT INTO subsidiary_category ( sub_cat_code, sub_cat_name ) (
+	SELECT
+		CAT_CODE AS "sub_cat_code",
+		CAT_NAME AS "sub_cat_name" 
+	FROM
+	glcat1 
+	)
